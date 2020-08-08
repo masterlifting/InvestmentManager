@@ -1,0 +1,21 @@
+﻿@model IEnumerable<PriceComponentModel>
+
+@foreach (var i in Model)
+{
+    <div class="row mb-1 mb-lg-2">
+        <div class="col-12 col-lg-6 text-center text-lg-left bg-secondary rounded-pill pl-lg-5 hover">
+            <div class="row" onclick="GetChart(@i.CompanyId,'priceDiagramm_')">
+                <div class="col-8">@i.CompanyName</div>
+                <div class="col-4"><span class="badge badge-success badge-pill"><em>@i.RecommendationPrice</em></span> @i.CurrencyType</div>
+            </div>
+        </div>
+        <div class="col-3 col-lg-1 text-right small">@i.CurrentPrice @i.CurrencyType</div>
+        <div class="col-3 col-lg-1 text-right small">@i.DateUpdate</div>
+        <div class="col-3 col-lg-2 text-center small">@i.MinPrice @i.CurrencyType</div>
+        <div class="col-3 col-lg-2 text-center small">@i.MaxPrice @i.CurrencyType</div>
+    </div>
+    <div class="row justify-content-center">
+        <div id="priceDiagramm_@i.CompanyId">
+        </div>
+    </div>
+}

@@ -1,0 +1,166 @@
+﻿@model IEnumerable<BrokerReportModel>
+
+<div class="container mt-3">
+    <div class="row">
+        <div class="col text-right">
+            <a class="btn btn-danger" asp-controller="portfolio" asp-action="@nameof(PortfolioController.ShowErrorReports)">Далее</a>
+        </div>
+    </div>
+    @foreach (var i in Model)
+    {
+        <div class="row mb-2 font-weight-bold" style="color:goldenrod">
+            <div class="offset-1 col-8">@i.AccountId</div>
+            <div class="col-3 text-right">@i.DateBeginReport.ToShortDateString()-@i.DateEndReport.ToShortDateString()</div>
+        </div>
+        @*Account*@
+        @if (i.AccountTransactions.Any())
+        {
+            <div class="container border border-light rounded mb-3 p-1">
+                <div class="row">
+                    <div class="col text-primary h-25 text-monospace text-right pr-5 font-weight-bold">операции по счету</div>
+                </div>
+                <div class="row font-weight-bold text-monospace text-muted">
+                    <div class="col-lg-3">Дата</div>
+                    <div class="col-lg-3">Статус</div>
+                    <div class="col-lg-3">Сумма</div>
+                    <div class="col-lg-3">Валюта</div>
+                </div>
+                @foreach (var j in i.AccountTransactions)
+                {
+                    if (j.TransactionStatus.Equals("Пополнение"))
+                    {
+                        <div class="row font-italic text-danger">
+                            <div class="col-lg-3">@j.DateOperation</div>
+                            <div class="col-lg-3">@j.TransactionStatus</div>
+                            <div class="col-lg-3">@j.Amount</div>
+                            <div class="col-lg-3">@j.Currency</div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="row font-italic text-success">
+                            <div class="col-lg-3">@j.DateOperation</div>
+                            <div class="col-lg-3">@j.TransactionStatus</div>
+                            <div class="col-lg-3">@j.Amount</div>
+                            <div class="col-lg-3">@j.Currency</div>
+                        </div>
+                    }
+                }
+            </div>
+        }
+        @*Dividend*@
+        @if (i.Dividends.Any())
+        {
+            <div class="container border border-light rounded mb-3 p-1">
+                <div class="row">
+                    <div class="col text-success h-25 text-monospace text-right pr-5 font-weight-bold">дивиденды</div>
+                </div>
+                <div class="row font-weight-bold text-monospace text-muted">
+                    <div class="col-lg-1">Дата</div>
+                    <div class="col-lg-7">Компания</div>
+                    <div class="col-lg-2">Сумма</div>
+                    <div class="col-lg-2">Валюта</div>
+                </div>
+                @foreach (var j in i.Dividends)
+                {
+                    <div class="row font-italic text-success">
+                        <div class="col-lg-1">@j.DateOperation</div>
+                        <div class="col-lg-7">@j.CompanyName</div>
+                        <div class="col-lg-2">@j.Amount</div>
+                        <div class="col-lg-2">@j.Currency</div>
+                    </div>
+                }
+            </div>
+        }
+        @*Stock*@
+        @if (i.StockTransactions.Any())
+        {
+            <div class="container border border-light rounded mb-3 p-1">
+                <div class="row">
+                    <div class="col text-info h-25 text-monospace text-right pr-5 font-weight-bold">операции с акциями</div>
+                </div>
+                <div class="row font-weight-bold text-monospace text-muted">
+                    <div class="col-lg-1">Дата</div>
+                    <div class="col-lg-2">Компания</div>
+                    <div class="col-lg-2">Статус</div>
+                    <div class="col-lg-2">Количество</div>
+                    <div class="col-lg-3">Цена</div>
+                    <div class="col-lg-2">Валюта</div>
+                </div>
+                @foreach (var j in i.StockTransactions)
+                {
+                    if (j.TransactionStatus.Equals("Покупка"))
+                    {
+                        <div class="row font-italic text-danger">
+                            <div class="col-lg-1">@j.DateOperation</div>
+                            <div class="col-lg-2">@j.Ticker</div>
+                            <div class="col-lg-2">@j.TransactionStatus</div>
+                            <div class="col-lg-2">@j.Quantity</div>
+                            <div class="col-lg-3">@j.Cost</div>
+                            <div class="col-lg-2">@j.Currency</div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="row font-italic text-success">
+                            <div class="col-lg-1">@j.DateOperation</div>
+                            <div class="col-lg-2">@j.Ticker</div>
+                            <div class="col-lg-2">@j.TransactionStatus</div>
+                            <div class="col-lg-2">@j.Quantity</div>
+                            <div class="col-lg-3">@j.Cost</div>
+                            <div class="col-lg-2">@j.Currency</div>
+                        </div>
+                    }
+                }
+            </div>
+        }
+        @*Comission*@
+        @if (i.Comissions.Any())
+        {
+            <div class="container border border-light rounded mb-3 p-1">
+                <div class="row">
+                    <div class="col text-danger h-25 text-monospace text-right pr-5 font-weight-bold">комиссии</div>
+                </div>
+                <div class="row font-weight-bold text-monospace text-muted">
+                    <div class="col-lg-1">Дата</div>
+                    <div class="col-lg-7">Вид</div>
+                    <div class="col-lg-2">Сумма</div>
+                    <div class="col-lg-2">Валюта</div>
+                </div>
+                @foreach (var j in i.Comissions)
+                {
+                    <div class="row font-italic text-danger">
+                        <div class="col-lg-1">@j.DateOperation</div>
+                        <div class="col-lg-7">@j.Type</div>
+                        <div class="col-lg-2">@j.Amount</div>
+                        <div class="col-lg-2">@j.Currency</div>
+                    </div>
+                }
+            </div>
+        }
+        @*Exchange*@
+        @if (i.ExchangeRates.Any())
+        {
+            <div class="container border border-light rounded mb-3 p-1">
+                <div class="row">
+                    <div class="col h-25 text-monospace text-right pr-5 font-weight-bold" style="color:orange">обмен валют</div>
+                </div>
+                <div class="row font-weight-bold text-monospace text-muted">
+                    <div class="col-lg-3">Дата</div>
+                    <div class="col-lg-3">Статус</div>
+                    <div class="col-lg-3">Валюта</div>
+                    <div class="col-lg-3">Колличество</div>
+                </div>
+                @foreach (var j in i.ExchangeRates)
+                {
+                    <div class="row font-italic">
+                        <div class="col-lg-3">@j.DateOperation</div>
+                        <div class="col-lg-3">@j.TransactionStatus</div>
+                        <div class="col-lg-3">@j.Rate</div>
+                        <div class="col-lg-3">@j.Quantity</div>
+                    </div>
+                }
+            </div>
+        }
+    }
+</div>

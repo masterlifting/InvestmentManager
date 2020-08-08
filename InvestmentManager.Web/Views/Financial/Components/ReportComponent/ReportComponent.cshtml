@@ -1,0 +1,15 @@
+﻿@model IEnumerable<ReportComponentModel>
+
+
+@foreach (var i in Model)
+{
+    <div class="row mb-1 mb-lg-2">
+        <div class="col-12 col-lg-6 text-center text-lg-left bg-secondary rounded-pill pl-lg-5 hover" onclick="ShowReport(@i.CompanyId)">@i.CompanyName</div>
+        <div class="col-4 col-lg-2 text-center">@i.LastYear г.</div>
+        <div class="col-3 col-lg-2 text-center">@i.LastQuarter кв.</div>
+        <div class="col-5 col-lg-2 text-center">отчетов: @i.TotalCount</div>
+    </div>
+    <div class="row" id="_reports_@i.CompanyId" style="display:none">
+        <partial name="@nameof(FinancialController.ReportHistoryPartial)" />
+    </div>
+}

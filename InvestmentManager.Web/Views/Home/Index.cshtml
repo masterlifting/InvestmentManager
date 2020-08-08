@@ -1,0 +1,60 @@
+﻿@model IEnumerable<StartPageComponentModel>
+@{
+    string priceStyle = "";
+}
+<div class="row pt-2 pb-2 text-center text-monospace text-danger">
+    <div class="col-4 col-lg-5 hover" onclick="ReverseName()">
+        Company<svg class="bi bi-chevron-bar-expand" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M3.646 10.146a.5.5 0 0 1 .708 0L8 13.793l3.646-3.647a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 0-.708zm0-4.292a.5.5 0 0 0 .708 0L8 2.207l3.646 3.647a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 0 0 0 .708zM1 8a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13A.5.5 0 0 1 1 8z" />
+        </svg>
+    </div>
+    <div class="col-4 col-lg-3 hover" onclick="SortSector()">
+        Sector<svg class="bi bi-chevron-bar-expand" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M3.646 10.146a.5.5 0 0 1 .708 0L8 13.793l3.646-3.647a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 0-.708zm0-4.292a.5.5 0 0 0 .708 0L8 2.207l3.646 3.647a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 0 0 0 .708zM1 8a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13A.5.5 0 0 1 1 8z" />
+        </svg>
+    </div>
+    <div class="col-4 col-lg-4 hover" onclick="SortIndustry()">
+        Industry<svg class="bi bi-chevron-bar-expand" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M3.646 10.146a.5.5 0 0 1 .708 0L8 13.793l3.646-3.647a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 0-.708zm0-4.292a.5.5 0 0 0 .708 0L8 2.207l3.646 3.647a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 0 0 0 .708zM1 8a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13A.5.5 0 0 1 1 8z" />
+        </svg>
+    </div>
+</div>
+
+<div class="container-fluid" id="companyList">
+
+    @foreach (var i in Model)
+    {
+        <div class="row ml-1 mb-1 mb-lg-2">
+            <div class="row col-12 col-lg-5 bg-secondary rounded-pill">
+                <div class=" row col-12 col-lg-7">
+                    <div class="col-2"><span class="badge badge-light badge-pill">@i.Place</span></div>
+                    <div class="col-10 text-center small text-md-left text-monospace align-self-center">@i.CompanyName</div>
+                </div>
+                <a class="col-5 col-lg-2 pb-1" asp-controller="Financial" asp-action="@nameof(FinancialController.ReportsHistory)" asp-route-id="@i.CompanyId"><em class="hover">@i.LastYearReport/@i.LastQuarterReport</em></a>
+                <a class="col-5 col-lg-2 pb-1" asp-controller="Financial" asp-action="@nameof(FinancialController.PriceLastYear)" asp-route-id="@i.CompanyId">
+                    @if (i.LastPrice <= i.BuyPrice)
+                        priceStyle = string.Intern("badge-danger");
+                    else
+                        priceStyle = string.Intern("badge-success");
+                    <span class="badge @priceStyle badge-pill"><em class="hover">@i.LastPrice</em></span>
+
+                </a>
+
+                <a class="col-2 col-lg-1 pb-1 hover" rel="noreferrer" href="https://ru.investing.com/equities/@i.ReportSource" target="_blank">
+                    <svg class="bi bi-info-circle-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM8 5.5a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" />
+                    </svg>
+                </a>
+            </div>
+            <div class="row col-12 col-lg-3">
+                <input class="col-2 mt-1 hover" type="checkbox" onclick="ChoiseSector(this)" value="@i.SectorId" />
+                <div class="col-10 text-right">@i.SectorName</div>
+            </div>
+            <div class="row col-12 col-lg-4 text-muted">
+                <div class="col-10 text-left">@i.IndustryName</div>
+                <input class="col-2 hover" type="checkbox" onclick="ChoiseIndustry(this)" value="@i.IndustryId)" />
+            </div>
+        </div>
+    }
+
+</div>

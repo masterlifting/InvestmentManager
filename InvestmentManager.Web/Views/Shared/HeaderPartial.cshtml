@@ -1,0 +1,61 @@
+﻿<form enctype="multipart/form-data" method="post" asp-controller="portfolio" asp-action="@nameof(PortfolioController.LoadReportFiles)">
+    <input id="findFiles" style="display:none" type="file" multiple name="files" onchange="this.parentNode.submit()">
+</form>
+<nav class="navbar navbar-expand-xl navbar-light bg-info rounded fixed-top">
+    <a class="navbar-brand" asp-action="Index" asp-controller="Home">Investment Manager</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
+        <div class="btn-group mb-1 mr-2" style="width:13em">
+            <button type="button" class="btn btn-secondary dropdown-toggle rounded-pill" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Финансовые данные
+            </button>
+            <div class="dropdown-menu dropdown-menu-right">
+                <a class="dropdown-item" asp-controller="Financial" asp-action="@nameof(FinancialController.PriceLastYear)" asp-route-id="0">Цены</a>
+                <a class="dropdown-item" asp-controller="Financial" asp-action="@nameof(FinancialController.ReportsHistory)" asp-route-id="0">Отчеты</a>
+                <a class="dropdown-item" asp-controller="Calculate" asp-action="@nameof(CalculateController.Coefficients)">Коэффициенты</a>
+            </div>
+        </div>
+        <div class="btn-group mb-1 mr-2" style="width:13em">
+            <button type="button" class="btn btn-secondary dropdown-toggle rounded-pill" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Мой портфель
+            </button>
+            <div class="dropdown-menu dropdown-menu-right">
+                <a class="dropdown-item" asp-controller="Company" asp-action="Index">Общие сведения</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" asp-controller="calculate" asp-action="@nameof(CalculateController.SellRecommendation)">Рекомендации к продаже</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" asp-controller="portfolio" asp-action="@nameof(PortfolioController.StockOperations)">Операции с акциями</a>
+                <a class="dropdown-item" asp-controller="portfolio" asp-action="@nameof(PortfolioController.AccountOperations)">Операции с счетами</a>
+                <a class="dropdown-item" asp-controller="portfolio" asp-action="@nameof(PortfolioController.RateOperations)">Операции с валютой</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" asp-controller="portfolio" asp-action="@nameof(PortfolioController.Comissions)">Комиссии</a>
+                <a class="dropdown-item" asp-controller="portfolio" asp-action="@nameof(PortfolioController.Dividends)">Дивиденды</a>
+            </div>
+        </div>
+        @if (User.Identity.IsAuthenticated)
+        {
+            <button class="btn btn-secondary rounded-pill mr-2" style="width:13em" type="button" onclick="document.querySelector('#findFiles').click()">Прочитать отчеты БКС</button>
+        }
+
+        @if (User.Identity.IsAuthenticated)
+        {
+            if (User.IsInRole("pestunov"))
+            {
+                <a class="btn btn-secondary rounded-pill mr-2" style="width:13em" asp-controller="Admin" asp-action="@nameof(AdminController.Index)">Администратор</a>
+            }
+            <div class="col-2 text-center">
+                <div class="text-light text-monospace">@User.Identity.Name <a asp-controller="account" asp-action="@nameof(AccountController.Logout)">(Выйти)</a></div>
+            </div>
+        }
+        else
+        {
+            <div class="col-2 text-center">
+                <a asp-controller="account" asp-action="@nameof(AccountController.Login)">Войти</a>
+            </div>
+        }
+
+    </div>
+</nav>
+

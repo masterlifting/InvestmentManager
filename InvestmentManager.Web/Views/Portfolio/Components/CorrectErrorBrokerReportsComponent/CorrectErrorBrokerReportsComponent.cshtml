@@ -1,0 +1,37 @@
+﻿<!-- Modal -->
+<div class="modal fade" id="correctErrorBrokerReportsModal" tabindex="-1" role="dialog" aria-labelledby="correctErrorBrokerReportsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-black-50" id="exampleModalLabel">Исправление ошибок</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid text-dark">
+                    <nav>
+                        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                            <a class="nav-item nav-link text-muted active" id="nav-ticker-tab" data-toggle="tab" href="#nav-ticker" role="tab" aria-controls="nav-ticker" aria-selected="true">Тикер</a>
+                            <a class="nav-item nav-link text-muted" id="nav-didentifier-tab" data-toggle="tab" href="#nav-didentifier" role="tab" aria-controls="nav-didentifier" aria-selected="false">Идентификатор дивиденда</a>
+                            <a class="nav-item nav-link text-muted" id="nav-account-tab" data-toggle="tab" href="#nav-account" role="tab" aria-controls="nav-account" aria-selected="false">Соглашение</a>
+                        </div>
+                    </nav>
+                    <div class="tab-content" id="nav-tabContent">
+                        <div class="tab-pane fade show active" id="nav-ticker" role="tabpanel" aria-labelledby="nav-ticker-tab">
+                            <vc:stock-transaction-error-component />
+                        </div>
+
+                        <div class="tab-pane fade" id="nav-didentifier" role="tabpanel" aria-labelledby="nav-didentifier-tab">
+                            <vc:dividend-error-component />
+                        </div>
+
+                        <div class="tab-pane fade" id="nav-account" role="tabpanel" aria-labelledby="nav-account-tab">
+                            <vc:account-transaction-error-component />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

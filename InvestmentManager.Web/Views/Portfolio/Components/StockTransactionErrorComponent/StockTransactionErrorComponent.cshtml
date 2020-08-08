@@ -1,0 +1,37 @@
+﻿@model StockTransactionErrorForm
+
+<form class="container-fluid" method="post" asp-controller="portfolio" asp-action="@nameof(PortfolioController.StockTransactionErrorHandler)" asp-antiforgery="true">
+    <div class="row">
+        <div class="col-6">
+            <div class="form-group">
+                <label asp-for="TickerName"></label>
+                <input class="form-control" asp-for="TickerName" autocomplete="off"/>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                <label asp-for="Companies"></label>
+                <select class="form-control" asp-for="CompanyId" asp-items="Model.Companies"></select>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6">
+            <div class="form-group">
+                <label asp-for="Exchanges"></label>
+                <select class="form-control" asp-for="ExchangeId" asp-items="Model.Exchanges"></select>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                <label asp-for="Lots"></label>
+                <select class="form-control" asp-for="LotId" asp-items="Model.Lots"></select>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col text-right">
+            <button type="submit" class="btn btn-outline-primary text-dark">Сохранить</button>
+        </div>
+    </div>
+</form>

@@ -1,0 +1,49 @@
+﻿@model IEnumerable<RateOperationModel>
+
+<div class="row pt-2 pb-2 text-center text-monospace text-danger">
+    <div class="col-4 col-lg-5 hover">
+        #<svg class="bi bi-chevron-bar-expand" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M3.646 10.146a.5.5 0 0 1 .708 0L8 13.793l3.646-3.647a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 0-.708zm0-4.292a.5.5 0 0 0 .708 0L8 2.207l3.646 3.647a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 0 0 0 .708zM1 8a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13A.5.5 0 0 1 1 8z" />
+        </svg>
+    </div>
+    <div class="col-4 col-lg-3 hover">
+        #<svg class="bi bi-chevron-bar-expand" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M3.646 10.146a.5.5 0 0 1 .708 0L8 13.793l3.646-3.647a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 0-.708zm0-4.292a.5.5 0 0 0 .708 0L8 2.207l3.646 3.647a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 0 0 0 .708zM1 8a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13A.5.5 0 0 1 1 8z" />
+        </svg>
+    </div>
+    <div class="col-4 col-lg-4 hover">
+        #<svg class="bi bi-chevron-bar-expand" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M3.646 10.146a.5.5 0 0 1 .708 0L8 13.793l3.646-3.647a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 0-.708zm0-4.292a.5.5 0 0 0 .708 0L8 2.207l3.646 3.647a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 0 0 0 .708zM1 8a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13A.5.5 0 0 1 1 8z" />
+        </svg>
+    </div>
+</div>
+
+
+<div class="container">
+    <div class="row text-center flex-md-nowrap text-muted mb-2">
+        <div class="col-6 col-lg-6">Счет</div>
+        <div class="col-6 col-lg-2">Дата операции</div>
+        <div class="col-6 col-lg-2">Тип операции</div>
+        <div class="col-6 col-lg-2">
+            <div class="row">
+                <div class="col-6">Количество</div>
+                <div class="col-6">Курс</div>
+            </div>
+        </div>
+    </div>
+
+    @foreach (var i in Model.OrderByDescending(x => x.DateOperation))
+    {
+        <div class="row mb-2 hoverView">
+            <div class="col-12 col-lg-6">@i.AccountName</div>
+            <div class="col-3 col-lg-2 text-center">@i.DateOperation.ToShortDateString()</div>
+            <div class="col-3 col-lg-2 text-center">@i.TypeOperation</div>
+            <div class="col-6 col-lg-2">
+                <div class="row">
+                    <div class="col-6">@i.Quantity$</div>
+                    <div class="col-6 text-center">@i.Rate</div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

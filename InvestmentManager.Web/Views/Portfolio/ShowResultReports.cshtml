@@ -1,0 +1,174 @@
+﻿@model ResultBrokerReportViewModel
+
+
+<div class="container-fluid mt-3">
+
+    <div class="row mb-3">
+        <div class="col text-right">
+            <a class="btn btn-success" asp-controller="portfolio" asp-action="@nameof(PortfolioController.SaveNewReports)">Сохранить</a>
+        </div>
+    </div>
+
+    @*Account*@
+    @if (Model.AccountTransactions.Any())
+    {
+        <div class="container-fluid border border-light rounded mb-3 p-1">
+            <div class="row">
+                <div class="col text-primary h-25 text-monospace text-right pr-5 font-weight-bold">операции по счетам</div>
+            </div>
+            <div class="row font-weight-bold text-monospace text-muted">
+                <div class="col-lg-3">Соглашение</div>
+                <div class="col-lg-3">Дата</div>
+                <div class="col-lg-3">Статус</div>
+                <div class="col-lg-2">Сумма</div>
+                <div class="col-lg-1">Валюта</div>
+            </div>
+            @foreach (var j in Model.AccountTransactions)
+            {
+                <div class="row font-italic">
+                    <div class="col-lg-3">@j.AccountName</div>
+                    <div class="col-lg-3">@j.DateOperation.ToShortDateString()</div>
+                    <div class="col-lg-3">@j.TransactionStatus</div>
+                    <div class="col-lg-2">@j.Amount</div>
+                    <div class="col-lg-1">@j.Currency</div>
+                </div>
+            }
+        </div>
+    }
+    @*Stock*@
+    @if (Model.StockTransactions.Any())
+    {
+        <div class="container-fluid border border-light rounded mb-3 p-1">
+            <div class="row">
+                <div class="col text-info h-25 text-monospace text-right pr-5 font-weight-bold">операции с акциями</div>
+            </div>
+            <div class="row font-weight-bold text-monospace text-muted">
+                <div class="col-lg-3">
+                    <div class="row">
+                        <div class="col">Соглашение</div>
+                    </div>
+                </div>
+                <div class="col-lg-9">
+                    <div class="row">
+                        <div class="col-2">Дата</div>
+                        <div class="col-3">Компания</div>
+                        <div class="col-1">Тикер</div>
+                        <div class="col-1">Статус</div>
+                        <div class="col-1">Идент.</div>
+                        <div class="col-1">Кол.</div>
+                        <div class="col-1">Цена</div>
+                        <div class="col-1">Биржа</div>
+                        <div class="col-1">Вал.</div>
+                    </div>
+                </div>
+            </div>
+            @foreach (var j in Model.StockTransactions)
+            {
+                <div class="row font-italic">
+                    <div class="col-lg-3">
+                        <div class="row">
+                            <div class="col">@j.AccountName</div>
+                        </div>
+                    </div>
+                    <div class="col-lg-9">
+                        <div class="row">
+                            <div class="col-2">@j.DateOperation.ToShortDateString()</div>
+                            <div class="col-3">@j.CompanyName</div>
+                            <div class="col-1">@j.Ticker</div>
+                            <div class="col-1">@j.TransactionStatus</div>
+                            <div class="col-1">@j.Identifier</div>
+                            <div class="col-1">@j.Quantity</div>
+                            <div class="col-1">@j.Cost</div>
+                            <div class="col-1">@j.Exchange</div>
+                            <div class="col-1">@j.Currency</div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    @*Dividend*@
+    @if (Model.Dividends.Any())
+    {
+        <div class="container-fluid border border-light rounded mb-3 p-1">
+            <div class="row">
+                <div class="col text-success h-25 text-monospace text-right pr-5 font-weight-bold">дивиденды</div>
+            </div>
+            <div class="row font-weight-bold text-monospace text-muted">
+                <div class="col-lg-3">Соглашение</div>
+                <div class="col-lg-1">Дата</div>
+                <div class="col-lg-2">Компания</div>
+                <div class="col-lg-3">Идентификатор</div>
+                <div class="col-lg-1">Сумма</div>
+                <div class="col-lg-1">Налог</div>
+                <div class="col-lg-1">Валюта</div>
+            </div>
+            @foreach (var j in Model.Dividends)
+            {
+                <div class="row font-italic">
+                    <div class="col-lg-3">@j.AccountName</div>
+                    <div class="col-lg-1">@j.DateOperation.ToShortDateString()</div>
+                    <div class="col-lg-2">@j.CompanyName</div>
+                    <div class="col-lg-3">@j.Isin</div>
+                    <div class="col-lg-1">@j.Amount</div>
+                    <div class="col-lg-1">@j.Tax</div>
+                    <div class="col-lg-1">@j.Currency</div>
+                </div>
+            }
+        </div>
+    }
+    @*Comission*@
+    @if (Model.Comissions.Any())
+    {
+        <div class="container-fluid border border-light rounded mb-3 p-1">
+            <div class="row">
+                <div class="col text-danger h-25 text-monospace text-right pr-5 font-weight-bold">комиссии</div>
+            </div>
+            <div class="row font-weight-bold text-monospace text-muted">
+                <div class="col-lg-3">Соглашение</div>
+                <div class="col-lg-3">Дата</div>
+                <div class="col-lg-4">Вид</div>
+                <div class="col-lg-1">Сумма</div>
+                <div class="col-lg-1">Валюта</div>
+            </div>
+            @foreach (var j in Model.Comissions)
+            {
+                <div class="row font-italic">
+                    <div class="col-lg-3">@j.AccountName</div>
+                    <div class="col-lg-3">@j.DateOperation.ToShortDateString()</div>
+                    <div class="col-lg-4">@j.ComissionTypeName</div>
+                    <div class="col-lg-1">@j.Amount</div>
+                    <div class="col-lg-1">@j.Currency</div>
+                </div>
+            }
+        </div>
+    }
+    @*Exchange*@
+    @if (Model.ExchangeRates.Any())
+    {
+        <div class="container-fluid border border-light rounded mb-3 p-1">
+            <div class="row">
+                <div class="col h-25 text-monospace text-right pr-5 font-weight-bold" style="color:orange">обмен валют</div>
+            </div>
+            <div class="row font-weight-bold text-monospace text-muted">
+                <div class="col-lg-3">Соглашение</div>
+                <div class="col-lg-3">Дата</div>
+                <div class="col-lg-2">Статус</div>
+                <div class="col-lg-1">Колличество</div>
+                <div class="col-lg-1">Курс</div>
+                <div class="col-lg-2">Идентификатор</div>
+            </div>
+            @foreach (var j in Model.ExchangeRates)
+            {
+                <div class="row font-italic">
+                    <div class="col-lg-3">@j.AccountName</div>
+                    <div class="col-lg-3">@j.DateOperation.ToShortDateString()</div>
+                    <div class="col-lg-2">@j.TransactionStatus</div>
+                    <div class="col-lg-1">@j.Quantity</div>
+                    <div class="col-lg-1">@j.Rate</div>
+                    <div class="col-lg-2">@j.Identifier</div>
+                </div>
+            }
+        </div>
+    }
+</div>
