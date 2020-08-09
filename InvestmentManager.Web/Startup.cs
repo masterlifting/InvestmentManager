@@ -27,7 +27,7 @@ namespace InvestmentManager.Web
             configuration.Bind("SellRecommendation", new SellRecommendationConfig());
             configuration.Bind("BuyRecommendation", new BuyRecommendationConfig());
 
-            services.AddDbContext<InvestmentContext>(x => x.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<InvestmentContext>(x => x.UseNpgsql(configuration.GetConnectionString("PostgresTestConnection")));
             services.AddIdentity<IdentityUser, IdentityRole>(configuration =>
             {
                 configuration.Password.RequiredLength = 10;
