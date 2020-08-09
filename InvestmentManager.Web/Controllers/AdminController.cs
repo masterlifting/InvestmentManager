@@ -94,7 +94,7 @@ namespace InvestmentManager.Web.Controllers
             var ratings = await calculator.GetCompleatedRatingsAsync().ConfigureAwait(false);
             unitOfWork.Rating.CreateEntities(ratings);
             unitOfWork.SellRecommendation.CreateEntities(calculator.GetCompleatedSellRecommendations(userManager.Users, ratings));
-            unitOfWork.BuyRecommendation.CreateEntities(await calculator.GetCompleatedBuyRecommendationsAsync(ratings).ConfigureAwait(false));
+            unitOfWork.BuyRecommendation.CreateEntities(calculator.GetCompleatedBuyRecommendations(ratings));
 
             await unitOfWork.CompleteAsync().ConfigureAwait(false);
 

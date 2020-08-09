@@ -30,8 +30,8 @@
                     <div class="col-2"><span class="badge badge-light badge-pill">@i.Place</span></div>
                     <div class="col-10 text-center small text-md-left text-monospace align-self-center">@i.CompanyName</div>
                 </div>
-                <a class="col-5 col-lg-2 pb-1" asp-controller="Financial" asp-action="@nameof(FinancialController.ReportsHistory)" asp-route-id="@i.CompanyId"><em class="hover">@i.LastYearReport/@i.LastQuarterReport</em></a>
-                <a class="col-5 col-lg-2 pb-1" asp-controller="Financial" asp-action="@nameof(FinancialController.PriceLastYear)" asp-route-id="@i.CompanyId">
+                <a class="col-5 col-lg-2 pb-1" asp-controller="Financial" asp-action="@nameof(FinancialController.Reports)" asp-route-id="@i.CompanyId"><em class="hover">@i.LastYearReport/@i.LastQuarterReport</em></a>
+                <a class="col-5 col-lg-2 pb-1" asp-controller="Financial" asp-action="@nameof(FinancialController.Prices)" asp-route-id="@i.CompanyId">
                     @if (i.LastPrice <= i.BuyPrice)
                         priceStyle = string.Intern("badge-danger");
                     else

@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="IRepository.cs~RF14aa3b8f.TMP" />
     <None Remove="Query.sql" />
     <None Remove="Перенос отчетов.sql" />
     <None Remove="Перенос цен.sql" />

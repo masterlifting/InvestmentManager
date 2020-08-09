@@ -153,7 +153,7 @@ function ShowReport(id) {
     let reportId = `_reports_${id}`;
     let showResult = isVisible(reportId);
     if (showResult === false) {
-        $.get("/Financial/ReportHistoryPartial", { id: id }, function (data) {
+        $.get("/Financial/ReportsPartial", { id: id }, function (data) {
             $("#" + reportId).replaceWith(data);
         });
     }

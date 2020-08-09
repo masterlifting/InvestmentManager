@@ -10,7 +10,7 @@ namespace InvestmentManager.Calculator
     {
         Task<List<Coefficient>> GetComplitedCoeffitientsAsync();
         Task<List<Rating>> GetCompleatedRatingsAsync();
-        Task<List<BuyRecommendation>> GetCompleatedBuyRecommendationsAsync(IEnumerable<Rating> ratings);
+        List<BuyRecommendation> GetCompleatedBuyRecommendations(IEnumerable<Rating> ratings);
         List<SellRecommendation> GetCompleatedSellRecommendations(IQueryable<IdentityUser> users, IEnumerable<Rating> ratings);
     }
 }

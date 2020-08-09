@@ -1,5 +1,21 @@
-﻿namespace InvestmentManager.Web.Models.FinancialModels
+﻿using System.Collections.Generic;
+
+namespace InvestmentManager.Web.Models.FinancialModels
 {
+    public class ReportModel
+    {
+        public long? CompanyId { get; set; }
+        public IEnumerable<ReportHeadModel> Headers { get; set; }
+        public IEnumerable<ReportBodyModel> ReportBodyModels { get; }
+    }
+    public class ReportHeadModel
+    {
+        public long CompanyId { get; set; }
+        public string CompanyName { get; set; }
+        public int LastYear { get; set; }
+        public int LastQuarter { get; set; }
+        public int TotalCount { get; set; }
+    }
     public class ReportBodyModel
     {
         public int Year { get; set; }

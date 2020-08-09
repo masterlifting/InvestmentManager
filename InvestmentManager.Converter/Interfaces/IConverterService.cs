@@ -2,6 +2,6 @@
 {
     public interface IConverterService
     {
-        int GetConvertedMonthInQuarter(int month);
+        int ConvertToQuarter(int month);
     }
 }

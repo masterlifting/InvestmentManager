@@ -12,8 +12,8 @@
                 Финансовые данные
             </button>
             <div class="dropdown-menu dropdown-menu-right">
-                <a class="dropdown-item" asp-controller="Financial" asp-action="@nameof(FinancialController.PriceLastYear)" asp-route-id="0">Цены</a>
-                <a class="dropdown-item" asp-controller="Financial" asp-action="@nameof(FinancialController.ReportsHistory)" asp-route-id="0">Отчеты</a>
+                <a class="dropdown-item" asp-controller="Financial" asp-action="@nameof(FinancialController.Prices)">Цены</a>
+                <a class="dropdown-item" asp-controller="Financial" asp-action="@nameof(FinancialController.Reports)">Отчеты</a>
                 <a class="dropdown-item" asp-controller="Calculate" asp-action="@nameof(CalculateController.Coefficients)">Коэффициенты</a>
             </div>
         </div>

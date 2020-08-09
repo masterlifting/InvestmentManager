@@ -3,6 +3,7 @@ using InvestmentManager.Repository;
 using InvestmentManager.Service.Interfaces;
 using InvestmentManager.Web.Models.ChartModels;
 using InvestmentManager.Web.Models.FinancialModels;
+using InvestmentManager.Web.ViewAgregator.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -16,50 +17,24 @@ namespace InvestmentManager.Web.Controllers
     {
         const string controllerName = "~/financial";
         private readonly IUnitOfWorkFactory unitOfWork;
-        private readonly IConverterService converterService;
+        private readonly IConverterService converter;
         private readonly IInvestmentCalculator calculator;
+        private readonly IFinancialAgregator agregator;
 
         public FinancialController(
             IUnitOfWorkFactory unitOfWork
-            , IConverterService converterService
-            , IInvestmentCalculator calculator)
+            , IConverterService converter
+            , IInvestmentCalculator calculator,
+            IFinancialAgregator agregator)
         {
             this.unitOfWork = unitOfWork;
-            this.converterService = converterService;
+            this.converter = converter;
             this.calculator = calculator;
+            this.agregator = agregator;
         }
-        public IActionResult ReportsHistory(long id) => View(id);
-        public IActionResult PriceLastYear(long id) => View(id);
-
-        public IActionResult ReportHistoryPartial(long id)
-        {
-            var reportModel = new List<ReportComponentModel>();
-            var listReports = new List<ReportBodyModel>();
-
-            foreach (var i in unitOfWork.Report.GetAll().Where(x => x.CompanyId == id).OrderByDescending(x => x.DateReport.Date))
-            {
-                listReports.Add(new ReportBodyModel
-                {
-                    Year = i.DateReport.Year,
-                    Quarter = converterService.GetConvertedMonthInQuarter(i.DateReport.Month),
-                    Assets = i.Assets,
-                    CashFlow = i.CashFlow,
-                    Dividends = i.Dividends,
-                    GrossProfit = i.GrossProfit,
-                    LongTermDebt = i.LongTermDebt,
-                    NetProfit = i.NetProfit,
-                    Obligations = i.Obligations,
-                    Revenue = i.Revenue,
-                    ShareCapital = i.ShareCapital,
-                    StockVolume = i.StockVolume,
-                    Turnover = i.Turnover
-                });
-            }
-
-            reportModel.Add(new ReportComponentModel(listReports) { CompanyId = id });
-
-            return PartialView(reportModel);
-        }
+        public async Task<IActionResult> Prices(long? id) => View(await agregator.GetPricesAsync(id).ConfigureAwait(false));
+        public async Task<IActionResult> Reports(long? id) => View(await agregator.GetReportsAsync(id).ConfigureAwait(false));
+        public IActionResult ReportsPartial(long id) => PartialView(new ReportModel { CompanyId = id });
         public IActionResult GetPrices() => View();
         public async Task<JsonResult> GetPrice(long id)
         {

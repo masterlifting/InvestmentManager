@@ -32,14 +32,14 @@ namespace InvestmentManager.StockPriceFinder.Implimentations
 
             var foundPrice = await priceProviders[providerName].FindNewPriciesAsync(tickerId, ticker, providerUri).ConfigureAwait(false);
 
-            return foundPrice.Any() ? await NewPriceFilter(foundPrice, tickerId).ConfigureAwait(false) : resultPricies;
+            return foundPrice.Any() ? NewPriceFilter(foundPrice, tickerId) : resultPricies;
         }
-        public async Task<List<Price>> NewPriceFilter(IEnumerable<Price> pricies, long tickerId)
+        public List<Price> NewPriceFilter(IEnumerable<Price> pricies, long tickerId)
         {
             var filteredList = new List<Price>();
             var dateFromPriceLists = pricies.Select(x => x.BidDate.Date);
             var dateFromPriceListsCount = dateFromPriceLists.Count();
-            var dateFromDb = await unitOfWork.Price.GetSortedPriceDateAsync(tickerId, dateFromPriceListsCount).ConfigureAwait(false);
+            var dateFromDb = unitOfWork.Price.GetLastDates(tickerId, dateFromPriceListsCount).Select(x => x.Date);
 
             var newDate = dateFromPriceLists.Except(dateFromDb);
 
@@ -47,7 +47,7 @@ namespace InvestmentManager.StockPriceFinder.Implimentations
             {
                 foreach (var date in newDate)
                 {
-                    var newPrice = pricies.First(x => x.BidDate.Date == date.Date);
+                    var newPrice = pricies.First(x => x.BidDate.Date == date);
 
                     filteredList.Add(newPrice);
                 }

@@ -1,4 +1,4 @@
-﻿@model long
+﻿@model ReportModel
 
 <div class="row pt-2 pb-2 text-center text-monospace text-danger">
     <div class="col-4 col-lg-5 hover">
@@ -19,5 +19,19 @@
 </div>
 
 <div class="container-fluid">
-    <vc:price-component id="Model" />
+
+    @foreach (var i in Model.Headers)
+    {
+        <div class="row mb-1 mb-lg-2">
+            <div class="col-12 col-lg-6 text-center text-lg-left bg-secondary rounded-pill pl-lg-5 hover" onclick="ShowReport(@i.CompanyId)">@i.CompanyName</div>
+            <div class="col-4 col-lg-2 text-center">@i.LastYear г.</div>
+            <div class="col-3 col-lg-2 text-center">@i.LastQuarter кв.</div>
+            <div class="col-5 col-lg-2 text-center">отчетов: @i.TotalCount</div>
+        </div>
+        
+        <div class="row" id="_reports_@i.CompanyId" style="display:none">
+            <partial name="@nameof(FinancialController.ReportsPartial)" />
+        </div>
+    }
+
 </div>

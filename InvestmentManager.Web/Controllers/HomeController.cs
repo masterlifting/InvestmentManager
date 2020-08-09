@@ -1,6 +1,6 @@
 ﻿using InvestmentManager.Repository;
+using InvestmentManager.Service.Interfaces;
 using InvestmentManager.Web.Models.CommonModels;
-using InvestmentManager.Web.ViewAgregator.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -12,14 +12,14 @@ namespace InvestmentManager.Web.Controllers
     public class HomeController : Controller
     {
         private readonly IUnitOfWorkFactory unitOfWork;
-        private readonly IFinancialAgregator financialAgregator;
+        private readonly IConverterService converter;
 
         public HomeController(
             IUnitOfWorkFactory unitOfWork
-            , IFinancialAgregator financialAgregator)
+            , IConverterService converter)
         {
             this.unitOfWork = unitOfWork;
-            this.financialAgregator = financialAgregator;
+            this.converter = converter;
         }
         public async Task<IActionResult> Index()
         {
@@ -29,21 +29,31 @@ namespace InvestmentManager.Web.Controllers
             var sectors = unitOfWork.Sector.GetAll();
             var industries = unitOfWork.Industry.GetAll();
             var reportSource = unitOfWork.ReportSource.GetAll();
-            var lastPrices = unitOfWork.Price.GetLastPrices();
             var ratings = unitOfWork.Rating.GetAll();
             var buyRecommendation = unitOfWork.BuyRecommendation.GetAll();
-            var financial = await financialAgregator.GetReportsComponentAsync(0).ConfigureAwait(false);
+
+            var lastPrices = unitOfWork.Price.GetLastPrices(7);
+            var lastReportDates = unitOfWork.Report.GetLastDateReports();
+
+            var companyIdsPriceOut = companies.Select(x => x.Id).Except(lastPrices.Keys);
 
             foreach
             (
                 var i in companies
-                .Join(sectors, x => x.SectorId, y => y.Id, (x, y) => new { CompanyId = x.Id, SectorId = y.Id, CompanyName = x.Name, x.IndustryId, Sector = y.Name })
-                .Join(industries, x => x.IndustryId, y => y.Id, (x, y) => new { IndustryId = y.Id, x.CompanyId, x.SectorId, x.CompanyName, x.Sector, Industry = y.Name })
-                .Join(reportSource, x => x.CompanyId, y => y.CompanyId, (x, y) => new { ReportSource = y.Value, x.CompanyName, x.Sector, x.Industry, x.CompanyId, x.IndustryId, x.SectorId })
-                .Join(lastPrices, x => x.CompanyId, y => y.Key, (x, y) => new { LastPrice = y.Value, x.ReportSource, x.CompanyName, x.Sector, x.Industry, x.CompanyId, x.IndustryId, x.SectorId })
-                .Join(financial, x => x.CompanyId, y => y.CompanyId, (x, y) => new { x.LastPrice, x.ReportSource, x.CompanyName, x.Sector, x.Industry, x.CompanyId, x.IndustryId, x.SectorId, y.LastYear, y.LastQuarter })
-                .Join(ratings, x => x.CompanyId, y => y.CompanyId, (x, y) => new { x.LastPrice, x.ReportSource, x.CompanyName, x.Sector, x.Industry, x.CompanyId, x.IndustryId, x.SectorId, x.LastYear, x.LastQuarter, y.Place })
-                .Join(buyRecommendation, x => x.CompanyId, y => y.CompanyId, (x, y) => new { x.LastPrice, x.ReportSource, x.CompanyName, x.Sector, x.Industry, x.CompanyId, x.IndustryId, x.SectorId, x.LastYear, x.LastQuarter, x.Place, BuyPrice = y.Price })
+                .Join(sectors, x => x.SectorId, y => y.Id, (x, y) => new
+                { CompanyId = x.Id, SectorId = y.Id, CompanyName = x.Name, x.IndustryId, Sector = y.Name })
+                .Join(industries, x => x.IndustryId, y => y.Id, (x, y) => new
+                { IndustryId = y.Id, x.CompanyId, x.SectorId, x.CompanyName, x.Sector, Industry = y.Name })
+                .Join(reportSource, x => x.CompanyId, y => y.CompanyId, (x, y) => new
+                { ReportSource = y.Value, x.CompanyName, x.Sector, x.Industry, x.CompanyId, x.IndustryId, x.SectorId })
+                .Join(lastPrices, x => x.CompanyId, y => y.Key, (x, y) => new
+                { LastPrice = y.Value, x.ReportSource, x.CompanyName, x.Sector, x.Industry, x.CompanyId, x.IndustryId, x.SectorId })
+                .Join(lastReportDates, x => x.CompanyId, y => y.Key, (x, y) => new
+                { x.LastPrice, x.ReportSource, x.CompanyName, x.Sector, x.Industry, x.CompanyId, x.IndustryId, x.SectorId, LastYear = y.Value.Year, LastQuarter = converter.ConvertToQuarter(y.Value.Month) })
+                .Join(ratings, x => x.CompanyId, y => y.CompanyId, (x, y) => new
+                { x.LastPrice, x.ReportSource, x.CompanyName, x.Sector, x.Industry, x.CompanyId, x.IndustryId, x.SectorId, x.LastYear, x.LastQuarter, y.Place })
+                .Join(buyRecommendation, x => x.CompanyId, y => y.CompanyId, (x, y) => new 
+                { x.LastPrice, x.ReportSource, x.CompanyName, x.Sector, x.Industry, x.CompanyId, x.IndustryId, x.SectorId, x.LastYear, x.LastQuarter, x.Place, BuyPrice = y.Price })
             )
             {
                 startModel.Add(new StartPageComponentModel
@@ -65,6 +75,44 @@ namespace InvestmentManager.Web.Controllers
                     Place = i.Place
                 });
             }
+
+            foreach
+            (
+                var i in companies.Where(x => companyIdsPriceOut.Contains(x.Id))
+                .Join(sectors, x => x.SectorId, y => y.Id, (x, y) => new
+                { CompanyId = x.Id, SectorId = y.Id, CompanyName = x.Name, x.IndustryId, Sector = y.Name })
+                .Join(industries, x => x.IndustryId, y => y.Id, (x, y) => new
+                { IndustryId = y.Id, x.CompanyId, x.SectorId, x.CompanyName, x.Sector, Industry = y.Name })
+                .Join(reportSource, x => x.CompanyId, y => y.CompanyId, (x, y) => new
+                { ReportSource = y.Value, x.CompanyName, x.Sector, x.Industry, x.CompanyId, x.IndustryId, x.SectorId })
+                .Join(lastReportDates, x => x.CompanyId, y => y.Key, (x, y) => new
+                { x.ReportSource, x.CompanyName, x.Sector, x.Industry, x.CompanyId, x.IndustryId, x.SectorId, LastYear = y.Value.Year, LastQuarter = converter.ConvertToQuarter(y.Value.Month) })
+                .Join(ratings, x => x.CompanyId, y => y.CompanyId, (x, y) => new
+                { x.ReportSource, x.CompanyName, x.Sector, x.Industry, x.CompanyId, x.IndustryId, x.SectorId, x.LastYear, x.LastQuarter, y.Place })
+                .Join(buyRecommendation, x => x.CompanyId, y => y.CompanyId, (x, y) => new 
+                { x.ReportSource, x.CompanyName, x.Sector, x.Industry, x.CompanyId, x.IndustryId, x.SectorId, x.LastYear, x.LastQuarter, x.Place, BuyPrice = y.Price })
+            )
+            {
+                startModel.Add(new StartPageComponentModel
+                {
+                    CompanyId = i.CompanyId,
+                    SectorId = i.SectorId,
+                    IndustryId = i.IndustryId,
+
+                    LastPrice = 0,
+                    BuyPrice = i.BuyPrice,
+
+                    LastYearReport = i.LastYear,
+                    LastQuarterReport = i.LastQuarter,
+
+                    CompanyName = i.CompanyName,
+                    IndustryName = i.Industry,
+                    SectorName = i.Sector,
+                    ReportSource = i.ReportSource,
+                    Place = i.Place
+                });
+            }
+
 
             return View(startModel.OrderBy(x => x.Place));
         }

@@ -12,32 +12,32 @@ namespace InvestmentManager.Web.ViewAgregator.Implimentations
     public class FinancialAgregator : IFinancialAgregator
     {
         private readonly IUnitOfWorkFactory unitOfWork;
-        private readonly IConverterService converterService;
+        private readonly IConverterService converter;
 
-        public FinancialAgregator(IUnitOfWorkFactory unitOfWork, IConverterService converterService)
+        public FinancialAgregator(IUnitOfWorkFactory unitOfWork, IConverterService converter)
         {
             this.unitOfWork = unitOfWork;
-            this.converterService = converterService;
+            this.converter = converter;
         }
 
-        public async Task<List<PriceComponentModel>> GetPricesComponentAsync(long id)
+        public async Task<List<PriceModel>> GetPricesAsync(long? id)
         {
-            var listModel = new List<PriceComponentModel>();
+            var listModel = new List<PriceModel>();
 
-            if (id != default)
+            if (id.HasValue)
             {
-                var oneModel = new PriceComponentModel();
+                var oneModel = new PriceModel();
 
-                var prices = await unitOfWork.Price.GetSortedPricesByDateAsync(id, OrderType.OrderByDesc).ConfigureAwait(false);
-                var company = await unitOfWork.Company.FindByIdAsync(id).ConfigureAwait(false);
-
+                var prices = await unitOfWork.Price.GetCustomPricesAsync(id.Value, 12, OrderType.OrderBy).ConfigureAwait(false);
+                var company = await unitOfWork.Company.FindByIdAsync(id.Value).ConfigureAwait(false);
+                var currency = await unitOfWork.Currency.FindByIdAsync(prices.First().CurrencyId).ConfigureAwait(false);
                 if (prices.Any())
                 {
-                    oneModel.CurrentPrice = prices.LastOrDefault().Value;
-                    oneModel.DateUpdate = prices.LastOrDefault().BidDate.Date.ToShortDateString();
+                    oneModel.CurrentPrice = prices.Last().Value;
+                    oneModel.DateUpdate = prices.Last().BidDate.ToShortDateString();
                     oneModel.MinPrice = prices.Min(x => x.Value);
                     oneModel.MaxPrice = prices.Max(x => x.Value);
-                    oneModel.CurrencyType = (await unitOfWork.Currency.FindByIdAsync(prices.First().CurrencyId).ConfigureAwait(false)).Name;
+                    oneModel.CurrencyType = currency.Name;
                 }
 
                 if (company != null)
@@ -54,17 +54,17 @@ namespace InvestmentManager.Web.ViewAgregator.Implimentations
             {
                 var companies = await unitOfWork.Company.GetAll().ToListAsync().ConfigureAwait(false);
                 var currencyTypes = unitOfWork.Currency.GetAll();
-                var prices = unitOfWork.Price.GetGroupedSortedDescPrices();
+                var prices = unitOfWork.Price.GetGroupedPrices(12, OrderType.OrderBy);
 
                 foreach (var i in companies.Join(prices, x => x.Id, y => y.Key, (x, y) => new
                 {
                     CompanyId = x.Id,
                     CompanyName = x.Name,
-                    CurrentPrice = y.Value.LastOrDefault().Value,
-                    DateUpdate = y.Value.LastOrDefault().BidDate.Date,
+                    CurrentPrice = y.Value.Last().Value,
+                    DateUpdate = y.Value.Last().BidDate,
                     MinPrice = y.Value.Min(z => z.Value),
                     MaxPrice = y.Value.Max(z => z.Value),
-                    y.Value.FirstOrDefault().CurrencyId
+                    y.Value.First().CurrencyId
                 })
                 .Join(currencyTypes, x => x.CurrencyId, y => y.Id, (x, y) => new
                 {
@@ -77,7 +77,7 @@ namespace InvestmentManager.Web.ViewAgregator.Implimentations
                     Currency = y.Name
                 }))
                 {
-                    listModel.Add(new PriceComponentModel
+                    listModel.Add(new PriceModel
                     {
                         CompanyId = i.CompanyId,
                         CompanyName = i.CompanyName,
@@ -93,79 +93,84 @@ namespace InvestmentManager.Web.ViewAgregator.Implimentations
 
             return listModel;
         }
-        public async Task<List<ReportComponentModel>> GetReportsComponentAsync(long id)
+        public async Task<ReportModel> GetReportsAsync(long? id)
         {
-            var model = new List<ReportComponentModel>();
+            var model = new ReportModel();
+            var headers = new List<ReportHeadModel>();
 
-            if (id != default)
+            if (id.HasValue)
             {
                 var reports = unitOfWork.Report.GetAll().Where(x => x.CompanyId == id);
-                var company = await unitOfWork.Company.FindByIdAsync(id).ConfigureAwait(false);
+                var company = await unitOfWork.Company.FindByIdAsync(id.Value).ConfigureAwait(false);
+                var dateReport = unitOfWork.Report.GetLastDateReport(id.Value);
 
                 if (!reports.Any() || company is null)
                     return model;
 
-                var tempModel = new ReportComponentModel(null)
+                headers.Add(new ReportHeadModel
                 {
-                    CompanyId = id,
+                    CompanyId = id.Value,
                     CompanyName = company.Name,
                     TotalCount = reports.Count(),
-                    LastYear = reports.Select(x => x.DateReport.Year).OrderBy(x => x).Last()
-                };
-
-                tempModel.LastQuarter = converterService.GetConvertedMonthInQuarter
-                    (
-                        reports.Where(x => x.DateReport.Year == tempModel.LastYear)
-                               .OrderBy(x => x.DateReport.Month)
-                               .Select(x => x.DateReport.Month)
-                               .Last());
-
-                model.Add(tempModel);
+                    LastYear = dateReport.Year,
+                    LastQuarter = converter.ConvertToQuarter(dateReport.Month)
+                });
             }
             else
             {
-                var reports = unitOfWork.Report.GetAll();
                 var companies = await unitOfWork.Company.GetAll().ToListAsync().ConfigureAwait(false);
+                var reports = unitOfWork.Report.GetAll();
+                var dateReports = unitOfWork.Report.GetLastDateReports();
 
                 if (!reports.Any() || !companies.Any())
                     return model;
 
                 foreach (var i in companies.GroupJoin(reports, x => x.Id, y => y.CompanyId, (x, y) => new
+                { CompanyId = x.Id, CompanyName = x.Name, Reports = y })
+                                            .Join(dateReports, x => x.CompanyId, y => y.Key, (x, y) => new
+                                            { x.CompanyId, x.CompanyName, x.Reports, LastDateReport = y.Value }))
                 {
-                    CompanyId = x.Id,
-                    CompanyName = x.Name,
-                    Reports = y
-                }))
-                {
-                    var tempModel = new ReportComponentModel(null)
+                    headers.Add(new ReportHeadModel
                     {
                         CompanyId = i.CompanyId,
                         CompanyName = i.CompanyName,
-                    };
-
-                    if (i.Reports.Any())
-                    {
-                        tempModel.TotalCount = i.Reports.Count();
-                        tempModel.LastYear = i.Reports.Select(z => z.DateReport.Year).OrderBy(z => z).Last();
-                        tempModel.LastQuarter = converterService.GetConvertedMonthInQuarter
-                        (
-                            i.Reports.Where(x => x.DateReport.Year == tempModel.LastYear)
-                                   .OrderBy(x => x.DateReport.Month)
-                                   .Select(x => x.DateReport.Month)
-                                   .Last()
-                        );
-                    }
-                    else
-                    {
-                        tempModel.TotalCount = 0;
-                        tempModel.LastYear = 0;
-                        tempModel.LastQuarter = 0;
-                    }
-
-                    model.Add(tempModel);
+                        TotalCount = i.Reports.Count(),
+                        LastYear = i.LastDateReport.Year,
+                        LastQuarter = converter.ConvertToQuarter(i.LastDateReport.Month)
+                    });
                 }
             }
+            model.Headers = headers;
             return model;
+        }
+        public List<ReportBodyModel> BuildReportBody(long? companyId)
+        {
+            var result = new List<ReportBodyModel>();
+            
+            if(companyId.HasValue)
+            {
+                foreach (var i in unitOfWork.Report.GetAll().Where(x => x.CompanyId == companyId.Value).OrderByDescending(x => x.DateReport))
+                {
+                    result.Add(new ReportBodyModel
+                    {
+                        Year = i.DateReport.Year,
+                        Quarter = converter.ConvertToQuarter(i.DateReport.Month),
+                        Assets = i.Assets,
+                        CashFlow = i.CashFlow,
+                        Dividends = i.Dividends,
+                        GrossProfit = i.GrossProfit,
+                        LongTermDebt = i.LongTermDebt,
+                        NetProfit = i.NetProfit,
+                        Obligations = i.Obligations,
+                        Revenue = i.Revenue,
+                        ShareCapital = i.ShareCapital,
+                        StockVolume = i.StockVolume,
+                        Turnover = i.Turnover
+                    });
+                }
+            }
+
+            return result;
         }
     }
 }

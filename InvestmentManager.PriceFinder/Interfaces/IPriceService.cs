@@ -7,6 +7,6 @@ namespace InvestmentManager.StockPriceFinder.Interfaces
     public interface IPriceService
     {
         Task<List<Price>> GetPriceListAsync(string providerName, long tickerId, string ticker, string providerUri);
-        Task<List<Price>> NewPriceFilter(IEnumerable<Price> prices, long tickerId);
+        List<Price> NewPriceFilter(IEnumerable<Price> prices, long tickerId);
     }
 }

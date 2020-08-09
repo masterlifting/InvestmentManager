@@ -40,7 +40,7 @@ namespace InvestmentManager.Web.Controllers
                     tempBody.Add(new CoefficientBodyModel
                     {
                         Year = dateReport.Year,
-                        Quarter = converterService.GetConvertedMonthInQuarter(dateReport.Month),
+                        Quarter = converterService.ConvertToQuarter(dateReport.Month),
                         PE = coefficient.PE,
                         PB = coefficient.PB,
                         EPS = coefficient.EPS,
@@ -67,7 +67,7 @@ namespace InvestmentManager.Web.Controllers
             var recommendations = await unitOfWork.SellRecommendation.GetAll().Where(x => x.UserId.Equals(userManager.GetUserId(User))).ToListAsync().ConfigureAwait(false);
 
             var companies = unitOfWork.Company.GetAll();
-            var lastPrices = unitOfWork.Price.GetLastPrices();
+            var lastPrices = unitOfWork.Price.GetLastPrices(7);
 
             var resultRecommendations = recommendations
                                                 .Join(companies, x => x.CompanyId, y => y.Id, (x, y) => new

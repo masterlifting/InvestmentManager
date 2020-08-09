@@ -1,0 +1,63 @@
+﻿@model IEnumerable<ReportBodyModel>
+
+<div class="col-lg-12 col-7 row text-muted">
+    <div class="col-lg-12 row justify-content-lg-between text-left text-lg-center">
+        <div class="col-lg-1 row">
+            <label class="col-lg-6 pr-0 pl-0">Год</label>
+            <label class="col-lg-6 pr-0 pl-0">Квартал</label>
+        </div>
+        <div class="col-lg-2 row">
+            <label class="col-lg-6 pr-0 pl-0">В_обращении</label>
+            <label class="col-lg-6 pr-0 pl-0">Дивиденды</label>
+        </div>
+        <div class="col-lg-2 row">
+            <label class="col-lg-6 pr-0 pl-0">Обязательства</label>
+            <label class="col-lg-6 pr-0 pl-0">Задолженность</label>
+        </div>
+        <div class="col-lg-2 row">
+            <label class="col-lg-6 pr-0 pl-0">Выручка</label>
+            <label class="col-lg-6 pr-0 pl-0">Чистая_прибыль</label>
+        </div>
+        <div class="col-lg-2 row">
+            <label class="col-lg-6 pr-0 pl-0">Валовая_прибыль</label>
+            <label class="col-lg-6 pr-0 pl-0">Денежный_поток</label>
+        </div>
+        <div class="col-lg-3 row">
+            <label class="col-lg-4 pr-0 pl-0">Активы</label>
+            <label class="col-lg-4 pr-0 pl-0">Оборот</label>
+            <label class="col-lg-4 pr-0 pl-0">Капитал</label>
+        </div>
+    </div>
+</div>
+<div class="col-lg-12 col-6 row flex-nowrap flex-lg-wrap" style="overflow-x:auto">
+    @foreach (var i in Model)
+    {
+        <div class="col-lg-12 row justify-content-between text-center">
+            <div class="col-lg-1 row">
+                <label class="col-lg-6">@i.Year</label>
+                <label class="col-lg-6">@i.Quarter</label>
+            </div>
+            <div class="col-lg-2 row">
+                <label class="col-lg-6">@i.StockVolume</label>
+                <label class="col-lg-6">@i.Dividends</label>
+            </div>
+            <div class="col-lg-2 row">
+                <label class="col-lg-6">@i.Obligations</label>
+                <label class="col-lg-6">@i.LongTermDebt</label>
+            </div>
+            <div class="col-lg-2 row">
+                <label class="col-lg-6">@i.Revenue</label>
+                <label class="col-lg-6">@i.NetProfit</label>
+            </div>
+            <div class="col-lg-2 row">
+                <label class="col-lg-6">@i.GrossProfit</label>
+                <label class="col-lg-6">@i.CashFlow</label>
+            </div>
+            <div class="col-lg-3 row">
+                <label class="col-lg-4">@i.Assets</label>
+                <label class="col-lg-4">@i.Turnover</label>
+                <label class="col-lg-4">@i.ShareCapital</label>
+            </div>
+        </div>
+    }
+</div>

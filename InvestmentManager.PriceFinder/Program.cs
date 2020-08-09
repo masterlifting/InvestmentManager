@@ -33,7 +33,7 @@ namespace InvestmentManager.StockPriceFinder
 
             IPriceService priceService = new PriceService(httpService, unitOfWork);
             var exchanges = unitOfWork.Exchange.GetAll();
-            var tickers = unitOfWork.Ticker.GetUniqueTikersForPrice();
+            var tickers = unitOfWork.Ticker.GetPriceTikers();
             var priceConfigure = tickers.Join(exchanges, x => x.ExchangeId, y => y.Id, (x, y) => new { TickerId = x.Id, Ticker = x.Name, y.ProviderName, y.ProviderUri });
 
             int count = priceConfigure.Count();

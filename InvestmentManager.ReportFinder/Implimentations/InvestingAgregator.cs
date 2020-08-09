@@ -3,6 +3,7 @@ using InvestmentManager.Entities.Market;
 using InvestmentManager.ReportFinder.Interfaces;
 using InvestmentManager.Repository;
 using InvestmentManager.Service.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -66,7 +67,7 @@ namespace InvestmentManager.ReportFinder.Implimentations
             Console.WriteLine("Сравниваю даты отчетов.");
             Console.ResetColor();
 
-            var lastDateReportFromDb = await unitOfWork.Report.GetFourLastReportDateAsync(companyId).ConfigureAwait(false);
+            var lastDateReportFromDb = await unitOfWork.Report.GetLastFourDateReport(companyId).ToArrayAsync().ConfigureAwait(false);
 
             if (!lastDateReportFromDb.Any())
             {
@@ -221,7 +222,7 @@ namespace InvestmentManager.ReportFinder.Implimentations
                     Obligations = dataResult.DecimalDictionary["ObligationCollection"][i]
                 };
 
-                dataResult.DividendCollection.TryGetValue((ParsedDates.FoundedDates[i].Year, converterService.GetConvertedMonthInQuarter(ParsedDates.FoundedDates[i].Month)), out decimal dividend);
+                dataResult.DividendCollection.TryGetValue((ParsedDates.FoundedDates[i].Year, converterService.ConvertToQuarter(ParsedDates.FoundedDates[i].Month)), out decimal dividend);
                 reportFromSite.Dividends = dividend;
 
                 parsedReports.Add(reportFromSite);
@@ -254,13 +255,13 @@ namespace InvestmentManager.ReportFinder.Implimentations
             var foundConvertedDates = new Dictionary<(int year, int quarter), DateTime>();
             foreach (var i in foundDates)
             {
-                foundConvertedDates.Add((i.Year, converterService.GetConvertedMonthInQuarter(i.Month)), i);
+                foundConvertedDates.Add((i.Year, converterService.ConvertToQuarter(i.Month)), i);
             }
 
             var dbConvertedDates = new Dictionary<(int year, int quarter), DateTime>();
             foreach (var i in lastDateReportFromDb)
             {
-                dbConvertedDates.Add((i.Year, converterService.GetConvertedMonthInQuarter(i.Month)), i);
+                dbConvertedDates.Add((i.Year, converterService.ConvertToQuarter(i.Month)), i);
             }
 
             //Даты отчетов, которых еще нет в БД
@@ -364,13 +365,13 @@ namespace InvestmentManager.ReportFinder.Implimentations
 
                     for (int i = 0; i < dividentDate.Count; i++)
                     {
-                        if (i > 0 && ((dividentDate[i].Year, converterService.GetConvertedMonthInQuarter(dividentDate[i].Month)) == (dividentDate[i - 1].Year, converterService.GetConvertedMonthInQuarter(dividentDate[i - 1].Month))))
+                        if (i > 0 && ((dividentDate[i].Year, converterService.ConvertToQuarter(dividentDate[i].Month)) == (dividentDate[i - 1].Year, converterService.ConvertToQuarter(dividentDate[i - 1].Month))))
                         {
-                            collection[(dividentDate[i - 1].Year, converterService.GetConvertedMonthInQuarter(dividentDate[i - 1].Month))] += dividendValue[i];
+                            collection[(dividentDate[i - 1].Year, converterService.ConvertToQuarter(dividentDate[i - 1].Month))] += dividendValue[i];
                         }
                         else
                         {
-                            collection.Add((dividentDate[i].Year, converterService.GetConvertedMonthInQuarter(dividentDate[i].Month)), dividendValue[i]);
+                            collection.Add((dividentDate[i].Year, converterService.ConvertToQuarter(dividentDate[i].Month)), dividendValue[i]);
                         }
                     }
                 }).ConfigureAwait(false);

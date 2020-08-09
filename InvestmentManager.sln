@@ -9,8 +9,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastru
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentation", "{00EC39C2-A6F0-4003-B93F-A494D80DA050}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{A6086C8F-3A4C-48A4-A36A-56BAD2384E1E}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InvestmentManager.Entities", "InvestmentManager.Entities\InvestmentManager.Entities.csproj", "{FC7CF234-85B2-425C-B791-28E4F8DC674C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InvestmentManager.Repository", "InvestmentManager.Repository\InvestmentManager.Repository.csproj", "{63ACD5F4-484A-43F4-B133-65D7AF9670C2}"
@@ -24,8 +22,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InvestmentManager.BrokerService", "InvestmentManager.BrokerService\InvestmentManager.BrokerService.csproj", "{BB2FDCEF-149B-470B-8B5A-6BCD81F172A8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InvestmentManager.Calculator", "InvestmentManager.Calculator\InvestmentManager.Calculator.csproj", "{A067076A-3DD4-486C-B60A-B660E9367B5A}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InvestmentManager.XUnit", "InvestmentManager.XUnit\InvestmentManager.XUnit.csproj", "{076E45F6-B0F3-4849-8F04-99E7177DDC83}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InvestmentManager.Service", "InvestmentManager.Converter\InvestmentManager.Service.csproj", "{FAF9CCE6-C65D-47B3-BC8F-58AF44D3A77F}"
 EndProject
@@ -65,10 +61,6 @@ Global
 		{A067076A-3DD4-486C-B60A-B660E9367B5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A067076A-3DD4-486C-B60A-B660E9367B5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A067076A-3DD4-486C-B60A-B660E9367B5A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{076E45F6-B0F3-4849-8F04-99E7177DDC83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{076E45F6-B0F3-4849-8F04-99E7177DDC83}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{076E45F6-B0F3-4849-8F04-99E7177DDC83}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{076E45F6-B0F3-4849-8F04-99E7177DDC83}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FAF9CCE6-C65D-47B3-BC8F-58AF44D3A77F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FAF9CCE6-C65D-47B3-BC8F-58AF44D3A77F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FAF9CCE6-C65D-47B3-BC8F-58AF44D3A77F}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -89,7 +81,6 @@ Global
 		{4913457C-3F4B-4C2F-B79E-633AE7EE6BB6} = {B03D9F88-7B9E-423C-801D-580B766C2E28}
 		{BB2FDCEF-149B-470B-8B5A-6BCD81F172A8} = {B03D9F88-7B9E-423C-801D-580B766C2E28}
 		{A067076A-3DD4-486C-B60A-B660E9367B5A} = {B03D9F88-7B9E-423C-801D-580B766C2E28}
-		{076E45F6-B0F3-4849-8F04-99E7177DDC83} = {A6086C8F-3A4C-48A4-A36A-56BAD2384E1E}
 		{FAF9CCE6-C65D-47B3-BC8F-58AF44D3A77F} = {B03D9F88-7B9E-423C-801D-580B766C2E28}
 		{912B9BCA-CFEA-4E35-9B3F-DB3B6AF4B8EF} = {B03D9F88-7B9E-423C-801D-580B766C2E28}
 	EndGlobalSection

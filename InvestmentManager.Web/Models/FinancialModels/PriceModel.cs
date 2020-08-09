@@ -1,6 +1,6 @@
 ﻿namespace InvestmentManager.Web.Models.FinancialModels
 {
-    public class PriceComponentModel
+    public class PriceModel
     {
         public long CompanyId { get; set; }
         public string CompanyName { get; set; }

@@ -17,7 +17,7 @@ namespace InvestmentManager.Calculator
     {
         private readonly IUnitOfWorkFactory unitOfWork;
         public InvestmentCalculator(IUnitOfWorkFactory unitOfWork) => this.unitOfWork = unitOfWork;
-        
+
         async Task<Rating> CalculateRatingAsync(CalculatedArgs calculatedArgs, long companyId)
         {
             if (calculatedArgs is null || companyId == 0)
@@ -315,7 +315,7 @@ namespace InvestmentManager.Calculator
                 {
                     CurrentRating = unitOfWork.Rating.GetAll().FirstOrDefault(x => x.CompanyId == companyId),
                     Coefficients = await unitOfWork.Coefficient.GetSortedCoefficientsAsync(companyId).ConfigureAwait(false),
-                    Prices = await unitOfWork.Price.GetSortedPricesByDateAsync(companyId, OrderType.OrderBy).ConfigureAwait(false),
+                    Prices = await unitOfWork.Price.GetCustomPricesAsync(companyId, 24, OrderType.OrderBy).ConfigureAwait(false),
                     Reports = unitOfWork.Report.GetAll().Where(x => x.CompanyId == companyId && x.IsChecked == true).OrderBy(x => x.DateReport.Date)
                 };
 
@@ -376,26 +376,26 @@ namespace InvestmentManager.Calculator
             }
             return result;
         }
-        public async Task<List<BuyRecommendation>> GetCompleatedBuyRecommendationsAsync(IEnumerable<Rating> ratings)
+        public List<BuyRecommendation> GetCompleatedBuyRecommendations(IEnumerable<Rating> ratings)
         {
             var result = new List<BuyRecommendation>();
             int ratingCount = ratings.Count();
             int companyCountWithPrices = unitOfWork.Price.GetCompanyCountWithPrices();
-            foreach (var companyId in unitOfWork.Company.GetAll().Select(x => x.Id))
+            var prices = unitOfWork.Price.GetGroupedPrices(12, OrderType.OrderBy);
+            
+            foreach (var i in unitOfWork.Company.GetAll()
+                .Join(prices, x => x.Id, y => y.Key, (x, y) => new { CompanyId = x.Id, Prices = y.Value })
+                .Join(ratings, x => x.CompanyId, y => y.CompanyId, (x, y) => new { x.CompanyId, x.Prices, y.Place }))
             {
-                // Получу прайс лист по этой компании
-                var companyPriceList = await unitOfWork.Price.GetSortedPricesByDateAsync(companyId, OrderType.OrderBy).ConfigureAwait(false);
-                // Если по компании имеется прайс лист, то добавляю данные для обновления рекоммендаций к покупке
-                if (companyPriceList.Any())
+                var recommendationArgs = new BuyRecommendationArgs
                 {
-                    var recommendationArgs = new BuyRecommendationArgs();
-                    recommendationArgs.CompanyId = companyId;
-                    recommendationArgs.Prices = companyPriceList;
-                    recommendationArgs.CompanyCountWhitPrice = companyCountWithPrices;
-                    recommendationArgs.RatingPlace = ratings.FirstOrDefault(x => x.CompanyId == companyId).Place;
+                    CompanyId = i.CompanyId,
+                    Prices = i.Prices,
+                    CompanyCountWhitPrice = companyCountWithPrices,
+                    RatingPlace = i.Place
+                };
 
-                    result.Add(CalculateBuyRecommendation(recommendationArgs));
-                }
+                result.Add(CalculateBuyRecommendation(recommendationArgs));
             }
             return result;
         }

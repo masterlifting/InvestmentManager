@@ -43,7 +43,7 @@ namespace InvestmentManager.ReportFinder
             IConverterService converterService = new ConverterService();
             IReportService reportService = new ReportService(serviceProvider, unitOfWork, converterService);
 
-            IDictionary<long, Report> lastReports = unitOfWork.Report.GetAllLastReportsGroupById();
+            IDictionary<long, Report> lastReports = unitOfWork.Report.GetLastReports();
             int sourceCount = await unitOfWork.ReportSource.GetAll().CountAsync().ConfigureAwait(false);
             Task<List<Report>> newReportsTask = null;
             var reportsToSave = new List<Report>();

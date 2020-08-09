@@ -39,7 +39,7 @@ namespace InvestmentManager.Repository
     public interface IIsinRepository : IRepository<Isin> { }
     public interface ITickerRepository : IRepository<Ticker>
     {
-        List<Ticker> GetUniqueTikersForPrice();
+        IEnumerable<Ticker> GetPriceTikers();
         IQueryable<Ticker> GetTickerIncludedLot();
     }
     public interface ILotRepository : IRepository<Lot> { }
@@ -53,21 +53,22 @@ namespace InvestmentManager.Repository
         /// Словарь последних вышедших отчетов по каждой компании
         /// </summary>
         /// <returns>Словарь(CompanyId,Report)</returns>
-        IDictionary<long, Report> GetAllLastReportsGroupById();
+        IDictionary<long, Report> GetLastReports();
         /// <summary>
         /// Четыре последних даты отчетов
         /// </summary>
         /// <param name="companyId"></param>
         /// <returns>4 даты</returns>
-        Task<List<DateTime>> GetFourLastReportDateAsync(long companyId);
+        IQueryable<DateTime> GetLastFourDateReport(long companyId);
+        IDictionary<long, DateTime> GetLastDateReports();
+        DateTime GetLastDateReport(long companyId);
     }
     public interface IPriceRepository : IRepository<Price>
     {
-        Task<IEnumerable<Price>> GetSortedPricesByDateAsync(long companyId, OrderType order);
-        Task<List<DateTime>> GetSortedPriceDateAsync(long tickerId, int countElement);
-        Dictionary<long, decimal> GetLastPrices();
-        Dictionary<long, IEnumerable<Price>> GetGroupedSortedDescPrices();
-        Task<decimal> GetPriceByDateReportAsync(long companyId, DateTime dateReport);
+        Task<IEnumerable<Price>> GetCustomPricesAsync(long companyId, int lastMonths, OrderType orderDate);
+        IDictionary<long, IEnumerable<Price>> GetGroupedPrices(int lastMonths, OrderType orderDate);
+        IDictionary<long, decimal> GetLastPrices(double lastDays);
+        IQueryable<DateTime> GetLastDates(long tickerId, int count);
         int GetCompanyCountWithPrices();
     }
     // Calculate
@@ -76,7 +77,7 @@ namespace InvestmentManager.Repository
     {
         Task<List<Coefficient>> GetSortedCoefficientsAsync(long companyId);
         Task<List<(decimal price, Report report)>> GetSortedCoefficientCalculatingDataAsync(long companyId);
-        Dictionary<string, List<(DateTime dateReport, Coefficient coefficient)>> GetViewData();
+        IDictionary<string, List<(DateTime dateReport, Coefficient coefficient)>> GetViewData();
     }
     public interface ISellRecommendationRepository : IRepository<SellRecommendation> { }
     public interface IBuyRecommendationRepository : IRepository<BuyRecommendation> { }

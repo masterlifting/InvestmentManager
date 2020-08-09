@@ -6,7 +6,8 @@ namespace InvestmentManager.Web.ViewAgregator.Interfaces
 {
     public interface IFinancialAgregator
     {
-        Task<List<PriceComponentModel>> GetPricesComponentAsync(long id);
-        Task<List<ReportComponentModel>> GetReportsComponentAsync(long id);
+        Task<List<PriceModel>> GetPricesAsync(long? companyId);
+        Task<ReportModel> GetReportsAsync(long? companyId);
+        List<ReportBodyModel> BuildReportBody(long? companyId);
     }
 }
