@@ -21,7 +21,8 @@ namespace InvestmentManager.Repository
 
         void DeleteEntity(TEntity entity);
         void DeleteEntities(IEnumerable<TEntity> entities);
-        void TruncateAndReseed();
+        void TruncateAndReseedSQL();
+        void DeleteAndReseedPostgres();
     }
 
     #region Repository Interfaces

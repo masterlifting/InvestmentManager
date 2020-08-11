@@ -1,5 +1,5 @@
 ﻿using InvestmentManager.Entities.Market;
-using InvestmentManager.StockPriceFinder.Interfaces;
+using InvestmentManager.PriceFinder.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Net.Http.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace InvestmentManager.StockPriceFinder.Implimentations
+namespace InvestmentManager.PriceFinder.Implimentations
 {
     public class TdameritradeAgregator : IPriceAgregator
     {

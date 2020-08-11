@@ -293,8 +293,8 @@ namespace InvestmentManager.Calculator
         public async Task<List<Coefficient>> GetComplitedCoeffitientsAsync()
         {
             var result = new List<Coefficient>();
-
-            foreach (long companyId in unitOfWork.Company.GetAll().Select(x => x.Id))
+            var companyIds = unitOfWork.Company.GetAll().Select(x => x.Id).ToList();
+            foreach (long companyId in companyIds)
             {
                 var data = await unitOfWork.Coefficient.GetSortedCoefficientCalculatingDataAsync(companyId).ConfigureAwait(false);
 
@@ -308,8 +308,8 @@ namespace InvestmentManager.Calculator
         public async Task<List<Rating>> GetCompleatedRatingsAsync()
         {
             var result = new List<Rating>();
-
-            foreach (long companyId in unitOfWork.Company.GetAll().Select(x => x.Id))
+            var companyIds = unitOfWork.Company.GetAll().Select(x => x.Id).ToList();
+            foreach (long companyId in companyIds)
             {
                 var calculatorArgs = new CalculatedArgs
                 {
@@ -341,16 +341,16 @@ namespace InvestmentManager.Calculator
             var companies = unitOfWork.Company.GetAll();
             int ratingCount = ratings.Count();
 
-            foreach (var user in users)
+            foreach (var user in users.ToList())
             {
                 var userStockTransactions = stockTransactions.Join(accounts.Where(x => x.UserId.Equals(user.Id)), x => x.AccountId, y => y.Id, (x, y) => x);
                 var companyIds = userStockTransactions.Join(tickers, x => x.TickerId, y => y.Id, (x, y) => y.CompanyId);
 
-                foreach (var companyId in companyIds.Distinct())
+                foreach (var companyId in companyIds.Distinct().ToList())
                 {
                     var companyTransactions = new List<StockTransaction>();
                     var recommendationArgs = new SellRecommendationArgs();
-                    foreach (var ticker in tickers.Where(x => x.CompanyId == companyId))
+                    foreach (var ticker in tickers.Where(x => x.CompanyId == companyId).ToList())
                     {
                         companyTransactions.AddRange(userStockTransactions.Where(x => x.TickerId == ticker.Id));
 
@@ -383,7 +383,7 @@ namespace InvestmentManager.Calculator
             int companyCountWithPrices = unitOfWork.Price.GetCompanyCountWithPrices();
             var prices = unitOfWork.Price.GetGroupedPrices(12, OrderType.OrderBy);
             
-            foreach (var i in unitOfWork.Company.GetAll()
+            foreach (var i in unitOfWork.Company.GetAll().AsEnumerable()
                 .Join(prices, x => x.Id, y => y.Key, (x, y) => new { CompanyId = x.Id, Prices = y.Value })
                 .Join(ratings, x => x.CompanyId, y => y.CompanyId, (x, y) => new { x.CompanyId, x.Prices, y.Place }))
             {

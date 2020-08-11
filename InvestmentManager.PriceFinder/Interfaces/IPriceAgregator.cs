@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace InvestmentManager.StockPriceFinder.Interfaces
+namespace InvestmentManager.PriceFinder.Interfaces
 {
     public interface IPriceAgregator
     {

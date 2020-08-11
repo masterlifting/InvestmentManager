@@ -26,12 +26,19 @@ namespace InvestmentManager.Repository
 
         public void DeleteEntity(TEntity entity) => context.Set<TEntity>().Remove(entity);
         public void DeleteEntities(IEnumerable<TEntity> entities) => context.Set<TEntity>().RemoveRange(entities);
-        public void TruncateAndReseed()
+        public void TruncateAndReseedSQL()
         {
             var tableName = context.Model.FindEntityType(typeof(TEntity)).GetTableName();
             context.Database.ExecuteSqlRaw($"TRUNCATE TABLE {tableName}");
             context.Database.ExecuteSqlRaw($"DBCC CHECKIDENT('{tableName}', RESEED, 1)");
         }
+        public void DeleteAndReseedPostgres()
+        {
+            var tableName = context.Model.FindEntityType(typeof(TEntity)).GetTableName();
+            context.Database.ExecuteSqlRaw($"DELETE FROM \"{tableName}\"");
+            context.Database.ExecuteSqlRaw($"ALTER SEQUENCE \"{tableName}_Id_seq\" RESTART WITH 1");
+        }
+
     }
     public enum OrderType
     {

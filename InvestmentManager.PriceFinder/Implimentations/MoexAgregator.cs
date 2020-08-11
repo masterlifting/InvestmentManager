@@ -1,5 +1,5 @@
 ﻿using InvestmentManager.Entities.Market;
-using InvestmentManager.StockPriceFinder.Interfaces;
+using InvestmentManager.PriceFinder.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using System.Globalization;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 
-namespace InvestmentManager.StockPriceFinder.Implimentations
+namespace InvestmentManager.PriceFinder.Implimentations
 {
     class MoexAgregator : IPriceAgregator
     {

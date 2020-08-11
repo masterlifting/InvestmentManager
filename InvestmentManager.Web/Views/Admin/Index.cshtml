@@ -1,52 +1,28 @@
-﻿@model AdminLoadModel
-
+﻿<div class="row">
+    <div class="col h4 pt-2 text-center text-monospace">панель администратора</div>
+</div>
+<div class="container-fluid border-top border-light rounded pt-2 pb-2 mb-2">
     <div class="row">
-        <div class="col h4 pt-2 text-center text-monospace">панель администратора</div>
+        <div class="col offset-1 h6 text-muted text-monospace text-left font-weight-bold">операции с ценами</div>
     </div>
-    <div class="container-fluid border-top border-light rounded pt-2 pb-2 mb-2">
-        <div class="row">
-            <div class="col offset-1 h6 text-muted text-monospace text-left font-weight-bold">операции с ценами</div>
-        </div>
-        <div class="row justify-content-around">
-            @if (Model.StockPriceFinderInProcess)
-            {
-                <a class="col-lg-3 btn btn-outline-danger text-light disabled mb-1 mb-lg-0">Обновить цены</a>
-                <a class="col-lg-3 btn btn-outline-danger text-light" asp-controller="Admin" asp-action="@nameof(AdminController.CancelOperation)" asp-route-processName="@Model.PriceFinderProcessName">Отменить операцию</a>
-            }
-            else
-            {
-                <a class="col-lg-3 btn btn-outline-danger text-light mb-1 mb-lg-0" asp-controller="Admin" asp-action="@nameof(AdminController.StartBackgroundProcess)" asp-route-processName="@Model.PriceFinderProcessName">Обновить цены</a>
-                <a class="col-lg-3 btn btn-outline-danger text-light disabled">Отменить операцию</a>
-            }
-        </div>
+    <div class="row justify-content-around">
+        <a class="col-lg-3 btn btn-outline-danger text-light my-1 mb-lg-0" asp-controller="Admin" asp-action="@nameof(AdminController.GetNewPrices)">Обновить цены</a>
     </div>
-    <div class="container-fluid border-top border-light rounded pt-2 pb-2">
-        <div class="row">
-            <div class="col offset-1 h6 text-muted text-monospace text-left font-weight-bold">операции с отчетами</div>
-        </div>
-        @if (Model.ReportFinderInProcess)
-        {
-            <div class="row justify-content-around">
-                <a class="col-lg-3 btn btn-outline-danger text-light disabled" href="#">Поиск новых отчетов</a>
-                <a class="col-lg-3 btn btn-outline-danger text-light mb-1 mb-lg-0" href="#">Проверить отчеты</a>
-                <a class="col-lg-3 btn btn-outline-danger text-light" asp-controller="Admin" asp-action="@nameof(AdminController.CancelOperation)" asp-route-processName="@Model.ReportFinderProcessName">Отменить операцию</a>
-            </div>
-        }
-        else
-        {
-            <div class="row justify-content-around">
-
-                <a class="col-lg-3 btn btn-outline-danger text-light" asp-controller="Admin" asp-action="@nameof(AdminController.StartBackgroundProcess)" asp-route-processName="@Model.ReportFinderProcessName">Поиск новых отчетов</a>
-                <a class="col-lg-3 btn btn-outline-danger text-light mb-1 mb-lg-0" asp-controller="financial" asp-action="@nameof(FinancialController.CheckReports)">Проверить отчеты</a>
-                <a class="col-lg-3 btn btn-outline-danger text-light disabled" href="#">Отменить операцию</a>
-            </div>
-        }
+</div>
+<div class="container-fluid border-top border-light rounded pt-2 pb-2">
+    <div class="row">
+        <div class="col offset-1 h6 text-muted text-monospace text-left font-weight-bold">операции с отчетами</div>
     </div>
-    <div class="container-fluid border-top border-light rounded pt-2 pb-2">
-        <div class="row">
-            <div class="col offset-1 h6 text-muted text-monospace text-left font-weight-bold">калькулятор</div>
-        </div>
-        <div class="row justify-content-around">
-            <a class="col btn btn-outline-danger text-light" asp-controller="admin" asp-action="@nameof(AdminController.UpdateAllCalculatorResult)">Пересчитать все</a>
-        </div>
+    <div class="row justify-content-around">
+        <a class="col-lg-3 btn btn-outline-danger text-light my-1" asp-controller="Admin" asp-action="@nameof(AdminController.GetNewReports)">Поиск новых отчетов</a>
+        <a class="col-lg-3 btn btn-outline-danger text-light my-1 mb-lg-0" asp-controller="financial" asp-action="@nameof(FinancialController.CheckReports)">Проверить отчеты</a>
     </div>
+</div>
+<div class="container-fluid border-top border-light rounded pt-2 pb-2">
+    <div class="row">
+        <div class="col offset-1 h6 text-muted text-monospace text-left font-weight-bold">калькулятор</div>
+    </div>
+    <div class="row justify-content-around">
+        <a class="col btn btn-outline-danger text-light my-1" asp-controller="admin" asp-action="@nameof(AdminController.UpdateAllCalculatorResult)">Пересчитать все</a>
+    </div>
+</div>

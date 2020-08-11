@@ -21,13 +21,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\InvesmentManager.ReportFinder\InvestmentManager.ReportFinder.csproj" />
     <ProjectReference Include="..\InvestmentManager.BrokerService\InvestmentManager.BrokerService.csproj" />
     <ProjectReference Include="..\InvestmentManager.Calculator\InvestmentManager.Calculator.csproj" />
     <ProjectReference Include="..\InvestmentManager.Converter\InvestmentManager.Service.csproj" />
+    <ProjectReference Include="..\InvestmentManager.PriceFinder\InvestmentManager.PriceFinder.csproj" />
     <ProjectReference Include="..\InvestmentManager.Repository\InvestmentManager.Repository.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Models\AdminModels\" />
     <Folder Include="wwwroot\lib\D3\" />
   </ItemGroup>
 

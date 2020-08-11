@@ -1,6 +1,10 @@
 using InvestmentManager.BrokerService;
 using InvestmentManager.Calculator;
 using InvestmentManager.Calculator.ConfigurationBinding;
+using InvestmentManager.PriceFinder.Implimentations;
+using InvestmentManager.PriceFinder.Interfaces;
+using InvestmentManager.ReportFinder.Implimentations;
+using InvestmentManager.ReportFinder.Interfaces;
 using InvestmentManager.Repository;
 using InvestmentManager.Service.Implimentations;
 using InvestmentManager.Service.Interfaces;
@@ -27,7 +31,7 @@ namespace InvestmentManager.Web
             configuration.Bind("SellRecommendation", new SellRecommendationConfig());
             configuration.Bind("BuyRecommendation", new BuyRecommendationConfig());
 
-            services.AddDbContext<InvestmentContext>(x => x.UseNpgsql(configuration.GetConnectionString("PostgresTestConnection")));
+            services.AddDbContext<InvestmentContext>(x => x.UseNpgsql(configuration.GetConnectionString("PostgresHomeConnection")));
             services.AddIdentity<IdentityUser, IdentityRole>(configuration =>
             {
                 configuration.Password.RequiredLength = 10;
@@ -44,6 +48,9 @@ namespace InvestmentManager.Web
             #region Custom Service
             services.AddScoped<IUnitOfWorkFactory, UnitOfWorkFactory>();
             services.AddScoped<IInvestmentCalculator, InvestmentCalculator>();
+
+            services.AddScoped<IPriceService, PriceService>();
+            services.AddScoped<IReportService, ReportService>();
 
             services.AddScoped<ICustomBrokerService, CustomBrokerService>();
             services.AddScoped<IFinancialAgregator, FinancialAgregator>();
