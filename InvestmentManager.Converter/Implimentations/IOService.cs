@@ -6,7 +6,7 @@ using System.Text;
 
 namespace InvestmentManager.Service.Implimentations
 {
-    public class LoaderService : ILoaderService
+    public class IOService : IIOService
     {
         public DataSet LoadDataSetFromExcel(string path)
         {

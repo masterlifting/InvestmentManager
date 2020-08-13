@@ -2,9 +2,7 @@
 using InvestmentManager.ReportFinder.Interfaces;
 using InvestmentManager.Repository;
 using InvestmentManager.Service.Interfaces;
-using System;
 using System.Collections.Generic;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace InvestmentManager.ReportFinder.Implimentations
@@ -14,12 +12,12 @@ namespace InvestmentManager.ReportFinder.Implimentations
 
         private readonly Dictionary<string, IReportAgregator> reportSources;
 
-        public ReportService(IServiceProvider servicesProvider, IUnitOfWorkFactory unitOfWork, IConverterService converterService)
+        public ReportService(IWebService httpService, IUnitOfWorkFactory unitOfWork, IConverterService converterService)
         {
             // !!! Если появятся новые источники отчетов, то просто добавь их сюда и реализуй IReportAgregator
             reportSources = new Dictionary<string, IReportAgregator>
             {
-                { "Investing", new InvestingAgregator(servicesProvider,unitOfWork, converterService) }
+                { "Investing", new InvestingAgregator(httpService, unitOfWork, converterService) }
             };
         }
 
@@ -32,18 +30,4 @@ namespace InvestmentManager.ReportFinder.Implimentations
                 : resultReport;
         }
     }
-    public class CustomHttpClient
-    {
-        HttpClient HttpClient { get; }
-        public CustomHttpClient(HttpClient httpClient) => HttpClient = httpClient;
-        public async Task<HttpResponseMessage> GetReportAsync(string query)
-        {
-            var request = new HttpRequestMessage(HttpMethod.Get, query);
-            var response = await HttpClient.SendAsync(request).ConfigureAwait(false);
-            Console.WriteLine(response.StatusCode);
-            response.EnsureSuccessStatusCode();
-            return response;
-        }
-    }
-
 }

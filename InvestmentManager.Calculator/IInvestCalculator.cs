@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace InvestmentManager.Calculator
 {
-    public interface IInvestmentCalculator
+    public interface IInvestCalculator
     {
         Task<List<Coefficient>> GetComplitedCoeffitientsAsync();
         Task<List<Rating>> GetCompleatedRatingsAsync();

@@ -1,6 +1,6 @@
 ﻿using InvestmentManager.Entities.Market;
 using InvestmentManager.PriceFinder.Interfaces;
-using Microsoft.Extensions.DependencyInjection;
+using InvestmentManager.Service.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -13,10 +13,9 @@ namespace InvestmentManager.PriceFinder.Implimentations
     {
         const NumberStyles style = NumberStyles.Number | NumberStyles.AllowCurrencySymbol;
         private static readonly CultureInfo culture = CultureInfo.CreateSpecificCulture("ru-RU");
-        private readonly IServiceProvider serviceProvider;
         static readonly DateTime date = DateTime.Now.AddDays(-366);
-
-        public MoexAgregator(IServiceProvider serviceProvider) => this.serviceProvider = serviceProvider;
+        private readonly IWebService httpService;
+        public MoexAgregator(IWebService httpService) => this.httpService = httpService;
 
         public async Task<List<Price>> FindNewPriciesAsync(long tickerId, string ticker, string providerUri)
         {
@@ -36,8 +35,7 @@ namespace InvestmentManager.PriceFinder.Implimentations
 
             string query = $@"{providerUri}/engines/stock/markets/shares/boards/TQBR/securities/{ticker}/candles.json?from={date.Year}-{date.Month}-{date.Day}&interval=24&start=0";
 
-            var clientMoex = serviceProvider.GetService<CustomHttpClient>();
-            var response = await clientMoex.GetPriceAsync(query);
+            var response = await httpService.GetDataAsync(query);
             var priceData = await response.Content.ReadFromJsonAsync<MoexJsonModel>().ConfigureAwait(false);
 
             foreach (var price in priceData.Candles.Data)

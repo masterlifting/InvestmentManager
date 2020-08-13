@@ -13,8 +13,8 @@ namespace InvestmentManager.Repository
         Task<TEntity> FindByIdAsync(long id);
         IQueryable<TEntity> GetAll();
 
-        void CreateEntity(TEntity entity);
-        void CreateEntities(IEnumerable<TEntity> entities);
+        Task CreateEntityAsync(TEntity entity);
+        Task CreateEntitiesAsync(IEnumerable<TEntity> entities);
 
         void UpdateEntity(TEntity entity);
         void UpdateEntities(IEnumerable<TEntity> entities);

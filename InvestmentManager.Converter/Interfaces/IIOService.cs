@@ -2,7 +2,7 @@
 
 namespace InvestmentManager.Service.Interfaces
 {
-    public interface ILoaderService
+    public interface IIOService
     {
         DataSet LoadDataSetFromExcel(string path);
     }

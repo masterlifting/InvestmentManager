@@ -29,16 +29,16 @@ namespace InvestmentManager.Web.Controllers
         private static readonly Dictionary<string, List<PortfolioReportModel>> ResultPortfolioReports = new Dictionary<string, List<PortfolioReportModel>>();
 
         private readonly IWebHostEnvironment environment;
-        private readonly ILoaderService loaderService;
-        private readonly ICustomBrokerService brokerService;
+        private readonly IIOService loaderService;
+        private readonly IInvestBrokerService brokerService;
         private readonly UserManager<IdentityUser> userManager;
         private readonly IUnitOfWorkFactory unitOfWork;
         private readonly IPortfolioAgregator agregator;
         const string controllerName = "~/portfolio";
         public PortfolioController(
             IWebHostEnvironment environment
-            , ILoaderService loaderService
-            , ICustomBrokerService brokerService
+            , IIOService loaderService
+            , IInvestBrokerService brokerService
             , UserManager<IdentityUser> userManager
             , IUnitOfWorkFactory unitOfWork
             , IPortfolioAgregator agregator)
@@ -268,31 +268,31 @@ namespace InvestmentManager.Web.Controllers
                 {
                     var accountTransactions = filter.GetNewTransactions(resultAccountTransactions);
                     if (accountTransactions.Any())
-                        unitOfWork.AccountTransaction.CreateEntities(accountTransactions);
+                        await unitOfWork.AccountTransaction.CreateEntitiesAsync(accountTransactions).ConfigureAwait(false);
                 }
                 if (resultStockTransactions.Any())
                 {
                     var stockTransactions = filter.GetNewTransactions(resultStockTransactions);
                     if (stockTransactions.Any())
-                        unitOfWork.StockTransaction.CreateEntities(stockTransactions);
+                        await unitOfWork.StockTransaction.CreateEntitiesAsync(stockTransactions).ConfigureAwait(false);
                 }
                 if (resultDividends.Any())
                 {
                     var dividends = filter.GetNewTransactions(resultDividends);
                     if (dividends.Any())
-                        unitOfWork.Dividend.CreateEntities(dividends);
+                        await unitOfWork.Dividend.CreateEntitiesAsync(dividends).ConfigureAwait(false);
                 }
                 if (resultComissions.Any())
                 {
                     var comissions = filter.GetNewTransactions(resultComissions);
                     if (comissions.Any())
-                        unitOfWork.Comission.CreateEntities(comissions);
+                        await unitOfWork.Comission.CreateEntitiesAsync(comissions).ConfigureAwait(false);
                 }
                 if (resultExchangeRates.Any())
                 {
                     var exchangeRates = filter.GetNewTransactions(resultExchangeRates);
                     if (exchangeRates.Any())
-                        unitOfWork.ExchangeRate.CreateEntities(exchangeRates);
+                        await unitOfWork.ExchangeRate.CreateEntitiesAsync(exchangeRates).ConfigureAwait(false);
                 }
 
                 await unitOfWork.CompleteAsync().ConfigureAwait(false);
@@ -310,14 +310,14 @@ namespace InvestmentManager.Web.Controllers
         {
             if (form != null && ModelState.IsValid)
             {
-                unitOfWork.Ticker.CreateEntity(new Ticker
+                await unitOfWork.Ticker.CreateEntityAsync(new Ticker
                 {
                     CompanyId = form.CompanyId,
                     ExchangeId = form.ExchangeId,
                     LotId = form.LotId,
 
                     Name = form.TickerName
-                });
+                }).ConfigureAwait(false);
 
                 await unitOfWork.CompleteAsync().ConfigureAwait(false);
             }
@@ -329,11 +329,11 @@ namespace InvestmentManager.Web.Controllers
         {
             if (form != null && ModelState.IsValid)
             {
-                unitOfWork.Account.CreateEntity(new Account
+                await unitOfWork.Account.CreateEntityAsync(new Account
                 {
                     Name = form.AccountName,
                     UserId = userManager.GetUserId(User)
-                });
+                }).ConfigureAwait(false);
 
                 await unitOfWork.CompleteAsync().ConfigureAwait(false);
             }
@@ -345,11 +345,11 @@ namespace InvestmentManager.Web.Controllers
         {
             if (form != null && ModelState.IsValid)
             {
-                unitOfWork.Isin.CreateEntity(new Isin
+                await unitOfWork.Isin.CreateEntityAsync(new Isin
                 {
                     CompanyId = form.CompanyId,
                     Name = form.Isin
-                });
+                }).ConfigureAwait(false);
 
                 await unitOfWork.CompleteAsync().ConfigureAwait(false);
             }

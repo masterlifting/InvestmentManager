@@ -9,6 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\InvestmentManager.Converter\InvestmentManager.Service.csproj" />
     <ProjectReference Include="..\InvestmentManager.Entities\InvestmentManager.Entities.csproj" />
     <ProjectReference Include="..\InvestmentManager.Repository\InvestmentManager.Repository.csproj" />
   </ItemGroup>

@@ -4,7 +4,6 @@ using InvestmentManager.ReportFinder.Interfaces;
 using InvestmentManager.Repository;
 using InvestmentManager.Service.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -16,7 +15,7 @@ namespace InvestmentManager.ReportFinder.Implimentations
 {
     public class InvestingAgregator : IReportAgregator
     {
-        private readonly IServiceProvider servicesProvider;
+        private readonly IWebService httpService;
         private readonly IUnitOfWorkFactory unitOfWork;
         private readonly IConverterService converterService;
         const NumberStyles style = NumberStyles.Number | NumberStyles.AllowCurrencySymbol;
@@ -25,11 +24,11 @@ namespace InvestmentManager.ReportFinder.Implimentations
         static (List<DateTime> NewDates, List<DateTime> FoundedDates) ParsedDates;
 
         public InvestingAgregator(
-            IServiceProvider servicesProvider
+            IWebService httpService
             , IUnitOfWorkFactory unitOfWork
             , IConverterService converterService)
         {
-            this.servicesProvider = servicesProvider;
+            this.httpService = httpService;
             this.unitOfWork = unitOfWork;
             this.converterService = converterService;
         }
@@ -55,8 +54,7 @@ namespace InvestmentManager.ReportFinder.Implimentations
             Console.WriteLine("Получаю страницу с данными отчетов для определения новых отчетов");
 
             var financialSummaryQuery = $"{pattern}-financial-summary";
-            var financialSummaryClient = servicesProvider.GetService<CustomHttpClient>();
-            var response = await financialSummaryClient.GetReportAsync(financialSummaryQuery).ConfigureAwait(false);
+            var response = await httpService.GetDataAsync(financialSummaryQuery).ConfigureAwait(false);
 
             var financialSummaryPage = new HtmlDocument();
             financialSummaryPage.LoadHtml(await response.Content.ReadAsStringAsync().ConfigureAwait(false));
@@ -101,21 +99,19 @@ namespace InvestmentManager.ReportFinder.Implimentations
         {
             Console.ForegroundColor = ConsoleColor.DarkYellow;
             Console.WriteLine("Загружаю остальные страницы с данными");
-            var downloaderClient = servicesProvider.GetService<CustomHttpClient>();
-
-            var mainResponse = await downloaderClient.GetReportAsync(pattern).ConfigureAwait(false);
+            var mainResponse = await httpService.GetDataAsync(pattern).ConfigureAwait(false);
             var mainPage = new HtmlDocument();
             mainPage.LoadHtml(await mainResponse.Content.ReadAsStringAsync().ConfigureAwait(false));
             if (mainPage is null)
                 throw new NullReferenceException("Главная страница не была загружена");
 
-            var balanceResponse = await downloaderClient.GetReportAsync($"{pattern}-balance-sheet").ConfigureAwait(false);
+            var balanceResponse = await httpService.GetDataAsync($"{pattern}-balance-sheet").ConfigureAwait(false);
             var balancePage = new HtmlDocument();
             balancePage.LoadHtml(await balanceResponse.Content.ReadAsStringAsync().ConfigureAwait(false));
             if (balancePage is null)
                 throw new NullReferenceException("Страница с балансами не была загружена");
 
-            var dividendsResponse = await downloaderClient.GetReportAsync($"{pattern}-dividends").ConfigureAwait(false);
+            var dividendsResponse = await httpService.GetDataAsync($"{pattern}-dividends").ConfigureAwait(false);
             var dividendsPage = new HtmlDocument();
             dividendsPage.LoadHtml(await dividendsResponse.Content.ReadAsStringAsync().ConfigureAwait(false));
             if (dividendsPage is null)

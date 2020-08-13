@@ -1,6 +1,6 @@
 ﻿using InvestmentManager.Entities.Market;
 using InvestmentManager.PriceFinder.Interfaces;
-using Microsoft.Extensions.DependencyInjection;
+using InvestmentManager.Service.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -14,9 +14,9 @@ namespace InvestmentManager.PriceFinder.Implimentations
     public class TdameritradeAgregator : IPriceAgregator
     {
         private static readonly CultureInfo culture = CultureInfo.CreateSpecificCulture("ru-RU");
-        private readonly IServiceProvider serviceProvider;
         const string apiKey = "X9GOW9DSLWI9IAAF5U8UF5Z1UFITUWFS";
-        public TdameritradeAgregator(IServiceProvider serviceProvider) => this.serviceProvider = serviceProvider;
+        private readonly IWebService httpService;
+        public TdameritradeAgregator(IWebService httpService) => this.httpService = httpService;
 
         public async Task<List<Price>> FindNewPriciesAsync(long tickerId, string ticker, string providerUri)
         {
@@ -24,9 +24,8 @@ namespace InvestmentManager.PriceFinder.Implimentations
             string historyPriceQuery = @$"{providerUri}/{ticker}/pricehistory?apikey={apiKey}&periodType=year&period=1&frequencyType=daily&frequency=1&needExtendedHoursData=false";
             string currentPriceQuery = @$"{providerUri}/{ticker}/quotes?apikey={apiKey}";
 
-            var tdameritradeClient = serviceProvider.GetService<CustomHttpClient>();
             #region History price
-            var historyPriceResponse = await tdameritradeClient.GetPriceAsync(historyPriceQuery);
+            var historyPriceResponse = await httpService.GetDataAsync(historyPriceQuery);
             var historyPricies = await historyPriceResponse.Content.ReadFromJsonAsync<TdameritradeJsonModel>().ConfigureAwait(false);
 
             foreach (var price in historyPricies.Candles.ToList())
@@ -42,7 +41,7 @@ namespace InvestmentManager.PriceFinder.Implimentations
             }
             #endregion
             #region Current price
-            var currentPriceResponse = await tdameritradeClient.GetPriceAsync(currentPriceQuery);
+            var currentPriceResponse = await httpService.GetDataAsync(currentPriceQuery);
             string currentPrice = await currentPriceResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             if (currentPrice != null)

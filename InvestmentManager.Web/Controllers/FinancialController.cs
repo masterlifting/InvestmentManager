@@ -18,13 +18,13 @@ namespace InvestmentManager.Web.Controllers
         const string controllerName = "~/financial";
         private readonly IUnitOfWorkFactory unitOfWork;
         private readonly IConverterService converter;
-        private readonly IInvestmentCalculator calculator;
+        private readonly IInvestCalculator calculator;
         private readonly IFinancialAgregator agregator;
 
         public FinancialController(
             IUnitOfWorkFactory unitOfWork
             , IConverterService converter
-            , IInvestmentCalculator calculator,
+            , IInvestCalculator calculator,
             IFinancialAgregator agregator)
         {
             this.unitOfWork = unitOfWork;

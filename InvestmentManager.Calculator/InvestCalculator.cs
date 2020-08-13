@@ -13,10 +13,10 @@ using System.Threading.Tasks;
 
 namespace InvestmentManager.Calculator
 {
-    public class InvestmentCalculator : IInvestmentCalculator
+    public class InvestCalculator : IInvestCalculator
     {
         private readonly IUnitOfWorkFactory unitOfWork;
-        public InvestmentCalculator(IUnitOfWorkFactory unitOfWork) => this.unitOfWork = unitOfWork;
+        public InvestCalculator(IUnitOfWorkFactory unitOfWork) => this.unitOfWork = unitOfWork;
 
         async Task<Rating> CalculateRatingAsync(CalculatedArgs calculatedArgs, long companyId)
         {

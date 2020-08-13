@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace InvestmentManager.Calculator
 {
-    public abstract class BaseCalculate
+    internal abstract class BaseCalculate
     {
         private protected static readonly CultureInfo cultureConfig = CultureInfo.InvariantCulture;
         private protected const NumberStyles styleConfig = NumberStyles.Number | NumberStyles.AllowCurrencySymbol;

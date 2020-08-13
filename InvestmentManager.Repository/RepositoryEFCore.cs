@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace InvestmentManager.Repository
@@ -18,8 +17,8 @@ namespace InvestmentManager.Repository
         public async Task<TEntity> FindByIdAsync(long id) => await context.Set<TEntity>().FindAsync(id).ConfigureAwait(false);
         public IQueryable<TEntity> GetAll() => context.Set<TEntity>();
 
-        public void CreateEntity(TEntity entity) => context.Set<TEntity>().AddAsync(entity);
-        public void CreateEntities(IEnumerable<TEntity> entities) => context.Set<TEntity>().AddRangeAsync(entities);
+        public async Task CreateEntityAsync(TEntity entity) => await context.Set<TEntity>().AddAsync(entity).ConfigureAwait(false);
+        public async Task CreateEntitiesAsync(IEnumerable<TEntity> entities) => await context.Set<TEntity>().AddRangeAsync(entities).ConfigureAwait(false);
 
         public void UpdateEntity(TEntity entity) => context.Set<TEntity>().Update(entity);
         public void UpdateEntities(IEnumerable<TEntity> entities) => context.Set<TEntity>().UpdateRange(entities);
@@ -48,19 +47,18 @@ namespace InvestmentManager.Repository
 
     #region Repository Classes
     // Broker
-    class AccountRepository : RepositoryEFCore<Account>, IAccountRepository { public AccountRepository(InvestmentContext context) : base(context) { } }
-    class AccountTransactionRepository : RepositoryEFCore<AccountTransaction>, IAccountTransactionRepository { public AccountTransactionRepository(InvestmentContext context) : base(context) { } }
-    class ComissionRepository : RepositoryEFCore<Comission>, IComissionRepository { public ComissionRepository(InvestmentContext context) : base(context) { } }
-    class ComissionTypeRepository : RepositoryEFCore<ComissionType>, IComissionTypeRepository { public ComissionTypeRepository(InvestmentContext context) : base(context) { } }
-    class DividendRepository : RepositoryEFCore<Dividend>, IDividendRepository { public DividendRepository(InvestmentContext context) : base(context) { } }
-    class ExchangeRateRepository : RepositoryEFCore<ExchangeRate>, IExchangeRateRepository { public ExchangeRateRepository(InvestmentContext context) : base(context) { } }
-    class StockTransactionRepository : RepositoryEFCore<StockTransaction>, IStockTransactionRepository { public StockTransactionRepository(InvestmentContext context) : base(context) { } }
-    class TransactionStatusRepository : RepositoryEFCore<TransactionStatus>, ITransactionStatusRepository { public TransactionStatusRepository(InvestmentContext context) : base(context) { } }
-
+    public class AccountRepository : RepositoryEFCore<Account>, IAccountRepository { public AccountRepository(InvestmentContext context) : base(context) { } }
+    public class AccountTransactionRepository : RepositoryEFCore<AccountTransaction>, IAccountTransactionRepository { public AccountTransactionRepository(InvestmentContext context) : base(context) { } }
+    public class ComissionRepository : RepositoryEFCore<Comission>, IComissionRepository { public ComissionRepository(InvestmentContext context) : base(context) { } }
+    public class ComissionTypeRepository : RepositoryEFCore<ComissionType>, IComissionTypeRepository { public ComissionTypeRepository(InvestmentContext context) : base(context) { } }
+    public class DividendRepository : RepositoryEFCore<Dividend>, IDividendRepository { public DividendRepository(InvestmentContext context) : base(context) { } }
+    public class ExchangeRateRepository : RepositoryEFCore<ExchangeRate>, IExchangeRateRepository { public ExchangeRateRepository(InvestmentContext context) : base(context) { } }
+    public class StockTransactionRepository : RepositoryEFCore<StockTransaction>, IStockTransactionRepository { public StockTransactionRepository(InvestmentContext context) : base(context) { } }
+    public class TransactionStatusRepository : RepositoryEFCore<TransactionStatus>, ITransactionStatusRepository { public TransactionStatusRepository(InvestmentContext context) : base(context) { } }
     // Market
-    class ExchangeRepository : RepositoryEFCore<Exchange>, IExchangeRepository { public ExchangeRepository(InvestmentContext context) : base(context) { } }
-    class IsinRepository : RepositoryEFCore<Isin>, IIsinRepository { public IsinRepository(InvestmentContext context) : base(context) { } }
-    class TickerRepository : RepositoryEFCore<Ticker>, ITickerRepository
+    public class ExchangeRepository : RepositoryEFCore<Exchange>, IExchangeRepository { public ExchangeRepository(InvestmentContext context) : base(context) { } }
+    public class IsinRepository : RepositoryEFCore<Isin>, IIsinRepository { public IsinRepository(InvestmentContext context) : base(context) { } }
+    public class TickerRepository : RepositoryEFCore<Ticker>, ITickerRepository
     {
         private readonly InvestmentContext context;
         public TickerRepository(InvestmentContext context) : base(context) => this.context = context;
@@ -68,12 +66,12 @@ namespace InvestmentManager.Repository
         public IQueryable<Ticker> GetTickerIncludedLot() => context.Tickers.AsNoTracking().Include(x => x.Lot);
         public IEnumerable<Ticker> GetPriceTikers() => context.Tickers.AsNoTracking().AsEnumerable().GroupBy(x => x.CompanyId).Select(x => x.First());
     }
-    class LotRepository : RepositoryEFCore<Lot>, ILotRepository { public LotRepository(InvestmentContext context) : base(context) { } }
-    class CompanyRepository : RepositoryEFCore<Company>, ICompanyRepository { public CompanyRepository(InvestmentContext context) : base(context) { } }
-    class IndustryRepository : RepositoryEFCore<Industry>, IIndustryRepository { public IndustryRepository(InvestmentContext context) : base(context) { } }
-    class SectorRepository : RepositoryEFCore<Sector>, ISectorRepository { public SectorRepository(InvestmentContext context) : base(context) { } }
-    class ReportSourceRepository : RepositoryEFCore<ReportSource>, IReportSourceRepository { public ReportSourceRepository(InvestmentContext context) : base(context) { } }
-    class ReportRepository : RepositoryEFCore<Report>, IReportRepository
+    public class LotRepository : RepositoryEFCore<Lot>, ILotRepository { public LotRepository(InvestmentContext context) : base(context) { } }
+    public class CompanyRepository : RepositoryEFCore<Company>, ICompanyRepository { public CompanyRepository(InvestmentContext context) : base(context) { } }
+    public class IndustryRepository : RepositoryEFCore<Industry>, IIndustryRepository { public IndustryRepository(InvestmentContext context) : base(context) { } }
+    public class SectorRepository : RepositoryEFCore<Sector>, ISectorRepository { public SectorRepository(InvestmentContext context) : base(context) { } }
+    public class ReportSourceRepository : RepositoryEFCore<ReportSource>, IReportSourceRepository { public ReportSourceRepository(InvestmentContext context) : base(context) { } }
+    public class ReportRepository : RepositoryEFCore<Report>, IReportRepository
     {
         private readonly InvestmentContext context;
         public ReportRepository(InvestmentContext context) : base(context) => this.context = context;
@@ -106,7 +104,7 @@ namespace InvestmentManager.Repository
         }
         public DateTime GetLastDateReport(long companyId) => context.Reports.AsNoTracking().Where(x => x.CompanyId == companyId).OrderBy(x => x.DateReport).Last().DateReport;
     }
-    class PriceRepository : RepositoryEFCore<Price>, IPriceRepository
+    public class PriceRepository : RepositoryEFCore<Price>, IPriceRepository
     {
         private readonly InvestmentContext context;
         public PriceRepository(InvestmentContext context) : base(context) => this.context = context;
@@ -147,12 +145,12 @@ namespace InvestmentManager.Repository
             .Tickers.First().Prices.Where(x => x.BidDate >= DateTime.Now.AddMonths(-lastMonths)).OrderBy(x => x.BidDate);
 
         public IQueryable<DateTime> GetLastDates(long tickerId, int count) =>
-            context.Prices.AsNoTracking().Where(x => x.TickerId == tickerId).OrderByDescending(x => x.BidDate).Select(x => x.BidDate.Date).Take(count);
+            context.Prices.Where(x => x.TickerId == tickerId).OrderByDescending(x => x.BidDate).Select(x => x.BidDate.Date).Take(count);
         public int GetCompanyCountWithPrices() => context.Companies.AsNoTracking().Include(x => x.Tickers).ThenInclude(x => x.Prices).Select(x => x.Tickers.First()).Where(x => x.Prices.Any()).Count();
     }
     // Calculate
-    class RatingRepository : RepositoryEFCore<Rating>, IRatingRepository { public RatingRepository(InvestmentContext context) : base(context) { } }
-    class CoefficientRepository : RepositoryEFCore<Coefficient>, ICoefficientRepository
+    public class RatingRepository : RepositoryEFCore<Rating>, IRatingRepository { public RatingRepository(InvestmentContext context) : base(context) { } }
+    public class CoefficientRepository : RepositoryEFCore<Coefficient>, ICoefficientRepository
     {
         private readonly InvestmentContext context;
         public CoefficientRepository(InvestmentContext context) : base(context) => this.context = context;
@@ -193,9 +191,9 @@ namespace InvestmentManager.Repository
             (await context.Companies.AsNoTracking().Include(x => x.Reports).ThenInclude(x => x.Coefficient).FirstOrDefaultAsync(x => x.Id == companyId).ConfigureAwait(false))
             .Reports.Where(x => x.IsChecked == true).OrderBy(x => x.DateReport).Select(x => x.Coefficient).ToList();
     }
-    class SellRecommendationRepository : RepositoryEFCore<SellRecommendation>, ISellRecommendationRepository { public SellRecommendationRepository(InvestmentContext context) : base(context) { } }
-    class BuyRecommendationRepository : RepositoryEFCore<BuyRecommendation>, IBuyRecommendationRepository { public BuyRecommendationRepository(InvestmentContext context) : base(context) { } }
+    public class SellRecommendationRepository : RepositoryEFCore<SellRecommendation>, ISellRecommendationRepository { public SellRecommendationRepository(InvestmentContext context) : base(context) { } }
+    public class BuyRecommendationRepository : RepositoryEFCore<BuyRecommendation>, IBuyRecommendationRepository { public BuyRecommendationRepository(InvestmentContext context) : base(context) { } }
     // Common
-    class CurrencyRepository : RepositoryEFCore<Currency>, ICurrencyRepository { public CurrencyRepository(InvestmentContext context) : base(context) { } }
+    public class CurrencyRepository : RepositoryEFCore<Currency>, ICurrencyRepository { public CurrencyRepository(InvestmentContext context) : base(context) { } }
     #endregion
 }

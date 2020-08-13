@@ -8,38 +8,81 @@ namespace InvestmentManager.Repository
     public class UnitOfWorkFactory : IUnitOfWorkFactory
     {
         private readonly InvestmentContext context;
-        public UnitOfWorkFactory(InvestmentContext context) => this.context = context;
+        public UnitOfWorkFactory(
+        InvestmentContext context
+        , IAccountRepository account
+        , IAccountTransactionRepository accountTransaction
+        , IComissionRepository comission
+        , IComissionTypeRepository comissionType
+        , IDividendRepository dividend
+        , IIsinRepository isin
+        , IExchangeRateRepository exchangeRate
+        , IStockTransactionRepository stockTransaction
+        , ITransactionStatusRepository transactionStatus
+        , IPriceRepository price
+        , ILotRepository lot
+        , ITickerRepository ticker
+        , ISectorRepository sector
+        , IReportRepository report
+        , ICompanyRepository company
+        , IExchangeRepository exchange
+        , IIndustryRepository industry
+        , IReportSourceRepository reportSource
+        , IRatingRepository rating
+        , ICoefficientRepository coefficient
+        , ISellRecommendationRepository sellRecommendation
+        , IBuyRecommendationRepository buyRecommendation
+        , ICurrencyRepository currency)
+        {
+            this.context = context;
+            Account = account;
+            AccountTransaction = accountTransaction;
+            Comission = comission;
+            ComissionType = comissionType;
+            Dividend = dividend;
+            Isin = isin;
+            ExchangeRate = exchangeRate;
+            StockTransaction = stockTransaction;
+            TransactionStatus = transactionStatus;
+            Price = price;
+            Lot = lot;
+            Ticker = ticker;
+            Sector = sector;
+            Report = report;
+            Company = company;
+            Exchange = exchange;
+            Industry = industry;
+            ReportSource = reportSource;
+            Rating = rating;
+            Coefficient = coefficient;
+            SellRecommendation = sellRecommendation;
+            BuyRecommendation = buyRecommendation;
+            Currency = currency;
+        }
 
-        // Broker
-        public IAccountRepository Account => new AccountRepository(context);
-        public IDividendRepository Dividend => new DividendRepository(context);
-        public IIsinRepository Isin => new IsinRepository(context);
-        public IComissionRepository Comission => new ComissionRepository(context);
-        public IExchangeRateRepository ExchangeRate => new ExchangeRateRepository(context);
-        public IComissionTypeRepository ComissionType => new ComissionTypeRepository(context);
-        public IStockTransactionRepository StockTransaction => new StockTransactionRepository(context);
-        public ITransactionStatusRepository TransactionStatus => new TransactionStatusRepository(context);
-        public IAccountTransactionRepository AccountTransaction => new AccountTransactionRepository(context);
-
-        // Market
-        public IPriceRepository Price => new PriceRepository(context);
-        public ILotRepository Lot => new LotRepository(context);
-        public ITickerRepository Ticker => new TickerRepository(context);
-        public ISectorRepository Sector => new SectorRepository(context);
-        public IReportRepository Report => new ReportRepository(context);
-        public ICompanyRepository Company => new CompanyRepository(context);
-        public IExchangeRepository Exchange => new ExchangeRepository(context);
-        public IIndustryRepository Industry => new IndustryRepository(context);
-        public IReportSourceRepository ReportSource => new ReportSourceRepository(context);
-
-        // Calculate
-        public IRatingRepository Rating => new RatingRepository(context);
-        public ICoefficientRepository Coefficient => new CoefficientRepository(context);
-        public ISellRecommendationRepository SellRecommendation => new SellRecommendationRepository(context);
-        public IBuyRecommendationRepository BuyRecommendation => new BuyRecommendationRepository(context);
-
-        // Common
-        public ICurrencyRepository Currency => new CurrencyRepository(context);
+        public IAccountRepository Account { get; }
+        public IAccountTransactionRepository AccountTransaction { get; }
+        public IComissionRepository Comission { get; }
+        public IComissionTypeRepository ComissionType { get; }
+        public IDividendRepository Dividend { get; }
+        public IIsinRepository Isin { get; }
+        public IExchangeRateRepository ExchangeRate { get; }
+        public IStockTransactionRepository StockTransaction { get; }
+        public ITransactionStatusRepository TransactionStatus { get; }
+        public IPriceRepository Price { get; }
+        public ILotRepository Lot { get; }
+        public ITickerRepository Ticker { get; }
+        public ISectorRepository Sector { get; }
+        public IReportRepository Report { get; }
+        public ICompanyRepository Company { get; }
+        public IExchangeRepository Exchange { get; }
+        public IIndustryRepository Industry { get; }
+        public IReportSourceRepository ReportSource { get; }
+        public IRatingRepository Rating { get; }
+        public ICoefficientRepository Coefficient { get; }
+        public ISellRecommendationRepository SellRecommendation { get; }
+        public IBuyRecommendationRepository BuyRecommendation { get; }
+        public ICurrencyRepository Currency { get; }
 
 
         public async Task<int> CompleteAsync() => await context.SaveChangesAsync().ConfigureAwait(false);

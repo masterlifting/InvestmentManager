@@ -21,7 +21,7 @@ namespace InvestmentManager.Web.Controllers
     {
         const string localUrl = "~/admin";
         private readonly IUnitOfWorkFactory unitOfWork;
-        private readonly IInvestmentCalculator calculator;
+        private readonly IInvestCalculator calculator;
         private readonly UserManager<IdentityUser> userManager;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IPriceService priceService;
@@ -29,7 +29,7 @@ namespace InvestmentManager.Web.Controllers
 
         public AdminController(
             IUnitOfWorkFactory unitOfWork
-            , IInvestmentCalculator calculator
+            , IInvestCalculator calculator
             , UserManager<IdentityUser> userManager
             , IWebHostEnvironment webHostEnvironment
             , IPriceService priceService
@@ -61,19 +61,20 @@ namespace InvestmentManager.Web.Controllers
             await unitOfWork.CompleteAsync().ConfigureAwait(false);
 
             // add new
-            unitOfWork.Coefficient.CreateEntities(await calculator.GetComplitedCoeffitientsAsync().ConfigureAwait(false));
+            await unitOfWork.Coefficient.CreateEntitiesAsync(await calculator.GetComplitedCoeffitientsAsync().ConfigureAwait(false)).ConfigureAwait(false);
             await unitOfWork.CompleteAsync().ConfigureAwait(false);
 
             var ratings = await calculator.GetCompleatedRatingsAsync().ConfigureAwait(false);
-            unitOfWork.Rating.CreateEntities(ratings);
-            unitOfWork.SellRecommendation.CreateEntities(calculator.GetCompleatedSellRecommendations(userManager.Users, ratings));
-            unitOfWork.BuyRecommendation.CreateEntities(calculator.GetCompleatedBuyRecommendations(ratings));
+            await unitOfWork.Rating.CreateEntitiesAsync(ratings).ConfigureAwait(false);
+            var sellRecommendations = calculator.GetCompleatedSellRecommendations(userManager.Users, ratings);
+            await unitOfWork.SellRecommendation.CreateEntitiesAsync(sellRecommendations).ConfigureAwait(false);
+            await unitOfWork.BuyRecommendation.CreateEntitiesAsync(calculator.GetCompleatedBuyRecommendations(ratings)).ConfigureAwait(false);
 
             await unitOfWork.CompleteAsync().ConfigureAwait(false);
 
             return LocalRedirect($"~/Home/{nameof(Index)}");
         }
-        public async Task GetNewPrices()
+        public async Task<LocalRedirectResult> GetNewPrices()
         {
             var newPricies = new List<Price>();
             var exchanges = unitOfWork.Exchange.GetAll();
@@ -88,16 +89,18 @@ namespace InvestmentManager.Web.Controllers
                 {
                     var newPrice = await priceService.GetPriceListAsync(i.ProviderName, i.TickerId, i.Ticker, i.ProviderUri).ConfigureAwait(false);
                     newPricies.AddRange(newPrice);
-                    //($"Цены по {i.Ticker} загружены в количестве: {newPrice.Count} шт. Осталось компаний {--count}.");
+                    Console.WriteLine($"Цены по {i.Ticker} загружены в количестве: {newPrice.Count} шт. Осталось компаний {--count}.");
                 }
                 catch (HttpRequestException ex)
                 {
-                    //($"На компании {i.Ticker} произошла ошибка {ex.Message}. Осталось компаний {--count}.");
+                    Console.WriteLine($"На компании {i.Ticker} произошла ошибка {ex.Message}. Осталось компаний {--count}.");
                 }
             }
 
-            unitOfWork.Price.CreateEntities(newPricies);
+            await unitOfWork.Price.CreateEntitiesAsync(newPricies).ConfigureAwait(false);
             await unitOfWork.CompleteAsync().ConfigureAwait(false);
+
+            return LocalRedirect($"~/Home/{nameof(Index)}");
         }
         public async Task GetNewReports()
         {
@@ -147,7 +150,7 @@ namespace InvestmentManager.Web.Controllers
             }
 
             //("\nСохраняю все, что нашел...");
-            unitOfWork.Report.CreateEntities(reportsToSave);
+            await unitOfWork.Report.CreateEntitiesAsync(reportsToSave);
             await unitOfWork.CompleteAsync().ConfigureAwait(false);
         }
     }

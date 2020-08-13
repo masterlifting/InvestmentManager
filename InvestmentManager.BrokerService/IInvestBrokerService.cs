@@ -2,7 +2,7 @@
 
 namespace InvestmentManager.BrokerService
 {
-    public interface ICustomBrokerService
+    public interface IInvestBrokerService
     {
         IBcsParser BcsParser { get; }
         IReportMapper ReportMapper { get; }
