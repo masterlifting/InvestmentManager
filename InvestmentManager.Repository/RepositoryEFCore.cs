@@ -38,6 +38,13 @@ namespace InvestmentManager.Repository
             context.Database.ExecuteSqlRaw($"ALTER SEQUENCE \"{tableName}_Id_seq\" RESTART WITH 1");
         }
 
+        public void PostgresAutoReseed()
+        {
+            var tableName = context.Model.FindEntityType(typeof(TEntity)).GetTableName();
+            var idlimit = context.Set<TEntity>().AsEnumerable().Max(x => x.GetType().GetProperty("Id").GetValue(x));
+            long nextId = (long)idlimit + 1;
+            context.Database.ExecuteSqlRaw($"ALTER SEQUENCE \"{tableName}_Id_seq\" RESTART WITH {nextId}");
+        }
     }
     public enum OrderType
     {

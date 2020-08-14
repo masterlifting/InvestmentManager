@@ -98,17 +98,29 @@ namespace InvestmentManager.Web.Controllers
             }
 
             await unitOfWork.Price.CreateEntitiesAsync(newPricies).ConfigureAwait(false);
-            await unitOfWork.CompleteAsync().ConfigureAwait(false);
+            try
+            {
+                await unitOfWork.CompleteAsync().ConfigureAwait(false);
+            }
+            catch
+            {
+                unitOfWork.Price.PostgresAutoReseed();
+            }
+            finally
+            {
+                await unitOfWork.CompleteAsync().ConfigureAwait(false);
+            }
 
             return LocalRedirect($"~/Home/{nameof(Index)}");
         }
-        public async Task GetNewReports()
+        public async Task<IActionResult> GetNewReports()
         {
             IDictionary<long, Report> lastReports = unitOfWork.Report.GetLastReports();
-            int sourceCount = await unitOfWork.ReportSource.GetAll().CountAsync().ConfigureAwait(false);
+            var reportSource = await unitOfWork.ReportSource.GetAll().ToListAsync().ConfigureAwait(false);
+            int sourceCount = reportSource.Count();
             Task<List<Report>> newReportsTask = null;
             var reportsToSave = new List<Report>();
-            await foreach (var i in unitOfWork.ReportSource.GetAll().AsAsyncEnumerable())
+            foreach (var i in reportSource)
             {
                 //($"\nОсталось проверить {sourceCount--} компаний.");
                 //($"Беру последний отчет.");
@@ -151,7 +163,20 @@ namespace InvestmentManager.Web.Controllers
 
             //("\nСохраняю все, что нашел...");
             await unitOfWork.Report.CreateEntitiesAsync(reportsToSave);
-            await unitOfWork.CompleteAsync().ConfigureAwait(false);
+            try
+            {
+                await unitOfWork.CompleteAsync().ConfigureAwait(false);
+            }
+            catch
+            {
+                unitOfWork.Report.PostgresAutoReseed();
+            }
+            finally
+            {
+                await unitOfWork.CompleteAsync().ConfigureAwait(false);
+            }
+
+            return LocalRedirect($"~/Home/{nameof(Index)}");
         }
     }
 }

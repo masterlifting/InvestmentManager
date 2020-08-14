@@ -25,15 +25,23 @@ namespace InvestmentManager.Web
     public class Startup
     {
         private readonly IConfiguration configuration;
-        public Startup(IConfiguration configuration) => this.configuration = configuration;
+        private readonly string connectionString;
+
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
+        {
+            connectionString = environment.IsDevelopment()
+                ? configuration["Connection:PostgresTestConnection"]
+                : configuration["ConnectionStrings:PostgresConnection"];
+
+            this.configuration = configuration;
+        }
 
         public void ConfigureServices(IServiceCollection services)
-        {
+        {   
             configuration.Bind("CalculatedWeight", new WeightConfig());
             configuration.Bind("SellRecommendation", new SellRecommendationConfig());
             configuration.Bind("BuyRecommendation", new BuyRecommendationConfig());
-
-            services.AddDbContext<InvestmentContext>(x => x.UseNpgsql(configuration["Connection:PostgresTestConnection"]));
+            services.AddDbContext<InvestmentContext>(x => x.UseNpgsql(connectionString));
             services.AddIdentity<IdentityUser, IdentityRole>(configuration =>
             {
                 configuration.Password.RequiredLength = 10;
@@ -73,7 +81,7 @@ namespace InvestmentManager.Web
             services.AddScoped<ICurrencyRepository, CurrencyRepository>();
             services.AddScoped<IUnitOfWorkFactory, UnitOfWorkFactory>();
             #endregion
-            
+
             #region Service
             #region Broker Service
             services.AddScoped<IBcsParser, BcsParser>();
@@ -94,14 +102,13 @@ namespace InvestmentManager.Web
             services.AddScoped<IIOService, IOService>();
             services.AddScoped<IConverterService, ConverterService>();
             #endregion
-            
+
             #region View agregator
             services.AddScoped<IFinancialAgregator, FinancialAgregator>();
             services.AddScoped<IPortfolioAgregator, PortfolioAgregator>();
             #endregion
 
         }
-
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())

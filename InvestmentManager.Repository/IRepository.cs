@@ -23,6 +23,7 @@ namespace InvestmentManager.Repository
         void DeleteEntities(IEnumerable<TEntity> entities);
         void TruncateAndReseedSQL();
         void DeleteAndReseedPostgres();
+        void PostgresAutoReseed();
     }
 
     #region Repository Interfaces
