@@ -19,6 +19,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
 
 namespace InvestmentManager.Web
 {
@@ -34,10 +35,15 @@ namespace InvestmentManager.Web
                 : configuration["ConnectionStrings:PostgresConnection"];
 
             this.configuration = configuration;
+
+            foreach (var i in configuration.AsEnumerable())
+            {
+                Console.WriteLine($"{i.Key} : {i.Value}");
+            }
         }
 
         public void ConfigureServices(IServiceCollection services)
-        {   
+        {
             configuration.Bind("CalculatedWeight", new WeightConfig());
             configuration.Bind("SellRecommendation", new SellRecommendationConfig());
             configuration.Bind("BuyRecommendation", new BuyRecommendationConfig());
