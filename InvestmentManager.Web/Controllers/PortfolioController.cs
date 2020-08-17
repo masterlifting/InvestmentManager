@@ -299,7 +299,22 @@ namespace InvestmentManager.Web.Controllers
                         await unitOfWork.ExchangeRate.CreateEntitiesAsync(exchangeRates).ConfigureAwait(false);
                 }
 
-                await unitOfWork.CompleteAsync().ConfigureAwait(false);
+                try
+                {
+                    await unitOfWork.CompleteAsync().ConfigureAwait(false);
+                }
+                catch
+                {
+                    unitOfWork.AccountTransaction.PostgresAutoReseed();
+                    unitOfWork.StockTransaction.PostgresAutoReseed();
+                    unitOfWork.Comission.PostgresAutoReseed();
+                    unitOfWork.Dividend.PostgresAutoReseed();
+                    unitOfWork.ExchangeRate.PostgresAutoReseed();
+                }
+                finally
+                {
+                    await unitOfWork.CompleteAsync().ConfigureAwait(false);
+                }
 
                 ResultPortfolioReports.Remove(userId);
             }
