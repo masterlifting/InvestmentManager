@@ -36,7 +36,10 @@ namespace InvestmentManager.Web
 
             this.configuration = configuration;
 
-            Console.WriteLine($"\n\n{connectionString}\n\n");
+            Console.WriteLine($"\n\n1 {connectionString}\n\n");
+            Console.WriteLine($"\n\n2 {configuration["ConnectionStrings:PostgresConnection"]}\n\n");
+            Console.WriteLine($"\n\n3 {configuration["ConnectionStrings"]}\n\n");
+            Console.WriteLine($"\n\n4 {configuration["ConnectionStrings : PostgresConnection"]}\n\n");
         }
 
         public void ConfigureServices(IServiceCollection services)
