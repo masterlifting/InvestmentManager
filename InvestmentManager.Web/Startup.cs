@@ -36,10 +36,7 @@ namespace InvestmentManager.Web
 
             this.configuration = configuration;
 
-            foreach (var i in configuration.AsEnumerable())
-            {
-                Console.WriteLine($"{i.Key} : {i.Value}");
-            }
+            Console.WriteLine($"\n\n{connectionString}\n\n");
         }
 
         public void ConfigureServices(IServiceCollection services)
