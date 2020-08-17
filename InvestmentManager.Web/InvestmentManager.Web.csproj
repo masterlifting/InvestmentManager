@@ -29,5 +29,6 @@
   <ItemGroup>
     <Folder Include="Models\AdminModels\" />
     <Folder Include="wwwroot\lib\D3\" />
+    <Folder Include="wwwroot\UserFiles\a638969d-c0ec-4ea9-bb2f-6d3c2ddb1cb8\Reports\" />
   </ItemGroup>
 </Project>

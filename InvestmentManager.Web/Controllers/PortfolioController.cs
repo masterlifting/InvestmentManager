@@ -57,7 +57,9 @@ namespace InvestmentManager.Web.Controllers
             string path = "";
 
             if (environment?.WebRootPath != null)
-                path = @$"{environment.WebRootPath}\UserFiles\{userManager.GetUserId(User)}\Reports\";
+                path = @$"{environment.WebRootPath}/UserFiles/{userManager.GetUserId(User)}/Reports/";
+
+            Console.WriteLine($"\nПуть для записи: {path}\n");
 
             if (string.IsNullOrWhiteSpace(path))
                 throw new NullReferenceException($"Не удалось определить путь для отчета: {path}");
@@ -68,6 +70,7 @@ namespace InvestmentManager.Web.Controllers
             var directory = new DirectoryInfo(path);
             if (!directory.Exists)
                 directory.Create();
+
 
             // Загружу на сервер файлы
             foreach (var file in files)
@@ -93,6 +96,7 @@ namespace InvestmentManager.Web.Controllers
 
             foreach (var i in reportsPath)
             {
+                Console.WriteLine($"\nПуть с файлом: {i}\n");
                 using DataSet dataSet = loaderService.LoadDataSetFromExcel(i);
                 firstStepData.Add(brokerService.BcsParser.ParsePeriodReport(dataSet), dataSet);
             }

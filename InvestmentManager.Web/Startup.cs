@@ -35,18 +35,6 @@ namespace InvestmentManager.Web
                 : configuration["ConnectionStrings:PostgresConnection"];
 
             this.configuration = configuration;
-
-            foreach (var i in configuration.AsEnumerable())
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"{i.Key} --- {i.Value}\n");
-                Console.ResetColor();
-            }
-
-            Console.WriteLine($"\n\n1 {connectionString}\n\n");
-            Console.WriteLine($"\n\n2 {configuration["ConnectionStrings:PostgresConnection"]}\n\n");
-            Console.WriteLine($"\n\n3 {configuration["ConnectionStrings"]}\n\n");
-            Console.WriteLine($"\n\n4 {configuration["ConnectionStrings : PostgresConnection"]}\n\n");
         }
 
         public void ConfigureServices(IServiceCollection services)
