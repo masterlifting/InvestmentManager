@@ -541,32 +541,6 @@ namespace InvestmentManager.Repository
                 new ReportSource{Id = 131, CompanyId = 131, Key="Investing", Value = "ogk-5"}
             });
             #endregion
-            #region Pestunov
-            builder.Entity<IdentityRole>().HasData(new IdentityRole
-            {
-                Id = "546e71e4-2c2f-4bcd-9ac5-260e34283e6d",
-                Name = "pestunov",
-                NormalizedName = "PESTUNOV"
-            });
-
-            builder.Entity<IdentityUser>().HasData(new IdentityUser
-            {
-                Id = "a638969d-c0ec-4ea9-bb2f-6d3c2ddb1cb8",
-                UserName = "andreypestunov",
-                NormalizedUserName = "ANDREYPESTUNOV",
-                Email = "andreypestunov@gmail.com",
-                NormalizedEmail = "ANDREYPESTUNOV@GMAIL.COM",
-                EmailConfirmed = true,
-                PasswordHash = new PasswordHasher<IdentityUser>().HashPassword(null, "M11a12s85ter"),
-                SecurityStamp = string.Empty
-            });
-
-            builder.Entity<IdentityUserRole<string>>().HasData(new IdentityUserRole<string>
-            {
-                RoleId = "546e71e4-2c2f-4bcd-9ac5-260e34283e6d",
-                UserId = "a638969d-c0ec-4ea9-bb2f-6d3c2ddb1cb8"
-            });
-            #endregion
         }
     }
 }
