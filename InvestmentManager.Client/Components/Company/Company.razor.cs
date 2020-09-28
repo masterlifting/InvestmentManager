@@ -15,7 +15,7 @@ namespace InvestmentManager.Client.Components.Company
         public List<CompanyViewModel> Companies = new List<CompanyViewModel>();
         protected override async Task OnInitializedAsync()
         {
-            Companies = await HttpClient.GetFromJsonAsync<List<CompanyViewModel>>("companies");
+            Companies = await HttpClient.GetFromJsonAsync<List<CompanyViewModel>>("companies").ConfigureAwait(false);
         }
     }
 }
