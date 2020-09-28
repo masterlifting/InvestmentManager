@@ -1,9 +1,9 @@
-﻿using InvestManager.Entities.Basic;
-using InvestManager.Entities.Market;
-using InvestManager.Entities.Relationship.InterfaceForeignKey;
+﻿using InvestmentManager.Entities.Basic;
+using InvestmentManager.Entities.Market;
+using InvestmentManager.Entities.Relationship.InterfaceForeignKey;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace InvestManager.Entities.Calculate
+namespace InvestmentManager.Entities.Calculate
 {
     public class BuyRecommendation : BaseEntity, ICompanyFK
     {

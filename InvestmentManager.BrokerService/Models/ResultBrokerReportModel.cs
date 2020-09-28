@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace InvestManager.BrokerService.Models
+namespace InvestmentManager.BrokerService.Models
 {
     public class ResultBrokerReportModel
     {

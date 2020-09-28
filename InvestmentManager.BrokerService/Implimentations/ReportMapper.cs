@@ -1,14 +1,14 @@
-﻿using InvestManager.BrokerService.Interfaces;
-using InvestManager.BrokerService.Models;
-using InvestManager.Entities.Broker;
-using InvestManager.Repository;
+﻿using InvestmentManager.BrokerService.Interfaces;
+using InvestmentManager.BrokerService.Models;
+using InvestmentManager.Entities.Broker;
+using InvestmentManager.Repository;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
 
-namespace InvestManager.BrokerService.Implimentations
+namespace InvestmentManager.BrokerService.Implimentations
 {
     public class ReportMapper : IReportMapper
     {

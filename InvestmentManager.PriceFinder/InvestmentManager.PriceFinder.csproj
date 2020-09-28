@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Net.Http.Json" Version="3.2.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\InvestmentManager.Entities\InvestmentManager.Entities.csproj" />
+    <ProjectReference Include="..\InvestmentManager.Repository\InvestmentManager.Repository.csproj" />
+    <ProjectReference Include="..\InvestmentManager.Services\InvestmentManager.Services.csproj" />
+  </ItemGroup>
+
+</Project>

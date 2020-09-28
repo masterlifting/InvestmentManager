@@ -1,10 +1,10 @@
-﻿using InvestManager.Entities.Basic;
-using InvestManager.Entities.Relationship.InterfaceForeignKey;
+﻿using InvestmentManager.Entities.Basic;
+using InvestmentManager.Entities.Relationship.InterfaceForeignKey;
 
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace InvestManager.Entities.Market
+namespace InvestmentManager.Entities.Market
 {
     public class Price : BaseEntity, ICurrencyFK, ITickerFK
     {

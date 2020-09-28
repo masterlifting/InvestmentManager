@@ -1,8 +1,8 @@
-﻿using InvestManager.Entities.Calculate;
-using InvestManager.Entities.Market;
+﻿using InvestmentManager.Entities.Calculate;
+using InvestmentManager.Entities.Market;
 using System.Collections.Generic;
 
-namespace InvestManager.Calculator.Models
+namespace InvestmentManager.Calculator.Models
 {
     public class CalculatedArgs
     {

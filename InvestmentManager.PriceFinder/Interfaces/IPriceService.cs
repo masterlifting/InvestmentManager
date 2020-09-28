@@ -1,8 +1,8 @@
-﻿using InvestManager.Entities.Market;
+﻿using InvestmentManager.Entities.Market;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace InvestManager.PriceFinder.Interfaces
+namespace InvestmentManager.PriceFinder.Interfaces
 {
     public interface IPriceService
     {

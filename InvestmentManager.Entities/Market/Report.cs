@@ -1,12 +1,12 @@
-﻿using InvestManager.Entities.Basic;
-using InvestManager.Entities.Calculate;
-using InvestManager.Entities.Relationship.InterfaceForeignKey;
-using InvestManager.Entities.Relationship.InterfaceNavigationProperty;
+﻿using InvestmentManager.Entities.Basic;
+using InvestmentManager.Entities.Calculate;
+using InvestmentManager.Entities.Relationship.InterfaceForeignKey;
+using InvestmentManager.Entities.Relationship.InterfaceNavigationProperty;
 
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace InvestManager.Entities.Market
+namespace InvestmentManager.Entities.Market
 {
     public class Report : BaseEntity, ICompanyFK, ICoefficientNP
     {

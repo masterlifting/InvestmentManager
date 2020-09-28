@@ -1,9 +1,9 @@
-﻿using InvestManager.BrokerService.Models;
-using InvestManager.Entities.Broker;
+﻿using InvestmentManager.BrokerService.Models;
+using InvestmentManager.Entities.Broker;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace InvestManager.BrokerService.Interfaces
+namespace InvestmentManager.BrokerService.Interfaces
 {
     public interface IReportMapper
     {

@@ -1,11 +1,11 @@
-﻿using InvestManager.BrokerService.Interfaces;
-using InvestManager.BrokerService.Models;
+﻿using InvestmentManager.BrokerService.Interfaces;
+using InvestmentManager.BrokerService.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 
-namespace InvestManager.BrokerService.Implimentations
+namespace InvestmentManager.BrokerService.Implimentations
 {
     public class BcsParser : IBcsParser
     {

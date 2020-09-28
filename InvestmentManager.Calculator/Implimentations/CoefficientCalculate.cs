@@ -1,10 +1,10 @@
-﻿using InvestManager.Calculator.ConfigurationBinding;
-using InvestManager.Calculator.Interfaces;
-using InvestManager.Entities.Calculate;
+﻿using InvestmentManager.Calculator.ConfigurationBinding;
+using InvestmentManager.Calculator.Interfaces;
+using InvestmentManager.Entities.Calculate;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace InvestManager.Calculator.Implimentations
+namespace InvestmentManager.Calculator.Implimentations
 {
     internal class CoefficientCalculate : BaseCalculate, ICoefficientCalculate
     {

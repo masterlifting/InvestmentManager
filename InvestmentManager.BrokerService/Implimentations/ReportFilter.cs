@@ -1,12 +1,12 @@
-﻿using InvestManager.BrokerService.Interfaces;
-using InvestManager.BrokerService.Models;
-using InvestManager.Entities.Basic;
-using InvestManager.Repository;
+﻿using InvestmentManager.BrokerService.Interfaces;
+using InvestmentManager.BrokerService.Models;
+using InvestmentManager.Entities.Basic;
+using InvestmentManager.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace InvestManager.BrokerService.Implimentations
+namespace InvestmentManager.BrokerService.Implimentations
 {
     public class ReportFilter : IReportFilter
     {

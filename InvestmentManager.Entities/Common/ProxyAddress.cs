@@ -1,7 +1,7 @@
-﻿using InvestManager.Entities.Basic;
+﻿using InvestmentManager.Entities.Basic;
 using System.ComponentModel.DataAnnotations;
 
-namespace InvestManager.Entities.Market
+namespace InvestmentManager.Entities.Market
 {
     public class ProxyAddress : BaseEntity
     {

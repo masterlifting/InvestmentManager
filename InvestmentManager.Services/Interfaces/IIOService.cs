@@ -1,7 +1,7 @@
 ﻿using System.Data;
 using System.IO;
 
-namespace InvestManager.Services.Interfaces
+namespace InvestmentManager.Services.Interfaces
 {
     public interface IIOService
     {

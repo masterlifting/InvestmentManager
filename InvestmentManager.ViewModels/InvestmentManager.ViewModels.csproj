@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\InvestmentManager.DomainModels\InvestmentManager.DomainModels.csproj" />
+    <ProjectReference Include="..\InvestmentManager.Entities\InvestmentManager.Entities.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,4 +1,4 @@
-﻿namespace InvestManager.Calculator.Interfaces
+﻿namespace InvestmentManager.Calculator.Interfaces
 {
     public interface IPriceCalculate
     {

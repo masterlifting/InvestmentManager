@@ -1,8 +1,8 @@
-﻿using InvestManager.BrokerService.Implimentations;
-using InvestManager.BrokerService.Interfaces;
-using InvestManager.BrokerService.Models;
-using InvestManager.Repository;
-using InvestManager.Services.Interfaces;
+﻿using InvestmentManager.BrokerService.Implimentations;
+using InvestmentManager.BrokerService.Interfaces;
+using InvestmentManager.BrokerService.Models;
+using InvestmentManager.Repository;
+using InvestmentManager.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
@@ -14,7 +14,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace InvestManager.BrokerService
+namespace InvestmentManager.BrokerService
 {
     public class InvestBrokerService : IInvestBrokerService
     {

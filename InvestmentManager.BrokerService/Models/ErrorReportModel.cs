@@ -1,4 +1,4 @@
-﻿namespace InvestManager.BrokerService.Models
+﻿namespace InvestmentManager.BrokerService.Models
 {
     public class ErrorReportModel
     {

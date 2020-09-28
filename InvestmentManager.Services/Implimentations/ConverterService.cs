@@ -1,6 +1,6 @@
-﻿using InvestManager.Services.Interfaces;
+﻿using InvestmentManager.Services.Interfaces;
 
-namespace InvestManager.Services.Implimentations
+namespace InvestmentManager.Services.Implimentations
 {
     public class ConverterService : IConverterService
     {

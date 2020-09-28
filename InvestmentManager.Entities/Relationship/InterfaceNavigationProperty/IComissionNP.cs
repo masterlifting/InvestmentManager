@@ -1,8 +1,8 @@
-﻿using InvestManager.Entities.Broker;
+﻿using InvestmentManager.Entities.Broker;
 
 using System.Collections.Generic;
 
-namespace InvestManager.Entities.Relationship.InterfaceNavigationProperty
+namespace InvestmentManager.Entities.Relationship.InterfaceNavigationProperty
 {
     public interface IComissionNP
     {

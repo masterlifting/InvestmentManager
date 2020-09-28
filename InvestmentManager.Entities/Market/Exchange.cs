@@ -1,11 +1,11 @@
-﻿using InvestManager.Entities.Basic;
-using InvestManager.Entities.Broker;
-using InvestManager.Entities.Relationship.InterfaceNavigationProperty;
+﻿using InvestmentManager.Entities.Basic;
+using InvestmentManager.Entities.Broker;
+using InvestmentManager.Entities.Relationship.InterfaceNavigationProperty;
 
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace InvestManager.Entities.Market
+namespace InvestmentManager.Entities.Market
 {
     public class Exchange : BaseEntity, ITickerNP, IStockTransactioNP
     {

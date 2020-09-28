@@ -1,4 +1,4 @@
-﻿namespace InvestManager.Services.Interfaces
+﻿namespace InvestmentManager.Services.Interfaces
 {
     public interface IConverterService
     {

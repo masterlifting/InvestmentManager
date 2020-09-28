@@ -1,12 +1,12 @@
-﻿using InvestManager.Entities.Broker;
-using InvestManager.Entities.Calculate;
-using InvestManager.Entities.Market;
+﻿using InvestmentManager.Entities.Broker;
+using InvestmentManager.Entities.Calculate;
+using InvestmentManager.Entities.Market;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace InvestManager.Repository
+namespace InvestmentManager.Repository
 {
     public interface IRepository<TEntity> where TEntity : class
     {

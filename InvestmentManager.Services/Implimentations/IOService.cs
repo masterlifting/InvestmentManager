@@ -1,10 +1,10 @@
 ﻿using ExcelDataReader;
-using InvestManager.Services.Interfaces;
+using InvestmentManager.Services.Interfaces;
 using System.Data;
 using System.IO;
 using System.Text;
 
-namespace InvestManager.Services.Implimentations
+namespace InvestmentManager.Services.Implimentations
 {
     public class IOService : IIOService
     {

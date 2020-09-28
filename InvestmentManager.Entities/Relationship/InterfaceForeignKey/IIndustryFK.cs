@@ -1,6 +1,6 @@
-﻿using InvestManager.Entities.Market;
+﻿using InvestmentManager.Entities.Market;
 
-namespace InvestManager.Entities.Relationship.InterfaceForeignKey
+namespace InvestmentManager.Entities.Relationship.InterfaceForeignKey
 {
     public interface IIndustryFK
     {

@@ -1,8 +1,8 @@
-﻿using InvestManager.ViewModels.OutsideRequestModels;
+﻿using InvestmentManager.ViewModels.OutsideRequestModels;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace InvestManager.Services.Interfaces
+namespace InvestmentManager.Services.Interfaces
 {
     public interface IWebService
     {

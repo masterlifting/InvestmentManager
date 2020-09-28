@@ -1,6 +1,6 @@
-﻿using InvestManager.Entities.Broker;
+﻿using InvestmentManager.Entities.Broker;
 
-namespace InvestManager.Entities.Relationship.InterfaceForeignKey
+namespace InvestmentManager.Entities.Relationship.InterfaceForeignKey
 {
     public interface ITransactionStatusFK
     {

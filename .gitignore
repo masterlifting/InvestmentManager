@@ -341,3 +341,6 @@ healthchecksdb
 
 .vs/
 **/obj/
+
+# Concrete file
+/InvestmentManager.Repository/BaseData.cs

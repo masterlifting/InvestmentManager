@@ -1,7 +1,7 @@
-﻿using InvestManager.BrokerService.Models;
+﻿using InvestmentManager.BrokerService.Models;
 using System.Data;
 
-namespace InvestManager.BrokerService.Interfaces
+namespace InvestmentManager.BrokerService.Interfaces
 {
     public interface IBcsParser
     {

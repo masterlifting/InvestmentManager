@@ -1,17 +1,17 @@
-﻿using InvestManager.Calculator.ConfigurationBinding;
-using InvestManager.Calculator.Implimentations;
-using InvestManager.Calculator.Models;
-using InvestManager.Entities.Broker;
-using InvestManager.Entities.Calculate;
-using InvestManager.Entities.Market;
-using InvestManager.Repository;
+﻿using InvestmentManager.Calculator.ConfigurationBinding;
+using InvestmentManager.Calculator.Implimentations;
+using InvestmentManager.Calculator.Models;
+using InvestmentManager.Entities.Broker;
+using InvestmentManager.Entities.Calculate;
+using InvestmentManager.Entities.Market;
+using InvestmentManager.Repository;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace InvestManager.Calculator
+namespace InvestmentManager.Calculator
 {
     public class InvestCalculator : IInvestCalculator
     {

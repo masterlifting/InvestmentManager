@@ -1,8 +1,8 @@
-﻿using InvestManager.BrokerService.Models;
+﻿using InvestmentManager.BrokerService.Models;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 
-namespace InvestManager.BrokerService
+namespace InvestmentManager.BrokerService
 {
     public interface IInvestBrokerService
     {

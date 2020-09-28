@@ -1,7 +1,7 @@
-﻿using InvestManager.Entities.Relationship.InterfaceForeignKey;
+﻿using InvestmentManager.Entities.Relationship.InterfaceForeignKey;
 using System;
 
-namespace InvestManager.Entities.Basic
+namespace InvestmentManager.Entities.Basic
 {
     public interface IBaseBroker : IAccountFK, ICurrencyFK
     {

@@ -1,9 +1,9 @@
-﻿using InvestManager.Entities.Broker;
-using InvestManager.Entities.Market;
+﻿using InvestmentManager.Entities.Broker;
+using InvestmentManager.Entities.Market;
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace InvestManager.Entities.Basic
+namespace InvestmentManager.Entities.Basic
 {
     public abstract class BaseBroker : IBaseBroker
     {

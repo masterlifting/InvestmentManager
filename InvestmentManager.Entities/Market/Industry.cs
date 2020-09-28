@@ -1,9 +1,9 @@
-﻿using InvestManager.Entities.Basic;
-using InvestManager.Entities.Relationship.InterfaceNavigationProperty;
+﻿using InvestmentManager.Entities.Basic;
+using InvestmentManager.Entities.Relationship.InterfaceNavigationProperty;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace InvestManager.Entities.Market
+namespace InvestmentManager.Entities.Market
 {
     public class Industry : BaseEntity, ICompanyNP
     {

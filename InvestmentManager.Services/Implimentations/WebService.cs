@@ -1,10 +1,10 @@
-﻿using InvestManager.Services.Interfaces;
-using InvestManager.ViewModels.OutsideRequestModels;
+﻿using InvestmentManager.Services.Interfaces;
+using InvestmentManager.ViewModels.OutsideRequestModels;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace InvestManager.Services.Implimentations
+namespace InvestmentManager.Services.Implimentations
 {
     public class WebService : IWebService
     {

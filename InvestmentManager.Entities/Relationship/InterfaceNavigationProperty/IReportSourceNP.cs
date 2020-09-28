@@ -1,6 +1,6 @@
-﻿using InvestManager.Entities.Market;
+﻿using InvestmentManager.Entities.Market;
 
-namespace InvestManager.Entities.Relationship.InterfaceNavigationProperty
+namespace InvestmentManager.Entities.Relationship.InterfaceNavigationProperty
 {
     public interface IReportSourceNP
     {
