@@ -344,6 +344,3 @@ healthchecksdb
 
 # Concrete file
 /InvestmentManager.Repository/BaseData.cs
-/InvestmentManager.Repository/Перенос отчетов.sql
-/InvestmentManager.Repository/Перенос цен.sql
-/InvestmentManager.Repository/Query.sql
