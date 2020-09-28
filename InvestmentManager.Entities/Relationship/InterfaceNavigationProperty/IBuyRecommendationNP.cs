@@ -1,6 +1,6 @@
-﻿using InvestmentManager.Entities.Calculate;
+﻿using InvestManager.Entities.Calculate;
 
-namespace InvestmentManager.Entities.Relationship.InterfaceNavigationProperty
+namespace InvestManager.Entities.Relationship.InterfaceNavigationProperty
 {
     public interface IBuyRecommendationNP
     {

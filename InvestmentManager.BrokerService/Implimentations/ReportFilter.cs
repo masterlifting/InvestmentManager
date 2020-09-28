@@ -1,12 +1,12 @@
-﻿using InvestmentManager.BrokerService.Interfaces;
-using InvestmentManager.BrokerService.Models;
-using InvestmentManager.Entities.Basic;
-using InvestmentManager.Repository;
+﻿using InvestManager.BrokerService.Interfaces;
+using InvestManager.BrokerService.Models;
+using InvestManager.Entities.Basic;
+using InvestManager.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace InvestmentManager.BrokerService.Implimentations
+namespace InvestManager.BrokerService.Implimentations
 {
     public class ReportFilter : IReportFilter
     {
@@ -17,7 +17,7 @@ namespace InvestmentManager.BrokerService.Implimentations
         {
             var monthReportList = new List<FilterReportModel>();
             var dayReportList = new List<FilterReportModel>();
-            // Пришешую коллецию из отчетоа делю на 2 коллекции: Месячные и дневные отчеты, сверяя их по периоду в отчете
+            // Пришедшую коллецию из отчетоа делю на 2 коллекции: Месячные и дневные отчеты, сверяя их по периоду в отчете
             foreach (var i in models)
             {
                 if (i.DateBegin != i.DateEnd)
@@ -46,51 +46,44 @@ namespace InvestmentManager.BrokerService.Implimentations
 
             return result.OrderBy(x => x.DateBegin).ToList();
         }
-        public List<T> GetNewTransactions<T>(IEnumerable<T> transactions) where T : class, IBaseBroker
+        public List<T> GetNewTransactions<T>(IEnumerable<T> transactions, long accountId) where T : class, IBaseBroker
         {
             var result = new List<T>();
 
-            // беру уникальные id аккаунтов из входящей коллекции транзакций
-            foreach (var id in transactions.Select(x => x.AccountId).Distinct())
+            // получаю коллекцию из базы по этому типу транзакции и аккаунту
+            var dbTransactions = context.Set<T>().AsEnumerable().Where(x => x.AccountId == accountId).GroupBy(x => x.DateOperation).OrderBy(x => x.Key);
+            // получаю выборку из входящей коллекции по этому аккаунту
+            var incomeTransactions = transactions.Where(x => x.AccountId == accountId).GroupBy(x => x.DateOperation).OrderBy(x => x.Key).ToList();
+            // Обе коллекции были сгруппированы и отсортированы по дате операции
+
+            // Если в базе есть что-то, то начинаю алгоритм. Если нет, то добавляю все пришедшие данные по этому аккаунту к результату
+            if (dbTransactions.Any())
             {
-                // получаю коллекцию из базы по этому типу транзакции и аккаунту
-                var dbTransactions = context.Set<T>().AsEnumerable().Where(x => x.AccountId == id).GroupBy(x => x.DateOperation).OrderBy(x => x.Key);
-                // получаю выборку из входящей коллекции по этому аккаунту
-                var incomeTransactions = transactions
-                    .Where(x => x.AccountId == id).GroupBy(x => x.DateOperation).OrderBy(x => x.Key).ToList();
-                // Обе коллекции были сгруппированы и отсортированы по дате операции
-
-                // Если в базе есть что-то, то начинаю алгоритм. Если нет, то добавляю все пришедшие данные по этому аккаунту к результату
-                if (dbTransactions.Any())
+                foreach (var i in dbTransactions)
                 {
-                    foreach (var i in dbTransactions)
+                    // получаю дату группы коллекции из БД
+                    DateTime dbDateOperation = i.Key.Date;
+
+                    for (int j = 0; j < incomeTransactions.Count; j++)
                     {
-                        // получаю дату группы коллекции из БД
-                        DateTime dbDateOperation = i.Key.Date;
+                        // получаю дату группы пришедшей коллекции
+                        DateTime incomeDateOperation = incomeTransactions[j].Key.Date;
 
-                        for (int j = 0; j < incomeTransactions.Count; j++)
+                        // Если даты групп совпадают и колличество операций за эту дату совпадает, то удаляю совпадение из входящей сгруппированой коллекции по этому аккаунту
+                        if (incomeDateOperation.Equals(dbDateOperation) && incomeTransactions[j].Count().Equals(i.Count()))
                         {
-                            // получаю дату группы пришедшей коллекции
-                            DateTime incomeDateOperation = incomeTransactions[j].Key.Date;
-
-                            // Если даты групп совпадают и колличество операций за эту дату совпадает, то удаляю совпадение из входящей сгруппированой коллекции по этому аккаунту
-                            if (incomeDateOperation.Equals(dbDateOperation) && incomeTransactions[j].Count().Equals(i.Count()))
-                            {
-                                incomeTransactions.RemoveAt(j);
-                                j--;
-                            }
+                            incomeTransactions.RemoveAt(j);
+                            j--;
                         }
                     }
-
-                    // То, что осталось после фильтра добавляю к результату
-                    foreach (var i in incomeTransactions)
-                    {
-                        result.AddRange(i.Select(x => x));
-                    }
                 }
-                else
-                    result.AddRange(transactions.Where(x => x.AccountId == id));
+
+                // То, что осталось после фильтра добавляю к результату
+                foreach (var i in incomeTransactions)
+                    result.AddRange(i.Select(x => x));
             }
+            else
+                result.AddRange(transactions.Where(x => x.AccountId == accountId));
 
             return result;
         }

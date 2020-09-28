@@ -1,0 +1,47 @@
+﻿@if (AlertType != AlertType.none)
+{
+    <div class="container fixed-top" style="z-index:999999999">
+        <div class="row rounded-bottom bg-@AlertType.ToString() text-@textColor text-monospace py-2">
+            <div class="col-10 align-self-center pl-5"> @alertText </div>
+            <button @onclick="@(()=> AlertType = AlertType.none)" class="col-2 close align-self-center px-3 text-right">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public AlertType AlertType { get; set; }
+    string alertText { get; set; }
+    string textColor = "light";
+    int lifeTimeNotification = 2000;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        switch (AlertType)
+        {
+            case AlertType.danger:
+                {
+                    alertText = DefaultData.alertDanger;
+                    await Task.Delay(lifeTimeNotification);
+                    AlertType = AlertType.none;
+                }
+                break;
+            case AlertType.success:
+                {
+                    alertText = DefaultData.alertSuccess;
+                    await Task.Delay(lifeTimeNotification);
+                    AlertType = AlertType.none;
+                }
+                break;
+            case AlertType.warning:
+                {
+                    textColor = "black";
+                    alertText = DefaultData.alertWarning;
+                    await Task.Delay(lifeTimeNotification);
+                    AlertType = AlertType.none;
+                }
+                break;
+        }
+    }
+}

@@ -1,13 +1,13 @@
-﻿using InvestmentManager.Entities.Market;
-using InvestmentManager.PriceFinder.Interfaces;
-using InvestmentManager.Service.Interfaces;
+﻿using InvestManager.Entities.Market;
+using InvestManager.PriceFinder.Interfaces;
+using InvestManager.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 
-namespace InvestmentManager.PriceFinder.Implimentations
+namespace InvestManager.PriceFinder.Implimentations
 {
     class MoexAgregator : IPriceAgregator
     {

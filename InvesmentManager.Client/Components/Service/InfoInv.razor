@@ -1,0 +1,36 @@
+﻿
+<div class="row text-monospace text-@Color.ToString() px-2">
+    @if (!string.IsNullOrWhiteSpace(Value))
+    {
+        if (!string.IsNullOrWhiteSpace(Date))
+        {
+            <div class="col-3">@Name</div>
+            <div class="col-3">@Value</div>
+            <div class="col-6">@Date</div>
+        }
+        else
+        {
+            <div class="col-6">@Name</div>
+            <div class="col-6">@Value</div>
+        }
+    }
+    else
+    {
+        if (!string.IsNullOrWhiteSpace(Date))
+        {
+            <div class="col-6">@Name</div>
+            <div class="col-6">@Date</div>
+        }
+        else
+        {
+            <div class="col-12">@Name</div>
+        }
+    }
+</div>
+
+@code {
+    [Parameter] public string Name { get; set; }
+    [Parameter] public string Value { get; set; }
+    [Parameter] public string Date { get; set; }
+    [Parameter] public ColorType Color { get; set; } = ColorType.light;
+}

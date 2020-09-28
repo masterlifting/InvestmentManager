@@ -1,16 +1,16 @@
-﻿using InvestmentManager.BrokerService.Models;
-using InvestmentManager.Entities.Broker;
+﻿using InvestManager.BrokerService.Models;
+using InvestManager.Entities.Broker;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace InvestmentManager.BrokerService.Interfaces
+namespace InvestManager.BrokerService.Interfaces
 {
     public interface IReportMapper
     {
-        Task<List<AccountTransaction>> MapToAccountTransactionsAsync(IEnumerable<BrockerAccountTransactionModel> models, long accountId);
-        Task<List<StockTransaction>> MapToStockTransactionsAsync(IEnumerable<BrockerStockTransactionModel> models, long accountId);
-        Task<List<Dividend>> MapToDividendsAsync(IEnumerable<BrockerDividendModel> models, long accountId);
-        Task<List<Comission>> MapToComissionsAsync(IEnumerable<BrockerComissionModel> models, long accountId);
-        Task<List<ExchangeRate>> MapToExchangeRatesAsync(IEnumerable<BrockerExchangeRateModel> models, long accountId);
+        Task<List<AccountTransaction>> MapToAccountTransactionsAsync(IEnumerable<StringAccountTransactionModel> models, long accountId, List<ErrorReportModel> errors);
+        Task<List<StockTransaction>> MapToStockTransactionsAsync(IEnumerable<StringStockTransactionModel> models, long accountId, List<ErrorReportModel> errors);
+        Task<List<Dividend>> MapToDividendsAsync(IEnumerable<StringDividendModel> models, long accountId, List<ErrorReportModel> errors);
+        Task<List<Comission>> MapToComissionsAsync(IEnumerable<StringComissionModel> models, long accountId, List<ErrorReportModel> errors);
+        Task<List<ExchangeRate>> MapToExchangeRatesAsync(IEnumerable<StringExchangeRateModel> models, long accountId, List<ErrorReportModel> errors);
     }
 }

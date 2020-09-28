@@ -1,0 +1,37 @@
+﻿<TitleSubInv Color="ColorType.warning" Text="Удержания" />
+
+<div class="row text-monospace border-bottom border-dark mx-1 text-info">
+    <div class="col-7 pl-0">
+        <div class="row">
+            <div class="col">Тип</div>
+        </div>
+    </div>
+    <div class="col-5">
+        <div class="row">
+            <div class="col-6 px-0">Сумма</div>
+            <div class="col-6 px-0 text-center">Дата</div>
+        </div>
+    </div>
+</div>
+
+@foreach (var comission in Comissions)
+{
+    <div class="row text-monospace border-bottom border-dark mx-1 text-@Color.ToString()">
+        <div class="col-7 pl-0">
+            <div class="row">
+                <div class="col">@comission.Type</div>
+            </div>
+        </div>
+        <div class="col-5">
+            <div class="row">
+                <div class="col-6 px-0">@comission.Amount</div>
+                <div class="col-6 px-0 text-center">@comission.DateOperation</div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public IEnumerable<BrokerComission> Comissions { get; set; }
+    [Parameter] public ColorType Color { get; set; } = ColorType.danger;
+}

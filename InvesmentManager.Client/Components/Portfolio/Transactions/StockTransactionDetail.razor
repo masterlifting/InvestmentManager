@@ -1,0 +1,46 @@
+﻿@inject HttpClient httpClient
+
+@if (models is null)
+{
+    <div class="row my-2">
+        <div class="col">
+            @DefaultData.loading
+        </div>
+    </div>
+}
+else
+{
+    @foreach (var model in models)
+    {
+        string textColor = model.Status.Equals("Покупка") ? string.Intern("danger") : string.Intern("success");
+
+        <div class="row small text-@textColor">
+            <div class="col-5">
+                <div class="row">
+                    <div class="col-6 pr-0">@model.TickerName</div>
+                    <div class="col-6">@model.Status</div>
+                </div>
+            </div>
+            <div class="col-1 px-0 text-center">@model.Quantity</div>
+            <div class="col-6">
+                <div class="row">
+                    <div class="col-5">@model.Price</div>
+                    <div class="col-7 pl-0 text-right">@model.DateTransaction.ToShortDateString()</div>
+                </div>
+            </div>
+        </div>
+    }
+    <CloseInv OnclickCallback="@OnclickCallback" />
+}
+
+@code {
+    [Parameter] public long CompanyId { get; set; }
+    [Parameter] public EventCallback OnclickCallback { get; set; }
+
+    IEnumerable<StockTransactionDetailModel> models;
+
+    protected override async Task OnInitializedAsync()
+    {
+        models = await httpClient.GetFromJsonAsync<IEnumerable<StockTransactionDetailModel>>($"transaction/getstocktransactiondetail?companyId={CompanyId}");
+    }
+}

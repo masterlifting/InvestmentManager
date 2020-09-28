@@ -1,9 +1,9 @@
-﻿using InvestmentManager.Entities.Basic;
-using InvestmentManager.Entities.Market;
-using InvestmentManager.Entities.Relationship.InterfaceForeignKey;
+﻿using InvestManager.Entities.Basic;
+using InvestManager.Entities.Market;
+using InvestManager.Entities.Relationship.InterfaceForeignKey;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace InvestmentManager.Entities.Broker
+namespace InvestManager.Entities.Broker
 {
     public class StockTransaction : BaseBroker, ITransactionStatusFK, IExchangeFK
     {
@@ -13,12 +13,12 @@ namespace InvestmentManager.Entities.Broker
         public decimal Cost { get; set; }
 
         public long TickerId { get; set; }
-        public Ticker Ticker { get; set; }
+        public virtual Ticker Ticker { get; set; }
 
         public long TransactionStatusId { get; set; }
-        public TransactionStatus TransactionStatus { get; set; }
+        public virtual TransactionStatus TransactionStatus { get; set; }
 
         public long ExchangeId { get; set; }
-        public Exchange Exchange { get; set; }
+        public virtual Exchange Exchange { get; set; }
     }
 }

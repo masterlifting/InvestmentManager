@@ -1,0 +1,9 @@
+﻿<div class="row font-italic font-weight-light text-monospace text-@Color.ToString() py-1">
+    <div class="col text-@Position.ToString()">@Text</div>
+</div>
+
+@code {
+    [Parameter] public ColorType Color { get; set; } = ColorType.secondary;
+    [Parameter] public PositionType Position { get; set; } = PositionType.left;
+    [Parameter] public string Text { get; set; }
+}

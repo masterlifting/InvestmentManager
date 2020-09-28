@@ -1,0 +1,30 @@
+﻿@page "/brokerreports"
+@inject ILocalStorageService localStorage
+@attribute [Authorize]
+
+@if (ReportModel.CorrectReports.Any())
+{
+    <CorrectReports Reports="@ReportModel.CorrectReports.ToList()" />
+}
+
+@if (ReportModel.ReportErrors.Any())
+{
+    <ReportErrors Errors="@ReportModel.ReportErrors" />
+}
+
+@if(!ReportModel.CorrectReports.Any() && !ReportModel.ReportErrors.Any())
+{
+    <TitleInv Position="PositionType.center" Color="ColorType.primary" Text="Новые данные отсутствуют." />
+}
+
+@code
+{
+    BrokerReportModel ReportModel = new BrokerReportModel();
+    [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await AuthenticationState).User;
+        ReportModel = await localStorage.GetItemAsync<BrokerReportModel>($"{user.Identity.Name}_bcsReport");
+    }
+}

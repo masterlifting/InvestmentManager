@@ -1,9 +1,9 @@
-﻿using InvestmentManager.Entities.Broker;
-using InvestmentManager.Entities.Market;
+﻿using InvestManager.Entities.Broker;
+using InvestManager.Entities.Market;
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace InvestmentManager.Entities.Basic
+namespace InvestManager.Entities.Basic
 {
     public abstract class BaseBroker : IBaseBroker
     {
@@ -14,9 +14,9 @@ namespace InvestmentManager.Entities.Basic
         public DateTime DateOperation { get; set; }
 
         public long AccountId { get; set; }
-        public Account Account { get; set; }
+        public virtual Account Account { get; set; }
 
         public long CurrencyId { get; set; }
-        public Currency Currency { get; set; }
+        public virtual Currency Currency { get; set; }
     }
 }

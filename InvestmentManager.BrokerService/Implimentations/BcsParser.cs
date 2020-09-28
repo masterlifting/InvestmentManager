@@ -1,11 +1,11 @@
-﻿using InvestmentManager.BrokerService.Interfaces;
-using InvestmentManager.BrokerService.Models;
+﻿using InvestManager.BrokerService.Interfaces;
+using InvestManager.BrokerService.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 
-namespace InvestmentManager.BrokerService.Implimentations
+namespace InvestManager.BrokerService.Implimentations
 {
     public class BcsParser : IBcsParser
     {
@@ -36,10 +36,7 @@ namespace InvestmentManager.BrokerService.Implimentations
                 throw new ArgumentException($"Не удалось получить даты из строки отчета: {period}");
 
             string account = report.Select($"{columnNumber} = 'Генеральное соглашение:'")
-            .FirstOrDefault().ItemArray
-            .Where(x => x is string)
-            .ElementAt(1)
-            .ToString();
+                                               .FirstOrDefault().ItemArray.Where(x => x is string).ElementAt(1).ToString();
 
             return new FilterReportModel
             {
@@ -48,9 +45,9 @@ namespace InvestmentManager.BrokerService.Implimentations
                 DateEnd = parsedDeteEnd
             };
         }
-        public BrokerReportModel ParseBcsReport(DataSet excelReport)
+        public StringReportModel ParseBcsReport(DataSet excelReport)
         {
-            var model = new BrokerReportModel();
+            var model = new StringReportModel();
 
             if (excelReport.Tables.Count == 0)
                 throw new NullReferenceException("Отсутствуют данные для парсинга");
@@ -74,9 +71,9 @@ namespace InvestmentManager.BrokerService.Implimentations
         }
 
 
-        IEnumerable<BrockerExchangeRateModel> ParseExchangeRates(DataTable report)
+        IEnumerable<StringExchangeRateModel> ParseExchangeRates(DataTable report)
         {
-            var exchangeRates = new List<BrockerExchangeRateModel>();
+            var exchangeRates = new List<StringExchangeRateModel>();
 
             if (dealsId > 0)
             {
@@ -147,7 +144,7 @@ namespace InvestmentManager.BrokerService.Implimentations
                 bool identNo = long.TryParse(identifier, out _);
 
                 if (buy && identNo)
-                    exchangeRates.Add(new BrockerExchangeRateModel
+                    exchangeRates.Add(new StringExchangeRateModel
                     {
                         DateOperation = dateOperation,
                         Identifier = identifier,
@@ -157,7 +154,7 @@ namespace InvestmentManager.BrokerService.Implimentations
                         Currency = currencyUsd
                     });
                 else if (sell && identNo)
-                    exchangeRates.Add(new BrockerExchangeRateModel
+                    exchangeRates.Add(new StringExchangeRateModel
                     {
                         DateOperation = dateOperation,
                         Identifier = identifier,
@@ -169,9 +166,9 @@ namespace InvestmentManager.BrokerService.Implimentations
 
             }
         }
-        IEnumerable<BrockerAccountTransactionModel> ParseAccountTransactions(DataTable report)
+        IEnumerable<StringAccountTransactionModel> ParseAccountTransactions(DataTable report)
         {
-            var accountTransactions = new List<BrockerAccountTransactionModel>();
+            var accountTransactions = new List<StringAccountTransactionModel>();
 
             for (int i = 0; i < assetsId; i++)
             {
@@ -200,7 +197,7 @@ namespace InvestmentManager.BrokerService.Implimentations
                     string dateOperation = report.Rows[j].ItemArray[1].ToString();
 
                     if (report.Rows[j].ItemArray[2].ToString().Equals("Приход ДС"))
-                        accountTransactions.Add(new BrockerAccountTransactionModel
+                        accountTransactions.Add(new StringAccountTransactionModel
                         {
                             DateOperation = dateOperation,
                             Amount = report.Rows[j].ItemArray[6].ToString(),
@@ -208,7 +205,7 @@ namespace InvestmentManager.BrokerService.Implimentations
                             Currency = currency.Equals("USD") ? currencyUsd : currencyRub,
                         });
                     if (report.Rows[j].ItemArray[2].ToString().Equals("Вывод ДС"))
-                        accountTransactions.Add(new BrockerAccountTransactionModel
+                        accountTransactions.Add(new StringAccountTransactionModel
                         {
                             DateOperation = dateOperation,
                             Amount = report.Rows[j].ItemArray[7].ToString(),
@@ -218,9 +215,9 @@ namespace InvestmentManager.BrokerService.Implimentations
                 }
             }
         }
-        IEnumerable<BrockerDividendModel> ParseDividends(DataTable report)
+        IEnumerable<StringDividendModel> ParseDividends(DataTable report)
         {
-            var dividends = new List<BrockerDividendModel>();
+            var dividends = new List<StringDividendModel>();
 
             for (int i = 0; i < assetsId; i++)
             {
@@ -248,7 +245,7 @@ namespace InvestmentManager.BrokerService.Implimentations
                 for (int j = startId; j < finishId; j++)
                 {
                     if (report.Rows[j].ItemArray[2].ToString().ToLower().IndexOf("дивиденд") >= 0)
-                        dividends.Add(new BrockerDividendModel
+                        dividends.Add(new StringDividendModel
                         {
                             CompanyName = report.Rows[j].ItemArray[14].ToString(),
                             DateOperation = report.Rows[j].ItemArray[1].ToString(),
@@ -259,9 +256,9 @@ namespace InvestmentManager.BrokerService.Implimentations
 
             }
         }
-        static IEnumerable<BrockerStockTransactionModel> ParseStockTransactions(DataTable report)
+        static IEnumerable<StringStockTransactionModel> ParseStockTransactions(DataTable report)
         {
-            var stockTransactions = new List<BrockerStockTransactionModel>();
+            var stockTransactions = new List<StringStockTransactionModel>();
 
             if (dealsId > 0)
             {
@@ -298,7 +295,7 @@ namespace InvestmentManager.BrokerService.Implimentations
                             bool identNo = long.TryParse(identifier, out _);
 
                             if (buy && identNo)
-                                stockTransactions.Add(new BrockerStockTransactionModel
+                                stockTransactions.Add(new StringStockTransactionModel
                                 {
                                     Ticker = ticker,
                                     Exchange = exchange,
@@ -310,7 +307,7 @@ namespace InvestmentManager.BrokerService.Implimentations
                                     Currency = currency.Equals("USD") ? currencyUsd : currencyRub
                                 });
                             else if (sell && identNo)
-                                stockTransactions.Add(new BrockerStockTransactionModel
+                                stockTransactions.Add(new StringStockTransactionModel
                                 {
                                     Ticker = ticker,
                                     Exchange = exchange,
@@ -329,9 +326,9 @@ namespace InvestmentManager.BrokerService.Implimentations
             return stockTransactions;
 
         }
-        static IEnumerable<BrockerComissionModel> ParseComissions(DataTable report)
+        static IEnumerable<StringComissionModel> ParseComissions(DataTable report)
         {
-            var comissions = new List<BrockerComissionModel>();
+            var comissions = new List<StringComissionModel>();
 
             var thisComissions = report.Select($"{columnNumber} = '1.3. Удержанные сборы/штрафы (итоговые суммы):'").FirstOrDefault();
             int startId = report.Rows.IndexOf(thisComissions);
@@ -356,7 +353,7 @@ namespace InvestmentManager.BrokerService.Implimentations
                     {
                         if (report.Rows[k].ItemArray[2].ToString().Equals(comissionName) && report.Rows[k].ItemArray[12].ToString().Equals(comissionExchangeName))
                         {
-                            comissions.Add(new BrockerComissionModel
+                            comissions.Add(new StringComissionModel
                             {
                                 Type = comissionName,
                                 DateOperation = report.Rows[k].ItemArray[1].ToString(),
@@ -366,7 +363,7 @@ namespace InvestmentManager.BrokerService.Implimentations
                         }
                         else if (report.Rows[k].ItemArray[2].ToString().Equals(comissionName) && report.Rows[k].ItemArray[10].ToString().Equals(comissionExchangeName))
                         {
-                            comissions.Add(new BrockerComissionModel
+                            comissions.Add(new StringComissionModel
                             {
                                 Type = comissionName,
                                 DateOperation = report.Rows[k].ItemArray[1].ToString(),

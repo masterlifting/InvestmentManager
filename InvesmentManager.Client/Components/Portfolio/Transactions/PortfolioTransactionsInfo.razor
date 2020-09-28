@@ -1,0 +1,17 @@
+﻿<div class="container invest_card">
+    <TitleInv Text="Транзакции в портфелях" />
+
+    <AuthorizeView>
+        <Authorized>
+            <LinkInv Path="accounttransactions" Name="Операции с счетами" />
+            <LinkInv Path="stocktransactions" Name="Операции с акциями" />
+            <LinkInv Path="comissiontransactions" Name="Комиссии" />
+            <LinkInv Path="dividendtransactions" Name="Дивиденды" />
+            <LinkInv Path="exchangeratetransactions" Name="Обмены валют" />
+        </Authorized>
+        <NotAuthorized>
+            <NotAuthorizeInfo />
+        </NotAuthorized>
+    </AuthorizeView>
+
+</div>

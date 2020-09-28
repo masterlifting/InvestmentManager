@@ -1,10 +1,10 @@
-﻿using InvestmentManager.Entities.Basic;
-using InvestmentManager.Entities.Relationship.InterfaceNavigationProperty;
+﻿using InvestManager.Entities.Basic;
+using InvestManager.Entities.Relationship.InterfaceNavigationProperty;
 
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace InvestmentManager.Entities.Broker
+namespace InvestManager.Entities.Broker
 {
     public class ComissionType : BaseEntity, IComissionNP
     {
@@ -12,6 +12,6 @@ namespace InvestmentManager.Entities.Broker
         [Required]
         public string Name { get; set; }
 
-        public List<Comission> Comissions { get; set; }
+        public virtual IEnumerable<Comission> Comissions { get; set; }
     }
 }

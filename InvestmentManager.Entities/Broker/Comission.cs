@@ -1,8 +1,8 @@
-﻿using InvestmentManager.Entities.Basic;
-using InvestmentManager.Entities.Relationship.InterfaceForeignKey;
+﻿using InvestManager.Entities.Basic;
+using InvestManager.Entities.Relationship.InterfaceForeignKey;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace InvestmentManager.Entities.Broker
+namespace InvestManager.Entities.Broker
 {
     public class Comission : BaseBroker, IComissionTypeFK
     {
@@ -10,6 +10,6 @@ namespace InvestmentManager.Entities.Broker
         public decimal Amount { get; set; }
 
         public long ComissionTypeId { get; set; }
-        public ComissionType ComissionType { get; set; }
+        public virtual ComissionType ComissionType { get; set; }
     }
 }

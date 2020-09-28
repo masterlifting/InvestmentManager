@@ -1,8 +1,8 @@
-﻿using InvestmentManager.Entities.Basic;
+﻿using InvestManager.Entities.Basic;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace InvestmentManager.Repository
+namespace InvestManager.Repository
 {
     public interface IUnitOfWorkFactory
     {

@@ -1,0 +1,36 @@
+﻿@foreach (var error in Errors.OrderBy(x => x.ErrorType))
+{
+    switch (error.ErrorType)
+    {
+        case BrokerReportErrorTypes.AccountError:
+            <AccountError Title="Ошибка при поиске соглашения..." ErrorValue="@error.ErrorValue" />
+            break;
+        case BrokerReportErrorTypes.AccountTransactionError:
+            <AccountTransactionError Title="Ошибка при операции с счетом..." ErrorValue="@error.ErrorValue" />
+            break;
+
+        case BrokerReportErrorTypes.StockTransactionError:
+            <StockTransactionError Title="Ошибка при операции с акцией..." ErrorValue="@error.ErrorValue" />
+            break;
+
+        case BrokerReportErrorTypes.DividendError:
+            <DividendError Title="Ошибка при поиске дивидендов..." ErrorValue="@error.ErrorValue" />
+            break;
+
+        case BrokerReportErrorTypes.ComissionError:
+            <ComissionError Title="Ошибка при поиске комиссий..." ErrorValue="@error.ErrorValue" />
+            break;
+
+        case BrokerReportErrorTypes.ExchangeRateError:
+            <ExchangeRateError Title="Ошибка при операции с валютой..." ErrorValue="@error.ErrorValue" />
+            break;
+        case BrokerReportErrorTypes.UndefinedError:
+            <UndefinedError Title="Неизвестная ошибка..." ErrorValue="@error.ErrorValue" />
+            break;
+    }
+}
+
+
+@code {
+    [Parameter] public IEnumerable<BrokerReportError> Errors { get; set; }
+}

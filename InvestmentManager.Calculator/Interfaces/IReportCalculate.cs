@@ -1,4 +1,4 @@
-﻿namespace InvestmentManager.Calculator.Interfaces
+﻿namespace InvestManager.Calculator.Interfaces
 {
     public interface IReportCalculate
     {

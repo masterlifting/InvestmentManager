@@ -1,10 +1,10 @@
-﻿using InvestmentManager.Entities.Basic;
-using InvestmentManager.Entities.Relationship.InterfaceForeignKey;
+﻿using InvestManager.Entities.Basic;
+using InvestManager.Entities.Relationship.InterfaceForeignKey;
 
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace InvestmentManager.Entities.Market
+namespace InvestManager.Entities.Market
 {
     public class Price : BaseEntity, ICurrencyFK, ITickerFK
     {
@@ -13,9 +13,9 @@ namespace InvestmentManager.Entities.Market
         public decimal Value { get; set; }
 
         public long CurrencyId { get; set; }
-        public Currency Currency { get; set; }
+        public virtual Currency Currency { get; set; }
 
         public long TickerId { get; set; }
-        public Ticker Ticker { get; set; }
+        public virtual Ticker Ticker { get; set; }
     }
 }

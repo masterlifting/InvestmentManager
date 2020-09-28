@@ -1,8 +1,8 @@
 ﻿using HtmlAgilityPack;
-using InvestmentManager.Entities.Market;
-using InvestmentManager.ReportFinder.Interfaces;
-using InvestmentManager.Repository;
-using InvestmentManager.Service.Interfaces;
+using InvestManager.Entities.Market;
+using InvestManager.ReportFinder.Interfaces;
+using InvestManager.Repository;
+using InvestManager.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -11,7 +11,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace InvestmentManager.ReportFinder.Implimentations
+namespace InvestManager.ReportFinder.Implimentations
 {
     public class InvestingAgregator : IReportAgregator
     {

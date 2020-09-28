@@ -1,0 +1,56 @@
+﻿@page "/login"
+@inject IAuthService AuthService
+@inject NavigationManager NavigationManager
+
+    <div class="container" style="margin-top: 10rem">
+        @if (withErrors)
+        {
+            <div class="alert alert-danger" role="alert">
+                <p>@error</p>
+            </div>
+        }
+        <h6 class="card-title text-center">Вход</h6>
+        <EditForm Model="loginModel" OnValidSubmit="HandleLogin">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="row mb-4">
+                <div class="col offset-md-3 col-md-6">
+                    <ValidationMessage For="@(() => loginModel.Email)" />
+                    <InputText Id="email" class="invest_Input" placeholder="введите email" @bind-Value="loginModel.Email" />
+                </div>
+            </div>
+            <div class="row mb-4">
+                <div class="col offset-md-3 col-md-6">
+                    <ValidationMessage For="@(() => loginModel.Password)" />
+                    <InputText Id="password" type="password" class="invest_Input" placeholder="введите пароль" @bind-Value="loginModel.Password" />
+                </div>
+            </div>
+            <div class="row mb-4">
+                <div class="col offset-md-3 col-md-6">
+                    <button type="submit" class="btn btn-dark w-100 rounded-pill">Войти</button>
+                </div>
+            </div>
+        </EditForm>
+    </div>
+
+@code {
+    LoginModel loginModel = new LoginModel();
+    bool withErrors;
+    string error = "";
+
+    async Task HandleLogin()
+    {
+        withErrors = false;
+
+        var result = await AuthService.LoginAsync(loginModel);
+
+        if (result.Successful)
+            NavigationManager.NavigateTo("/");
+        else
+        {
+            error = result.Error;
+            withErrors = true;
+        }
+    }
+}

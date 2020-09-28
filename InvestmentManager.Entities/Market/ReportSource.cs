@@ -1,8 +1,8 @@
-﻿using InvestmentManager.Entities.Basic;
-using InvestmentManager.Entities.Relationship.InterfaceForeignKey;
+﻿using InvestManager.Entities.Basic;
+using InvestManager.Entities.Relationship.InterfaceForeignKey;
 using System.ComponentModel.DataAnnotations;
 
-namespace InvestmentManager.Entities.Market
+namespace InvestManager.Entities.Market
 {
     public class ReportSource : BaseEntity, ICompanyFK
     {
@@ -14,6 +14,6 @@ namespace InvestmentManager.Entities.Market
         public string Value { get; set; }
 
         public long CompanyId { get; set; }
-        public Company Company { get; set; }
+        public virtual Company Company { get; set; }
     }
 }

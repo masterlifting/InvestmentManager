@@ -1,11 +1,11 @@
-﻿using InvestmentManager.Entities.Basic;
-using InvestmentManager.Entities.Broker;
-using InvestmentManager.Entities.Relationship.InterfaceForeignKey;
-using InvestmentManager.Entities.Relationship.InterfaceNavigationProperty;
+﻿using InvestManager.Entities.Basic;
+using InvestManager.Entities.Broker;
+using InvestManager.Entities.Relationship.InterfaceForeignKey;
+using InvestManager.Entities.Relationship.InterfaceNavigationProperty;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace InvestmentManager.Entities.Market
+namespace InvestManager.Entities.Market
 {
     public class Ticker : BaseEntity, ICompanyFK, IExchangeFK, ILotFK, IStockTransactioNP, IPriceNP
     {
@@ -14,15 +14,15 @@ namespace InvestmentManager.Entities.Market
         public string Name { get; set; }
 
         public long CompanyId { get; set; }
-        public Company Company { get; set; }
+        public virtual Company Company { get; set; }
 
         public long ExchangeId { get; set; }
-        public Exchange Exchange { get; set; }
+        public virtual Exchange Exchange { get; set; }
 
         public long LotId { get; set; }
-        public Lot Lot { get; set; }
+        public virtual Lot Lot { get; set; }
 
-        public List<StockTransaction> StockTransactions { get; set; }
-        public List<Price> Prices { get; set; }
+        public virtual IEnumerable<StockTransaction> StockTransactions { get; set; }
+        public virtual IEnumerable<Price> Prices { get; set; }
     }
 }

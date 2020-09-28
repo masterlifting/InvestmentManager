@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace InvestmentManager.Entities.Basic
+namespace InvestManager.Entities.Basic
 {
     public abstract class BaseEntity : IBaseEntity
     {

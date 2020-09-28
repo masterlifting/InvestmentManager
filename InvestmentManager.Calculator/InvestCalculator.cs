@@ -1,17 +1,17 @@
-﻿using InvestmentManager.Calculator.ConfigurationBinding;
-using InvestmentManager.Calculator.Implimentations;
-using InvestmentManager.Calculator.Models;
-using InvestmentManager.Entities.Broker;
-using InvestmentManager.Entities.Calculate;
-using InvestmentManager.Entities.Market;
-using InvestmentManager.Repository;
+﻿using InvestManager.Calculator.ConfigurationBinding;
+using InvestManager.Calculator.Implimentations;
+using InvestManager.Calculator.Models;
+using InvestManager.Entities.Broker;
+using InvestManager.Entities.Calculate;
+using InvestManager.Entities.Market;
+using InvestManager.Repository;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace InvestmentManager.Calculator
+namespace InvestManager.Calculator
 {
     public class InvestCalculator : IInvestCalculator
     {
@@ -150,7 +150,7 @@ namespace InvestmentManager.Calculator
 
             if (args is null) return result;
 
-            var operations = args.StockTransactions.OrderBy(x => x.DateOperation.Date).Select(x => new { x.TransactionStatusId, x.Quantity, x.Cost });
+            var operations = args.StockTransactions.OrderBy(x => x.DateOperation).Select(x => new { x.TransactionStatusId, x.Quantity, x.Cost });
 
             decimal freeAvgPrice = 0;
             int sellCount = 0;
@@ -201,7 +201,7 @@ namespace InvestmentManager.Calculator
                 decimal lotMin = Math.Round((stockCount * percentMin) * 0.01m, 0);
 
                 //Если распределилось не до конца, то дораспределим
-                if ((lotMax + lotMid + lotMin) < stockCount)
+                if ((lotMax + lotMid + lotMin) < freeStockCount)
                 {
                     decimal a = stockCount - (lotMax + lotMid + lotMin);
                     decimal b = (new decimal[] { percentMin, percentMid, percentMax }).Max();
@@ -242,12 +242,12 @@ namespace InvestmentManager.Calculator
                 result.PriceMid = priceMid;
                 result.PriceMax = priceMax;
 
-                //Теперь вычтем с низа рекомендаций проданые лоты по порядку
+                //Вычтем с низа рекомендаций проданые лоты по порядку
                 foreach (var operation in operations.Where(x => x.TransactionStatusId == 4))
                 {
                     sellCount = operation.Quantity / args.Lot;
 
-                    if (result.LotMid > 0 && sellCount > 0)
+                    if (result.LotMin > 0 && sellCount > 0)
                     {
                         sellCount -= result.LotMin;
                         result.LotMin = sellCount < 0 ? Math.Abs(sellCount) : 0;

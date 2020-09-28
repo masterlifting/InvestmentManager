@@ -1,13 +1,13 @@
-﻿using InvestmentManager.Entities.Broker;
-using InvestmentManager.Entities.Calculate;
-using InvestmentManager.Entities.Market;
+﻿using InvestManager.Entities.Broker;
+using InvestManager.Entities.Calculate;
+using InvestManager.Entities.Market;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace InvestmentManager.Repository
+namespace InvestManager.Repository
 {
     public class RepositoryEFCore<TEntity> : IRepository<TEntity> where TEntity : class
     {
@@ -72,6 +72,11 @@ namespace InvestmentManager.Repository
 
         public IQueryable<Ticker> GetTickerIncludedLot() => context.Tickers.AsNoTracking().Include(x => x.Lot);
         public IEnumerable<Ticker> GetPriceTikers() => context.Tickers.AsNoTracking().AsEnumerable().GroupBy(x => x.CompanyId).Select(x => x.First());
+        public IQueryable<Ticker> GetTikersIncludeTransactions(IEnumerable<long> accountIds)
+        {
+            var tickerIds = context.StockTransactions.AsNoTracking().Where(y => accountIds.Contains(y.AccountId)).Select(x => x.TickerId);
+            return context.Tickers.AsNoTracking().Include(x => x.StockTransactions).Where(x => tickerIds.Contains(x.Id));
+        }
     }
     public class LotRepository : RepositoryEFCore<Lot>, ILotRepository { public LotRepository(InvestmentContext context) : base(context) { } }
     public class CompanyRepository : RepositoryEFCore<Company>, ICompanyRepository { public CompanyRepository(InvestmentContext context) : base(context) { } }
@@ -116,9 +121,9 @@ namespace InvestmentManager.Repository
         private readonly InvestmentContext context;
         public PriceRepository(InvestmentContext context) : base(context) => this.context = context;
 
-        public IDictionary<long, IEnumerable<Price>> GetGroupedPrices(int lastMonths, OrderType orderDate)
+        public Dictionary<long, List<Price>> GetGroupedPrices(int lastMonths, OrderType orderDate)
         {
-            var result = new Dictionary<long, IEnumerable<Price>>();
+            var result = new Dictionary<long, List<Price>>();
 
             var tickers = context.Companies.AsNoTracking().Include(x => x.Tickers).Select(x => x.Tickers.First());
             var prices = orderDate == OrderType.OrderBy
@@ -128,7 +133,7 @@ namespace InvestmentManager.Repository
             var agregatedData = prices.AsEnumerable().GroupBy(x => x.TickerId).Join(tickers, x => x.Key, y => y.Id, (x, y) => new { y.CompanyId, Prices = x.Select(y => y) });
 
             foreach (var i in agregatedData)
-                result.Add(i.CompanyId, i.Prices);
+                result.Add(i.CompanyId, i.Prices.ToList());
 
             return result;
         }
@@ -142,6 +147,19 @@ namespace InvestmentManager.Repository
 
             foreach (var i in agregatedData)
                 result.Add(i.CompanyId, i.LastPrice);
+
+            return result;
+        }
+        public IDictionary<long, DateTime> GetLastDates(double lastDays)
+        {
+            var result = new Dictionary<long, DateTime>();
+
+            var tickers = context.Companies.AsNoTracking().Include(x => x.Tickers).Select(x => x.Tickers.First());
+            var prices = context.Prices.AsNoTracking().Where(x => x.BidDate >= DateTime.Now.AddDays(-lastDays)).OrderBy(x => x.BidDate);
+            var agregatedData = prices.AsEnumerable().GroupBy(x => x.TickerId).Join(tickers, x => x.Key, y => y.Id, (x, y) => new { y.CompanyId, LastDate = x.Last().BidDate });
+
+            foreach (var i in agregatedData)
+                result.Add(i.CompanyId, i.LastDate);
 
             return result;
         }

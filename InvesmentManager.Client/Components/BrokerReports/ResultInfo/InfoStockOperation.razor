@@ -1,0 +1,45 @@
+﻿<TitleSubInv Color="ColorType.warning" Text="Операции с акциями" />
+
+<div class="row text-monospace border-bottom border-dark mx-1 text-info">
+    <div class="col-7 pl-0">
+        <div class="row">
+            <div class="col-4">Статус</div>
+            <div class="col-4">Биржа</div>
+            <div class="col-4">Акций</div>
+        </div>
+    </div>
+    <div class="col-5">
+        <div class="row">
+            <div class="col-6 px-0">За акцию</div>
+            <div class="col-6 px-0 text-center">Дата</div>
+        </div>
+    </div>
+</div>
+
+@foreach (var transaction in StockTransactions)
+{
+    if (transaction.Status.Equals("Продажа"))
+        Color = ColorType.success;
+
+    <div class="row text-monospace border-bottom border-dark mx-1 text-@Color.ToString()">
+        <div class="col-12 text-primary">@transaction.Ticker | @transaction.Company</div>
+        <div class="col-7 pl-0">
+            <div class="row">
+                <div class="col-4">@transaction.Status</div>
+                <div class="col-4">@transaction.Exchange</div>
+                <div class="col-4">@transaction.Quantity</div>
+            </div>
+        </div>
+        <div class="col-5">
+            <div class="row">
+                <div class="col-6 px-0">@transaction.Cost</div>
+                <div class="col-6 px-0 text-center">@transaction.DateOperation</div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public IEnumerable<BrokerStockTransaction> StockTransactions { get; set; }
+    [Parameter] public ColorType Color { get; set; } = ColorType.danger;
+}

@@ -1,0 +1,55 @@
+﻿@inject HttpClient httpClient
+@using System.Text.RegularExpressions
+<AlertInv AlertType="@alertType" />
+
+<BaseError Title="@Title" IsDone="@isDone" ErrorValue="@ErrorValue">
+    <EditForm Model="@result" OnValidSubmit="SendData">
+        <DataAnnotationsValidator />
+
+        <ValidationMessage For="@(() => result.CompanyId)" />
+        <InputSelect class="invest_Input" @bind-Value="@result.CompanyId">
+            <option selected value="">Этот дивиденд какой компании?</option>
+            @foreach (var i in model.Companies)
+            {
+                <option value="@i.Id">@i.Name</option>
+            }
+        </InputSelect>
+        <div class="row">
+            <div class="col-12">Возможный идентификатор дивиденда: </div>
+        </div>
+        <ValidationMessage For="@(() => result.IdentifierName)" />
+        <InputText class="invest_Input" @bind-Value="@result.IdentifierName" />
+
+
+        <div class="row mt-3">
+            <div class="col">
+                <button type="submit" class="btn btn-sm btn-warning w-100 rounded-pill">Исправить</button>
+            </div>
+        </div>
+    </EditForm>
+</BaseError>
+
+
+@code {
+    AlertType alertType;
+
+    [Parameter] public string ErrorValue { get; set; }
+    [Parameter] public string Title { get; set; }
+
+    DividendErrorModel model = new DividendErrorModel();
+    DividendErrorResultModel result;
+    bool isDone = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        result = new DividendErrorResultModel { IdentifierName = Regex.Match(ErrorValue.Split('\'')[1], @", (\w*), налог").Groups[1].Value };
+        model = await httpClient.GetFromJsonAsync<DividendErrorModel>("error/dividenderror");
+    }
+
+    async Task SendData()
+    {
+        isDone = true;
+        var response = await httpClient.PostAsJsonAsync<DividendErrorResultModel>("error/dividenderror", result);
+        alertType = response.IsSuccessStatusCode ? AlertType.success : AlertType.danger;
+    }
+}

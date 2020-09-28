@@ -1,11 +1,11 @@
-﻿using InvestmentManager.BrokerService.Interfaces;
+﻿using InvestManager.BrokerService.Models;
+using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
 
-namespace InvestmentManager.BrokerService
+namespace InvestManager.BrokerService
 {
     public interface IInvestBrokerService
     {
-        IBcsParser BcsParser { get; }
-        IReportMapper ReportMapper { get; }
-        IReportFilter ReportFilter { get; }
+        Task<ResultBrokerReportModel> GetNewReportsAsync(IFormFileCollection files, string userId);
     }
 }

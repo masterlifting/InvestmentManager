@@ -1,0 +1,25 @@
+﻿@inject HttpClient httpClient
+
+<TitleSubInv Text="Общая информация" />
+
+<AuthorizeView>
+    <Authorized>
+        <InfoInv Name="Компаний в портфеле" Value="@result.CompanyCount" />
+    </Authorized>
+    <NotAuthorized>
+        <NotAuthorizeInfo />
+    </NotAuthorized>
+</AuthorizeView>
+
+@code
+{
+    [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; }
+    PortfolioCommonModel result = new PortfolioCommonModel();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var user = (await AuthenticationState).User;
+        if (user.Identity.IsAuthenticated)
+            result = await httpClient.GetFromJsonAsync<PortfolioCommonModel>($"portfolio/common");
+    }
+}

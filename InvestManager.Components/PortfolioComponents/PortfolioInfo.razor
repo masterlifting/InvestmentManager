@@ -1,0 +1,11 @@
+﻿
+<div class="container invest_card">
+    <TitleInv Text="Данные по портфелям" />
+
+    <PortfolioFinancialInfo Dollar="Dollar" />
+    <PortfolioCommonInfo />
+</div>
+@code
+{
+    [Parameter] public decimal Dollar { get; set; }
+}

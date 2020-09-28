@@ -1,0 +1,37 @@
+﻿<a href="/@Path" class="row font-weight-bold py-2 small" style="color:mediumaquamarine">
+    @if (!string.IsNullOrWhiteSpace(Value))
+    {
+    <div class="col-5"><span class="oi oi-external-link" aria-hidden="true"></span>&emsp;@Name: </div>
+        if (string.IsNullOrWhiteSpace(Date))
+        {
+            <div class="col-7">@Value</div>
+        }
+        else
+        {
+            <div class="col-7">@Value (@Date)</div>
+        }
+
+    }
+    else
+    {
+        if (string.IsNullOrWhiteSpace(Date))
+        {
+<div class="col-12"><span class="oi oi-external-link" aria-hidden="true"></span>&emsp;@Name</div>
+        }
+        else
+        {
+<div class="col-12"><span class="oi oi-external-link" aria-hidden="true"></span>&emsp;@Name (@Date)</div>
+        }
+    }
+</a>
+
+@code {
+    [Parameter]
+    public string Path { get; set; }
+    [Parameter]
+    public string Name { get; set; }
+    [Parameter]
+    public string Value { get; set; }
+    [Parameter]
+    public string Date { get; set; }
+}

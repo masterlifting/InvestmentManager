@@ -1,9 +1,9 @@
-﻿using InvestmentManager.Entities.Basic;
-using InvestmentManager.Entities.Market;
-using InvestmentManager.Entities.Relationship.InterfaceForeignKey;
+﻿using InvestManager.Entities.Basic;
+using InvestManager.Entities.Market;
+using InvestManager.Entities.Relationship.InterfaceForeignKey;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace InvestmentManager.Entities.Calculate
+namespace InvestManager.Entities.Calculate
 {
     public class BuyRecommendation : BaseEntity, ICompanyFK
     {
@@ -11,6 +11,6 @@ namespace InvestmentManager.Entities.Calculate
         public decimal Price { get; set; }
 
         public long CompanyId { get; set; }
-        public Company Company { get; set; }
+        public virtual Company Company { get; set; }
     }
 }

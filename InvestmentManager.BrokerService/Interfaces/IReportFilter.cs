@@ -1,8 +1,8 @@
-﻿using InvestmentManager.BrokerService.Models;
-using InvestmentManager.Entities.Basic;
+﻿using InvestManager.BrokerService.Models;
+using InvestManager.Entities.Basic;
 using System.Collections.Generic;
 
-namespace InvestmentManager.BrokerService.Interfaces
+namespace InvestManager.BrokerService.Interfaces
 {
     public interface IReportFilter
     {
@@ -13,11 +13,11 @@ namespace InvestmentManager.BrokerService.Interfaces
         /// <returns></returns>
         List<FilterReportModel> GetUniqueLoadedReports(IEnumerable<FilterReportModel> models);
         /// <summary>
-        /// Из входящей коллекции транзакций оставляем только те операции, которых нет в базе данных
+        /// Из входящей коллекции транзакций оставляет только те операции, которых нет в базе данных
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="transactions"></param>
         /// <returns></returns>
-        List<T> GetNewTransactions<T>(IEnumerable<T> transactions) where T : class, IBaseBroker;
+        List<T> GetNewTransactions<T>(IEnumerable<T> transactions, long accountId) where T : class, IBaseBroker;
     }
 }

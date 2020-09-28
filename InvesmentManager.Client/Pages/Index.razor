@@ -1,0 +1,40 @@
+﻿@page "/"
+@inject HttpClient httpClient
+
+<div class="container invest_card">
+    <div class="row">
+        <div class="offset-1 col-8">Курс&emsp;<span class="oi oi-dollar" aria-hidden="true"></span>&emsp;сегодня:</div>
+        @if (dollar.HasValue)
+        {
+            <div class="col-3 text-center font-weight-bold text-danger">@dollar.Value.ToString("C")</div>
+        }
+        else
+        {
+            <text>@DefaultData.loading</text>
+        }
+    </div>
+</div>
+
+
+<MainInfo />
+
+@if (dollar.HasValue)
+{
+    <PortfolioSummaryInfo Dollar="@dollar.Value" />
+}
+
+<PortfolioTransactionsInfo />
+
+<AdminPanel />
+
+@code
+{
+    decimal? dollar;
+    CBRF rate;
+
+    protected override async Task OnInitializedAsync()
+    {
+        rate = await httpClient.GetFromJsonAsync<CBRF>("outside/getrate");
+        dollar = rate.Valute.USD.Value;
+    }
+}

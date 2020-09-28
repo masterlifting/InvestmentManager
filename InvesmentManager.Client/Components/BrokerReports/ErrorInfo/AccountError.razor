@@ -1,0 +1,38 @@
+﻿@inject HttpClient httpClient
+<AlertInv AlertType="@alertType" />
+
+<BaseError Title="@Title" IsDone="@isDone" ErrorValue="@ErrorValue">
+    <EditForm Model="@result" OnValidSubmit="SendData">
+        <DataAnnotationsValidator />
+
+        <ValidationMessage For="@(() => result.AccountName)" />
+        <InputText class="invest_Input" @bind-Value="@result.AccountName" />
+        <div class="row mt-3">
+            <div class="col">
+                <button type="submit" class="btn btn-sm btn-warning w-100 rounded-pill">Добавить</button>
+            </div>
+        </div>
+    </EditForm>
+</BaseError>
+
+@code {
+    AlertType alertType;
+
+    [Parameter] public string ErrorValue { get; set; }
+    [Parameter] public string Title { get; set; }
+
+    AccountErrorResultModel result;
+    bool isDone = false;
+
+    protected override void OnInitialized()
+    {
+        result = new AccountErrorResultModel { AccountName = ErrorValue.Split('\'')[1] };
+    }
+
+    async Task SendData()
+    {
+        isDone = true;
+        var response = await httpClient.PostAsJsonAsync<AccountErrorResultModel>("error/accounterror", result);
+        alertType = response.IsSuccessStatusCode ? AlertType.success : AlertType.danger;
+    }
+}

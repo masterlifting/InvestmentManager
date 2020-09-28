@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace InvestmentManager.Entities.Basic
+namespace InvestManager.Entities.Basic
 {
     public interface IBaseEntity
     {

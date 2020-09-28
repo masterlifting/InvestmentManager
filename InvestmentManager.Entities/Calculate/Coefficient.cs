@@ -1,10 +1,10 @@
-﻿using InvestmentManager.Entities.Basic;
-using InvestmentManager.Entities.Market;
-using InvestmentManager.Entities.Relationship.InterfaceForeignKey;
+﻿using InvestManager.Entities.Basic;
+using InvestManager.Entities.Market;
+using InvestManager.Entities.Relationship.InterfaceForeignKey;
 
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace InvestmentManager.Entities.Calculate
+namespace InvestManager.Entities.Calculate
 {
     public class Coefficient : BaseEntity, IReportFK
     {
@@ -24,6 +24,6 @@ namespace InvestmentManager.Entities.Calculate
         public decimal EPS { get; set; }
 
         public long ReportId { get; set; }
-        public Report Report { get; set; }
+        public virtual Report Report { get; set; }
     }
 }

@@ -1,11 +1,11 @@
-﻿using InvestmentManager.Entities.Broker;
+﻿using InvestManager.Entities.Broker;
 
 using System.Collections.Generic;
 
-namespace InvestmentManager.Entities.Relationship.InterfaceNavigationProperty
+namespace InvestManager.Entities.Relationship.InterfaceNavigationProperty
 {
     public interface IStockTransactioNP
     {
-        List<StockTransaction> StockTransactions { get; set; }
+        IEnumerable<StockTransaction> StockTransactions { get; set; }
     }
 }

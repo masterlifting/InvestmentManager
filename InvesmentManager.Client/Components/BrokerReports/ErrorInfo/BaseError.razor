@@ -1,0 +1,22 @@
+﻿@if (!IsDone)
+{
+    <div class="container invest_ErrorCard">
+        <TitleInv Text="@Title" Color="ColorType.warning" Position="PositionType.center" />
+        <div class="row">
+            <div class="col-12">Ошибка:</div>
+            <label class="col-12 text-center text-light">@ErrorValue</label>
+            <div class="col-12">Возможное решение: </div>
+            <div class="col-12">@ChildContent</div>
+        </div>
+    </div>
+}
+
+
+@code {
+    AlertType alertType;
+
+    [Parameter] public string Title { get; set; }
+    [Parameter] public bool IsDone { get; set; }
+    [Parameter] public string ErrorValue { get; set; }
+    [Parameter] public RenderFragment ChildContent { get; set; }
+}

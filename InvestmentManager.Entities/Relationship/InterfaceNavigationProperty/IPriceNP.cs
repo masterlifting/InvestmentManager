@@ -1,11 +1,11 @@
-﻿using InvestmentManager.Entities.Market;
+﻿using InvestManager.Entities.Market;
 
 using System.Collections.Generic;
 
-namespace InvestmentManager.Entities.Relationship.InterfaceNavigationProperty
+namespace InvestManager.Entities.Relationship.InterfaceNavigationProperty
 {
     public interface IPriceNP
     {
-        List<Price> Prices { get; set; }
+        IEnumerable<Price> Prices { get; set; }
     }
 }

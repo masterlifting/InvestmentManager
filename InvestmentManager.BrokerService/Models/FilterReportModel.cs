@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace InvestmentManager.BrokerService.Models
+namespace InvestManager.BrokerService.Models
 {
     public class FilterReportModel
     {

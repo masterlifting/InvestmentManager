@@ -1,0 +1,58 @@
+﻿@inject HttpClient httpClient
+
+<AuthorizeView Roles="pestunov">
+    <Authorized>
+
+        <AlertInv AlertType="@alertType" />
+        <LoadingInv IsLoading="@isLoading" />
+        <div class="container invest_card">
+            <TitleInv Text="Панель администратора" />
+
+            <LinkInv OnclickCallback="@GetNewPrices" Name="Обновить цены" />
+            <LinkInv OnclickCallback="@GetNewReports" Name="Обновить отчеты" />
+            <LinkInv Path="financialreportsform" Name="Проверить отчеты" />
+            <LinkInv OnclickCallback="@RecalculateAll" Name="Пересчитать все" />
+        </div>
+
+    </Authorized>
+</AuthorizeView>
+
+@code
+{
+    AlertType alertType;
+    bool isLoading;
+
+    async Task RecalculateAll()
+    {
+        isLoading = true;
+        var response = await httpClient.GetAsync("admin/recalculateall");
+        isLoading = false;
+
+        if (response.IsSuccessStatusCode)
+            alertType = AlertType.success;
+        else
+            alertType = AlertType.danger;
+    }
+    async Task GetNewPrices()
+    {
+        isLoading = true;
+        var response = await httpClient.GetAsync("admin/getnewprices");
+        isLoading = false;
+
+        if (response.IsSuccessStatusCode)
+            alertType = AlertType.success;
+        else
+            alertType = AlertType.danger;
+    }
+    async Task GetNewReports()
+    {
+        isLoading = true;
+        var response = await httpClient.GetAsync("admin/getnewreports");
+        isLoading = false;
+
+        if (response.IsSuccessStatusCode)
+            alertType = AlertType.success;
+        else
+            alertType = AlertType.danger;
+    }
+}

@@ -1,13 +1,13 @@
-﻿using InvestmentManager.Entities.Market;
-using InvestmentManager.Repository;
-using InvestmentManager.PriceFinder.Interfaces;
+﻿using InvestManager.Entities.Market;
+using InvestManager.Repository;
+using InvestManager.PriceFinder.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using InvestmentManager.Service.Interfaces;
+using InvestManager.Services.Interfaces;
 
-namespace InvestmentManager.PriceFinder.Implimentations
+namespace InvestManager.PriceFinder.Implimentations
 {
     public class PriceService : IPriceService
     {

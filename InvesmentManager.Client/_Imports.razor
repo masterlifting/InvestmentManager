@@ -1,0 +1,46 @@
+﻿@using System.IO
+@using BlazorInputFile
+
+@using InvestManager.Client.Components.Service
+@using InvestManager.Client.Components.Index
+@using InvestManager.Client.Components.Admin
+@using InvestManager.Client.Components.Portfolio.Summary
+@using InvestManager.Client.Components.Portfolio.Transactions
+@using InvestManager.Client.Components.Company
+@using InvestManager.Client.Components.BrokerReports
+@using InvestManager.Client.Components.BrokerReports.ResultInfo
+@using InvestManager.Client.Components.BrokerReports.ErrorInfo
+@using InvestManager.Client.ChoiceModel
+
+@using System.Net.Http
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+
+@using Microsoft.AspNetCore.Authorization.Infrastructure
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Authorization
+@using InvestManager.Client.AuthConfiguration
+@using InvestManager.Client.Components.Authentication
+@using System.Security.Claims
+
+@using System.Net.Http.Json
+@using System.Text.Json
+@using System.Globalization
+@using System.Text
+@using Microsoft.AspNetCore.Components.WebAssembly.Http
+@using Microsoft.JSInterop
+@using InvestManager.Client
+@using InvestManager.Client.Shared
+@using Blazored.LocalStorage
+
+@using InvestManager.DomainModels
+@using InvestManager.ViewModels
+@using InvestManager.ViewModels.AuthenticationModels
+@using InvestManager.ViewModels.CompanyModels
+@using InvestManager.ViewModels.OutsideRequestModels
+@using InvestManager.ViewModels.PortfolioModels
+@using InvestManager.ViewModels.PortfolioModels.BrokerReportErrorModels
+@using InvestManager.ViewModels.ReportModels
+@using InvestManager.ViewModels.RecommendationModels
+@using InvestManager.ViewModels.TransactionModels

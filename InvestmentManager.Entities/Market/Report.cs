@@ -1,12 +1,12 @@
-﻿using InvestmentManager.Entities.Basic;
-using InvestmentManager.Entities.Calculate;
-using InvestmentManager.Entities.Relationship.InterfaceForeignKey;
-using InvestmentManager.Entities.Relationship.InterfaceNavigationProperty;
+﻿using InvestManager.Entities.Basic;
+using InvestManager.Entities.Calculate;
+using InvestManager.Entities.Relationship.InterfaceForeignKey;
+using InvestManager.Entities.Relationship.InterfaceNavigationProperty;
 
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace InvestmentManager.Entities.Market
+namespace InvestManager.Entities.Market
 {
     public class Report : BaseEntity, ICompanyFK, ICoefficientNP
     {
@@ -41,10 +41,10 @@ namespace InvestmentManager.Entities.Market
         public decimal LongTermDebt { get; set; }
 
         #region Relationship
-        public Coefficient Coefficient { get; set; }
+        public virtual Coefficient Coefficient { get; set; }
 
         public long CompanyId { get; set; }
-        public Company Company { get; set; }
+        public virtual Company Company { get; set; }
         #endregion
     }
 }

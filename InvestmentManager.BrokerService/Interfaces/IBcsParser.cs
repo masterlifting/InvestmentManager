@@ -1,11 +1,11 @@
-﻿using InvestmentManager.BrokerService.Models;
+﻿using InvestManager.BrokerService.Models;
 using System.Data;
 
-namespace InvestmentManager.BrokerService.Interfaces
+namespace InvestManager.BrokerService.Interfaces
 {
     public interface IBcsParser
     {
-        BrokerReportModel ParseBcsReport(DataSet excelReport);
+        StringReportModel ParseBcsReport(DataSet excelReport);
         FilterReportModel ParsePeriodReport(DataSet excelReport);
     }
 }

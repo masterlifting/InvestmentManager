@@ -1,10 +1,10 @@
-﻿using InvestmentManager.Entities.Market;
+﻿using InvestManager.Entities.Market;
 using System.Collections.Generic;
 
-namespace InvestmentManager.Entities.Relationship.InterfaceNavigationProperty
+namespace InvestManager.Entities.Relationship.InterfaceNavigationProperty
 {
     public interface IIsinNP
     {
-        List<Isin> Isins { get; set; }
+        IEnumerable<Isin> Isins { get; set; }
     }
 }

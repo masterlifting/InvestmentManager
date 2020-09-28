@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 
-namespace InvestmentManager.Calculator
+namespace InvestManager.Calculator
 {
     internal abstract class BaseCalculate
     {

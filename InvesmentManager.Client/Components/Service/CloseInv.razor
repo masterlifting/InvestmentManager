@@ -1,0 +1,11 @@
+﻿<div class="row my-1">
+    <div class="col text-@Position.ToString()">
+        <span @onclick="@OnclickCallback" class="oi oi-x text-@Color" aria-hidden="true" style="cursor:pointer"></span>
+    </div>
+</div>
+
+@code {
+    [Parameter] public EventCallback OnclickCallback { get; set; }
+    [Parameter] public ColorType Color { get; set; } = ColorType.light;
+    [Parameter] public PositionType Position { get; set; } = PositionType.right;
+}

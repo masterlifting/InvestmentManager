@@ -1,0 +1,62 @@
+﻿@inject HttpClient httpClient
+
+
+<AlertInv AlertType="@alertType" />
+@foreach (var report in Reports)
+{
+    <div class="container invest_ReportCard">
+
+        <TitleInv Position="PositionType.center" Color="ColorType.warning" Text="@report.AccountId" />
+        @if (report.AccountTransactions.Any())
+        {
+            <InfoAccountOperation AccountTransactions="@report.AccountTransactions" />
+        }
+
+        @if (report.StockTransactions.Any())
+        {
+            <InfoStockOperation StockTransactions="@report.StockTransactions" />
+        }
+
+        @if (report.Comissions.Any())
+        {
+            <InfoComission Comissions="@report.Comissions" />
+        }
+
+        @if (report.Dividends.Any())
+        {
+            <InfoDividend Dividends="@report.Dividends" />
+        }
+
+        @if (report.ExchangeRates.Any())
+        {
+            <InfoChangeRate ExchangeRates="@report.ExchangeRates" />
+        }
+
+        @if (report.AccountTransactions.Any() || report.StockTransactions.Any() || report.Comissions.Any() || report.Dividends.Any() || report.ExchangeRates.Any())
+        {
+            <div class="row mt-3">
+                <div class="col">
+                    <button class="btn btn-sm btn-success w-100 rounded-pill" @onclick="@(()=> SaveData(report.AccountId, report))">Сохранить</button>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    [Parameter] public List<CorrectBrokerReport> Reports { get; set; }
+    public AlertType alertType;
+
+    async Task SaveData(string accountId, CorrectBrokerReport report)
+    {
+        var response = await httpClient.PostAsJsonAsync<string>("portfolio/savereports", accountId);
+        
+        if (response.IsSuccessStatusCode)
+        {
+            alertType = AlertType.success;
+            await Task.Run(() => Reports.Remove(report));
+        }
+        else
+            alertType = AlertType.danger;
+    }
+}

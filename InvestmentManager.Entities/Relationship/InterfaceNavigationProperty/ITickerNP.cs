@@ -1,10 +1,10 @@
-﻿using InvestmentManager.Entities.Market;
+﻿using InvestManager.Entities.Market;
 using System.Collections.Generic;
 
-namespace InvestmentManager.Entities.Relationship.InterfaceNavigationProperty
+namespace InvestManager.Entities.Relationship.InterfaceNavigationProperty
 {
     public interface ITickerNP
     {
-        List<Ticker> Tickers { get; set; }
+        IEnumerable<Ticker> Tickers { get; set; }
     }
 }

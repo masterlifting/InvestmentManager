@@ -1,4 +1,4 @@
-﻿namespace InvestmentManager.Calculator.ConfigurationBinding
+﻿namespace InvestManager.Calculator.ConfigurationBinding
 {
     public class WeightConfig
     {

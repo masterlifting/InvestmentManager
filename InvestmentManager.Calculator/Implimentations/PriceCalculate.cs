@@ -1,10 +1,10 @@
-﻿using InvestmentManager.Calculator.ConfigurationBinding;
-using InvestmentManager.Calculator.Interfaces;
-using InvestmentManager.Entities.Market;
+﻿using InvestManager.Calculator.ConfigurationBinding;
+using InvestManager.Calculator.Interfaces;
+using InvestManager.Entities.Market;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace InvestmentManager.Calculator.Implimentations
+namespace InvestManager.Calculator.Implimentations
 {
     internal class PriceCalculate : BaseCalculate, IPriceCalculate
     {

@@ -1,11 +1,11 @@
-﻿using InvestmentManager.Entities.Basic;
-using InvestmentManager.Entities.Broker;
-using InvestmentManager.Entities.Relationship.InterfaceNavigationProperty;
+﻿using InvestManager.Entities.Basic;
+using InvestManager.Entities.Broker;
+using InvestManager.Entities.Relationship.InterfaceNavigationProperty;
 
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace InvestmentManager.Entities.Market
+namespace InvestManager.Entities.Market
 {
     public class Exchange : BaseEntity, ITickerNP, IStockTransactioNP
     {
@@ -21,7 +21,7 @@ namespace InvestmentManager.Entities.Market
         [Required]
         public string ProviderUri { get; set; }
 
-        public List<Ticker> Tickers { get; set; }
-        public List<StockTransaction> StockTransactions { get; set; }
+        public virtual IEnumerable<Ticker> Tickers { get; set; }
+        public virtual IEnumerable<StockTransaction> StockTransactions { get; set; }
     }
 }

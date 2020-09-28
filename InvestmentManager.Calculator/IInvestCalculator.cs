@@ -1,10 +1,10 @@
-﻿using InvestmentManager.Entities.Calculate;
+﻿using InvestManager.Entities.Calculate;
 using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace InvestmentManager.Calculator
+namespace InvestManager.Calculator
 {
     public interface IInvestCalculator
     {

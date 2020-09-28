@@ -1,10 +1,10 @@
-﻿using InvestmentManager.Entities.Basic;
-using InvestmentManager.Entities.Relationship.InterfaceNavigationProperty;
+﻿using InvestManager.Entities.Basic;
+using InvestManager.Entities.Relationship.InterfaceNavigationProperty;
 
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace InvestmentManager.Entities.Broker
+namespace InvestManager.Entities.Broker
 {
     public class Account : BaseEntity, IDividendNP, IAccountTransactionNP, IStockTransactioNP, IComissionNP, IExchaneRateNP
     {
@@ -16,10 +16,10 @@ namespace InvestmentManager.Entities.Broker
         [StringLength(100)]
         public string UserId { get; set; }
 
-        public List<Dividend> Dividends { get; set; }
-        public List<AccountTransaction> AccountTransactions { get; set; }
-        public List<StockTransaction> StockTransactions { get; set; }
-        public List<Comission> Comissions { get; set; }
-        public List<ExchangeRate> ExchangeRates { get; set; }
+        public virtual IEnumerable<Dividend> Dividends { get; set; }
+        public virtual IEnumerable<AccountTransaction> AccountTransactions { get; set; }
+        public virtual IEnumerable<StockTransaction> StockTransactions { get; set; }
+        public virtual IEnumerable<Comission> Comissions { get; set; }
+        public virtual IEnumerable<ExchangeRate> ExchangeRates { get; set; }
     }
 }

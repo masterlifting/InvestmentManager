@@ -1,12 +1,12 @@
-﻿using InvestmentManager.Entities.Broker;
-using InvestmentManager.Entities.Calculate;
-using InvestmentManager.Entities.Market;
+﻿using InvestManager.Entities.Broker;
+using InvestManager.Entities.Calculate;
+using InvestManager.Entities.Market;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace InvestmentManager.Repository
+namespace InvestManager.Repository
 {
     public interface IRepository<TEntity> where TEntity : class
     {
@@ -34,7 +34,7 @@ namespace InvestmentManager.Repository
     public interface IComissionTypeRepository : IRepository<ComissionType> { }
     public interface IDividendRepository : IRepository<Dividend> { }
     public interface IExchangeRateRepository : IRepository<ExchangeRate> { }
-    public interface IStockTransactionRepository : IRepository<StockTransaction> { }
+    public interface IStockTransactionRepository : IRepository<StockTransaction>  { }
     public interface ITransactionStatusRepository : IRepository<TransactionStatus> { }
     // Market
     public interface IExchangeRepository : IRepository<Exchange> { }
@@ -43,6 +43,7 @@ namespace InvestmentManager.Repository
     {
         IEnumerable<Ticker> GetPriceTikers();
         IQueryable<Ticker> GetTickerIncludedLot();
+        IQueryable<Ticker> GetTikersIncludeTransactions(IEnumerable<long> accountIds);
     }
     public interface ILotRepository : IRepository<Lot> { }
     public interface ICompanyRepository : IRepository<Company> { }
@@ -68,8 +69,9 @@ namespace InvestmentManager.Repository
     public interface IPriceRepository : IRepository<Price>
     {
         Task<IEnumerable<Price>> GetCustomPricesAsync(long companyId, int lastMonths, OrderType orderDate);
-        IDictionary<long, IEnumerable<Price>> GetGroupedPrices(int lastMonths, OrderType orderDate);
+        Dictionary<long, List<Price>> GetGroupedPrices(int lastMonths, OrderType orderDate);
         IDictionary<long, decimal> GetLastPrices(double lastDays);
+        IDictionary<long, DateTime> GetLastDates(double lastDays);
         IQueryable<DateTime> GetLastDates(long tickerId, int count);
         int GetCompanyCountWithPrices();
     }

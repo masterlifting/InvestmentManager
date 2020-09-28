@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\InvestManager.ViewModels\InvestManager.ViewModels.csproj" />
+    <ProjectReference Include="..\InvestmentManager.BrokerService\InvestManager.BrokerService.csproj" />
+  </ItemGroup>
+
+</Project>

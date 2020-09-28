@@ -1,0 +1,16 @@
+﻿@page "/exchangeratetransactions"
+@inject HttpClient httpClient
+<LoadingInv IsLoading="@isLoading" />
+
+<div class="container invest_card">
+</div>
+
+@code {
+    bool isLoading;
+    ClaimsPrincipal user;
+    [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        user = (await AuthenticationState).User;
+    }
+}

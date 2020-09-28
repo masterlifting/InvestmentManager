@@ -1,11 +1,11 @@
-﻿using InvestmentManager.Entities.Market;
-using InvestmentManager.ReportFinder.Interfaces;
-using InvestmentManager.Repository;
-using InvestmentManager.Service.Interfaces;
+﻿using InvestManager.Entities.Market;
+using InvestManager.ReportFinder.Interfaces;
+using InvestManager.Repository;
+using InvestManager.Services.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace InvestmentManager.ReportFinder.Implimentations
+namespace InvestManager.ReportFinder.Implimentations
 {
     public class ReportService : IReportService
     {

@@ -1,0 +1,58 @@
+﻿@page "/stocktransactions"
+@inject HttpClient httpClient
+
+<LoadingInv IsLoading="@isLoading" />
+
+@if (models != null)
+{
+    foreach (var model in models)
+    {
+        string profit = model.CurrencyId == 1 ? model.ProfitCurrent.ToString("C", new CultureInfo("en-US")) : model.ProfitCurrent.ToString("C");
+        ColorType lotColor = model.FreeLot == 0 ? ColorType.success : ColorType.light;
+        ColorType profitColor = model.ProfitCurrent > 0 ? ColorType.success : ColorType.danger;
+
+        <div class="container invest_card">
+            <TitleInv Color="ColorType.warning" Text="@model.CompanyName" />
+            @if (_companyId == model.CompanyId)
+            {
+                <StockTransactionDetail OnclickCallback="@CloseDetail" CompanyId="@model.CompanyId" />
+            }
+            else
+            {
+                <GetDetailInv OnclickCallback="GetDetail" Value="@model.CompanyId.ToString()" />
+                <InfoInv Name="Последняя операция:" Value="@model.DateLastTransaction.ToShortDateString()" />
+                <InfoInv Color="@lotColor" Name="Свободных лотов:" Value="@model.FreeLot.ToString()" />
+                <InfoInv Color="@profitColor" Name="Текущий профит:" Value="@profit" />
+            }
+
+
+            @if (model.ProfitCurrent < 0 && model.FreeLot > 0)
+            {
+                string price = model.CurrencyId == 1
+                    ? ((decimal)Math.Abs(model.ProfitCurrent) / model.FreeLot).ToString("C", new CultureInfo("en-US"))
+                    : ((decimal)Math.Abs(model.ProfitCurrent) / model.FreeLot).ToString("C");
+                <InfoInv Color="ColorType.info" Name="Взвешенная цена:" Value="@price" />
+            }
+        </div>
+    }
+}
+
+@code {
+    bool isLoading;
+    long _companyId = 0;
+    IEnumerable<StockTransactionModel> models;
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+        models = await httpClient.GetFromJsonAsync<IEnumerable<StockTransactionModel>>("transaction/getstocktransactions");
+        isLoading = false;
+    }
+    void GetDetail(string companyId)
+    {
+        _companyId = long.Parse(companyId);
+    }
+    void CloseDetail()
+    {
+        _companyId = 0;
+    }
+}

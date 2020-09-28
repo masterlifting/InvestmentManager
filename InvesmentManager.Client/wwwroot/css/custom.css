@@ -1,0 +1,60 @@
+﻿.invest_background_image {
+    background-image: url(/images/BackGround.jpg);
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+    height: calc(100vh - 3rem);
+    overflow: auto;
+}
+
+
+.invest_card {
+    font-size: 11px;
+    background-color: black;
+    color: antiquewhite;
+    opacity: 0.89;
+    padding: 15px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    border-radius: 25px;
+    box-shadow: 10px 5px 25px rgba(0,0,0,0.95);
+}
+
+.invest_ReportCard {
+    font-size: 11px;
+    background-color: black;
+    color: antiquewhite;
+    opacity: 0.89;
+    padding: 20px 5px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    border-radius: 25px;
+    box-shadow: 10px 5px 25px rgba(0,0,0,0.95);
+}
+
+.invest_ErrorCard {
+    font-size: 11px;
+    background-color: darkred;
+    color: orange;
+    opacity: 0.95;
+    padding: 20px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    border-radius: 25px;
+    box-shadow: 10px 5px 25px rgba(0,0,0,0.95);
+}
+
+.invest_Input {
+    border-radius: 25px;
+    background-color: black;
+    color: azure;
+    padding: 7px 10px;
+    margin: 2px 0px;
+    justify-self: center;
+    width:100%;
+}
+.invest_Label {
+    align-self:center;
+    text-align:right;
+}

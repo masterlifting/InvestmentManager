@@ -1,7 +1,7 @@
-﻿using InvestmentManager.Entities.Market;
+﻿using InvestManager.Entities.Market;
 using System.Collections.Generic;
 
-namespace InvestmentManager.Calculator.Models
+namespace InvestManager.Calculator.Models
 {
     public class BuyRecommendationArgs
     {
