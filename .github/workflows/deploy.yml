@@ -17,8 +17,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: SSH Commands
+        uses: actions/checkout@v2
         with:
-          uses: actions/checkout@v2
           host: ${{ secrets.SSH_AGENT_HOST }}
           username: ${{ secrets.SSH_AGENT_USERNAME }}
           key: ${{ secrets.SSH_AGENT_KEY }}
