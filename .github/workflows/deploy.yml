@@ -17,7 +17,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: SSH Commands
-        uses: ssh-action@master
         with:
           host: ${{ secrets.SSH_AGENT_HOST }}
           username: ${{ secrets.SSH_AGENT_USERNAME }}
