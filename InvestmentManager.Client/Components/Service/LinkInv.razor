@@ -1,14 +1,21 @@
-﻿<a href="/@Path" @onclick="OnclickCallback"  class="row font-weight-bold py-2 small" style="color:mediumaquamarine">
+﻿<a href="/@Path" @onclick="OnclickCallback" class="row font-weight-bold py-2" style="color:mediumaquamarine">
     @if (!string.IsNullOrWhiteSpace(Value))
     {
-    <div class="col-5"><span class="oi oi-external-link" aria-hidden="true"></span>&emsp;@Name: </div>
+        <div class="col-8"><span class="oi oi-external-link" aria-hidden="true"></span>&emsp;@Name: </div>
         if (string.IsNullOrWhiteSpace(Date))
         {
-            <div class="col-7">@Value</div>
+            <div class="col-4">@Value</div>
         }
         else
         {
-            <div class="col-7">@Value (@Date)</div>
+            <div class="col-4">
+                <div class="row">
+                    <div class="col-8">
+                        @Value
+                    </div>
+                    <div class="col-4"><span class="oi oi-info" aria-hidden="true"></span></div>
+                </div>
+            </div>
         }
 
     }
@@ -16,11 +23,14 @@
     {
         if (string.IsNullOrWhiteSpace(Date))
         {
-<div class="col-12"><span class="oi oi-external-link" aria-hidden="true"></span>&emsp;@Name</div>
+            <div class="col-12"><span class="oi oi-external-link" aria-hidden="true"></span>&emsp;@Name</div>
         }
         else
         {
-<div class="col-12"><span class="oi oi-external-link" aria-hidden="true"></span>&emsp;@Name (@Date)</div>
+            <div class="col-12">
+                <span class="oi oi-external-link" aria-hidden="true"></span>@Name
+                <span class="oi oi-info" aria-hidden="true"></span>
+            </div>
         }
     }
 </a>
