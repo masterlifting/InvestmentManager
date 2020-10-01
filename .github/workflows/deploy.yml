@@ -1,0 +1,16 @@
+name: CI
+on:
+  push:
+    branches: [ master ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: deploy site
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_AGENT_HOST }}
+          username: ${{ secrets.SSH_AGENT_USERNAME }}
+          key: ${{ secrets.SSH_AGENT_KEY }}
+          script: ${{ secrets.SSH_SCRIPT }}
