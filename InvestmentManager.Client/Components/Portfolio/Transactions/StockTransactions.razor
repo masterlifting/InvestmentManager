@@ -1,28 +1,26 @@
 ﻿@page "/stocktransactions"
 @inject HttpClient httpClient
 
-<LoadingInv IsLoading="@isLoading" />
-
 @if (models != null)
 {
     foreach (var model in models)
     {
         string profit = model.CurrencyId == 1 ? model.ProfitCurrent.ToString("C", new CultureInfo("en-US")) : model.ProfitCurrent.ToString("C");
-        ColorType lotColor = model.FreeLot == 0 ? ColorType.success : ColorType.light;
-        ColorType profitColor = model.ProfitCurrent > 0 ? ColorType.success : ColorType.danger;
+        Choices.Color lotColor = model.FreeLot == 0 ? Choices.Color.success : Choices.Color.light;
+        Choices.Color profitColor = model.ProfitCurrent > 0 ? Choices.Color.success : Choices.Color.danger;
 
         <div class="container invest_card">
-            <TitleInv Color="ColorType.warning" Text="@model.CompanyName" />
+            <RowTitle Text="@model.CompanyName" Color="Choices.Color.warning"/>
             @if (_companyId == model.CompanyId)
             {
-                <StockTransactionDetail OnclickCallback="@CloseDetail" CompanyId="@model.CompanyId" />
+                <StockTransactionDetail CloseDetail="@CloseDetail" CompanyId="@model.CompanyId" />
             }
             else
             {
-                <GetDetailInv OnclickCallback="GetDetail" Value="@model.CompanyId.ToString()" />
-                <InfoInv Name="Последняя операция:" Value="@model.DateLastTransaction.ToShortDateString()" />
-                <InfoInv Color="@lotColor" Name="Свободных лотов:" Value="@model.FreeLot.ToString()" />
-                <InfoInv Color="@profitColor" Name="Текущий профит:" Value="@profit" />
+                <DetailIcon DetailAction="GetDetail" Value="@model.CompanyId.ToString()" />
+                <RowInfo Title="Последняя операция:" Value="@model.DateLastTransaction.ToShortDateString()" />
+                <RowInfo Title="Свободных лотов:" Value="@model.FreeLot.ToString()" Color="@lotColor" />
+                <RowInfo Title="Текущий профит:" Value="@profit" Color="@profitColor" />
             }
 
 
@@ -31,28 +29,17 @@
                 string price = model.CurrencyId == 1
                     ? ((decimal)Math.Abs(model.ProfitCurrent) / model.FreeLot).ToString("C", new CultureInfo("en-US"))
                     : ((decimal)Math.Abs(model.ProfitCurrent) / model.FreeLot).ToString("C");
-                <InfoInv Color="ColorType.info" Name="Взвешенная цена:" Value="@price" />
+                <RowInfo Title="Взвешенная цена:" Value="@price" Color="Choices.Color.info"/>
             }
         </div>
     }
 }
 
 @code {
-    bool isLoading;
     long _companyId = 0;
     IEnumerable<StockTransactionModel> models;
-    protected override async Task OnInitializedAsync()
-    {
-        isLoading = true;
+    protected override async Task OnInitializedAsync() =>
         models = await httpClient.GetFromJsonAsync<IEnumerable<StockTransactionModel>>("transaction/getstocktransactions");
-        isLoading = false;
-    }
-    void GetDetail(string companyId)
-    {
-        _companyId = long.Parse(companyId);
-    }
-    void CloseDetail()
-    {
-        _companyId = 0;
-    }
+    void GetDetail(string companyId) => _companyId = long.Parse(companyId);
+    void CloseDetail() => _companyId = 0;
 }

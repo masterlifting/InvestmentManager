@@ -1,13 +1,13 @@
 ﻿<div class="container invest_card">
-    <TitleInv Text="Транзакции в портфелях" />
+    <RowTitle Text="Транзакции в портфелях" />
 
     <AuthorizeView>
         <Authorized>
-            <LinkInv Path="accounttransactions" Name="Операции с счетами" />
-            <LinkInv Path="stocktransactions" Name="Операции с акциями" />
-            <LinkInv Path="comissiontransactions" Name="Комиссии" />
-            <LinkInv Path="dividendtransactions" Name="Дивиденды" />
-            <LinkInv Path="exchangeratetransactions" Name="Обмены валют" />
+            <LinkSmartRoute Route="accounttransactions" Name="Операции с счетами" />
+            <LinkSmartRoute Route="stocktransactions" Name="Операции с акциями" />
+            <LinkSmartRoute Route="comissiontransactions" Name="Комиссии" />
+            <LinkSmartRoute Route="dividendtransactions" Name="Дивиденды" />
+            <LinkSmartRoute Route="exchangeratetransactions" Name="Обмены валют" />
         </Authorized>
         <NotAuthorized>
             <NotAuthorizeInfo />

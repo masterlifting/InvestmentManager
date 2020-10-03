@@ -1,0 +1,10 @@
+﻿<div class="row h-100">
+    <div class="col text-center align-self-center" @onclick="InfoAction" style="cursor:pointer">
+        <span class="oi oi-info" aria-hidden="true"></span>
+    </div>
+</div>
+
+@code {
+    [Parameter] public Choices.Position Position { get; set; } = Choices.Position.right;
+    [Parameter] public EventCallback InfoAction { get; set; }
+}

@@ -1,12 +1,11 @@
 ﻿@inject HttpClient httpClient
 
 
-<AlertInv AlertType="@alertType" />
 @foreach (var report in Reports)
 {
     <div class="container invest_ReportCard">
 
-        <TitleInv Position="PositionType.center" Color="ColorType.warning" Text="@report.AccountId" />
+        <RowTitle Position="Choices.Position.center" Color="Choices.Color.warning" Text="@report.AccountId" />
         @if (report.AccountTransactions.Any())
         {
             <InfoAccountOperation AccountTransactions="@report.AccountTransactions" />
@@ -45,18 +44,12 @@
 
 @code {
     [Parameter] public List<CorrectBrokerReport> Reports { get; set; }
-    public AlertType alertType;
 
     async Task SaveData(string accountId, CorrectBrokerReport report)
     {
         var response = await httpClient.PostAsJsonAsync<string>("portfolio/savereports", accountId);
-        
+
         if (response.IsSuccessStatusCode)
-        {
-            alertType = AlertType.success;
             await Task.Run(() => Reports.Remove(report));
-        }
-        else
-            alertType = AlertType.danger;
     }
 }

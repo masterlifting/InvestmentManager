@@ -1,9 +1,5 @@
-﻿<AlertInv AlertType="@alertType" />
-
-<BaseError Title="@Title" ErrorValue="@ErrorValue" IsDone="@isDone"></BaseError>
+﻿<BaseError Title="@Title" ErrorValue="@ErrorValue" IsDone="@isDone"></BaseError>
 @code {
-    AlertType alertType;
-
     [Parameter] public string ErrorValue { get; set; }
     [Parameter] public string Title { get; set; }
 

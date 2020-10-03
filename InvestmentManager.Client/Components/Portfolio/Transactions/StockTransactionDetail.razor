@@ -30,12 +30,12 @@ else
             </div>
         </div>
     }
-    <CloseInv OnclickCallback="@OnclickCallback" />
+    <CloseIcon CloseAction="CloseDetail" />
 }
 
 @code {
     [Parameter] public long CompanyId { get; set; }
-    [Parameter] public EventCallback OnclickCallback { get; set; }
+    [Parameter] public EventCallback CloseDetail { get; set; }
 
     IEnumerable<StockTransactionDetailModel> models;
 

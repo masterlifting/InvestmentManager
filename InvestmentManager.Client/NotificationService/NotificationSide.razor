@@ -1,0 +1,46 @@
+﻿@inject Notification notice
+
+@implements IDisposable
+
+@if (notice.VisibleAlert)
+{
+    <div class="container-fluid fixed-top">
+        <div class="row rounded-bottom bg-@notice.SideColor text-muted  py-2  font-weight-bold">
+            <div class="col-10 align-self-center pl-5"> @notice.Message </div>
+            <div class="col-2 text-center align-self-center">
+                <span class="oi oi-bolt" aria-hidden="true"></span>
+            </div>
+        </div>
+    </div>
+}
+
+@if (notice.VisibleInfo)
+{
+    <div class="container fixed-bottom">
+        <div class="row rounded-top bg-@notice.SideColor text-light  py-2 align-self-center">
+            <div class="col-1 text-center">
+                <span class="oi oi-envelope-open" aria-hidden="true"></span>
+            </div>
+            <div class="col-10">
+                <div class="row py-1">
+                    <div class="font-weight-bold text-warning">@notice.Title</div>
+                </div>
+                <div class="row py-1">
+                    <div class="col ">
+                        @notice.Message
+                    </div>
+                </div>
+            </div>
+            <div class="col-1">
+                <CloseIcon CloseAction="HideInfo" />
+            </div>
+        </div>
+    </div>
+}
+
+
+@code{
+    protected override void OnInitialized() => notice.OnChange += StateHasChanged;
+    public void Dispose() => notice.OnChange -= StateHasChanged;
+    void HideInfo() => notice.VisibleInfo = false;
+}

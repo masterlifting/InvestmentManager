@@ -6,13 +6,11 @@
         <div class="h5 text-secondary">Не  проверенные отчеты</div>
     </div>
 </div>
-<AlertInv AlertType="@alertType" />
-<LoadingInv IsLoading="isLoading" />
 
 @foreach (var result in newReports)
 {
     <div class="container invest_card">
-        <TitleInv Color="ColorType.warning" Text="@result.CompanyName" />
+        <RowTitle Color="Choices.Color.warning" Text="@result.CompanyName" />
 
         @foreach (var report in result.Reports)
         {
@@ -81,42 +79,24 @@
 }
 
 @code {
-        AlertType alertType;
-        bool isLoading;
     List<NewCompanyReportModel> newReports = new List<NewCompanyReportModel>();
 
     protected override async Task OnInitializedAsync()
     {
-        isLoading = true;
         newReports = await httpClient.GetFromJsonAsync<List<NewCompanyReportModel>>("admin/getreports");
-        isLoading = false;
     }
 
     async Task DeleteReport(NewReportModel report, string companyName)
     {
-        isLoading = true;
         var response = await httpClient.PostAsJsonAsync<long>("admin/deletereport", report.ReportId);
-        isLoading = false;
         if (response.IsSuccessStatusCode)
-        {
-            alertType = AlertType.success;
             await DeleteReportNodeAsync(report, companyName);
-        }
-        else
-            alertType = AlertType.danger;
     }
     async Task SaveReport(NewReportModel report, string companyName)
     {
-        isLoading = true;
         var response = await httpClient.PostAsJsonAsync<NewReportModel>("admin/savereport", report);
-        isLoading = false;
         if (response.IsSuccessStatusCode)
-        {
-            alertType = AlertType.success;
             await DeleteReportNodeAsync(report, companyName);
-        }
-        else
-            alertType = AlertType.danger;
     }
     async Task DeleteReportNodeAsync(NewReportModel report, string companyName) =>
         await Task.Run(() => { newReports.FirstOrDefault(x => x.CompanyName.Equals(companyName)).Reports.Remove(report); });

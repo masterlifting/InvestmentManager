@@ -1,0 +1,39 @@
+﻿<div class="row py-2 invest_Link">
+    <div class="col-@colLink" style="cursor:pointer">
+        <div @onclick="LinkAction">
+            <span class="oi oi-external-link" aria-hidden="true"></span>
+            &emsp;@Name
+        </div>
+    </div>
+    @if (!string.IsNullOrWhiteSpace(Value))
+    {
+        <div class="col-3 px-0">
+            <div class="row">
+                <div class="col-10">
+                    @Value
+                </div>
+                <div class="col-2">
+                    <InfoIcon Position="Choices.Position.right" InfoAction="DetailAction"/>
+                </div>
+            </div>
+        </div>
+    }
+
+</div>
+
+@code {
+
+    int colLink = 9;
+    [Parameter] public string Path { get; set; }
+    [Parameter] public string Name { get; set; }
+    [Parameter] public string Value { get; set; }
+    [Parameter] public EventCallback LinkAction { get; set; }
+    [Parameter] public EventCallback DetailAction { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        colLink = string.IsNullOrWhiteSpace(Value) ? 12 : colLink;
+    }
+}

@@ -8,7 +8,7 @@
     foreach (var account in models.GroupBy(x => x.Account))
     {
         <div class="container invest_card">
-            <TitleInv Color="ColorType.warning" Text="@account.Key" />
+            <RowTitle Color="Choices.Color.warning" Text="@account.Key" />
             @foreach (var model in account)
             {
                 string sum = model.CurrencyId == 1 ? model.Sum.ToString("C", new CultureInfo("en-US")) : model.Sum.ToString("C");

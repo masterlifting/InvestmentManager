@@ -3,7 +3,7 @@
 app {
     display: flex;
     flex-direction: column;
-    font-family: Verdana;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
 .valid.modified:not([type=checkbox]) {

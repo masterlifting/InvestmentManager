@@ -4,7 +4,6 @@
 
 <AuthorizeView>
     <Authorized>
-        <LoadingInv IsLoading="@isLoading" />
         @if (Recommendations != null)
         {
             foreach (var r in Recommendations
@@ -14,69 +13,58 @@
                 .ThenBy(x => (x.PriceMin - x.LastPriceValue)))
             {
                 string lastPrice = r.CurrencyId == 2 ? r.LastPriceValue.ToString("C") : r.LastPriceValue.ToString("C", new CultureInfo("en-US"));
+                Choices.Color nameColor = r.IsRecommendMin || r.IsRecommendMid || r.IsRecommendMax ? Choices.Color.success : Choices.Color.warning;
 
                 <div class="container invest_card">
-                    <TitleInv Color="ColorType.warning" Text="@r.CompanyName" />
+                    
+                    <RowTitle Color="@nameColor" Text="@r.CompanyName" />
+
                     @if (_companyId == r.CompanyId)
                     {
-                        <StockTransactionDetail OnclickCallback="@CloseDetail" CompanyId="@r.CompanyId" />
+                        <StockTransactionDetail CloseDetail="@CloseDetail" CompanyId="@r.CompanyId" />
                     }
                     else
                     {
-                        <GetDetailInv OnclickCallback="GetDetail" Value="@r.CompanyId.ToString()" />
-                        <InfoInv Name="Цена обновлена:" Value="@r.LastPriceDate" />
-                        <InfoInv Color="ColorType.info" Name="Последняя цена:" Value="@lastPrice" />
+                        <DetailIcon DetailAction="GetDetail" Value="@r.CompanyId.ToString()" />
+                        <RowInfo Title="Цена обновлена:" Value="@r.LastPriceDate" />
+                        <RowInfo Color="Choices.Color.info" Title="Последняя цена:" Value="@lastPrice" />
+                        <div class="row">
+                            <div class="col text-warning">Продавать с прибылью в:</div>
+                        </div>
                         @if (r.ValueMin != 0)
                         {
                             string price = r.CurrencyId == 2 ? r.PriceMin.ToString("C") : r.PriceMin.ToString("C", new CultureInfo("en-US"));
                             string view = $"{r.ValueMin} шт. по {price}";
-                            ColorType colorType = r.IsRecommendMin ? ColorType.success : ColorType.danger;
-                            <InfoInv Color="@colorType" Name="20% прибыль | Продать" Value="@view" />
+                            Choices.Color color = r.IsRecommendMin ? Choices.Color.success : Choices.Color.danger;
+                            <RowInfo Color="@color" Title="20%" Value="@view" />
                         }
                         @if (r.ValueMid != 0)
                         {
                             string price = r.CurrencyId == 2 ? r.PriceMid.ToString("C") : r.PriceMid.ToString("C", new CultureInfo("en-US"));
                             string view = $"{r.ValueMid} шт. по {price}";
-                            ColorType colorType = r.IsRecommendMid ? ColorType.success : ColorType.danger;
-                            <InfoInv Color="@colorType" Name="50% прибыль | Продать" Value="@view" />
+                            Choices.Color color = r.IsRecommendMid ? Choices.Color.success : Choices.Color.danger;
+                            <RowInfo Color="@color" Title="50%" Value="@view" />
                         }
                         @if (r.ValueMax != 0)
                         {
                             string price = r.CurrencyId == 2 ? r.PriceMax.ToString("C") : r.PriceMax.ToString("C", new CultureInfo("en-US"));
                             string view = $"{r.ValueMax} шт. по {price}";
-                            ColorType colorType = r.IsRecommendMax ? ColorType.success : ColorType.danger;
-                            <InfoInv Color="@colorType" Name="80% прибыль | Продать" Value="@view" />
+                            Choices.Color color = r.IsRecommendMax ? Choices.Color.success : Choices.Color.danger;
+                            <RowInfo Color="@color" Title="80%" Value="@view" />
                         }
                     }
                 </div>
             }
         }
     </Authorized>
-    <NotAuthorized>
-        <AlertInv AlertType="@AlertType.warning"></AlertInv>
-        <NotAuthorizeInfo>
-        </NotAuthorizeInfo>
-    </NotAuthorized>
 </AuthorizeView>
 
 @code {
-    bool isLoading;
     long _companyId = 0;
 
     IEnumerable<SellRecommendationModel> Recommendations;
-    protected override async Task OnInitializedAsync()
-    {
-        isLoading = true;
-        Recommendations = await httpClient.GetFromJsonAsync<IEnumerable<SellRecommendationModel>>("recommendation/sellr");
-        isLoading = false;
-    }
-    void GetDetail(string companyId)
-    {
-        _companyId = long.Parse(companyId);
-    }
-    void CloseDetail()
-    {
-        _companyId = 0;
-    }
-
+    protected override async Task OnInitializedAsync() =>
+    Recommendations = await httpClient.GetFromJsonAsync<IEnumerable<SellRecommendationModel>>("recommendation/sellr");
+    void GetDetail(string companyId) => _companyId = long.Parse(companyId);
+    void CloseDetail() => _companyId = 0;
 }

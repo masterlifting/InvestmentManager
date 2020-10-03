@@ -1,6 +1,6 @@
-﻿<TitleSubInv Color="ColorType.warning" Text="Обмен валюты" />
+﻿<RowTitleSub Color="Choices.Color.warning" Text="Обмен валюты" />
 
-<div class="row text-monospace border-bottom border-dark mx-1 text-info">
+<div class="row  border-bottom border-dark mx-1 text-info">
     <div class="col-7 pl-0">
         <div class="row">
             <div class="col-8">Статус</div>
@@ -17,7 +17,7 @@
 
 @foreach (var rate in ExchangeRates)
 {
-    <div class="row text-monospace border-bottom border-dark mx-1 text-@Color.ToString()">
+    <div class="row  border-bottom border-dark mx-1 text-@Color.ToString()">
         <div class="col-7 pl-0">
             <div class="row">
                 <div class="col-8">@rate.Status</div>
@@ -35,5 +35,5 @@
 
 @code {
     [Parameter] public IEnumerable<BrokerExchangeRate> ExchangeRates { get; set; }
-    [Parameter] public ColorType Color { get; set; } = ColorType.light;
+    [Parameter] public Choices.Color Color { get; set; } = Choices.Color.light;
 }

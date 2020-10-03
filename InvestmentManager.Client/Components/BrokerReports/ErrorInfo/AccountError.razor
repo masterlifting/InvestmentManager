@@ -1,10 +1,8 @@
 ﻿@inject HttpClient httpClient
-<AlertInv AlertType="@alertType" />
 
 <BaseError Title="@Title" IsDone="@isDone" ErrorValue="@ErrorValue">
     <EditForm Model="@result" OnValidSubmit="SendData">
         <DataAnnotationsValidator />
-
         <ValidationMessage For="@(() => result.AccountName)" />
         <InputText class="invest_Input" @bind-Value="@result.AccountName" />
         <div class="row mt-3">
@@ -16,8 +14,6 @@
 </BaseError>
 
 @code {
-    AlertType alertType;
-
     [Parameter] public string ErrorValue { get; set; }
     [Parameter] public string Title { get; set; }
 
@@ -33,6 +29,5 @@
     {
         isDone = true;
         var response = await httpClient.PostAsJsonAsync<AccountErrorResultModel>("error/accounterror", result);
-        alertType = response.IsSuccessStatusCode ? AlertType.success : AlertType.danger;
     }
 }

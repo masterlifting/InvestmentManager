@@ -6,12 +6,12 @@
 
 @code {
     [Parameter] public string Value { get; set; }
-    [Parameter] public PositionType Position { get; set; } = PositionType.right;
-    [Parameter] public EventCallback<string> OnclickCallback { get; set; }
+    [Parameter] public Choices.Position Position { get; set; } = Choices.Position.right;
+    [Parameter] public EventCallback<string> DetailAction { get; set; }
 
     async Task OnClick()
     {
         if (!string.IsNullOrWhiteSpace(Value))
-            await OnclickCallback.InvokeAsync(Value);
+            await DetailAction.InvokeAsync(Value);
     }
 }

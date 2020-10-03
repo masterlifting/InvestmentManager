@@ -1,31 +1,25 @@
 ﻿@page "/buyrecommendation"
 @inject HttpClient httpClient
 
-<LoadingInv IsLoading="@isLoading" />
 @if (Recommendations != null)
 {
     foreach (var r in Recommendations.OrderByDescending(x => x.IsRecommend).ThenBy(x => (x.LastPriceValue - x.BuyPrice)))
     {
         string lastPrice = r.CurrencyId == 2 ? r.LastPriceValue.ToString("C") : r.LastPriceValue.ToString("C", new CultureInfo("en-US"));
         string buyPrice = r.CurrencyId == 2 ? r.BuyPrice.ToString("C") : r.BuyPrice.ToString("C", new CultureInfo("en-US"));
-        ColorType colorType = r.IsRecommend ? ColorType.success : ColorType.danger;
+        Choices.Color color = r.IsRecommend ? Choices.Color.success : Choices.Color.danger;
 
         <div class="container invest_card">
-            <TitleInv Color="ColorType.warning" Text="@r.CompanyName" />
-            <InfoInv Name="Цена обновлена:" Value="@r.LastPriceDate" />
-            <InfoInv Color="ColorType.info" Name="Последняя цена:" Value="@lastPrice" />
-            <InfoInv Color="colorType" Name="Цена для покупки:" Value="@buyPrice" />
+            <RowTitle Text="@r.CompanyName"  Color="Choices.Color.warning"/>
+            <RowInfo Title="Цена обновлена:" Value="@r.LastPriceDate" />
+            <RowInfo Title="Последняя цена:" Value="@lastPrice" Color="Choices.Color.info" />
+            <RowInfo Title="Цена для покупки:" Value="@buyPrice" Color="@color" />
         </div>
     }
 }
 
 @code {
-    bool isLoading;
     IEnumerable<BuyRecommendationModel> Recommendations;
-    protected override async Task OnInitializedAsync()
-    {
-        isLoading = true;
+    protected override async Task OnInitializedAsync() =>
         Recommendations = await httpClient.GetFromJsonAsync<IEnumerable<BuyRecommendationModel>>("recommendation/buyr");
-        isLoading = false;
-    }
 }

@@ -1,6 +1,6 @@
-﻿<TitleSubInv Color="ColorType.warning" Text="Дивиденды" />
+﻿<RowTitleSub Color="Choices.Color.warning" Text="Дивиденды" />
 
-<div class="row text-monospace border-bottom border-dark mx-1 text-info">
+<div class="row  border-bottom border-dark mx-1 text-info">
     <div class="col-7 pl-0">
         <div class="row">
             <div class="col">Компания</div>
@@ -16,7 +16,7 @@
 
 @foreach (var dividend in Dividends)
 {
-    <div class="row text-monospace border-bottom border-dark mx-1 text-@Color.ToString()">
+    <div class="row  border-bottom border-dark mx-1 text-@Color.ToString()">
         <div class="col-7 pl-0">
             <div class="row">
                 <div class="col">@dividend.Company</div>
@@ -33,5 +33,5 @@
 
 @code {
     [Parameter] public IEnumerable<BrokerDividend> Dividends { get; set; }
-    [Parameter] public ColorType Color { get; set; } = ColorType.success;
+    [Parameter] public Choices.Color Color { get; set; } = Choices.Color.success;
 }

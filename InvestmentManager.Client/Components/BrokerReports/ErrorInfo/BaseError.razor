@@ -1,7 +1,7 @@
 ﻿@if (!IsDone)
 {
     <div class="container invest_ErrorCard">
-        <TitleInv Text="@Title" Color="ColorType.warning" Position="PositionType.center" />
+        <RowTitle Text="@Title" Color="Choices.Color.warning" Position="Choices.Position.center" />
         <div class="row">
             <div class="col-12">Ошибка:</div>
             <label class="col-12 text-center text-light">@ErrorValue</label>
@@ -13,8 +13,6 @@
 
 
 @code {
-    AlertType alertType;
-
     [Parameter] public string Title { get; set; }
     [Parameter] public bool IsDone { get; set; }
     [Parameter] public string ErrorValue { get; set; }

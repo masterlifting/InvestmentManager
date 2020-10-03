@@ -1,0 +1,10 @@
+﻿<div class="row h-100">
+    <div class="col text-center p-1 align-self-center" @onclick="@CloseAction">
+        <span class="oi oi-x text-@Color" aria-hidden="true" style="cursor:pointer"></span>
+    </div>
+</div>
+
+@code {
+    [Parameter] public EventCallback CloseAction { get; set; }
+    [Parameter] public Choices.Color Color { get; set; } = Choices.Color.light;
+}

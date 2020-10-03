@@ -8,6 +8,7 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Components\Service\ve-7624.tmp" />
+    <None Remove="Pages\ve-431E.tmp" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Blazored.LocalStorage" Version="3.0.0" />
@@ -28,5 +29,8 @@
   </ItemGroup>
   <ItemGroup>
     <ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Components\Service\Buttons\" />
   </ItemGroup>
 </Project>

@@ -10,7 +10,6 @@
 
 
 .invest_card {
-    font-size: 11px;
     background-color: black;
     color: antiquewhite;
     opacity: 0.89;
@@ -22,7 +21,6 @@
 }
 
 .invest_ReportCard {
-    font-size: 11px;
     background-color: black;
     color: antiquewhite;
     opacity: 0.89;
@@ -34,7 +32,6 @@
 }
 
 .invest_ErrorCard {
-    font-size: 11px;
     background-color: darkred;
     color: orange;
     opacity: 0.95;
@@ -52,9 +49,18 @@
     padding: 7px 10px;
     margin: 2px 0px;
     justify-self: center;
-    width:100%;
+    width: 100%;
 }
+
 .invest_Label {
-    align-self:center;
-    text-align:right;
+    align-self: center;
+    text-align: right;
 }
+
+.invest_Link {
+    color: mediumaquamarine;
+}
+
+    .invest_Link a {
+        color: mediumaquamarine !important;
+    }

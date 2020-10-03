@@ -1,12 +1,14 @@
-﻿<div class="row text-monospace ml-1">
-    <AuthorizeView>
-        <Authorized>
-            <a class="text-black-50 text-right" href="logout">Выйти</a>&ensp;
-            <div class="text-light">@context.User.Identity.Name.Split('@')[0]</div>
-        </Authorized>
-        <NotAuthorized>
-            <a class="text-right font-weight-bold" style="color:darkgreen" href="login">Войти</a>&ensp;
-            <a class="text-light" href="register">Зарегистрироваться</a>
-        </NotAuthorized>
-    </AuthorizeView>
+﻿<div class="row  ml-1">
+    <div class="col">
+        <AuthorizeView>
+            <Authorized>
+                <NavLink style="text-decoration:none" class="text-black-50" href="logout">Выйти</NavLink>&ensp;
+                <span class="text-light">@context.User.Identity.Name.Split('@')[0]</span>
+            </Authorized>
+            <NotAuthorized>
+                <NavLink class="font-weight-bold" style="color:darkgreen;text-decoration:none" href="login">Войти</NavLink>&ensp;
+                <NavLink style="text-decoration:none" class="text-light" href="register">Зарегистрироваться</NavLink>
+            </NotAuthorized>
+        </AuthorizeView>
+    </div>
 </div>

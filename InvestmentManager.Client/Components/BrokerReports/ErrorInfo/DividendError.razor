@@ -1,6 +1,5 @@
 ﻿@inject HttpClient httpClient
 @using System.Text.RegularExpressions
-<AlertInv AlertType="@alertType" />
 
 <BaseError Title="@Title" IsDone="@isDone" ErrorValue="@ErrorValue">
     <EditForm Model="@result" OnValidSubmit="SendData">
@@ -31,8 +30,6 @@
 
 
 @code {
-    AlertType alertType;
-
     [Parameter] public string ErrorValue { get; set; }
     [Parameter] public string Title { get; set; }
 
@@ -50,6 +47,5 @@
     {
         isDone = true;
         var response = await httpClient.PostAsJsonAsync<DividendErrorResultModel>("error/dividenderror", result);
-        alertType = response.IsSuccessStatusCode ? AlertType.success : AlertType.danger;
     }
 }

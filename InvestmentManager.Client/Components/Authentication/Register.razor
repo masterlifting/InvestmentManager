@@ -2,17 +2,18 @@
 @inject IAuthService  AuthService
 @inject NavigationManager NavigationManager
 
-        <div class="container" style="margin-top: 10rem">
-            @if (withErrors)
+<div class="container h-100">
+    @if (withErrors)
+    {
+        <div class="alert alert-danger" role="alert">
+            @foreach (var error in errors)
             {
-                <div class="alert alert-danger" role="alert">
-                    @foreach (var error in errors)
-                    {
-                        <p>@error</p>
-                    }
-                </div>
+                <p>@error</p>
             }
-            <h6 class="card-title text-center">Регистрация</h6>
+        </div>
+    }
+    <div class="row h-100">
+        <div class="col align-self-center">
             <EditForm Model="registerModel" OnValidSubmit="HandleRegistration">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
@@ -46,22 +47,24 @@
 
             </EditForm>
         </div>
-    @code {
-        RegisterModel registerModel = new RegisterModel();
-        bool withErrors;
-        IEnumerable<string> errors;
+    </div>
+</div>
+@code {
+    RegisterModel registerModel = new RegisterModel();
+    bool withErrors;
+    IEnumerable<string> errors;
 
-        async Task HandleRegistration()
+    async Task HandleRegistration()
+    {
+        withErrors = false;
+        var result = await AuthService.RegisterAsync(registerModel);
+
+        if (result.Successful)
+            NavigationManager.NavigateTo("/login");
+        else
         {
-            withErrors = false;
-            var result = await AuthService.RegisterAsync(registerModel);
-
-            if (result.Successful)
-                NavigationManager.NavigateTo("/login");
-            else
-            {
-                errors = result.Errors;
-                withErrors = true;
-            }
+            errors = result.Errors;
+            withErrors = true;
         }
     }
+}
