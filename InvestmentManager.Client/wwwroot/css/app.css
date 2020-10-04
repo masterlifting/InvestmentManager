@@ -4,6 +4,7 @@ app {
     display: flex;
     flex-direction: column;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
+    color:antiquewhite;
 }
 
 .valid.modified:not([type=checkbox]) {

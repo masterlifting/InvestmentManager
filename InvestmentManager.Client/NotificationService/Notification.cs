@@ -7,21 +7,18 @@ namespace InvestmentManager.Client.NotificationService
 {
     public class Notification
     {
-        public string SideColor { get; private set; }
-        public string Message { get; private set; }
-        public string Title { get; private set; }
-        public bool VisibleAlert { get; set; }
-        public bool VisibleInfo { get; set; }
+        public Notice Notice { get; set; } = new Notice();
+        public Info Info { get; set; } = new Info();
 
         public event Action OnChange;
 
 
         public void ShowInfo(string title, string message)
         {
-            SideColor = string.Intern(Choices.Color.info.ToString());
-            Title = title;
-            Message = message;
-            VisibleInfo = true;
+            Info.ColorBg = string.Intern(Choices.Color.info.ToString());
+            Info.Title = title;
+            Info.Message = message;
+            Info.Visible = true;
             NotifyStateChanged();
         }
 
@@ -32,14 +29,32 @@ namespace InvestmentManager.Client.NotificationService
 
         private async Task GetNoticeAsync(Choices.Color color, string message)
         {
-            SideColor = string.Intern(color.ToString());
-            Message = message;
-            VisibleAlert = true;
+            Notice.ColorBg = string.Intern(color.ToString());
+            Notice.Message = message;
+            Notice.Visible = true;
             NotifyStateChanged();
             await Task.Delay(1000).ConfigureAwait(false);
-            VisibleAlert = false;
+            Notice.Visible = false;
             NotifyStateChanged();
         }
         private void NotifyStateChanged() => OnChange?.Invoke();
+    }
+    public class Notice
+    {
+        public string ColorBg { get; set; }
+        public string Message { get; set; }
+        public bool Visible { get; set; }
+    }
+    public class Info
+    {
+        public string ColorBg { get; set; }
+        public string Message { get; set; }
+        public string Title { get; set; }
+        public bool Visible { get; set; }
+
+    }
+    public class Loading
+    {
+
     }
 }

@@ -14,6 +14,12 @@
             dark,
             muted
         }
+        public enum ColorBtn
+        {
+            ibtsm,
+            ibtdg,
+            ibtwr
+        }
         public enum Position
         {
             right,

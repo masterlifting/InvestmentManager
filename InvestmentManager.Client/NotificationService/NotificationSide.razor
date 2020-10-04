@@ -2,11 +2,11 @@
 
 @implements IDisposable
 
-@if (notice.VisibleAlert)
+@if (notice.Notice.Visible)
 {
     <div class="container-fluid fixed-top">
-        <div class="row rounded-bottom bg-@notice.SideColor text-muted  py-2  font-weight-bold">
-            <div class="col-10 align-self-center pl-5"> @notice.Message </div>
+        <div class="row bg-@notice.Notice.ColorBg text-muted py-2 font-weight-bold irb" style="height:3em">
+            <div class="col-10 align-self-center pl-5"> @notice.Notice.Message </div>
             <div class="col-2 text-center align-self-center">
                 <span class="oi oi-bolt" aria-hidden="true"></span>
             </div>
@@ -14,20 +14,20 @@
     </div>
 }
 
-@if (notice.VisibleInfo)
+@if (notice.Info.Visible)
 {
     <div class="container fixed-bottom">
-        <div class="row rounded-top bg-@notice.SideColor text-light  py-2 align-self-center">
+        <div class="row bg-@notice.Info.ColorBg text-light  py-2 align-self-center irt">
             <div class="col-1 text-center">
                 <span class="oi oi-envelope-open" aria-hidden="true"></span>
             </div>
             <div class="col-10">
                 <div class="row py-1">
-                    <div class="font-weight-bold text-warning">@notice.Title</div>
+                    <div class="font-weight-bold text-warning">@notice.Info.Title</div>
                 </div>
                 <div class="row py-1">
                     <div class="col ">
-                        @notice.Message
+                        @notice.Info.Message
                     </div>
                 </div>
             </div>
@@ -42,5 +42,5 @@
 @code{
     protected override void OnInitialized() => notice.OnChange += StateHasChanged;
     public void Dispose() => notice.OnChange -= StateHasChanged;
-    void HideInfo() => notice.VisibleInfo = false;
+    void HideInfo() => notice.Info.Visible = false;
 }

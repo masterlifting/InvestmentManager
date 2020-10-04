@@ -9,7 +9,7 @@
         string buyPrice = r.CurrencyId == 2 ? r.BuyPrice.ToString("C") : r.BuyPrice.ToString("C", new CultureInfo("en-US"));
         Choices.Color color = r.IsRecommend ? Choices.Color.success : Choices.Color.danger;
 
-        <div class="container invest_card">
+        <div class="container ir ibl iblbscd">
             <RowTitle Text="@r.CompanyName"  Color="Choices.Color.warning"/>
             <RowInfo Title="Цена обновлена:" Value="@r.LastPriceDate" />
             <RowInfo Title="Последняя цена:" Value="@lastPrice" Color="Choices.Color.info" />

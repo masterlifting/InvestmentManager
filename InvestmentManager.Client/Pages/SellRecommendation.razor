@@ -15,7 +15,7 @@
                 string lastPrice = r.CurrencyId == 2 ? r.LastPriceValue.ToString("C") : r.LastPriceValue.ToString("C", new CultureInfo("en-US"));
                 Choices.Color nameColor = r.IsRecommendMin || r.IsRecommendMid || r.IsRecommendMax ? Choices.Color.success : Choices.Color.warning;
 
-                <div class="container invest_card">
+                <div class="container ir ibl iblbscd">
                     
                     <RowTitle Color="@nameColor" Text="@r.CompanyName" />
 

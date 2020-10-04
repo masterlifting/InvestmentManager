@@ -13,37 +13,30 @@
         </div>
     }
     <div class="row h-100">
-        <div class="col align-self-center">
-            <EditForm Model="registerModel" OnValidSubmit="HandleRegistration">
+        <div class="col offset-md-3 col-md-6 align-self-center">
+            <EditForm class="ir ibl iblbscd" Model="registerModel" OnValidSubmit="HandleRegistration">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
 
-                <div class="row mb-4">
-                    <div class="col offset-md-3 col-md-6">
-                        <InputText Id="email" class="invest_Input" placeholder="введите email" @bind-Value="registerModel.Email" />
-                        <ValidationMessage For="@(() => registerModel.Email)" />
+                <div class="row">
+                    <div class="col ">
+                        <InputText type="email" placeholder="введите email" @bind-Value="registerModel.Email" />
                     </div>
                 </div>
 
-                <div class="row mb-4">
-                    <div class="col offset-md-3 col-md-6">
-                        <InputText Id="password" type="password" class="invest_Input" placeholder="введите пароль" @bind-Value="registerModel.Password" />
-                        <ValidationMessage For="@(() => registerModel.Password)" />
+                <div class="row my-3">
+                    <div class="col">
+                        <InputText type="password" placeholder="введите пароль" @bind-Value="registerModel.Password" />
                     </div>
                 </div>
 
-                <div class="row mb-4">
-                    <div class="col offset-md-3 col-md-6">
-                        <InputText Id="password" type="password" class="invest_Input" placeholder="повторите пароль" @bind-Value="registerModel.PasswordConfirm" />
-                        <ValidationMessage For="@(() => registerModel.PasswordConfirm)" />
+                <div class="row mb-3">
+                    <div class="col">
+                        <InputText type="password" placeholder="повторите пароль" @bind-Value="registerModel.PasswordConfirm" />
                     </div>
                 </div>
 
-                <div class="row mb-4">
-                    <div class="col offset-md-3 col-md-6">
-                        <button type="submit" class="btn btn-dark w-100 rounded-pill">Зарегистрироваться</button>
-                    </div>
-                </div>
+                <ButtonSubmit Title="Зарегистрироваться" Color="Choices.ColorBtn.ibtsm"/>
 
             </EditForm>
         </div>

@@ -1,0 +1,10 @@
+﻿<div class="row">
+    <div class="col">
+        <button type="submit" class="ibtn @Color.ToString()">@Title</button>
+    </div>
+</div>
+
+@code{
+    [Parameter] public string Title { get; set; }
+    [Parameter] public Choices.ColorBtn Color { get; set; }
+}

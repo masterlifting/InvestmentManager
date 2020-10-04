@@ -6,7 +6,7 @@
         <DataAnnotationsValidator />
 
         <ValidationMessage For="@(() => result.CompanyId)" />
-        <InputSelect class="invest_Input" @bind-Value="@result.CompanyId">
+        <InputSelect class="ii" @bind-Value="@result.CompanyId">
             <option selected value="">Этот дивиденд какой компании?</option>
             @foreach (var i in model.Companies)
             {
@@ -17,7 +17,7 @@
             <div class="col-12">Возможный идентификатор дивиденда: </div>
         </div>
         <ValidationMessage For="@(() => result.IdentifierName)" />
-        <InputText class="invest_Input" @bind-Value="@result.IdentifierName" />
+        <InputText class="ii" @bind-Value="@result.IdentifierName" />
 
 
         <div class="row mt-3">

@@ -9,7 +9,7 @@
 
 @foreach (var result in newReports)
 {
-    <div class="container invest_card">
+    <div class="container ir ibl iblbscd">
         <RowTitle Color="Choices.Color.warning" Text="@result.CompanyName" />
 
         @foreach (var report in result.Reports)
@@ -19,51 +19,51 @@
                 <ValidationSummary />
                 <div class="row ">
                     <div class="col-6 invest_Label">Дата</div>
-                    <InputDate class="col-5 invest_Input" @bind-Value="@report.DateReport" />
+                    <InputDate class="col-5 ii" @bind-Value="@report.DateReport" />
                 </div>
                 <div class="row ">
                     <div class="col-6 invest_Label">Всего акций</div>
-                    <InputNumber ParsingErrorMessage="Колличество акций должно быть числом" class="col-5 invest_Input" @bind-Value="@report.StockVolume" />
+                    <InputNumber ParsingErrorMessage="Колличество акций должно быть числом" class="col-5 ii" @bind-Value="@report.StockVolume" />
                 </div>
                 <div class="row ">
                     <div class="col-6 invest_Label">Дивиденды</div>
-                    <InputNumber ParsingErrorMessage="Дивиденды должны быть числом" class="col-5 invest_Input" @bind-Value="@report.Dividend" />
+                    <InputNumber ParsingErrorMessage="Дивиденды должны быть числом" class="col-5 ii" @bind-Value="@report.Dividend" />
                 </div>
                 <div class="row ">
                     <div class="col-6 invest_Label">Выручка</div>
-                    <InputNumber ParsingErrorMessage="Выручка должна быть числом" class="col-5 invest_Input" @bind-Value="@report.Revenue" />
+                    <InputNumber ParsingErrorMessage="Выручка должна быть числом" class="col-5 ii" @bind-Value="@report.Revenue" />
                 </div>
                 <div class="row ">
                     <div class="col-6 invest_Label">Валовая прибыль</div>
-                    <InputNumber ParsingErrorMessage="Валовая прибыль должна быть числом" class="col-5 invest_Input" @bind-Value="@report.GrossProfit" />
+                    <InputNumber ParsingErrorMessage="Валовая прибыль должна быть числом" class="col-5 ii" @bind-Value="@report.GrossProfit" />
                 </div>
                 <div class="row ">
                     <div class="col-6 invest_Label">Чистая прибыль</div>
-                    <InputNumber ParsingErrorMessage="Чистая прибыль должна быть числом" class="col-5 invest_Input" @bind-Value="@report.NetProfit" />
+                    <InputNumber ParsingErrorMessage="Чистая прибыль должна быть числом" class="col-5 ii" @bind-Value="@report.NetProfit" />
                 </div>
                 <div class="row ">
                     <div class="col-6 invest_Label">Денежный поток</div>
-                    <InputNumber ParsingErrorMessage="Денежный поток должен быть числом" class="col-5 invest_Input" @bind-Value="@report.CashFlow" />
+                    <InputNumber ParsingErrorMessage="Денежный поток должен быть числом" class="col-5 ii" @bind-Value="@report.CashFlow" />
                 </div>
                 <div class="row ">
                     <div class="col-6 invest_Label">Активы</div>
-                    <InputNumber ParsingErrorMessage="Активы должны быть числом" class="col-5 invest_Input" @bind-Value="@report.Assets" />
+                    <InputNumber ParsingErrorMessage="Активы должны быть числом" class="col-5 ii" @bind-Value="@report.Assets" />
                 </div>
                 <div class="row ">
                     <div class="col-6 invest_Label">Акционерный капитал</div>
-                    <InputNumber ParsingErrorMessage="Капитал должен быть числом" class="col-5 invest_Input" @bind-Value="@report.ShareCapital" />
+                    <InputNumber ParsingErrorMessage="Капитал должен быть числом" class="col-5 ii" @bind-Value="@report.ShareCapital" />
                 </div>
                 <div class="row ">
                     <div class="col-6 invest_Label">Оборот</div>
-                    <InputNumber ParsingErrorMessage="Оборот должен быть числом" class="col-5 invest_Input" @bind-Value="@report.Turnover" />
+                    <InputNumber ParsingErrorMessage="Оборот должен быть числом" class="col-5 ii" @bind-Value="@report.Turnover" />
                 </div>
                 <div class="row ">
                     <div class="col-6 invest_Label">Задолженность</div>
-                    <InputNumber ParsingErrorMessage="Задолженность должна быть числом" class="col-5 invest_Input" @bind-Value="@report.LongTermDebt" />
+                    <InputNumber ParsingErrorMessage="Задолженность должна быть числом" class="col-5 ii" @bind-Value="@report.LongTermDebt" />
                 </div>
                 <div class="row ">
                     <div class="col-6 invest_Label">Обязательства</div>
-                    <InputNumber ParsingErrorMessage="Обязательства должны быть числом" class="col-5 invest_Input" @bind-Value="@report.Obligation" />
+                    <InputNumber ParsingErrorMessage="Обязательства должны быть числом" class="col-5 ii" @bind-Value="@report.Obligation" />
                 </div>
                 <div class="row justify-content-around my-3">
                     <div class="col-5">

@@ -7,7 +7,6 @@
     <title>InvestmentManager</title>
     <base href="/" />
     <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
-    <link href="css/open-iconic/font/css/open-iconic-bootstrap.min.css" />
     <link href="css/custom.css" rel="stylesheet" />
     <link href="css/app.css" rel="stylesheet" />
     <link href="manifest.json" rel="manifest" />
@@ -16,7 +15,15 @@
 
 <body>
     <app>
-        <text class="text-center">Загрузка...</text>
+        <div class="container-fluid" style="background-color:black;">
+            <div class="row">
+                <div class="col text-center" style="height:100vh">
+                    <div class="spinner-border" role="status" style="margin-top:50vh">
+                        <span class="sr-only"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </app>
 
     <div id="blazor-error-ui">

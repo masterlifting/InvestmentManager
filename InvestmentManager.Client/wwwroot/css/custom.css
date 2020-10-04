@@ -1,50 +1,119 @@
 ﻿.invest_background_image {
-    background-image: url(/images/BackGround.jpg);
+    /*background-image: url(/images/BackGround.jpg);
     background-position: center center;
     background-repeat: no-repeat;
     background-attachment: fixed;
-    background-size: cover;
+    background-size: cover;*/
+    background-color: aliceblue;
     height: calc(100vh - 3rem);
     overflow: auto;
 }
-
-
-.invest_card {
-    background-color: black;
-    color: antiquewhite;
-    opacity: 0.89;
-    padding: 15px;
-    margin-bottom: 10px;
-    margin-top: 10px;
+/*радиус и тень блока*/
+.ir {
     border-radius: 25px;
-    box-shadow: 10px 5px 25px rgba(0,0,0,0.95);
 }
 
-.invest_ReportCard {
-    background-color: black;
-    color: antiquewhite;
-    opacity: 0.89;
-    padding: 20px 5px;
-    margin-bottom: 10px;
-    margin-top: 10px;
-    border-radius: 25px;
-    box-shadow: 10px 5px 25px rgba(0,0,0,0.95);
+.irt {
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
 }
 
-.invest_ErrorCard {
+.irb {
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+}
+/*шаблон блока*/
+.ibl {
+    /*opacity: 0.97;*/
+    margin-bottom: .8em;
+    margin-top: 1em;
+    padding: 1em;
+    border: 3px solid black;
+}
+/*карточки*/
+/*базовая*/
+.iblbscd {
+    box-shadow: 7px 7px 20px 5px black;
+    background-color: rgb(24,24,24);
+}
+
+    .iblbscd:hover {
+        background-color: black;
+    }
+/*с ошибкой*/
+.iblercd {
     background-color: darkred;
     color: orange;
-    opacity: 0.95;
-    padding: 20px;
-    margin-bottom: 10px;
-    margin-top: 10px;
+}
+/*Кнопки*/
+/*submit*/
+.ibtn {
+    width: 100%;
+    height: 2.5em;
+    line-height: 2.5em;
+    text-decoration: none;
+    text-align: center;
+    color: antiquewhite;
+    text-shadow: 0 1px rgba(255,255,255,.2), 0 -1px rgba(0,0,0,.8);
+    outline: none;
+    border: none;
     border-radius: 25px;
-    box-shadow: 10px 5px 25px rgba(0,0,0,0.95);
+    background: darkgreen radial-gradient(150% 100% at 50% 5px, rgba(255,255,255,.2), rgba(0,0,0,0));
+    box-shadow: inset rgba(0,0,0,.6) 0 -2px 5px, inset rgba(252,255,255,.7) 0 2px 5px, rgba(0,0,0,.8) 0 2px 5px -1px;
+    user-select: none;
 }
 
-.invest_Input {
+.ibtsm {
+    background: darkgreen radial-gradient(150% 100% at 50% 5px, rgba(255,255,255,.2), rgba(0,0,0,0));
+}
+
+    .ibtsm:hover {
+        color: azure;
+        cursor: pointer;
+        background: green radial-gradient(150% 100% at 50% 5px, rgba(255,255,255,.2), rgba(0,0,0,0));
+    }
+
+    .ibtsm:active {
+        padding-bottom: 1px;
+        box-shadow: inset rgba(0,0,0,1) 0 1px 3px, inset rgba(0,0,0,.6) 0 -2px 5px, inset rgba(252,255,255,.7) 0 2px 5px, 0 1px rgba(255,255,255,.08);
+    }
+
+.ibtdg {
+    background: darkred radial-gradient(150% 100% at 50% 5px, rgba(255,255,255,.2), rgba(0,0,0,0));
+}
+
+    .ibtdg:hover {
+        color: azure;
+        cursor: pointer;
+        background: red radial-gradient(150% 100% at 50% 5px, rgba(255,255,255,.2), rgba(0,0,0,0));
+    }
+
+    .ibtdg:active {
+        padding-bottom: 1px;
+        box-shadow: inset rgba(0,0,0,1) 0 1px 3px, inset rgba(0,0,0,.6) 0 -2px 5px, inset rgba(252,255,255,.7) 0 2px 5px, 0 1px rgba(255,255,255,.08);
+    }
+
+.ibtwr {
+    background: darkgoldenrod radial-gradient(150% 100% at 50% 5px, rgba(255,255,255,.2), rgba(0,0,0,0));
+}
+
+    .ibtwr:hover {
+        color: dimgray;
+        cursor: pointer;
+        background: gold radial-gradient(150% 100% at 50% 5px, rgba(255,255,255,.2), rgba(0,0,0,0));
+    }
+
+    .ibtwr:active {
+        padding-bottom: 1px;
+        box-shadow: inset rgba(0,0,0,1) 0 1px 3px, inset rgba(0,0,0,.6) 0 -2px 5px, inset rgba(252,255,255,.7) 0 2px 5px, 0 1px rgba(255,255,255,.08);
+    }
+
+/*Взаимодействие*/
+/*input*/
+input {
     border-radius: 25px;
     background-color: black;
+    border: 2px solid white;
     color: azure;
     padding: 7px 10px;
     margin: 2px 0px;
@@ -52,15 +121,15 @@
     width: 100%;
 }
 
-.invest_Label {
+.ilbl {
     align-self: center;
     text-align: right;
 }
 
-.invest_Link {
+.ilnk {
     color: mediumaquamarine;
 }
 
-    .invest_Link a {
+    .ilnk a {
         color: mediumaquamarine !important;
     }

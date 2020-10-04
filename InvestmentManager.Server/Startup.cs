@@ -43,7 +43,7 @@ namespace InvestmentManager.Server
                 provider.UseNpgsql(configuration["ConnectionStrings:LocalPostgresConnection"]);
                 /*/
                 provider.UseNpgsql(configuration["ConnectionStrings:PostgresConnection"]);
-               //*/
+                //*/
             });
             services.AddIdentity<IdentityUser, IdentityRole>(options =>
             {

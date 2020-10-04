@@ -10,28 +10,23 @@
         </div>
     }
     <div class="row h-100">
-        <div class="col align-self-center">
-            <EditForm Model="loginModel" OnValidSubmit="HandleLogin">
+        <div class="col offset-md-3 col-md-6 align-self-center">
+            <EditForm class="ir ibl iblbscd" Model="loginModel" OnValidSubmit="HandleLogin">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
+                <div class="row">
+                    <div class="col">
+                        <InputText type="email" placeholder="введите email" @bind-Value="loginModel.Email" />
+                    </div>
+                </div>
+                <div class="row my-3">
+                    <div class="col">
+                        <InputText type="password" placeholder="введите пароль" @bind-Value="loginModel.Password" />
+                    </div>
+                </div>
 
-                <div class="row mb-4">
-                    <div class="col offset-md-3 col-md-6">
-                        <ValidationMessage For="@(() => loginModel.Email)" />
-                        <InputText Id="email" class="invest_Input" placeholder="введите email" @bind-Value="loginModel.Email" />
-                    </div>
-                </div>
-                <div class="row mb-4">
-                    <div class="col offset-md-3 col-md-6">
-                        <ValidationMessage For="@(() => loginModel.Password)" />
-                        <InputText Id="password" type="password" class="invest_Input" placeholder="введите пароль" @bind-Value="loginModel.Password" />
-                    </div>
-                </div>
-                <div class="row mb-4">
-                    <div class="col offset-md-3 col-md-6">
-                        <button type="submit" class="btn btn-dark w-100 rounded-pill">Войти</button>
-                    </div>
-                </div>
+                <ButtonSubmit Title="Войти" Color="Choices.ColorBtn.ibtsm"/>
+
             </EditForm>
         </div>
     </div>
