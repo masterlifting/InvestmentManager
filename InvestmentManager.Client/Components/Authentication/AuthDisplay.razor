@@ -1,13 +1,13 @@
-﻿<div class="row  ml-1">
+﻿<div class="row ml-1">
     <div class="col">
         <AuthorizeView>
             <Authorized>
-                <NavLink style="text-decoration:none" class="text-secondary" href="logout">Выйти</NavLink>&ensp;
+                <NavLink class="text-secondary" href="logout">Выйти</NavLink>&ensp;
                 <span class="text-light">@context.User.Identity.Name.Split('@')[0]</span>
             </Authorized>
             <NotAuthorized>
-                <NavLink class="font-weight-bold text-warning" style="text-decoration:none" href="login">Войти</NavLink>&ensp;
-                <NavLink style="text-decoration:none" class="text-light" href="register">Зарегистрироваться</NavLink>
+                <NavLink class="font-weight-bold text-warning" href="login">Войти</NavLink>&ensp;
+                <NavLink href="register">Зарегистрироваться</NavLink>
             </NotAuthorized>
         </AuthorizeView>
     </div>

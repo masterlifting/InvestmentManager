@@ -1,0 +1,11 @@
+﻿
+<div class="row icard-info p-1 mx-1 my-1">
+    <div class="col-7 font-weight-bold">@Title</div>
+    <div class="col-5 text-@Color.ToString() px-0">@Value</div>
+</div>
+
+@code {
+    [Parameter] public Choice.Color Color { get; set; } = Choice.Color.light;
+    [Parameter] public string Title { get; set; }
+    [Parameter] public string Value { get; set; }
+}

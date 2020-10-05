@@ -1,10 +1,10 @@
 ﻿<div class="row h-100">
-    <div class="col text-center align-self-center" @onclick="InfoAction" style="cursor:pointer">
+    <div class="col text-@Position.ToString() align-self-center ilink" @onclick="InfoAction">
         <span class="oi oi-info" aria-hidden="true"></span>
     </div>
 </div>
 
 @code {
-    [Parameter] public Choices.Position Position { get; set; } = Choices.Position.right;
+    [Parameter] public Choice.Position Position { get; set; } = Choice.Position.center;
     [Parameter] public EventCallback InfoAction { get; set; }
 }

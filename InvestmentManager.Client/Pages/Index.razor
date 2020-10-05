@@ -1,40 +1,46 @@
 ﻿@page "/"
 @inject HttpClient httpClient
 
-<div class="container ir ibl iblbscd">
-    <div class="row">
-        <div class="col-8"><span class="oi oi-dollar" aria-hidden="true"></span> сегодня:</div>
-        @if (dollar.HasValue)
-        {
-            <div class="col-4 text-right font-weight-bold text-danger">@dollar.Value.ToString("C")</div>
-        }
-        else
-        {
-            <text>@DefaultData.loading</text>
-        }
+    <div class="container-fluid icard">
+        <div class="row">
+            <div class="col text-center text-warning">Alpha version!</div>
+        </div>
     </div>
-</div>
+
+    <div class="container icard">
+        <div class="row">
+            <div class="col-8"><span class="oi oi-dollar" aria-hidden="true"></span> сегодня:</div>
+            @if (dollar.HasValue)
+            {
+                <div class="col-4 text-right font-weight-bold text-danger">@dollar.Value.ToString("C")</div>
+            }
+            else
+            {
+                <text>@DefaultData.loading</text>
+            }
+        </div>
+    </div>
 
 
-<MainInfo />
+    <MainInfo />
 
-@if (dollar.HasValue)
-{
-    <PortfolioSummaryInfo Dollar="@dollar.Value" />
-}
-
-<PortfolioTransactionsInfo />
-
-<AdminPanel />
-
-@code
-{
-    decimal? dollar;
-    CBRF rate;
-
-    protected override async Task OnInitializedAsync()
+    @if (dollar.HasValue)
     {
-        rate = await httpClient.GetFromJsonAsync<CBRF>("outside/getrate");
-        dollar = rate.Valute.USD.Value;
+        <PortfolioSummaryInfo Dollar="@dollar.Value" />
     }
-}
+
+    <PortfolioTransactionsInfo />
+
+    <AdminPanel />
+
+    @code
+{
+        decimal? dollar;
+        CBRF rate;
+
+        protected override async Task OnInitializedAsync()
+        {
+            rate = await httpClient.GetFromJsonAsync<CBRF>("outside/getrate");
+            dollar = rate.Valute.USD.Value;
+        }
+    }

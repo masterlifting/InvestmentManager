@@ -1,6 +1,6 @@
 ﻿namespace InvestmentManager.Client.ChoiceModel
 {
-    public static class Choices
+    public static class Choice
     {
         public enum Color
         {
@@ -14,22 +14,17 @@
             dark,
             muted
         }
-        public enum ColorBtn
+        public enum Button
         {
-            ibtsm,
-            ibtdg,
-            ibtwr
+            success,
+            warning,
+            danger
         }
         public enum Position
         {
             right,
             left,
             center
-        }
-        public enum RowCount
-        {
-            Two,
-            One
         }
     }
 }

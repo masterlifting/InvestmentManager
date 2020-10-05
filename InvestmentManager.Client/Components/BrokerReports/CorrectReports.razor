@@ -5,7 +5,7 @@
 {
     <div class="container invest_ReportCard">
 
-        <RowTitle Position="Choices.Position.center" Color="Choices.Color.warning" Text="@report.AccountId" />
+        <RowTitle Position="Choice.Position.center" Color="Choice.Color.warning" Text="@report.AccountId" />
         @if (report.AccountTransactions.Any())
         {
             <InfoAccountOperation AccountTransactions="@report.AccountTransactions" />

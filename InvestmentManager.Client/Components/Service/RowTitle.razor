@@ -1,10 +1,9 @@
 ﻿<div class="row">
-    <div class="col text-@Position.ToString() text-@Color.ToString() mb-0 font-weight-bold">@Text.ToUpper()</div>
+    <div class="col text-@Position.ToString() text-@Color.ToString() mb-0 font-weight-bold text-uppercase">@Text</div>
 </div>
-<div class="dropdown-divider"></div>
 
 @code {
     [Parameter] public string Text { get; set; }
-    [Parameter] public Choices.Color Color { get; set; } = Choices.Color.info;
-    [Parameter] public Choices.Position Position { get; set; } = Choices.Position.right;
+    [Parameter] public Choice.Color Color { get; set; } = Choice.Color.info;
+    [Parameter] public Choice.Position Position { get; set; } = Choice.Position.right;
 }

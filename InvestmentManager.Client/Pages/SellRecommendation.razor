@@ -13,9 +13,9 @@
                 .ThenBy(x => (x.PriceMin - x.LastPriceValue)))
             {
                 string lastPrice = r.CurrencyId == 2 ? r.LastPriceValue.ToString("C") : r.LastPriceValue.ToString("C", new CultureInfo("en-US"));
-                Choices.Color nameColor = r.IsRecommendMin || r.IsRecommendMid || r.IsRecommendMax ? Choices.Color.success : Choices.Color.warning;
+                Choice.Color nameColor = r.IsRecommendMin || r.IsRecommendMid || r.IsRecommendMax ? Choice.Color.success : Choice.Color.warning;
 
-                <div class="container ir ibl iblbscd">
+                <div class="container icard small">
                     
                     <RowTitle Color="@nameColor" Text="@r.CompanyName" />
 
@@ -26,31 +26,31 @@
                     else
                     {
                         <DetailIcon DetailAction="GetDetail" Value="@r.CompanyId.ToString()" />
-                        <RowInfo Title="Цена обновлена:" Value="@r.LastPriceDate" />
-                        <RowInfo Color="Choices.Color.info" Title="Последняя цена:" Value="@lastPrice" />
+                        <RowSingleInfo Title="Цена обновлена:" Value="@r.LastPriceDate" />
+                        <RowSingleInfo Color="Choice.Color.info" Title="Последняя цена:" Value="@lastPrice" />
                         <div class="row">
-                            <div class="col text-warning">Продавать с прибылью в:</div>
+                            <div class="offset-1 col-11 text-warning">Продавать с прибылью в:</div>
                         </div>
                         @if (r.ValueMin != 0)
                         {
                             string price = r.CurrencyId == 2 ? r.PriceMin.ToString("C") : r.PriceMin.ToString("C", new CultureInfo("en-US"));
                             string view = $"{r.ValueMin} шт. по {price}";
-                            Choices.Color color = r.IsRecommendMin ? Choices.Color.success : Choices.Color.danger;
-                            <RowInfo Color="@color" Title="20%" Value="@view" />
+                            Choice.Color color = r.IsRecommendMin ? Choice.Color.success : Choice.Color.danger;
+                            <RowSingleInfo Color="@color" Title="20%" Value="@view" />
                         }
                         @if (r.ValueMid != 0)
                         {
                             string price = r.CurrencyId == 2 ? r.PriceMid.ToString("C") : r.PriceMid.ToString("C", new CultureInfo("en-US"));
                             string view = $"{r.ValueMid} шт. по {price}";
-                            Choices.Color color = r.IsRecommendMid ? Choices.Color.success : Choices.Color.danger;
-                            <RowInfo Color="@color" Title="50%" Value="@view" />
+                            Choice.Color color = r.IsRecommendMid ? Choice.Color.success : Choice.Color.danger;
+                            <RowSingleInfo Color="@color" Title="50%" Value="@view" />
                         }
                         @if (r.ValueMax != 0)
                         {
                             string price = r.CurrencyId == 2 ? r.PriceMax.ToString("C") : r.PriceMax.ToString("C", new CultureInfo("en-US"));
                             string view = $"{r.ValueMax} шт. по {price}";
-                            Choices.Color color = r.IsRecommendMax ? Choices.Color.success : Choices.Color.danger;
-                            <RowInfo Color="@color" Title="80%" Value="@view" />
+                            Choice.Color color = r.IsRecommendMax ? Choice.Color.success : Choice.Color.danger;
+                            <RowSingleInfo Color="@color" Title="80%" Value="@view" />
                         }
                     }
                 </div>

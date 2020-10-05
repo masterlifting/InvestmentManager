@@ -1,12 +1,12 @@
-﻿<div @onclick="@OnClick" class="row" style="cursor:pointer">
-    <div class="col text-@Position.ToString()">
+﻿<div @onclick="@OnClick" class="row">
+    <div class="col text-@Position.ToString() ilink">
         <span class="oi oi-list" aria-hidden="true"></span>
     </div>
 </div>
 
 @code {
     [Parameter] public string Value { get; set; }
-    [Parameter] public Choices.Position Position { get; set; } = Choices.Position.right;
+    [Parameter] public Choice.Position Position { get; set; } = Choice.Position.right;
     [Parameter] public EventCallback<string> DetailAction { get; set; }
 
     async Task OnClick()

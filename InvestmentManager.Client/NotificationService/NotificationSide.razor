@@ -4,12 +4,10 @@
 
 @if (notice.Notice.Visible)
 {
-    <div class="container-fluid fixed-top">
-        <div class="row bg-@notice.Notice.ColorBg text-muted py-2 font-weight-bold irb" style="height:3em">
-            <div class="col-10 align-self-center pl-5"> @notice.Notice.Message </div>
-            <div class="col-2 text-center align-self-center">
-                <span class="oi oi-bolt" aria-hidden="true"></span>
-            </div>
+    <div class="row fixed-top py-2 font-weight-bold inotice inotice-@notice.Notice.ColorBg" style="height: 3em">
+        <div class="col-10 align-self-center pl-5"> @notice.Notice.Message </div>
+        <div class="col-2 text-center align-self-center">
+            <span class="oi oi-bolt" aria-hidden="true"></span>
         </div>
     </div>
 }
@@ -17,7 +15,7 @@
 @if (notice.Info.Visible)
 {
     <div class="container fixed-bottom">
-        <div class="row bg-@notice.Info.ColorBg text-light  py-2 align-self-center irt">
+        <div class="row py-2 align-self-center inotice inotice-@notice.Info.ColorBg irounded-notice-top">
             <div class="col-1 text-center">
                 <span class="oi oi-envelope-open" aria-hidden="true"></span>
             </div>

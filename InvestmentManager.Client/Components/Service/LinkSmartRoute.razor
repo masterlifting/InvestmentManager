@@ -1,19 +1,19 @@
-﻿<div class="row py-2 ilnk">
+﻿<div class="row py-1">
     <div class="col-@colLink">
-        <a href="/@Route" style="text-decoration:none">
+        <a href="/@Route">
             <span class="oi oi-external-link" aria-hidden="true"></span>
             &emsp;@Name
         </a>
     </div>
     @if (!string.IsNullOrWhiteSpace(Value))
     {
-        <div class="col-3 px-0">
+        <div class="col-4">
             <div class="row">
                 <div class="col-9">
                     @Value
                 </div>
                 <div class="col-3">
-                    <InfoIcon Position="Choices.Position.right" InfoAction="DetailAction"/>
+                    <InfoIcon Position="Choice.Position.right" InfoAction="DetailAction"/>
                 </div>
             </div>
         </div>

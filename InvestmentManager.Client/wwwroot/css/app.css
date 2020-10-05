@@ -4,17 +4,17 @@ app {
     display: flex;
     flex-direction: column;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
-    color:antiquewhite;
+    color: antiquewhite;
 }
 
 .valid.modified:not([type=checkbox]) {
     border-radius: 25px;
-    border: 3px solid green;
+    border: 1px solid darkgreen;
 }
 
 .invalid {
-    border-radius:25px;
-    border:3px solid red;
+    border-radius: 25px;
+    border: 1px solid darkred;
 }
 
 .validation-message {
@@ -22,7 +22,7 @@ app {
 }
 
 #blazor-error-ui {
-    background: lightyellow;
+    background: khaki;
     bottom: 0;
     box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
     display: none;
@@ -33,9 +33,9 @@ app {
     z-index: 1000;
 }
 
-#blazor-error-ui .dismiss {
-    cursor: pointer;
-    position: absolute;
-    right: 0.75rem;
-    top: 0.5rem;
-}
+    #blazor-error-ui .dismiss {
+        cursor: pointer;
+        position: absolute;
+        right: 0.75rem;
+        top: 0.5rem;
+    }

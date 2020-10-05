@@ -6,11 +6,11 @@
     foreach (var model in models)
     {
         string profit = model.CurrencyId == 1 ? model.ProfitCurrent.ToString("C", new CultureInfo("en-US")) : model.ProfitCurrent.ToString("C");
-        Choices.Color lotColor = model.FreeLot == 0 ? Choices.Color.success : Choices.Color.light;
-        Choices.Color profitColor = model.ProfitCurrent > 0 ? Choices.Color.success : Choices.Color.danger;
+        Choice.Color lotColor = model.FreeLot == 0 ? Choice.Color.success : Choice.Color.light;
+        Choice.Color profitColor = model.ProfitCurrent > 0 ? Choice.Color.success : Choice.Color.danger;
 
-        <div class="container ir ibl iblbscd">
-            <RowTitle Text="@model.CompanyName" Color="Choices.Color.warning"/>
+        <div class="container icard small">
+            <RowTitle Text="@model.CompanyName" Color="Choice.Color.warning"/>
             @if (_companyId == model.CompanyId)
             {
                 <StockTransactionDetail CloseDetail="@CloseDetail" CompanyId="@model.CompanyId" />
@@ -18,9 +18,9 @@
             else
             {
                 <DetailIcon DetailAction="GetDetail" Value="@model.CompanyId.ToString()" />
-                <RowInfo Title="Последняя операция:" Value="@model.DateLastTransaction.ToShortDateString()" />
-                <RowInfo Title="Свободных лотов:" Value="@model.FreeLot.ToString()" Color="@lotColor" />
-                <RowInfo Title="Текущий профит:" Value="@profit" Color="@profitColor" />
+                <RowSingleInfo Title="Последняя операция:" Value="@model.DateLastTransaction.ToShortDateString()" />
+                <RowSingleInfo Title="Свободных лотов:" Value="@model.FreeLot.ToString()" Color="@lotColor" />
+                <RowSingleInfo Title="Текущий профит:" Value="@profit" Color="@profitColor" />
             }
 
 
@@ -29,7 +29,7 @@
                 string price = model.CurrencyId == 1
                     ? ((decimal)Math.Abs(model.ProfitCurrent) / model.FreeLot).ToString("C", new CultureInfo("en-US"))
                     : ((decimal)Math.Abs(model.ProfitCurrent) / model.FreeLot).ToString("C");
-                <RowInfo Title="Взвешенная цена:" Value="@price" Color="Choices.Color.info"/>
+                <RowSingleInfo Title="Взвешенная цена:" Value="@price" Color="Choice.Color.info"/>
             }
         </div>
     }

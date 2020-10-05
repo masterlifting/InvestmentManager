@@ -4,24 +4,24 @@
 @inject ILocalStorageService localStorage
 @inject Notification notice
 
-<div class="container ir ibl iblbscd">
+<div class="container icard">
     <RowTitle Text="Общая информация" />
     <RowTitleSub Text="Накоплены следующие данные" />
     <LinkSmartRoute Route="companylist" Name="Копаний" Value="@result.CompanyCount" DetailAction="@(() => notice.ShowInfo("Компании обновлены",result.CompanyDateUpdate))" />
     <LinkSmartRoute Name="Отчетов" Value="@result.ReportCount" DetailAction="@(()=> notice.ShowInfo("Отчеты обновлены",result.ReportDateUpdate))" />
     <LinkSmartRoute Name="Коэффициентов" Value="@result.CoefficientCount" DetailAction="@(()=> notice.ShowInfo("Коэффициенты обновлены",result.CoefficientDateUpdate))" />
     <LinkSmartRoute Name="Цен" Value="@result.PriceCount" DetailAction="@(()=> notice.ShowInfo("Цены обновлены",result.PriceDateUpdate))" />
-    <RowTitleSub Text="В результате их анализа имеется" />
-    <LinkSmartRoute Name="рейтинг компаний" DetailAction="@(()=> notice.ShowInfo("Рейтинг обновлен",result.RatingDateUpdate))" />
-    <RowTitleSub Text="По итогам которого доступны" />
-    <LinkSmartRoute Route="buyrecommendation" Name="цены к покупке" Value="@result.BuyRecommendationCount" DetailAction="@(()=> notice.ShowInfo("Рекоммендации обновлены",result.BuyRecommendationDateUpdate))" />
-    <RowTitleSub Text="А если" />
-    <LinkSmartAction LinkAction="@(async () => await ClickInputFileButtonAsync("inputButton"))" Name="загрузить .xls отчеты от БКС" />
+    <RowTitleSub Text="в результате анализа которых имеется" />
+    <LinkSmartRoute Name="Рейтинг компаний" DetailAction="@(()=> notice.ShowInfo("Рейтинг обновлен",result.RatingDateUpdate))" />
+    <RowTitleSub Text="по итогам которого доступны" />
+    <LinkSmartRoute Route="buyrecommendation" Name="Цены к покупке" Value="@result.BuyRecommendationCount" DetailAction="@(()=> notice.ShowInfo("Рекоммендации обновлены",result.BuyRecommendationDateUpdate))" />
+    <RowTitleSub Text="а если" />
+    <LinkSmartAction LinkAction="@(async () => await ClickInputFileButtonAsync("inputButton"))" Name="Загрузить .xls отчеты от БКС" />
     <InputFile multiple OnChange="HandleSelectionAsync" id="inputButton" style="display:none" />
     <RowTitleSub Text="или" />
-    <LinkSmartRoute Name="добавить транзакции" />
+    <LinkSmartRoute Name="Добавить транзакции" />
     <RowTitleSub Text="то станут доступны" />
-    <LinkSmartAction LinkAction="@(async () => await CheckAccessAsync())" Name="рекомендации к продаже"/>
+    <LinkSmartAction LinkAction="@(async () => await CheckAccessAsync())" Name="Рекомендации к продаже"/>
 </div>
 
 @code
