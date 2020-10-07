@@ -1,36 +1,33 @@
 ﻿@page "/accounttransactions"
 @inject HttpClient httpClient
 
-<LoadingInv IsLoading="@isLoading" />
-
 @if (models != null)
 {
     foreach (var account in models.GroupBy(x => x.Account))
     {
         <div class="container icard small">
             <RowTitle Color="Choice.Color.warning" Text="@account.Key" />
-            @foreach (var model in account)
-            {
-                string sum = model.CurrencyId == 1 ? model.Sum.ToString("C", new CultureInfo("en-US")) : model.Sum.ToString("C");
-                string colorTransaction = model.Status.Equals("Пополнение") ? "danger" : "success";
+            <div class="row icard-content">
+                <div class="col">
+                    @foreach (var model in account)
+                    {
+                        string sum = model.CurrencyId == 1 ? model.Sum.ToString("C", new CultureInfo("en-US")) : model.Sum.ToString("C");
+                        string colorTransaction = model.Status.Equals("Пополнение") ? "danger" : "success";
 
-                <div class="row text-@colorTransaction my-1">
-                    <div class="col-4">@model.Status</div>
-                    <div class="col-4">@sum</div>
-                    <div class="col-4 text-right">@model.DateTransaction.ToShortDateString()</div>
+                        <div class="row text-@colorTransaction my-1 text-nowrap">
+                            <div class="col-4">@model.Status</div>
+                            <div class="col-4">@sum</div>
+                            <div class="col-4 text-right">@model.DateTransaction.ToShortDateString()</div>
+                        </div>
+                    }
                 </div>
-            }
+            </div>
         </div>
     }
 }
 
 @code {
-    bool isLoading;
     IEnumerable<AccountTransactionModel> models;
-    protected override async Task OnInitializedAsync()
-    {
-        isLoading = true;
+    protected override async Task OnInitializedAsync() =>
         models = await httpClient.GetFromJsonAsync<IEnumerable<AccountTransactionModel>>("transaction/accounttransactions");
-        isLoading = false;
-    }
 }

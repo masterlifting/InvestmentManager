@@ -5,7 +5,7 @@
         <DataAnnotationsValidator />
 
         <ValidationMessage For="@(() => result.CompanyId)" />
-        <InputSelect class="ii" @bind-Value="@result.CompanyId">
+        <InputSelect class="iselect" @bind-Value="@result.CompanyId">
             <option selected value="">Какой компании принадлежит @result.TikerName?</option>
             @foreach (var i in model.Companies)
             {
@@ -13,7 +13,7 @@
             }
         </InputSelect>
         <ValidationMessage For="@(() => result.LotId)" />
-        <InputSelect class="ii" @bind-Value="@result.LotId">
+        <InputSelect class="iselect" @bind-Value="@result.LotId">
             <option selected value="">Сколькими лотами торгуется @result.TikerName?</option>
             @foreach (var i in model.Lots)
             {
@@ -22,7 +22,7 @@
         </InputSelect>
 
         <ValidationMessage For="@(() => result.ExchangeId)" />
-        <InputSelect class="ii" @bind-Value="@result.ExchangeId">
+        <InputSelect class="iselect" @bind-Value="@result.ExchangeId">
             <option selected value="">На какой площадке торгуется @result.TikerName?</option>
             @foreach (var i in model.Exchanges)
             {
@@ -30,11 +30,8 @@
             }
         </InputSelect>
 
-        <div class="row mt-3">
-            <div class="col">
-                <button type="submit" class="btn btn-sm btn-warning w-100 rounded-pill">Исправить</button>
-            </div>
-        </div>
+        <ButtonSubmit Title="Исправить" Color="Choice.Button.warning"/>
+    
     </EditForm>
 </BaseError>
 @code {

@@ -1,11 +1,13 @@
 ﻿@if (!IsDone)
 {
-    <div class="container ir ibl ibe">
+    <div class="container icard-danger">
         <RowTitle Text="@Title" Color="Choice.Color.warning" Position="Choice.Position.center" />
+        <RowTitleSub Color="Choice.Color.dark" Text="Ошибка:" />
         <div class="row">
-            <div class="col-12">Ошибка:</div>
             <label class="col-12 text-center text-light">@ErrorValue</label>
-            <div class="col-12">Возможное решение: </div>
+        </div>
+        <RowTitleSub Color="Choice.Color.dark" Text="Возможное решение:" />
+        <div class="row icard-content">
             <div class="col-12">@ChildContent</div>
         </div>
     </div>

@@ -1,38 +1,24 @@
-﻿<div class="row py-1">
-    <div class="col-@colLink">
-        <a href="/@Route">
-            <span class="oi oi-external-link" aria-hidden="true"></span>
-            &emsp;@Name
-        </a>
-    </div>
+﻿<div class="row px-2 my-2">
+    <a class="col-8 col-md-5 ilink" href="/@Route">@Name</a>
     @if (!string.IsNullOrWhiteSpace(Value))
     {
-        <div class="col-4">
-            <div class="row">
-                <div class="col-9">
-                    @Value
-                </div>
-                <div class="col-3">
-                    <InfoIcon Position="Choice.Position.right" InfoAction="DetailAction"/>
+            <div class="col-4 offset-md-4 col-md-3">
+                <div class="row">
+                    <div class="col-9 col-md-10 ">
+                        @Value
+                    </div>
+                    <div class="col-3 col-md-2">
+                        <InfoIcon Position="Choice.Position.center" InfoAction="DetailAction" />
+                    </div>
                 </div>
             </div>
-        </div>
     }
-
 </div>
 
 @code {
 
-    int colLink = 8;
     [Parameter] public string Route { get; set; }
     [Parameter] public string Name { get; set; }
     [Parameter] public string Value { get; set; }
     [Parameter] public EventCallback DetailAction { get; set; }
-
-    protected override void OnInitialized()
-    {
-        base.OnInitialized();
-
-        colLink = string.IsNullOrWhiteSpace(Value) ? 12 : colLink;
-    }
 }

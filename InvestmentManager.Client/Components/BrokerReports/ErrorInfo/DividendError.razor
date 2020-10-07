@@ -6,25 +6,19 @@
         <DataAnnotationsValidator />
 
         <ValidationMessage For="@(() => result.CompanyId)" />
-        <InputSelect class="ii" @bind-Value="@result.CompanyId">
+        <InputSelect class="iselect" @bind-Value="@result.CompanyId">
             <option selected value="">Этот дивиденд какой компании?</option>
             @foreach (var i in model.Companies)
             {
                 <option value="@i.Id">@i.Name</option>
             }
         </InputSelect>
-        <div class="row">
-            <div class="col-12">Возможный идентификатор дивиденда: </div>
-        </div>
+
+        <RowTitleSub Color="Choice.Color.dark" Text="Возможный идентификатор дивиденда:"/>
+        
         <ValidationMessage For="@(() => result.IdentifierName)" />
-        <InputText class="ii" @bind-Value="@result.IdentifierName" />
-
-
-        <div class="row mt-3">
-            <div class="col">
-                <button type="submit" class="btn btn-sm btn-warning w-100 rounded-pill">Исправить</button>
-            </div>
-        </div>
+        <InputText @bind-Value="@result.IdentifierName" />
+        <ButtonSubmit Title="Исправить" Color="Choice.Button.warning" />
     </EditForm>
 </BaseError>
 

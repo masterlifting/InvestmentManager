@@ -5,6 +5,7 @@ app {
     flex-direction: column;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     color: antiquewhite;
+    font-size:13px;
 }
 
 .valid.modified:not([type=checkbox]) {

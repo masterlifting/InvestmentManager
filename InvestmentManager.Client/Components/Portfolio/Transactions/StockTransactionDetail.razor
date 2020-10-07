@@ -1,43 +1,36 @@
 ﻿@inject HttpClient httpClient
 
-@if (models is null)
-{
-    <div class="row my-2">
-        <div class="col">
-            @DefaultData.loading
-        </div>
-    </div>
-}
-else
-{
-    @foreach (var model in models)
-    {
-        string textColor = model.Status.Equals("Покупка") ? string.Intern("danger") : string.Intern("success");
+<div class="row icard-content">
+    <div class="col">
+        @foreach (var model in models)
+        {
+            string textColor = model.Status.Equals("Покупка") ? string.Intern("danger") : string.Intern("success");
 
-        <div class="row small text-@textColor">
-            <div class="col-5">
-                <div class="row">
-                    <div class="col-6 pr-0">@model.TickerName</div>
-                    <div class="col-6">@model.Status</div>
+            <div class="row small text-@textColor">
+                <div class="col-5">
+                    <div class="row">
+                        <div class="col-6 pr-0">@model.TickerName</div>
+                        <div class="col-6">@model.Status</div>
+                    </div>
+                </div>
+                <div class="col-1 px-0 text-center">@model.Quantity</div>
+                <div class="col-6">
+                    <div class="row">
+                        <div class="col-5">@model.Price</div>
+                        <div class="col-7 pl-0 text-right">@model.DateTransaction.ToShortDateString()</div>
+                    </div>
                 </div>
             </div>
-            <div class="col-1 px-0 text-center">@model.Quantity</div>
-            <div class="col-6">
-                <div class="row">
-                    <div class="col-5">@model.Price</div>
-                    <div class="col-7 pl-0 text-right">@model.DateTransaction.ToShortDateString()</div>
-                </div>
-            </div>
-        </div>
-    }
-    <CloseIcon CloseAction="CloseDetail" />
-}
+        }
+    </div>
+</div>
+<CloseIcon CloseAction="CloseDetail" />
 
 @code {
     [Parameter] public long CompanyId { get; set; }
     [Parameter] public EventCallback CloseDetail { get; set; }
 
-    IEnumerable<StockTransactionDetailModel> models;
+    IEnumerable<StockTransactionDetailModel> models = new List<StockTransactionDetailModel>();
 
     protected override async Task OnInitializedAsync()
     {

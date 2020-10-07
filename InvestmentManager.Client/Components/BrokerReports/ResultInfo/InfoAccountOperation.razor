@@ -1,35 +1,39 @@
-﻿<RowTitleSub Color="Choice.Color.warning" Text="Операции по счету" />
+﻿<RowTitleSub Text="Операции по счету" />
 
-<div class="row  border-bottom border-dark mx-1 text-info">
-    <div class="col-7 pl-0">
-        <div class="row">
-            <div class="col">Статус</div>
+<div class="row icard-content small">
+    <div class="col">
+        <div class="row text-info text-nowrap">
+            <div class="col-7">
+                <div class="row">
+                    <div class="col">Статус</div>
+                </div>
+            </div>
+            <div class="col-5">
+                <div class="row">
+                    <div class="col-6 px-0">Сумма</div>
+                    <div class="col-6 px-0 text-center">Дата</div>
+                </div>
+            </div>
         </div>
-    </div>
-    <div class="col-5">
-        <div class="row">
-            <div class="col-6 px-0">Сумма</div>
-            <div class="col-6 px-0 text-center">Дата</div>
-        </div>
+
+        @foreach (var transaction in AccountTransactions)
+        {
+            <div class="row text-@Color.ToString()">
+                <div class="col-7">
+                    <div class="row">
+                        <div class="col">@transaction.Status</div>
+                    </div>
+                </div>
+                <div class="col-5">
+                    <div class="row">
+                        <div class="col-6 px-0">@transaction.Amount</div>
+                        <div class="col-6 px-0 text-center">@transaction.DateOperation</div>
+                    </div>
+                </div>
+            </div>
+        }
     </div>
 </div>
-
-@foreach (var transaction in AccountTransactions)
-{
-    <div class="row  border-bottom border-dark mx-1 text-@Color.ToString()">
-        <div class="col-7 pl-0">
-            <div class="row">
-                <div class="col">@transaction.Status</div>
-            </div>
-        </div>
-        <div class="col-5">
-            <div class="row">
-                <div class="col-6 px-0">@transaction.Amount</div>
-                <div class="col-6 px-0 text-center">@transaction.DateOperation</div>
-            </div>
-        </div>
-    </div>
-}
 
 
 @code {

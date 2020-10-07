@@ -10,7 +10,7 @@
         Choice.Color profitColor = model.ProfitCurrent > 0 ? Choice.Color.success : Choice.Color.danger;
 
         <div class="container icard small">
-            <RowTitle Text="@model.CompanyName" Color="Choice.Color.warning"/>
+            <RowTitle Text="@model.CompanyName" Color="Choice.Color.warning" />
             @if (_companyId == model.CompanyId)
             {
                 <StockTransactionDetail CloseDetail="@CloseDetail" CompanyId="@model.CompanyId" />
@@ -18,9 +18,13 @@
             else
             {
                 <DetailIcon DetailAction="GetDetail" Value="@model.CompanyId.ToString()" />
-                <RowSingleInfo Title="Последняя операция:" Value="@model.DateLastTransaction.ToShortDateString()" />
-                <RowSingleInfo Title="Свободных лотов:" Value="@model.FreeLot.ToString()" Color="@lotColor" />
-                <RowSingleInfo Title="Текущий профит:" Value="@profit" Color="@profitColor" />
+                <div class="row icard-content">
+                    <div class="col">
+                        <RowSingleInfo Title="Последняя операция:" Value="@model.DateLastTransaction.ToShortDateString()" />
+                        <RowSingleInfo Title="Свободных лотов:" Value="@model.FreeLot.ToString()" Color="@lotColor" />
+                        <RowSingleInfo Title="Текущий профит:" Value="@profit" Color="@profitColor" />
+                    </div>
+                </div>
             }
 
 
@@ -29,7 +33,11 @@
                 string price = model.CurrencyId == 1
                     ? ((decimal)Math.Abs(model.ProfitCurrent) / model.FreeLot).ToString("C", new CultureInfo("en-US"))
                     : ((decimal)Math.Abs(model.ProfitCurrent) / model.FreeLot).ToString("C");
-                <RowSingleInfo Title="Взвешенная цена:" Value="@price" Color="Choice.Color.info"/>
+                <div class="row icard-content">
+                    <div class="col">
+                        <RowSingleInfo Title="Взвешенная цена:" Value="@price" Color="Choice.Color.info" />
+                    </div>
+                </div>
             }
         </div>
     }

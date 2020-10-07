@@ -3,9 +3,9 @@
 
 @foreach (var report in Reports)
 {
-    <div class="container invest_ReportCard">
+    <div class="container icard">
 
-        <RowTitle Position="Choice.Position.center" Color="Choice.Color.warning" Text="@report.AccountId" />
+        <RowTitle Color="Choice.Color.warning" Text="@report.AccountId" />
         @if (report.AccountTransactions.Any())
         {
             <InfoAccountOperation AccountTransactions="@report.AccountTransactions" />
@@ -33,11 +33,7 @@
 
         @if (report.AccountTransactions.Any() || report.StockTransactions.Any() || report.Comissions.Any() || report.Dividends.Any() || report.ExchangeRates.Any())
         {
-            <div class="row mt-3">
-                <div class="col">
-                    <button class="btn btn-sm btn-success w-100 rounded-pill" @onclick="@(()=> SaveData(report.AccountId, report))">Сохранить</button>
-                </div>
-            </div>
+            <ButtonAction Title="Сохранить" Color="Choice.Button.success" ClickAction="@(()=> SaveData(report.AccountId, report))" />
         }
     </div>
 }

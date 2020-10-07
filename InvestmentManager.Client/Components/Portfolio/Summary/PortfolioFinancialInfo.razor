@@ -1,17 +1,20 @@
 @inject HttpClient httpClient
 
 <RowTitleSub Text="Финансовые показатели" />
-
-<RowDoubleInfo Title="Общая стоимость в рублях" Value="@result.SummaryR" />
-<RowDoubleInfo Title="Чистые инвестиции" Value="@result.CleanInvestSum" />
-<RowDoubleInfo Title="Общая стоимость" Value="@result.Summary" />
-<RowDoubleInfo Title="Оборотная стоимость" Value="@result.CirculationSum" />
-<RowDoubleInfo Title="Cвободный остаток" Value="@result.FreeSum" Color="Choice.Color.success" />
-<RowDoubleInfo Title="Прибыльность" Value="@result.PercentProfit" Color="Choice.Color.warning"/>
-<RowDoubleInfo Title="Дивидендов" Value="@result.Dividends" Color="Choice.Color.success" />
-<RowDoubleInfo Title="Комиссий" Value="@result.Comissions" Color="Choice.Color.danger" />
-<RowDoubleInfo Title="Курс купленных $" Value="@result.AvgDollarBuy" />
-<RowDoubleInfo Title="Курс проданных $" Value="@result.AvgDollarSell" />
+<div class="row icard-content">
+    <div class="col">
+        <RowDoubleInfo Title="Общая стоимость в рублях" Value="@result.SummaryR" />
+        <RowDoubleInfo Title="Чистые инвестиции" Value="@result.CleanInvestSum" />
+        <RowDoubleInfo Title="Общая стоимость" Value="@result.Summary" />
+        <RowDoubleInfo Title="Оборотная стоимость" Value="@result.CirculationSum" />
+        <RowDoubleInfo Title="Cвободный остаток" Value="@result.FreeSum" Color="Choice.Color.success" />
+        <RowDoubleInfo Title="Прибыльность" Value="@result.PercentProfit" Color="Choice.Color.warning" />
+        <RowDoubleInfo Title="Дивидендов" Value="@result.Dividends" Color="Choice.Color.success" />
+        <RowDoubleInfo Title="Комиссий" Value="@result.Comissions" Color="Choice.Color.danger" />
+        <RowDoubleInfo Title="Курс купленных $" Value="@result.AvgDollarBuy" />
+        <RowDoubleInfo Title="Курс проданных $" Value="@result.AvgDollarSell" />
+    </div>
+</div>
 
 @code
 {

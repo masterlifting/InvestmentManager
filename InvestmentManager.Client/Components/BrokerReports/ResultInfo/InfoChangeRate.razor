@@ -1,37 +1,41 @@
-﻿<RowTitleSub Color="Choice.Color.warning" Text="Обмен валюты" />
+﻿<RowTitleSub Text="Обмен валюты" />
 
-<div class="row  border-bottom border-dark mx-1 text-info">
-    <div class="col-7 pl-0">
-        <div class="row">
-            <div class="col-8">Статус</div>
-            <div class="col-4">Курс</div>
+<div class="row icard-content small">
+    <div class="col">
+        <div class="row text-info text-nowrap">
+            <div class="col-7">
+                <div class="row">
+                    <div class="col-8">Статус</div>
+                    <div class="col-4">Курс</div>
+                </div>
+            </div>
+            <div class="col-5">
+                <div class="row">
+                    <div class="col-6">Кол-во</div>
+                    <div class="col-6 text-center">Дата</div>
+                </div>
+            </div>
         </div>
-    </div>
-    <div class="col-5">
-        <div class="row">
-            <div class="col-6 px-0">Кол-во</div>
-            <div class="col-6 px-0 text-center">Дата</div>
-        </div>
+
+        @foreach (var rate in ExchangeRates)
+        {
+            <div class="row text-@Color.ToString()">
+                <div class="col-7">
+                    <div class="row">
+                        <div class="col-8">@rate.Status</div>
+                        <div class="col-4">@rate.Rate</div>
+                    </div>
+                </div>
+                <div class="col-5">
+                    <div class="row">
+                        <div class="col-6">@rate.Quantity</div>
+                        <div class="col-6 text-center">@rate.DateOperation</div>
+                    </div>
+                </div>
+            </div>
+        }
     </div>
 </div>
-
-@foreach (var rate in ExchangeRates)
-{
-    <div class="row  border-bottom border-dark mx-1 text-@Color.ToString()">
-        <div class="col-7 pl-0">
-            <div class="row">
-                <div class="col-8">@rate.Status</div>
-                <div class="col-4">@rate.Rate</div>
-            </div>
-        </div>
-        <div class="col-5">
-            <div class="row">
-                <div class="col-6 px-0">@rate.Quantity</div>
-                <div class="col-6 px-0 text-center">@rate.DateOperation</div>
-            </div>
-        </div>
-    </div>
-}
 
 @code {
     [Parameter] public IEnumerable<BrokerExchangeRate> ExchangeRates { get; set; }

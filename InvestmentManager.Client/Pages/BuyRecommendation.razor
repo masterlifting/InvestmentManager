@@ -7,13 +7,23 @@
     {
         string lastPrice = r.CurrencyId == 2 ? r.LastPriceValue.ToString("C") : r.LastPriceValue.ToString("C", new CultureInfo("en-US"));
         string buyPrice = r.CurrencyId == 2 ? r.BuyPrice.ToString("C") : r.BuyPrice.ToString("C", new CultureInfo("en-US"));
-        Choice.Color color = r.IsRecommend ? Choice.Color.success : Choice.Color.danger;
+        Choice.Color color = Choice.Color.danger;
+        Choice.Color nameColor = Choice.Color.warning;
+        if (r.IsRecommend)
+        {
+            color = Choice.Color.success;
+            nameColor = Choice.Color.success;
+        }
 
         <div class="container icard small">
-            <RowTitle Text="@r.CompanyName"  Color="Choice.Color.warning"/>
-            <RowSingleInfo Title="Цена обновлена:" Value="@r.LastPriceDate" />
-            <RowSingleInfo Title="Последняя цена:" Value="@lastPrice" Color="Choice.Color.info" />
-            <RowSingleInfo Title="Покупать по:" Value="@buyPrice" Color="@color" />
+            <RowTitle Text="@r.CompanyName" Color="@nameColor" />
+            <div class="row icard-content">
+                <div class="col ">
+                    <RowSingleInfo Title="Цена обновлена:" Value="@r.LastPriceDate" />
+                    <RowSingleInfo Title="Последняя цена:" Value="@lastPrice" Color="Choice.Color.info" />
+                    <RowSingleInfo Title="Покупать по:" Value="@buyPrice" Color="@color" />
+                </div>
+            </div>
         </div>
     }
 }

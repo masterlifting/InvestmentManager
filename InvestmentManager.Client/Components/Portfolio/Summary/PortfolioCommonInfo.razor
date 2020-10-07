@@ -1,8 +1,11 @@
 ﻿@inject HttpClient httpClient
 
 <RowTitleSub Text="Общая информация" />
-
-<RowDoubleInfo Title="Моих компаний" Value="@result.CompanyCount" />
+<div class="row icard-content">
+    <div class="col">
+        <RowDoubleInfo Title="Моих компаний" Value="@result.CompanyCount" />
+    </div>
+</div>
 
 @code
 {
