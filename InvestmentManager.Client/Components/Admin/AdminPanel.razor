@@ -1,4 +1,4 @@
-﻿@inject HttpClient httpClient
+﻿@inject CustomHttpClient httpClient
 
 <AuthorizeView Roles="pestunov">
     <Authorized>
@@ -15,7 +15,7 @@
 
 @code
 {
-    async Task RecalculateAll() => await httpClient.GetAsync("admin/recalculateall");
-    async Task GetNewPrices() => await httpClient.GetAsync("admin/getnewprices");
-    async Task GetNewReports() => await httpClient.GetAsync("admin/getnewreports");
+    async Task RecalculateAll() => await httpClient.GetVoidAsync("admin/recalculateall", true);
+    async Task GetNewPrices() => await httpClient.GetVoidAsync("admin/getnewprices");
+    async Task GetNewReports() => await httpClient.GetVoidAsync("admin/getnewreports");
 }

@@ -9,7 +9,7 @@ using System.Security.Claims;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace InvestmentManager.Client.AuthConfiguration
+namespace InvestmentManager.Client.Services.AuthConfiguration
 {
     public class ApiAuthenticationStateProvider : AuthenticationStateProvider
     {

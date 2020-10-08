@@ -1,4 +1,5 @@
 ﻿using Blazored.LocalStorage;
+using InvestmentManager.Client.Services.NotificationService;
 using InvestmentManager.ViewModels.AuthenticationModels;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Net.Http;
@@ -7,33 +8,41 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace InvestmentManager.Client.AuthConfiguration
+namespace InvestmentManager.Client.Services.AuthConfiguration
 {
     public class AuthService : IAuthService
     {
         private readonly HttpClient httpClient;
         private readonly AuthenticationStateProvider authenticationStateProvider;
         private readonly ILocalStorageService localStorage;
+        private readonly Notification notification;
 
         public AuthService(
             HttpClient httpClient
             , AuthenticationStateProvider authenticationStateProvider
-            , ILocalStorageService localStorage)
+            , ILocalStorageService localStorage
+            , Notification notification)
         {
             this.httpClient = httpClient;
             this.authenticationStateProvider = authenticationStateProvider;
             this.localStorage = localStorage;
+            this.notification = notification;
         }
 
         public async Task<RegisterResult> RegisterAsync(RegisterModel model)
         {
+            notification.LoadStart();
             var response = await httpClient.PostAsJsonAsync("accounts", model).ConfigureAwait(false);
-            return JsonSerializer.Deserialize<RegisterResult>(await response.Content.ReadAsStringAsync().ConfigureAwait(false), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var result = JsonSerializer.Deserialize<RegisterResult>(await response.Content.ReadAsStringAsync().ConfigureAwait(false), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            notification.LoadStop();
+            return result;
         }
         public async Task<LoginResult> LoginAsync(LoginModel model)
         {
+            notification.LoadStart();
             var response = await httpClient.PostAsJsonAsync("login", model).ConfigureAwait(false);
             var result = JsonSerializer.Deserialize<LoginResult>(await response.Content.ReadAsStringAsync().ConfigureAwait(false), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            notification.LoadStop();
 
             if (!response.IsSuccessStatusCode)
                 return result;

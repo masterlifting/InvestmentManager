@@ -1,7 +1,7 @@
-﻿@inject HttpClient httpClient
-@inject IJSRuntime jsRuntime
-@inject NavigationManager navigationManager
+﻿@inject IJSRuntime jsRuntime
 @inject ILocalStorageService localStorage
+@inject CustomHttpClient httpClient
+@inject NavigationManager navigationManager
 @inject Notification notice
 
 <div class="container icard">
@@ -16,12 +16,12 @@
     <RowTitleSub Text="по итогам которого доступны" />
     <LinkSmartRoute Route="buyrecommendation" Name="Цены к покупке" Value="@result.BuyRecommendationCount" DetailAction="@(()=> notice.ShowInfo("Рекоммендации обновлены",result.BuyRecommendationDateUpdate))" />
     <RowTitleSub Text="а если" />
+    <LinkSmartRoute Name="Добавить транзакции" />
+    <RowTitleSub Text="или" />
     <LinkSmartAction LinkAction="@(async () => await ClickInputFileButtonAsync("inputButton"))" Name="Загрузить .xls отчеты от БКС" />
     <InputFile multiple OnChange="HandleSelectionAsync" id="inputButton" style="display:none" />
-    <RowTitleSub Text="или" />
-    <LinkSmartRoute Name="Добавить транзакции" />
     <RowTitleSub Text="то станут доступны" />
-    <LinkSmartAction LinkAction="@(async () => await CheckAccessAsync())" Name="Рекомендации к продаже"/>
+    <LinkSmartAction LinkAction="@(async () => await CheckAccessAsync())" Name="Рекомендации к продаже" />
 </div>
 
 @code
@@ -29,16 +29,17 @@
     IndexModel result = new IndexModel();
     ClaimsPrincipal user;
     [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; }
-    HttpResponseMessage response;
 
     protected override async Task OnInitializedAsync()
     {
-        result = await httpClient.GetFromJsonAsync<IndexModel>("index");
+        result = await httpClient.GetResultAsync<IndexModel>("index");
         user = (await AuthenticationState).User;
     }
 
     async Task HandleSelectionAsync(IFileListEntry[] files)
     {
+        notice.LoadStart();
+
         if (files != null)
         {
             var content = new MultipartFormDataContent();
@@ -50,19 +51,19 @@
                 ms.Close();
             }
 
-            response = await httpClient.PostAsync("portfolio/bcsreports", content);
-            var reportModel = JsonSerializer.Deserialize<BrokerReportModel>
-                (
-                    await response.Content.ReadAsStringAsync().ConfigureAwait(false)
-                    , new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
-                );
-
+            var response = await httpClient.PostContentAsync("portfolio/bcsreports", content).ConfigureAwait(false);
             content.Dispose();
 
             if (response.IsSuccessStatusCode)
             {
+                var reportModel = JsonSerializer.Deserialize<BrokerReportModel>(await response.Content.ReadAsStringAsync().ConfigureAwait(false), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                 await localStorage.SetItemAsync<BrokerReportModel>($"{user.Identity.Name}_bcsReport", reportModel).ConfigureAwait(false);
                 navigationManager.NavigateTo("brokerreports");
+            }
+            else
+            {
+                notice.LoadStop();
+                await notice.NoticeFailedAsync("Не удалось загрузить отчеты.");
             }
         }
     }

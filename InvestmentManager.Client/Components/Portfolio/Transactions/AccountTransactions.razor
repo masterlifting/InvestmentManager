@@ -1,5 +1,6 @@
 ﻿@page "/accounttransactions"
-@inject HttpClient httpClient
+@inject CustomHttpClient httpClient
+@inject Notification notice
 
 @if (models != null)
 {
@@ -24,10 +25,14 @@
             </div>
         </div>
     }
+    notice.LoadStop();
 }
 
 @code {
     IEnumerable<AccountTransactionModel> models;
-    protected override async Task OnInitializedAsync() =>
-        models = await httpClient.GetFromJsonAsync<IEnumerable<AccountTransactionModel>>("transaction/accounttransactions");
+    protected override async Task OnInitializedAsync()
+    {
+        notice.LoadStart();
+        models = await httpClient.GetResultAsync<IEnumerable<AccountTransactionModel>>("transaction/accounttransactions");
+    }
 }

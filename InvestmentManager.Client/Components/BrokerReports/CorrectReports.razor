@@ -1,4 +1,5 @@
-﻿@inject HttpClient httpClient
+﻿@inject CustomHttpClient httpClient
+@inject Notification notice
 
 
 @foreach (var report in Reports)
@@ -43,9 +44,12 @@
 
     async Task SaveData(string accountId, CorrectBrokerReport report)
     {
-        var response = await httpClient.PostAsJsonAsync<string>("portfolio/savereports", accountId);
-
-        if (response.IsSuccessStatusCode)
+        if (await httpClient.PostBoolAsync("portfolio/savereports", accountId))
+        {
             await Task.Run(() => Reports.Remove(report));
+            await notice.NoticeSuccesAsync();
+        }
+        else
+            await notice.NoticeFailedAsync();
     }
 }

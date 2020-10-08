@@ -1,5 +1,6 @@
 ﻿@page "/buyrecommendation"
-@inject HttpClient httpClient
+@inject CustomHttpClient httpClient
+@inject Notification notice
 
 @if (Recommendations != null)
 {
@@ -26,10 +27,15 @@
             </div>
         </div>
     }
+    notice.LoadStop();
 }
 
 @code {
     IEnumerable<BuyRecommendationModel> Recommendations;
-    protected override async Task OnInitializedAsync() =>
-        Recommendations = await httpClient.GetFromJsonAsync<IEnumerable<BuyRecommendationModel>>("recommendation/buyr");
+
+    protected override async Task OnInitializedAsync()
+    {
+        notice.LoadStart();
+        Recommendations = await httpClient.GetResultAsync<IEnumerable<BuyRecommendationModel>>("recommendation/buyr");
+    }
 }

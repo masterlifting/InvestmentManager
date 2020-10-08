@@ -1,5 +1,6 @@
 ﻿@page "/sellrecommendation"
-@inject HttpClient httpClient
+@inject CustomHttpClient httpClient
+@inject Notification notice
 
 
 <AuthorizeView>
@@ -63,6 +64,7 @@
                     }
                 </div>
             }
+            notice.LoadStop();
         }
     </Authorized>
 </AuthorizeView>
@@ -71,8 +73,11 @@
     long _companyId = 0;
 
     IEnumerable<SellRecommendationModel> Recommendations;
-    protected override async Task OnInitializedAsync() =>
-    Recommendations = await httpClient.GetFromJsonAsync<IEnumerable<SellRecommendationModel>>("recommendation/sellr");
+    protected override async Task OnInitializedAsync()
+    {
+        notice.LoadStart();
+        Recommendations = await httpClient.GetResultAsync<IEnumerable<SellRecommendationModel>>("recommendation/sellr");
+    }
     void GetDetail(string companyId) => _companyId = long.Parse(companyId);
     void CloseDetail() => _companyId = 0;
 }

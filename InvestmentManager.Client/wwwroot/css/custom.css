@@ -37,7 +37,7 @@
 /*#endregion */
 /*#region Route */
 a {
-    color: steelblue;
+    color: powderblue;
     text-decoration: none;
     border: none;
     user-select: none;
@@ -52,7 +52,7 @@ a {
     }
 
 .ilink {
-    color: steelblue;
+    color: powderblue;
     text-decoration: none;
     border: none;
     user-select: none;
@@ -227,7 +227,6 @@ input {
     border: none;
     user-select: none;
     text-decoration: none;
-    text-shadow: 0 1px rgba(255,255,255,.2), 0 -1px rgba(0,0,0,.8);
     box-shadow: inset rgba(0,0,0,.6) 0 -2px 5px, inset rgba(252,255,255,.7) 0 2px 5px, rgba(0,0,0,.8) 0 2px 5px -1px;
 }
 
@@ -245,6 +244,10 @@ input {
 
 .inotice-danger {
     background: darkred radial-gradient(150% 100% at 50% 5px, rgba(255,255,255,.2), rgba(0,0,0,0));
+}
+
+.inotice-secondary {
+    background: lightslategrey radial-gradient(150% 100% at 50% 5px, rgba(255,255,255,.2), rgba(0,0,0,0));
 }
 /*#endregion */
 /*#region Text */

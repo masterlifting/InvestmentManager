@@ -1,4 +1,4 @@
-﻿@inject HttpClient httpClient
+﻿@inject CustomHttpClient httpClient
 @using System.Text.RegularExpressions
 
 <BaseError Title="@Title" IsDone="@isDone" ErrorValue="@ErrorValue">
@@ -14,8 +14,8 @@
             }
         </InputSelect>
 
-        <RowTitleSub Color="Choice.Color.dark" Text="Возможный идентификатор дивиденда:"/>
-        
+        <RowTitleSub Color="Choice.Color.dark" Text="Возможный идентификатор дивиденда:" />
+
         <ValidationMessage For="@(() => result.IdentifierName)" />
         <InputText @bind-Value="@result.IdentifierName" />
         <ButtonSubmit Title="Исправить" Color="Choice.Button.warning" />
@@ -31,15 +31,11 @@
     DividendErrorResultModel result;
     bool isDone = false;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
         result = new DividendErrorResultModel { IdentifierName = Regex.Match(ErrorValue.Split('\'')[1], @", (\w*), налог").Groups[1].Value };
-        model = await httpClient.GetFromJsonAsync<DividendErrorModel>("error/dividenderror");
+        model = await httpClient.GetResultAsync<DividendErrorModel>("error/dividenderror");
     }
 
-    async Task SendData()
-    {
-        isDone = true;
-        var response = await httpClient.PostAsJsonAsync<DividendErrorResultModel>("error/dividenderror", result);
-    }
+    async Task SendData() => isDone = await httpClient.PostBoolAsync("error/dividenderror", result, true);
 }

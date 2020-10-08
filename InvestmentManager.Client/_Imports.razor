@@ -12,7 +12,8 @@
 @using InvestmentManager.Client.Components.BrokerReports
 @using InvestmentManager.Client.Components.BrokerReports.ResultInfo
 @using InvestmentManager.Client.Components.BrokerReports.ErrorInfo
-@using InvestmentManager.Client.NotificationService
+@using InvestmentManager.Client.Services.NotificationService
+@using InvestmentManager.Client.Services.HttpService
 @using InvestmentManager.Client.ChoiceModel
 
 @using System.Net.Http
@@ -23,7 +24,7 @@
 @using Microsoft.AspNetCore.Authorization.Infrastructure
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Authorization
-@using InvestmentManager.Client.AuthConfiguration
+@using InvestmentManager.Client.Services.AuthConfiguration
 @using InvestmentManager.Client.Components.Authentication
 @using System.Security.Claims
 

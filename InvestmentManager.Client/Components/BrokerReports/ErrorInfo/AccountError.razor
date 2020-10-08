@@ -1,4 +1,4 @@
-﻿@inject HttpClient httpClient
+﻿@inject CustomHttpClient httpClient
 
 <BaseError Title="@Title" IsDone="@isDone" ErrorValue="@ErrorValue">
     <EditForm Model="@result" OnValidSubmit="SendData">
@@ -16,14 +16,11 @@
     AccountErrorResultModel result;
     bool isDone = false;
 
-    protected override void OnInitialized()
+    protected override void OnParametersSet()
     {
+        base.OnParametersSet();
         result = new AccountErrorResultModel { AccountName = ErrorValue.Split('\'')[1] };
     }
 
-    async Task SendData()
-    {
-        isDone = true;
-        var response = await httpClient.PostAsJsonAsync<AccountErrorResultModel>("error/accounterror", result);
-    }
+    async Task SendData() => isDone = await httpClient.PostBoolAsync("error/accounterror", result, true);
 }

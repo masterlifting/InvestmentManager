@@ -2,8 +2,9 @@ using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Blazored.LocalStorage;
-using InvestmentManager.Client.AuthConfiguration;
-using InvestmentManager.Client.NotificationService;
+using InvestmentManager.Client.Services.AuthConfiguration;
+using InvestmentManager.Client.Services.HttpService;
+using InvestmentManager.Client.Services.NotificationService;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,6 +23,7 @@ namespace InvestmentManager.Client
             builder.Services.AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>();
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<Notification>();
+            builder.Services.AddScoped<CustomHttpClient>();
 
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 

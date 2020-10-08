@@ -1,5 +1,6 @@
 ﻿@page "/financialreportsform"
-@inject HttpClient httpClient
+@inject CustomHttpClient httpClient
+@inject Notification notice
 
 <div class="container">
     <div class="row justify-content-center">
@@ -81,22 +82,27 @@
 @code {
     List<NewCompanyReportModel> newReports = new List<NewCompanyReportModel>();
 
-    protected override async Task OnInitializedAsync()
-    {
-        newReports = await httpClient.GetFromJsonAsync<List<NewCompanyReportModel>>("admin/getreports");
-    }
+    protected override async Task OnParametersSetAsync() => newReports = await httpClient.GetResultAsync<List<NewCompanyReportModel>>("admin/getreports");
 
     async Task DeleteReport(NewReportModel report, string companyName)
     {
-        var response = await httpClient.PostAsJsonAsync<long>("admin/deletereport", report.ReportId);
-        if (response.IsSuccessStatusCode)
+        if (await httpClient.PostBoolAsync("admin/deletereport", report.ReportId))
+        {
             await DeleteReportNodeAsync(report, companyName);
+            await notice.NoticeSuccesAsync("Отчет удален", 700);
+        }
+        else
+            await notice.NoticeFailedAsync();
     }
     async Task SaveReport(NewReportModel report, string companyName)
     {
-        var response = await httpClient.PostAsJsonAsync<NewReportModel>("admin/savereport", report);
-        if (response.IsSuccessStatusCode)
+        if (await httpClient.PostBoolAsync<NewReportModel>("admin/savereport", report))
+        {
             await DeleteReportNodeAsync(report, companyName);
+            await notice.NoticeSuccesAsync("Отчет сохранен", 700);
+        }
+        else
+            await notice.NoticeFailedAsync();
     }
     async Task DeleteReportNodeAsync(NewReportModel report, string companyName) =>
         await Task.Run(() => { newReports.FirstOrDefault(x => x.CompanyName.Equals(companyName)).Reports.Remove(report); });

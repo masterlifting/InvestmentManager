@@ -1,5 +1,5 @@
 ﻿@page "/"
-@inject HttpClient httpClient
+@inject CustomHttpClient httpClient
 
     <div class="container-fluid icard">
         <div class="row">
@@ -40,7 +40,7 @@
 
         protected override async Task OnInitializedAsync()
         {
-            rate = await httpClient.GetFromJsonAsync<CBRF>("outside/getrate");
+            rate = await httpClient.GetResultAsync<CBRF>("outside/getrate");
             dollar = rate.Valute.USD.Value;
         }
     }

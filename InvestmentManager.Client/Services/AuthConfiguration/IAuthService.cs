@@ -1,7 +1,7 @@
 ﻿using InvestmentManager.ViewModels.AuthenticationModels;
 using System.Threading.Tasks;
 
-namespace InvestmentManager.Client.AuthConfiguration
+namespace InvestmentManager.Client.Services.AuthConfiguration
 {
     public interface IAuthService
     {

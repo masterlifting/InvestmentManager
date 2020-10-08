@@ -1,4 +1,4 @@
-﻿@inject HttpClient httpClient
+﻿@inject CustomHttpClient httpClient
 
 <div class="row icard-content">
     <div class="col">
@@ -34,6 +34,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        models = await httpClient.GetFromJsonAsync<IEnumerable<StockTransactionDetailModel>>($"transaction/getstocktransactiondetail?companyId={CompanyId}");
+        models = await httpClient.GetResultAsync<IEnumerable<StockTransactionDetailModel>>($"transaction/getstocktransactiondetail?companyId={CompanyId}", true);
     }
 }

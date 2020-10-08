@@ -1,5 +1,6 @@
 ﻿@page "/stocktransactions"
-@inject HttpClient httpClient
+@inject CustomHttpClient httpClient
+@inject Notification notice
 
 @if (models != null)
 {
@@ -41,13 +42,17 @@
             }
         </div>
     }
+    notice.LoadStop();
 }
 
 @code {
     long _companyId = 0;
     IEnumerable<StockTransactionModel> models;
-    protected override async Task OnInitializedAsync() =>
-        models = await httpClient.GetFromJsonAsync<IEnumerable<StockTransactionModel>>("transaction/getstocktransactions");
+    protected override async Task OnInitializedAsync()
+    {
+        notice.LoadStart();
+        models = await httpClient.GetResultAsync<IEnumerable<StockTransactionModel>>("transaction/getstocktransactions");
+    }
     void GetDetail(string companyId) => _companyId = long.Parse(companyId);
     void CloseDetail() => _companyId = 0;
 }
