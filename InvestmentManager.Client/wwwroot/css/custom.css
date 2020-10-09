@@ -163,7 +163,7 @@ a {
         box-shadow: inset rgba(0,0,0,1) 0 1px 3px, inset rgba(0,0,0,.6) 0 -2px 5px, inset rgba(252,255,255,.7) 0 2px 5px, 0 1px rgba(255,255,255,.08);
     }
 
-    .btn, .ibtn-danger:active, .ibtn-success:focus {
+    .btn, .ibtn-danger:active, .ibtn-danger:focus {
         outline: none;
     }
 
@@ -180,7 +180,7 @@ a {
         box-shadow: inset rgba(0,0,0,1) 0 1px 3px, inset rgba(0,0,0,.6) 0 -2px 5px, inset rgba(252,255,255,.7) 0 2px 5px, 0 1px rgba(255,255,255,.08);
     }
 
-    .btn, .ibtn-warning:active, .ibtn-success:focus {
+    .btn, .ibtn-warning:active, .ibtn-warning:focus {
         outline: none;
     }
 
@@ -248,11 +248,5 @@ input {
 
 .inotice-secondary {
     background: lightslategrey radial-gradient(150% 100% at 50% 5px, rgba(255,255,255,.2), rgba(0,0,0,0));
-}
-/*#endregion */
-/*#region Text */
-.ilabel {
-    align-self: center;
-    text-align: right;
 }
 /*#endregion */

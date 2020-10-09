@@ -3,20 +3,15 @@
 @inject Notification notice
 @attribute [Authorize]
 
-@if (ReportModel.CorrectReports.Any())
-{
-    <CorrectReports Reports="@ReportModel.CorrectReports.ToList()" />
-}
-
 @if (ReportModel.ReportErrors.Any())
 {
     <ReportErrors Errors="@ReportModel.ReportErrors" />
 }
-
-@if(!ReportModel.CorrectReports.Any() && !ReportModel.ReportErrors.Any())
+else if (ReportModel.CorrectReports.Any())
 {
-    <RowTitle Position="Choice.Position.center" Color="Choice.Color.primary" Text="Новые данные отсутствуют." />
+    <CorrectReports Reports="@ReportModel.CorrectReports.ToList()" />
 }
+
 
 @code
 {

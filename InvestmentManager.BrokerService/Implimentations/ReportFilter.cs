@@ -51,7 +51,7 @@ namespace InvestmentManager.BrokerService.Implimentations
             var result = new List<T>();
 
             // получаю коллекцию из базы по этому типу транзакции и аккаунту
-            var dbTransactions = context.Set<T>().AsEnumerable().Where(x => x.AccountId == accountId).GroupBy(x => x.DateOperation).OrderBy(x => x.Key);
+            var dbTransactions = context.Set<T>().Where(x => x.AccountId == accountId).AsEnumerable().GroupBy(x => x.DateOperation).OrderBy(x => x.Key);
             // получаю выборку из входящей коллекции по этому аккаунту
             var incomeTransactions = transactions.Where(x => x.AccountId == accountId).GroupBy(x => x.DateOperation).OrderBy(x => x.Key).ToList();
             // Обе коллекции были сгруппированы и отсортированы по дате операции
@@ -62,15 +62,15 @@ namespace InvestmentManager.BrokerService.Implimentations
                 foreach (var i in dbTransactions)
                 {
                     // получаю дату группы коллекции из БД
-                    DateTime dbDateOperation = i.Key.Date;
+                    DateTime dbDateOperation = i.Key;
 
                     for (int j = 0; j < incomeTransactions.Count; j++)
                     {
                         // получаю дату группы пришедшей коллекции
-                        DateTime incomeDateOperation = incomeTransactions[j].Key.Date;
+                        DateTime incomeDateOperation = incomeTransactions[j].Key;
 
                         // Если даты групп совпадают и колличество операций за эту дату совпадает, то удаляю совпадение из входящей сгруппированой коллекции по этому аккаунту
-                        if (incomeDateOperation.Equals(dbDateOperation) && incomeTransactions[j].Count().Equals(i.Count()))
+                        if (incomeDateOperation == dbDateOperation && incomeTransactions[j].Count() == i.Count())
                         {
                             incomeTransactions.RemoveAt(j);
                             j--;
