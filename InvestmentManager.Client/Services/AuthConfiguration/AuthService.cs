@@ -48,7 +48,7 @@ namespace InvestmentManager.Client.Services.AuthConfiguration
                 return result;
 
             await localStorage.SetItemAsync("authToken", result.Token).ConfigureAwait(false);
-            ((ApiAuthenticationStateProvider)authenticationStateProvider).MarkUserAsAuthenticated(model.Email);
+            ((ApiAuthenticationStateProvider)authenticationStateProvider).MarkUserAsAuthenticated(model?.Email);
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", result.Token);
 
             return result;

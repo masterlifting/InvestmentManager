@@ -1,0 +1,21 @@
+﻿@page "/companylist"
+@inject CustomHttpClient httpClient
+
+<div class="container icard">
+    @foreach (var i in Companies)
+    {
+        <div class="row icard-content">
+            <div class="col-md-1 col-2 text-center">
+                @i.Id
+            </div>
+            <div class="col-md-11 col-10">
+                @i.Name
+            </div>
+        </div>
+    }
+</div>
+
+@code{
+    List<CompanyViewModel> Companies = new List<CompanyViewModel>();
+    protected override async Task OnInitializedAsync() => Companies = await httpClient.GetResultAsync<List<CompanyViewModel>>("companies").ConfigureAwait(false);
+}

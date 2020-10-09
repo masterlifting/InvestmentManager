@@ -44,7 +44,7 @@ namespace InvestmentManager.Client.Services.AuthConfiguration
 
                 if (roles != null)
                 {
-                    if (roles.ToString().Trim().StartsWith("["))
+                    if (roles.ToString().Trim().StartsWith("[", StringComparison.OrdinalIgnoreCase))
                     {
                         var parsedRoles = JsonSerializer.Deserialize<string[]>(roles.ToString());
 

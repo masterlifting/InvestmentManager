@@ -198,7 +198,7 @@ namespace InvestmentManager.Server.Controllers
                     var newPrice = await priceService.GetPriceListAsync(i.ProviderName, i.TickerId, i.Ticker, i.ProviderUri).ConfigureAwait(false);
                     newPricies.AddRange(newPrice);
                 }
-                catch (HttpRequestException ex)
+                catch
                 {
                     continue;
                 }
