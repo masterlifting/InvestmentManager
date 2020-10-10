@@ -1,11 +1,17 @@
 ﻿<div class="row mt-2">
     <div class="col">
-        <button type="button"  @onclick="ClickAction" class="ibtn ibtn-@Color.ToString()">@Title</button>
+        <button type="button" @onclick="ClickAction" class="@buttonColor">@Title</button>
     </div>
 </div>
 
 @code{
+    string buttonColor;
     [Parameter] public string Title { get; set; }
     [Parameter] public Choice.Button Color { get; set; }
     [Parameter] public EventCallback ClickAction { get; set; }
+    protected override void OnInitialized()
+    {
+        buttonColor = $"i{Color}";
+        base.OnInitialized();
+    }
 }

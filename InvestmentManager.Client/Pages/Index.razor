@@ -1,46 +1,57 @@
 ﻿@page "/"
 @inject CustomHttpClient httpClient
+@inject NavigationManager navigationManager
+@inject Notification notice
 
-    <div class="container-fluid icard">
-        <div class="row">
-            <div class="col text-center text-warning">Alpha version!</div>
-        </div>
-    </div>
+<LinkSmartAction Name="This test version by Blazor" LinkAction="CheckAdminRole" Position="Choice.Position.center" />
 
-    <div class="container icard">
-        <div class="row">
-            <div class="col-8"><span class="oi oi-dollar" aria-hidden="true"></span> сегодня:</div>
-            @if (dollar.HasValue)
-            {
-                <div class="col-4 text-right font-weight-bold text-danger">@dollar.Value.ToString("C")</div>
-            }
-            else
-            {
-                <text>@DefaultData.loading</text>
-            }
-        </div>
-    </div>
-
-
-    <MainInfo />
-
-    @if (dollar.HasValue)
-    {
-        <PortfolioSummaryInfo Dollar="@dollar.Value" />
-    }
-
-    <PortfolioTransactionsInfo />
-
-    <AdminPanel />
-
-    @code
-{
-        decimal? dollar;
-        CBRF rate;
-
-        protected override async Task OnInitializedAsync()
+<div class="container idark iframe">
+    <div class="row">
+        <div class="col-8"><span class="oi oi-dollar" aria-hidden="true"></span> сегодня:</div>
+        @if (dollar.HasValue)
         {
-            rate = await httpClient.GetResultAsync<CBRF>("outside/getrate");
-            dollar = rate.Valute.USD.Value;
+            <div class="col-4 text-right font-weight-bold text-danger">@dollar.Value.ToString("C")</div>
         }
+        else
+        {
+            <text>@DefaultData.loading</text>
+        }
+    </div>
+</div>
+
+
+<MainInfo />
+
+@if (dollar.HasValue)
+{
+    <PortfolioSummaryInfo Dollar="@dollar.Value" />
+}
+
+<PortfolioTransactionsInfo />
+
+<AdminPanel />
+
+@code
+{
+    decimal? dollar;
+    CBRF rate;
+
+    ClaimsPrincipal user;
+    [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = (await AuthenticationState).User;
+
+        rate = await httpClient.GetResultAsync<CBRF>("outside/getrate");
+        dollar = rate.Valute.USD.Value;
     }
+    async Task CheckAdminRole()
+    {
+        if (user.Identity.IsAuthenticated)
+            navigationManager.NavigateTo("homepage");
+        else
+            await notice.NoticeAccessAsync("A new architecture is creating...");
+
+    }
+}

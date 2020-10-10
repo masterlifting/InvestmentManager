@@ -10,12 +10,12 @@ app {
 
 .valid.modified:not([type=checkbox]) {
     border-radius: 25px;
-    border: 1px solid darkgreen;
+    border: 2px solid darkgreen;
 }
 
 .invalid {
     border-radius: 25px;
-    border: 1px solid darkred;
+    border: 2px solid darkred;
 }
 
 .validation-message {

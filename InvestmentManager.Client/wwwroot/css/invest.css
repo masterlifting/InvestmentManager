@@ -1,0 +1,164 @@
+﻿/*#region Main */
+* {
+    border: 0;
+    outline: none;
+    text-decoration: none;
+}
+
+    *, *:active, *:focus {
+        outline: none;
+    }
+
+.iframe-main {
+    background-color: aliceblue;
+    height: calc(100vh - 3rem);
+    overflow: auto;
+}
+
+    .iframe-main * {
+        border-radius: 25px;
+    }
+
+.iframe {
+    margin-bottom: 1em;
+    margin-top: 1em;
+    padding: 1em;
+    box-shadow: 7px 7px 25px 7px rgba(20, 20, 20, 0.9),inset rgba(24,24,24,.6) 0 -2px 5px, inset rgba(252,255,255,.7) 0 2px 5px, rgba(24,24,24,.8) 0 2px 5px -1px;
+}
+
+.icontent {
+    padding: 0.5em 0.3em;
+    margin: 0.4em;
+    text-shadow: 0 1px rgba(255,255,255,.2), 0 -1px rgba(0,0,0,.8);
+    box-shadow: inset 3px 3px 5px 3px rgba(20, 20, 20, 0.7);
+}
+/*#endregion */
+/*#region Route */
+a {
+    color: powderblue;
+    text-decoration: none;
+}
+
+    a:hover {
+        color: aqua;
+    }
+
+    a:active {
+        font-weight: bold;
+        box-shadow: inset rgba(0,0,0,1) 0 1px 3px, inset rgba(0,0,0,.6) 0 -2px 5px, inset rgba(252,255,255,.7) 0 2px 5px, 0 1px rgba(255,255,255,.08);
+    }
+
+.ilink {
+    color: powderblue;
+    cursor: pointer;
+    padding: 0.1em 1em;
+}
+
+    .ilink:hover {
+        color: aqua;
+    }
+
+    .ilink:active {
+        font-weight: bold;
+        box-shadow: inset rgba(0,0,0,1) 0 1px 3px, inset rgba(0,0,0,.6) 0 -2px 5px, inset rgba(252,255,255,.7) 0 2px 5px, 0 1px rgba(255,255,255,.08);
+    }
+/*#endregion */
+/*#region Color */
+.isuccess {
+    background: darkgreen radial-gradient(150% 100% at 50% 5px, rgba(255,255,255,.2), rgba(255,255,255,.17));
+}
+
+.iwarning {
+    background: darkgoldenrod radial-gradient(150% 100% at 50% 5px, rgba(255,255,255,.2), rgba(255,255,255,.17));
+}
+
+.idanger {
+    background: darkred radial-gradient(150% 100% at 50% 5px, rgba(255,255,255,.2), rgba(255,255,255,.17));
+}
+
+.iinfo {
+    background: darkcyan radial-gradient(150% 100% at 50% 5px, rgba(255,255,255,.2), rgba(255,255,255,.17));
+}
+
+.idark {
+    background: rgb(0,0,0) radial-gradient(150% 100% at 50% 5px, rgba(255,255,255,.2), rgba(255,255,255,.17));
+}
+
+.isecodary {
+    background: lightslategrey radial-gradient(150% 100% at 50% 5px, rgba(255,255,255,.2), rgba(255,255,255,.17));
+}
+/*#endregion */
+/*#region Button */
+button {
+    color: antiquewhite;
+    width: 100%;
+    height: 2.5em;
+    line-height: 2.5em;
+    text-align: center;
+    transition: background 0.3s ease;
+}
+
+    button:hover {
+        color: black;
+        background: antiquewhite radial-gradient(150% 100% at 50% 5px, rgba(255,255,255,.2), rgba(255,255,255,.17));
+    }
+
+    button:active {
+        box-shadow: inset rgba(0,0,0,1) 0 1px 3px, inset rgba(0,0,0,.6) 0 -2px 5px, inset rgba(252,255,255,.7) 0 2px 5px, 0 1px rgba(255,255,255,.08);
+    }
+
+    button, button:active, button:focus {
+        outline: none;
+    }
+/*#endregion */
+/*#region Rounded */
+.irounded {
+    border-radius: 25px;
+}
+
+.irounded-top {
+    border-top-left-radius: 25px;
+    border-top-right-radius: 25px;
+}
+
+.irounded-bottom {
+    border-bottom-left-radius: 25px;
+    border-bottom-right-radius: 25px;
+}
+/*#endregion */
+/*#region 3D */
+.iconvex {
+    text-shadow: 0 1px rgba(255,255,255,.2), 0 -1px rgba(0,0,0,.8);
+    box-shadow: inset rgba(24,24,24,.6) 0 -2px 5px, inset rgba(252,255,255,.7) 0 2px 5px, rgba(24,24,24,.8) 0 2px 5px -1px;
+}
+
+.idepressed {
+    text-shadow: 0 1px rgba(255,255,255,.2), 0 -1px rgba(0,0,0,.8);
+    box-shadow: inset 3px 3px 5px 3px rgba(20, 20, 20, 0.7);
+}
+
+.iactive:active {
+    box-shadow: inset rgba(0,0,0,1) 0 1px 3px, inset rgba(0,0,0,.6) 0 -2px 5px, inset rgba(252,255,255,.7) 0 2px 5px, 0 1px rgba(255,255,255,.08);
+}
+/*#endregion */
+/*#region Enter */
+input {
+    width: 100%;
+    margin: 2px 0px;
+    padding: 7px 10px;
+    justify-self: center;
+    color: rgb(24,24,24);
+    background-color: aliceblue;
+    box-shadow: inset 3px 3px 5px 3px rgba(20, 20, 20, 0.7);
+}
+
+select {
+    color: antiquewhite;
+    width: 100%;
+    height: 2.5em;
+    line-height: 2.5em;
+    padding-left: 1em;
+    background: rgb(24,24,24) radial-gradient(150% 100% at 50% 5px, rgba(255,255,255,.2), rgba(255,255,255,.17));
+    box-shadow: inset rgba(24,24,24,.6) 0 -2px 10px, inset rgba(252,255,255,.7) 0 2px 10px;
+}
+/*#endregion */

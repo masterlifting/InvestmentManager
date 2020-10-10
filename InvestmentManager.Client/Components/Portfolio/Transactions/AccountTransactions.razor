@@ -6,9 +6,9 @@
 {
     foreach (var account in models.GroupBy(x => x.Account))
     {
-        <div class="container icard small">
+        <div class="container idark iframe small">
             <RowTitle Color="Choice.Color.warning" Text="@account.Key" />
-            <div class="row icard-content">
+            <div class="row icontent">
                 <div class="col">
                     @foreach (var model in account)
                     {

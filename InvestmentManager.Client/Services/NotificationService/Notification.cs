@@ -16,7 +16,7 @@ namespace InvestmentManager.Client.Services.NotificationService
 
         public void ShowInfo(string title, string message)
         {
-            Info.ColorBg = string.Intern(Choice.Color.info.ToString());
+            Info.ColorBg = string.Intern("i"+Choice.Color.info.ToString());
             Info.Title = title;
             Info.Message = message;
             Info.Visible = true;
@@ -34,7 +34,7 @@ namespace InvestmentManager.Client.Services.NotificationService
 
         private async Task GetNoticeAsync(Choice.Color color, string message, int delay)
         {
-            Notice.ColorBg = string.Intern(color.ToString());
+            Notice.ColorBg = string.Intern("i"+color.ToString());
             Notice.Message = message;
             Notice.Visible = true;
             NotifyStateChanged();

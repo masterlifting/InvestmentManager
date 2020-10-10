@@ -1,9 +1,10 @@
-﻿<div class="row p-2">
-    <div class="col col-md-5 ilink py-2" @onclick="LinkAction">@Name</div>
+﻿<div class="row p-2 justify-content-@Position.ToString()">
+    <div class="col col-md-5 ilink iconvex py-2" @onclick="LinkAction">@Name</div>
 </div>
 
 @code {
 
     [Parameter] public string Name { get; set; }
     [Parameter] public EventCallback LinkAction { get; set; }
+    [Parameter] public Choice.Position Position { get; set; }
 }

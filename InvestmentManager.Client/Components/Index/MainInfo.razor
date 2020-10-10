@@ -4,7 +4,7 @@
 @inject NavigationManager navigationManager
 @inject Notification notice
 
-<div class="container icard">
+<div class="container idark iframe ">
     <RowTitle Text="Общая информация" />
     <RowTitleSub Text="Накоплены следующие данные" />
     <LinkSmartRoute Route="companylist" Name="Копаний" Value="@result.CompanyCount" DetailAction="@(() => notice.ShowInfo("Компании обновлены",result.CompanyDateUpdate))" />

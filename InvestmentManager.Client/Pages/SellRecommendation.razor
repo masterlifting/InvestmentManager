@@ -16,7 +16,7 @@
                 string lastPrice = r.CurrencyId == 2 ? r.LastPriceValue.ToString("C") : r.LastPriceValue.ToString("C", new CultureInfo("en-US"));
                 Choice.Color nameColor = r.IsRecommendMin || r.IsRecommendMid || r.IsRecommendMax ? Choice.Color.success : Choice.Color.warning;
 
-                <div class="container icard small">
+                <div class="container idark iframe small">
 
                     <RowTitle Color="@nameColor" Text="@r.CompanyName" />
 
@@ -27,7 +27,7 @@
                     else
                     {
                         <DetailIcon DetailAction="GetDetail" Value="@r.CompanyId.ToString()" />
-                        <div class="row icard-content">
+                        <div class="row icontent">
                             <div class="col">
                                 <RowSingleInfo Title="Цена обновлена:" Value="@r.LastPriceDate" />
                                 <RowSingleInfo Color="Choice.Color.info" Title="Последняя цена:" Value="@lastPrice" />
@@ -36,7 +36,7 @@
                         <div class="row">
                             <div class="offset-1 col-11 text-warning">Продавать с прибылью в:</div>
                         </div>
-                        <div class="row icard-content">
+                        <div class="row icontent">
                             <div class="col">
                                 @if (r.ValueMin != 0)
                                 {

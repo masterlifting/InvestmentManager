@@ -5,12 +5,12 @@
 
 @foreach (var result in newReports)
 {
-    <div class="container icard">
+    <div class="container idark iframe">
         <RowTitle Color="Choice.Color.warning" Text="@result.CompanyName" />
 
         @foreach (var report in result.Reports)
         {
-            <EditForm class="icard-content small text-nowrap" Model="@report" OnValidSubmit="@(() => SaveReport(report, result.CompanyName))">
+            <EditForm class="icontent small text-nowrap" Model="@report" OnValidSubmit="@(() => SaveReport(report, result.CompanyName))">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
                 <div class="row ">

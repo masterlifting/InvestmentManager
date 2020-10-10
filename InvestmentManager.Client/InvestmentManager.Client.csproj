@@ -31,6 +31,13 @@
     <ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="NewVersion\" />
+    <Folder Include="NewVersion\Common\Icons\" />
+    <Folder Include="NewVersion\Common\Buttons\" />
+    <Folder Include="NewVersion\Common\Links\" />
+    <Folder Include="NewVersion\Common\Enter\" />
+    <Folder Include="NewVersion\Common\Frames\" />
+    <Folder Include="NewVersion\Common\Views\" />
+    <Folder Include="NewVersion\Admin\" />
+    <Folder Include="NewVersion\Infrastructure\" />
   </ItemGroup>
 </Project>

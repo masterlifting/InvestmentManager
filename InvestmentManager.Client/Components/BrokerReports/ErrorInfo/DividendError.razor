@@ -6,7 +6,7 @@
         <DataAnnotationsValidator />
 
         <ValidationMessage For="@(() => result.CompanyId)" />
-        <InputSelect class="iselect" @bind-Value="@result.CompanyId">
+        <InputSelect  @bind-Value="@result.CompanyId">
             <option selected value="">Этот дивиденд какой компании?</option>
             @foreach (var i in model.Companies)
             {
@@ -21,7 +21,6 @@
         <ButtonSubmit Title="Исправить" Color="Choice.Button.warning" />
     </EditForm>
 </BaseError>
-
 
 @code {
     [Parameter] public string ErrorValue { get; set; }

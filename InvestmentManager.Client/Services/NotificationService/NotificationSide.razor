@@ -4,7 +4,7 @@
 
 @if (notice.Notice.Visible)
 {
-    <div class="row fixed-top py-2 font-weight-bold inotice inotice-@notice.Notice.ColorBg" style="height: 3em">
+    <div class="row fixed-top py-2 font-weight-bold iconvex @notice.Notice.ColorBg" style="height: 3em">
         <div class="col-10 align-self-center pl-5"> @notice.Notice.Message </div>
         <div class="col-2 text-center align-self-center">
             <span class="oi oi-bolt" aria-hidden="true"></span>
@@ -15,7 +15,7 @@
 @if (notice.Info.Visible)
 {
     <div class="container fixed-bottom">
-        <div class="row py-2 inotice inotice-@notice.Info.ColorBg irounded-notice-top">
+        <div class="row py-2 iconvex @notice.Info.ColorBg irounded-top">
             <div class="col-1">
                 <div class="row">
                     <div class="col text-center p-1">
@@ -42,7 +42,7 @@
 
 @if (notice.IsLoading)
 {
-    <div class="row fixed-top inotice inotice-secondary" style="height: 3em">
+    <div class="row fixed-top iconvex isecodary" style="height: 3em">
         <div class="col text-center align-self-center">
             <div class="spinner-border text-white" role="status">
                 <span class="sr-only">Loading...</span>

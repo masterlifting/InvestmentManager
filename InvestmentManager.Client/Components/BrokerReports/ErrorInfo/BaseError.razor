@@ -1,13 +1,13 @@
 ﻿@if (!IsDone)
 {
-    <div class="container icard-danger">
+    <div class="container idanger iframe">
         <RowTitle Text="@Title" Color="Choice.Color.warning" Position="Choice.Position.center" />
         <RowTitleSub Color="Choice.Color.dark" Text="Ошибка:" />
         <div class="row">
             <label class="col-12 text-center text-light">@ErrorValue</label>
         </div>
         <RowTitleSub Color="Choice.Color.dark" Text="Возможное решение:" />
-        <div class="row icard-content">
+        <div class="row icontent">
             <div class="col-12">@ChildContent</div>
         </div>
     </div>

@@ -10,7 +10,7 @@
         Choice.Color lotColor = model.FreeLot == 0 ? Choice.Color.success : Choice.Color.light;
         Choice.Color profitColor = model.ProfitCurrent > 0 ? Choice.Color.success : Choice.Color.danger;
 
-        <div class="container icard small">
+        <div class="container idark iframe small">
             <RowTitle Text="@model.CompanyName" Color="Choice.Color.warning" />
             @if (_companyId == model.CompanyId)
             {
@@ -19,7 +19,7 @@
             else
             {
                 <DetailIcon DetailAction="GetDetail" Value="@model.CompanyId.ToString()" />
-                <div class="row icard-content">
+                <div class="row icontent">
                     <div class="col">
                         <RowSingleInfo Title="Последняя операция:" Value="@model.DateLastTransaction.ToShortDateString()" />
                         <RowSingleInfo Title="Свободных лотов:" Value="@model.FreeLot.ToString()" Color="@lotColor" />

@@ -1,31 +1,16 @@
-﻿/*#region Background */
+﻿#region Background 
 .invest_background_image {
-    /*background-image: url(/images/BackGround.jpg);
+    background-image: url(/images/BackGround.jpg);
     background-position: center center;
     background-repeat: no-repeat;
     background-attachment: fixed;
-    background-size: cover;*/
+    background-size: cover;
     background-color: aliceblue;
     height: calc(100vh - 3rem);
     overflow: auto;
 }
-/*#endregion */
-/*#region Rounded */
-.irounded {
-    border-radius: 25px;
-}
-
-.irounded-notice-top {
-    border-top-left-radius: 25px;
-    border-top-right-radius: 25px;
-}
-
-.irouded-notice-bottom {
-    border-bottom-left-radius: 25px;
-    border-bottom-right-radius: 25px;
-}
-/*#endregion */
-/*#region Navbar */
+#endregion 
+#region Navbar 
 .inavbar {
     height: 3em;
     text-decoration: none;
@@ -34,46 +19,8 @@
     box-shadow: inset rgba(0,0,0,.6) 0 -2px 5px, inset rgba(252,255,255,.7) 0 2px 5px, rgba(0,0,0,.8) 0 2px 5px -1px;
     box-shadow: 0px 5px 7px 5px rgba(20, 20, 20, 0.9);
 }
-/*#endregion */
-/*#region Route */
-a {
-    color: powderblue;
-    text-decoration: none;
-    border: none;
-    user-select: none;
-}
-
-    a:hover {
-        color: aqua;
-    }
-
-    a, a:active, a:focus {
-        outline: none;
-    }
-
-.ilink {
-    color: powderblue;
-    text-decoration: none;
-    border: none;
-    user-select: none;
-    cursor: pointer;
-    border-radius: 25px;
-    padding: 0.1em 1em;
-    text-shadow: 0 1px rgba(255,255,255,.2), 0 -1px rgba(0,0,0,.8);
-    background: rgb(24,24,24) radial-gradient(150% 100% at 50% 5px, rgba(255,255,255,.2), rgba(0,0,0,0));
-    box-shadow: inset rgba(24,24,24,.6) 0 -2px 10px, inset rgba(252,255,255,.7) 0 2px 10px;
-}
-
-    .ilink:hover {
-        color: aqua;
-    }
-
-    .ilink:active {
-        font-size: 12px;
-        box-shadow: inset rgba(0,0,0,1) 0 1px 3px, inset rgba(0,0,0,.6) 0 -2px 5px, inset rgba(252,255,255,.7) 0 2px 5px, 0 1px rgba(255,255,255,.08);
-    }
-/*#endregion */
-/*#region Card */
+#endregion 
+#region Card 
 .icard {
     outline: none;
     border: none;
@@ -116,8 +63,8 @@ a {
     text-shadow: 0 1px rgba(255,255,255,.2), 0 -1px rgba(0,0,0,.8);
     box-shadow: inset 3px 3px 5px 3px rgba(20, 20, 20, 0.7);
 }
-/*#endregion */
-/*#region Button */
+#endregion 
+#region Button 
 .ibtn {
     outline: none;
     border: none;
@@ -204,8 +151,8 @@ a {
         outline: none;
     }
 
-/*#endregion */
-/*#region Enter */
+#endregion 
+#region Enter 
 input {
     border-radius: 25px;
     width: 100%;
@@ -220,8 +167,8 @@ input {
     input, input:active, input:focus {
         outline: none;
     }
-/*#endregion */
-/*#region Notification */
+#endregion 
+#region Notification 
 .inotice {
     outline: none;
     border: none;
@@ -249,4 +196,4 @@ input {
 .inotice-secondary {
     background: lightslategrey radial-gradient(150% 100% at 50% 5px, rgba(255,255,255,.2), rgba(0,0,0,0));
 }
-/*#endregion */
+#endregion 
