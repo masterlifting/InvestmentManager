@@ -21,7 +21,7 @@
         @foreach (var transaction in StockTransactions)
         {
             if (transaction.Status.Equals("Продажа"))
-                Color = Choice.Color.success;
+                Color = Choice.TextColor.success;
 
             <div class="row">
                 <div class="col-12">@transaction.Ticker | @transaction.Company</div>
@@ -45,5 +45,5 @@
 
 @code {
     [Parameter] public IEnumerable<BrokerStockTransaction> StockTransactions { get; set; }
-    [Parameter] public Choice.Color Color { get; set; } = Choice.Color.danger;
+    [Parameter] public Choice.TextColor Color { get; set; } = Choice.TextColor.danger;
 }

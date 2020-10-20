@@ -1,4 +1,4 @@
-﻿@page "/accounttransactions"
+﻿@*@page "/accounttransactions"
 @inject CustomHttpClient httpClient
 @inject Notification notice
 
@@ -35,4 +35,4 @@
         notice.LoadStart();
         models = await httpClient.GetResultAsync<IEnumerable<AccountTransactionModel>>("transaction/accounttransactions");
     }
-}
+}*@

@@ -1,0 +1,55 @@
+﻿@inject IJSRuntime jsRuntime
+@inject ILocalStorageService localStorage
+@inject CustomHttpClient http
+@inject NavigationManager navigationManager
+@inject Notification notice
+
+<LinkSmartAction LinkAction="@(async () => await ClickInputFileButtonAsync("inputButton"))" Name="Загрузить .xls отчеты от БКС" />
+<InputFile multiple OnChange="HandleSelectionAsync" id="inputButton" style="display:none" />
+
+@code {
+    ClaimsPrincipal user;
+    [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; }
+
+    async Task HandleSelectionAsync(IFileListEntry[] files)
+    {
+        notice.LoadStart();
+
+        if (files != null)
+        {
+            var content = new MultipartFormDataContent();
+            foreach (var file in files)
+            {
+                var ms = new MemoryStream();
+                await file.Data.CopyToAsync(ms);
+                content.Add(new ByteArrayContent(ms.GetBuffer()), file.Name, file.Name);
+                ms.Close();
+            }
+
+            var response = await http.PostContentAsync("portfolio/bcsreports", content).ConfigureAwait(false);
+            content.Dispose();
+
+            if (response.IsSuccessStatusCode)
+            {
+                var reportModel = JsonSerializer.Deserialize<BrokerReportModel>(await response.Content.ReadAsStringAsync().ConfigureAwait(false), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                await localStorage.SetItemAsync<BrokerReportModel>($"{user.Identity.Name}_bcsReport", reportModel).ConfigureAwait(false);
+                navigationManager.NavigateTo("brokerreports");
+            }
+            else
+            {
+                notice.LoadStop();
+                await notice.NoticeFailedAsync("Не удалось загрузить отчеты.");
+            }
+        }
+    }
+    async Task ClickInputFileButtonAsync(string inputFileId)
+    {
+        if (!user.Identity.IsAuthenticated)
+        {
+            await notice.NoticeAccessAsync();
+            return;
+        }
+
+        await jsRuntime.InvokeVoidAsync("uploadBrokerReports", inputFileId);
+    }
+}

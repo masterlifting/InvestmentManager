@@ -1,0 +1,36 @@
+﻿<div class="row @Theme iframe">
+    <div class="col-9 text-@TitleColor.ToString() font-weight-bold text-nowrap">@Name</div>
+    <div class="col-3 text-right">
+        <DetailToggleComponent ToggleAction="ToggleDetail" />
+    </div>
+    @if (isDetail)
+    {
+        <div class="dropdown-divider"></div>
+        <div class="col-12">
+            <div class="row justify-content-around  text-center">
+                @IconBlock
+            </div>
+        </div>
+        @AdditionalBlock
+
+        <div class="dropdown-divider"></div>
+        <div class="col-12">
+            @InfoBlock
+        </div>
+    }
+</div>
+
+@ActionBlock
+
+@code {
+    [Parameter] public string Name { get; set; }
+    [Parameter] public Choice.Color TitleColor { get; set; }
+    [Parameter] public Choice.InvestColor Theme { get; set; } = Choice.InvestColor.idark;
+    [Parameter] public RenderFragment AdditionalBlock { get; set; }
+    [Parameter] public RenderFragment IconBlock { get; set; }
+    [Parameter] public RenderFragment InfoBlock { get; set; }
+    [Parameter] public RenderFragment ActionBlock { get; set; }
+
+    bool isDetail;
+    void ToggleDetail(bool isDetail) => this.isDetail = isDetail;
+}

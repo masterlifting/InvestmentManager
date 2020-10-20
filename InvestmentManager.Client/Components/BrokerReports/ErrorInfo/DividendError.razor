@@ -1,4 +1,4 @@
-﻿@inject CustomHttpClient httpClient
+﻿@inject CustomHttpClient http
 @using System.Text.RegularExpressions
 
 <BaseError Title="@Title" IsDone="@isDone" ErrorValue="@ErrorValue">
@@ -8,17 +8,18 @@
         <ValidationMessage For="@(() => result.CompanyId)" />
         <InputSelect  @bind-Value="@result.CompanyId">
             <option selected value="">Этот дивиденд какой компании?</option>
-            @foreach (var i in model.Companies)
+            @foreach (var i in form.Companies)
             {
                 <option value="@i.Id">@i.Name</option>
             }
         </InputSelect>
-
-        <RowTitleSub Color="Choice.Color.dark" Text="Возможный идентификатор дивиденда:" />
+        <div class="row">
+            <div class="col text-dark">Identifier for dividend:</div>
+        </div>
 
         <ValidationMessage For="@(() => result.IdentifierName)" />
         <InputText @bind-Value="@result.IdentifierName" />
-        <ButtonSubmit Title="Исправить" Color="Choice.Button.warning" />
+        <ButtonSubmit Title="Исправить" Color="Choice.InvestColor.iwarning" />
     </EditForm>
 </BaseError>
 
@@ -26,15 +27,15 @@
     [Parameter] public string ErrorValue { get; set; }
     [Parameter] public string Title { get; set; }
 
-    DividendErrorModel model = new DividendErrorModel();
+    DividendErrorForm form = new DividendErrorForm();
     DividendErrorResultModel result;
     bool isDone = false;
 
     protected override async Task OnParametersSetAsync()
     {
         result = new DividendErrorResultModel { IdentifierName = Regex.Match(ErrorValue.Split('\'')[1], @", (\w*), налог").Groups[1].Value };
-        model = await httpClient.GetResultAsync<DividendErrorModel>("error/dividenderror");
+        form = await http.GetResultAsync<DividendErrorForm>("error/dividenderror");
     }
 
-    async Task SendData() => isDone = await httpClient.PostBoolAsync("error/dividenderror", result, true);
+    async Task SendData() => isDone = await http.PostBoolAsync("error/dividenderror", result, true);
 }

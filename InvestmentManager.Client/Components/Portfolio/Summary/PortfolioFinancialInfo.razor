@@ -1,4 +1,4 @@
-@inject CustomHttpClient httpClient
+@*@inject CustomHttpClient httpClient
 
 <RowTitleSub Text="Финансовые показатели" />
 <div class="row icontent">
@@ -28,4 +28,4 @@
         if (user.Identity.IsAuthenticated)
             result = await httpClient.GetResultAsync<PortfolioFinancialInfoModel>($"portfolio/financial?dollar={Dollar}");
     }
-}
+}*@

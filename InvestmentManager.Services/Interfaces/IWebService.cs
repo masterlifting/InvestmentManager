@@ -1,4 +1,4 @@
-﻿using InvestmentManager.ViewModels.OutsideRequestModels;
+﻿using InvestmentManager.Services.Implimentations;
 using System.Net.Http;
 using System.Threading.Tasks;
 

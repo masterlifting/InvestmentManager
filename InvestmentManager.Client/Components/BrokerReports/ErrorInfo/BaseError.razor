@@ -1,12 +1,18 @@
 ﻿@if (!IsDone)
 {
-    <div class="container idanger iframe">
-        <RowTitle Text="@Title" Color="Choice.Color.warning" Position="Choice.Position.center" />
-        <RowTitleSub Color="Choice.Color.dark" Text="Ошибка:" />
+    <div class="idanger iframe">
+        <div class="row">
+            <div class="col text-center text-warning">@Title</div>
+        </div>
+        <div class="row">
+            <div class="col text-dark">Error: </div>
+        </div>
         <div class="row">
             <label class="col-12 text-center text-light">@ErrorValue</label>
         </div>
-        <RowTitleSub Color="Choice.Color.dark" Text="Возможное решение:" />
+        <div class="row">
+            <div class="col text-danger">Decision:</div>
+        </div>
         <div class="row icontent">
             <div class="col-12">@ChildContent</div>
         </div>

@@ -44,6 +44,7 @@ namespace InvestmentManager.Repository
         IEnumerable<Ticker> GetPriceTikers();
         IQueryable<Ticker> GetTickerIncludedLot();
         IQueryable<Ticker> GetTikersIncludeTransactions(IEnumerable<long> accountIds);
+        IQueryable<Ticker> GetTikersIncludeTransactions(long accountId);
     }
     public interface ILotRepository : IRepository<Lot> { }
     public interface ICompanyRepository : IRepository<Company> { }

@@ -1,0 +1,6 @@
+﻿<span class="oi oi-@IconName ilink" aria-hidden="true" @onclick="Action"></span>
+
+@code {
+    [Parameter] public string IconName { get; set; }
+    [Parameter] public EventCallback Action { get; set; }
+}

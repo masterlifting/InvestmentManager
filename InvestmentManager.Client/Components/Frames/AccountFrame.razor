@@ -1,0 +1,60 @@
+﻿@inject CustomHttpClient http
+@inject ILocalStorageService localStorage
+
+<FrameTemplate Theme="Choice.InvestColor.isuccess" Name="@sum" TitleColor="Choice.Color.light">
+    <IconBlock>
+        <div class="col-1 px-0"> <IconCustom IconName="info" /> </div>
+        <div class="col-1 px-0"> <IconCustom IconName="yen" /> </div>
+        <div class="col-1 px-0"> <IconCustom IconName="loop" /> </div>
+        <div class="col-1 px-0"> <IconCustom IconName="pencil" /> </div>
+        <div class="col-1 px-0"> <IconCustom IconName="data-transfer-download" /> </div>
+        <div class="col-1 px-0"> <IconCustom IconName="pie-chart" /> </div>
+    </IconBlock>
+    <AdditionalBlock>
+        <div class="dropdown-divider"></div>
+        <div class="col-12">
+            @foreach (var account in Accounts)
+            {
+                <div class="row align-items-center pt-1">
+                    <div class="col-2 col-md-1">
+                        <SelectorComponent IsSelected="account.IsActive" SelectedId="account.Id" SelectorAction="ToggleSelector" />
+                    </div>
+                    <div class="col-10 col-md-11 small">@account.Name</div>
+                </div>
+            }
+        </div>
+    </AdditionalBlock>
+    <InfoBlock>
+        <IconRowInformation IconName="info" Name="Accounts information" />
+        <IconRowInformation IconName="yen" Name="Transactions" />
+        <IconRowInformation IconName="loop" Name="Exchange rate" />
+        <IconRowInformation IconName="pencil" Name="Add transactions" />
+        <IconRowInformation IconName="data-transfer-download" Name="Load .xls transactions" Description="Only by Russian Bcs broker"/>
+        <IconRowInformation IconName="pie-chart" Name="Analytics" />
+    </InfoBlock>
+</FrameTemplate>
+
+@code {
+    string sum = "0.00";
+    List<AccountFrameModel> Accounts = new List<AccountFrameModel>();
+    [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; }
+    IIdentity user;
+    protected override async Task OnInitializedAsync()
+    {
+        user = (await AuthenticationState).User.Identity;
+        if (user.IsAuthenticated)
+        {
+            Accounts = await http.GetResultAsync<List<AccountFrameModel>>("accounts/all");
+            sum = Accounts.Sum(x => x.Sum).ToString("C");
+            await localStorage.SetItemAsync($"{user.Name}{DefaultData.IdName.accountIds}", Accounts.Where(x => x.IsActive).Select(x => x.Id).ToArray());
+        }
+    }
+
+    public async Task ToggleSelector((bool isSelected, long selectedId) selector)
+    {
+        Accounts.First(x => x.Id == selector.selectedId).IsActive = selector.isSelected;
+        long[] selectedIds = Accounts.Where(x => x.IsActive).Select(x => x.Id).ToArray();
+        sum = (await http.GetResultAsync<List<AccountFrameModel>>("accounts/selected", JsonSerializer.Serialize(selectedIds))).Sum(x => x.Sum).ToString("C");
+        await localStorage.SetItemAsync($"{user.Name}{DefaultData.IdName.accountIds}", selectedIds);
+    }
+}

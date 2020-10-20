@@ -2,7 +2,7 @@
 {
     public static class Choice
     {
-        public enum Color
+        public enum TextColor
         {
             light,
             success,
@@ -14,17 +14,20 @@
             dark,
             muted
         }
-        public enum Button
-        {
-            success,
-            warning,
-            danger
-        }
         public enum Position
         {
             right,
             left,
             center
+        }
+        public enum InvestColor
+        {
+            isuccess,
+            idanger,
+            iwarning,
+            iinfo,
+            isecondary,
+            idark
         }
     }
 }

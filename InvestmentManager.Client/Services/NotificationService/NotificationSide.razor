@@ -11,7 +11,6 @@
         </div>
     </div>
 }
-
 @if (notice.Info.Visible)
 {
     <div class="container fixed-bottom">
@@ -34,12 +33,11 @@
                 </div>
             </div>
             <div class="col-1">
-                <CloseIcon CloseAction="HideInfo" />
+                <IconClose Action="HideInfo" />
             </div>
         </div>
     </div>
 }
-
 @if (notice.IsLoading)
 {
     <div class="row fixed-top iconvex isecodary" style="height: 3em">

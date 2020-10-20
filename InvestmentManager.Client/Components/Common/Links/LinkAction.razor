@@ -1,0 +1,13 @@
+﻿<div class="row px-1 py-2">
+    <div class="col-12 ilink iconvex py-1 text-@Position.ToString()" @onclick="Action">
+        <span class="oi oi-@IconName mr-1" style="cursor:pointer" aria-hidden="true"></span>
+        @Name
+    </div>
+</div>
+
+@code {
+    [Parameter] public string IconName { get; set; }
+    [Parameter] public string Name { get; set; }
+    [Parameter] public EventCallback Action { get; set; }
+    [Parameter] public Choice.Position Position { get; set; } = Choice.Position.left;
+}

@@ -1,5 +1,5 @@
 ﻿using InvestmentManager.Services.Interfaces;
-using InvestmentManager.ViewModels.OutsideRequestModels;
+using System;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -28,5 +28,20 @@ namespace InvestmentManager.Services.Implimentations
             var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             return JsonSerializer.Deserialize<CBRF>(content);
         }
+    }
+    public class CBRF
+    {
+        public CBRF() => Valute = new Valute();
+        public DateTime Date { get; set; }
+        public Valute Valute { get; set; }
+    }
+    public class Valute
+    {
+        public Valute() => USD = new USD();
+        public USD USD { get; set; }
+    }
+    public class USD
+    {
+        public decimal Value { get; set; }
     }
 }

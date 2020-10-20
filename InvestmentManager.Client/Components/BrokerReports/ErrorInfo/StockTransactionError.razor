@@ -1,4 +1,4 @@
-﻿@inject CustomHttpClient httpClient
+﻿@inject CustomHttpClient http
 
 <BaseError Title="@Title" IsDone="@isDone" ErrorValue="@ErrorValue">
     <EditForm Model="@result" OnValidSubmit="SendData">
@@ -7,7 +7,7 @@
         <ValidationMessage For="@(() => result.CompanyId)" />
         <InputSelect @bind-Value="@result.CompanyId">
             <option selected value="">Какой компании принадлежит @result.TikerName?</option>
-            @foreach (var i in model.Companies)
+            @foreach (var i in form.Companies)
             {
                 <option value="@i.Id">@i.Name</option>
             }
@@ -15,7 +15,7 @@
         <ValidationMessage For="@(() => result.LotId)" />
         <InputSelect @bind-Value="@result.LotId">
             <option selected value="">Сколькими лотами торгуется @result.TikerName?</option>
-            @foreach (var i in model.Lots)
+            @foreach (var i in form.Lots)
             {
                 <option value="@i.Id">@i.Value</option>
             }
@@ -24,13 +24,13 @@
         <ValidationMessage For="@(() => result.ExchangeId)" />
         <InputSelect @bind-Value="@result.ExchangeId">
             <option selected value="">На какой площадке торгуется @result.TikerName?</option>
-            @foreach (var i in model.Exchanges)
+            @foreach (var i in form.Exchanges)
             {
                 <option value="@i.Id">@i.Name</option>
             }
         </InputSelect>
 
-        <ButtonSubmit Title="Исправить" Color="Choice.Button.warning"/>
+        <ButtonSubmit Title="Исправить" Color="Choice.InvestColor.iwarning"/>
     
     </EditForm>
 </BaseError>
@@ -38,15 +38,15 @@
     [Parameter] public string ErrorValue { get; set; }
     [Parameter] public string Title { get; set; }
 
-    StockTransactionErrorModel model = new StockTransactionErrorModel();
+    StockTransactionErrorForm form = new StockTransactionErrorForm();
     StockTransactionErrorResultModel result;
     bool isDone = false;
 
     protected override async Task OnParametersSetAsync()
     {
         result = new StockTransactionErrorResultModel { TikerName = ErrorValue.Split('\'')[1] };
-        model = await httpClient.GetResultAsync<StockTransactionErrorModel>("error/stocktransactionerror");
+        form = await http.GetResultAsync<StockTransactionErrorForm>("error/stocktransactionerror");
     }
 
-    async Task SendData() => isDone =  await httpClient.PostBoolAsync("error/stocktransactionerror", result, true);
+    async Task SendData() => isDone =  await http.PostBoolAsync("error/stocktransactionerror", result, true);
 }

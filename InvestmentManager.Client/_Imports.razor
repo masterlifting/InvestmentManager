@@ -1,50 +1,53 @@
 ﻿@using System.IO
-@using BlazorInputFile
-
-@using InvestmentManager.Client.Components.Service
-@using InvestmentManager.Client.Components.Service.Icons
-@using InvestmentManager.Client.Components.Service.Buttons
-@using InvestmentManager.Client.Components.Index
-@using InvestmentManager.Client.Components.Admin
-@using InvestmentManager.Client.Components.Portfolio.Summary
-@using InvestmentManager.Client.Components.Portfolio.Transactions
-@using InvestmentManager.Client.Components.Company
-@using InvestmentManager.Client.Components.BrokerReports
-@using InvestmentManager.Client.Components.BrokerReports.ResultInfo
-@using InvestmentManager.Client.Components.BrokerReports.ErrorInfo
-@using InvestmentManager.Client.Services.NotificationService
-@using InvestmentManager.Client.Services.HttpService
-@using InvestmentManager.Client.ChoiceModel
-
+@using System.Text
+@using System.Text.Json
+@using System.Net.Http.Json
+@using System.Globalization
+@using Microsoft.JSInterop
 @using System.Net.Http
+@using System.Security.Claims
+@using System.Security.Principal
+@using Microsoft.AspNetCore.Components.WebAssembly.Http
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.AspNetCore.Components.Web
-
 @using Microsoft.AspNetCore.Authorization.Infrastructure
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Authorization
-@using InvestmentManager.Client.Services.AuthConfiguration
-@using InvestmentManager.Client.Components.Authentication
-@using System.Security.Claims
 
-@using System.Net.Http.Json
-@using System.Text.Json
-@using System.Globalization
-@using System.Text
-@using Microsoft.AspNetCore.Components.WebAssembly.Http
-@using Microsoft.JSInterop
-@using InvestmentManager.Client
-@using InvestmentManager.Client.Shared
+@using BlazorInputFile
 @using Blazored.LocalStorage
 
-@using InvestmentManager.DomainModels
+@using InvestmentManager.Client
+@using InvestmentManager.Client.Shared
+@using InvestmentManager.Client.ChoiceModel
+@using InvestmentManager.Client.Services.NotificationService
+@using InvestmentManager.Client.Services.HttpService
+@using InvestmentManager.Client.Services.AuthConfiguration
+
+@using InvestmentManager.Client.Components.Authentication
+@using InvestmentManager.Client.Components.Frames
+@using InvestmentManager.Client.Components.Views
+@using InvestmentManager.Client.Components.InfoShort.Company
+@using InvestmentManager.Client.Components.InfoFull.Company
+@using InvestmentManager.Client.Components.InfoFull.Account
+
+@using InvestmentManager.Client.Components.Common.Links
+@using InvestmentManager.Client.Components.Common.Icons
+@using InvestmentManager.Client.Components.Common.Buttons
+
+@using InvestmentManager.Client.Components.Portfolio.Summary
+@using InvestmentManager.Client.Components.Portfolio.Transactions
+@using InvestmentManager.Client.Components.BrokerReports
+@using InvestmentManager.Client.Components.BrokerReports.ResultInfo
+@using InvestmentManager.Client.Components.BrokerReports.ErrorInfo
+
 @using InvestmentManager.ViewModels
-@using InvestmentManager.ViewModels.AuthenticationModels
+@using InvestmentManager.ViewModels.Attributes
+@using InvestmentManager.ViewModels.AccountModels
 @using InvestmentManager.ViewModels.CompanyModels
-@using InvestmentManager.ViewModels.OutsideRequestModels
-@using InvestmentManager.ViewModels.PortfolioModels
-@using InvestmentManager.ViewModels.PortfolioModels.BrokerReportErrorModels
-@using InvestmentManager.ViewModels.ReportModels
+@using InvestmentManager.ViewModels.ErrorModels
 @using InvestmentManager.ViewModels.RecommendationModels
-@using InvestmentManager.ViewModels.TransactionModels
+@using InvestmentManager.ViewModels.ReportModels.CompanyReportModels
+@using InvestmentManager.ViewModels.ReportModels.BrokerReportModels
+@using InvestmentManager.ViewModels.SecurityModels

@@ -1,9 +1,5 @@
 ﻿@page "/"
-@inject CustomHttpClient httpClient
-@inject NavigationManager navigationManager
-@inject Notification notice
-
-<LinkSmartAction Name="This test version by Blazor" LinkAction="CheckAdminRole" Position="Choice.Position.center" />
+@inject CustomHttpClient http
 
 <div class="container idark iframe">
     <div class="row">
@@ -19,39 +15,25 @@
     </div>
 </div>
 
+<AdminFrame />
+<AccountFrame />
 
-<MainInfo />
-
-@if (dollar.HasValue)
+@for (int i = 0; i < model.Count; i++)
 {
-    <PortfolioSummaryInfo Dollar="@dollar.Value" />
+    <CompanyFrame Id="@model[i].Id" Name="@model[i].Name" />
 }
 
-<PortfolioTransactionsInfo />
-
-<AdminPanel />
 
 @code
 {
     decimal? dollar;
     CBRF rate;
-
-    ClaimsPrincipal user;
-    [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; }
+    List<CompanyModel> model = new List<CompanyModel>();
 
     protected override async Task OnInitializedAsync()
     {
-        user = (await AuthenticationState).User;
-
-        rate = await httpClient.GetResultAsync<CBRF>("outside/getrate");
+        model = await http.GetResultAsync<List<CompanyModel>>("company/list");
+        rate = await http.GetResultAsync<CBRF>("outside/getrate");
         dollar = rate.Valute.USD.Value;
-    }
-    async Task CheckAdminRole()
-    {
-        if (user.Identity.IsAuthenticated)
-            navigationManager.NavigateTo("homepage");
-        else
-            await notice.NoticeAccessAsync("A new architecture is creating...");
-
     }
 }

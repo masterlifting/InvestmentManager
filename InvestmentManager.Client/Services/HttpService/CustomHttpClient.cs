@@ -39,6 +39,44 @@ namespace InvestmentManager.Client.Services.HttpService
 
             return result;
         }
+        public async Task<TResult> GetResultAsync<TResult>(string route, long id, bool withLoading = false)
+        {
+            var taskResult = httpClient.GetFromJsonAsync<TResult>($"{route}?id={id}");
+
+            if (withLoading)
+            {
+                var startTime = DateTime.Now;
+                if ((DateTime.Now - startTime).TotalMilliseconds > timeThreshold && !taskResult.IsCompleted)
+                    notification.LoadStart();
+            }
+
+            var result = await taskResult.ConfigureAwait(false);
+
+            if (withLoading)
+                notification.LoadStop();
+
+            return result;
+        }
+        public async Task<TResult> GetResultAsync<TResult>(string route, string ids, bool withLoading = false)
+        {
+            var taskResult = httpClient.GetFromJsonAsync<TResult>($"{route}?ids={ids}");
+
+            if (withLoading)
+            {
+                var startTime = DateTime.Now;
+                if ((DateTime.Now - startTime).TotalMilliseconds > timeThreshold && !taskResult.IsCompleted)
+                    notification.LoadStart();
+            }
+
+            var result = await taskResult.ConfigureAwait(false);
+
+            if (withLoading)
+                notification.LoadStop();
+
+            return result;
+        }
+
+
         public async Task GetVoidAsync(string route, bool withConfirm = false)
         {
             notification.LoadStart();

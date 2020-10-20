@@ -1,9 +1,0 @@
-﻿<div class="row">
-    <div class="col text-@Position.ToString() text-@Color.ToString() mb-0 font-weight-bold text-uppercase">@Text</div>
-</div>
-
-@code {
-    [Parameter] public string Text { get; set; }
-    [Parameter] public Choice.Color Color { get; set; } = Choice.Color.info;
-    [Parameter] public Choice.Position Position { get; set; } = Choice.Position.right;
-}

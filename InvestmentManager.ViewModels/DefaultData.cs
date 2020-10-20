@@ -10,5 +10,13 @@
         public const string noticeFailed = "Что-то пошло не так.";
         public const string noticeAccess = "Необходимо войти!";
         public const string noticeInfo = "Информация";
+        public static class Description
+        {
+            public const string companyInfo = "Common information about this company";
+        }
+        public static class IdName
+        {
+            public const string accountIds = "_accountIds";
+        }
     }
 }

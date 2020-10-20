@@ -1,0 +1,87 @@
+﻿<FrameTemplate Name="@Name" TitleColor="Choice.Color.warning">
+    <IconBlock>
+        <div class="col-1 px-0"> <IconCustom Action="@(() => isAdditionalInfo = !isAdditionalInfo)" IconName="info" /> </div>
+        <div class="col-1 px-0"> <IconCustom Action="@(() => isTransactions = !isTransactions)" IconName="yen" /> </div>
+        <div class="col-1 px-0"> <IconCustom Action="@(() => isRating = !isRating )" IconName="bar-chart" /> </div>
+        <div class="col-1 px-0"> <IconCustom Action="@(() => isBuyRecommendations = !isBuyRecommendations)" IconName="plus" /> </div>
+        <div class="col-1 px-0"> <IconCustom Action="@(() => isSellRecommendations = !isSellRecommendations)" IconName="minus" /> </div>
+        <div class="col-1 px-0"> <IconCustom Action="@(() => isCoefficient = !isCoefficient)" IconName="calculator" /> </div>
+        <div class="col-1 px-0"> <IconCustom Action="@(() => isReport = !isReport )" IconName="document" /> </div>
+        <div class="col-1 px-0"> <IconCustom Action="@(() => isPrice = !isPrice)" IconName="graph" /> </div>
+        <div class="col-1 px-0"> <IconCustom Action="@(() => isDividend = !isDividend)" IconName="target" /> </div>
+    </IconBlock>
+    <InfoBlock>
+        <IconRowInformation IconName="info" Name="@additionalInfo" Description="@DefaultData.Description.companyInfo" />
+        <IconRowInformation IconName="yen" Name="@transactions" />
+        <IconRowInformation IconName="bar-chart" Name="@rating" />
+        <IconRowInformation IconName="plus" Name="@buyRecommendations" />
+        <IconRowInformation IconName="minus" Name="@sellRecommendations" />
+        <IconRowInformation IconName="calculator" Name="@coefficient" />
+        <IconRowInformation IconName="document" Name="@report" />
+        <IconRowInformation IconName="graph" Name="@price" />
+        <IconRowInformation IconName="target" Name="@dividend" />
+    </InfoBlock>
+    <ActionBlock>
+        @if (isAdditionalInfo)
+        {
+            <AdditionalInfoShort InfoName="@additionalInfo" CompanyId="@Id" UpdateVisible="@((bool isVisible) => isAdditionalInfo = isVisible)" />
+        }
+        @if (isTransactions)
+        {
+            <TransactionHistoryShort InfoName="@transactions" CompanyId="@Id" UpdateVisible="@((bool isVisible) => isTransactions = isVisible)" />
+        }
+        @if (isRating)
+        {
+            <RatingDetailsShort InfoName="@rating" CompanyId="@Id" UpdateVisible="@((bool isVisible) => isRating = isVisible)" />
+        }
+        @if (isBuyRecommendations)
+        {
+            <RecommendationsForBuyingShort InfoName="@buyRecommendations" CompanyId="@Id" UpdateVisible="@((bool isVisible) => isBuyRecommendations = isVisible)" />
+        }
+        @if (isSellRecommendations)
+        {
+            <RecommendationsForSaleShort InfoName="@sellRecommendations" CompanyId="@Id" UpdateVisible="@((bool isVisible) => isSellRecommendations = isVisible)" />
+        }
+        @if (isCoefficient)
+        {
+            <CoefficientHistoryShort InfoName="@coefficient" CompanyId="@Id" UpdateVisible="@((bool isVisible) => isCoefficient = isVisible)" />
+        }
+        @if (isReport)
+        {
+            <ReportHistoryShort InfoName="@report" CompanyId="@Id" UpdateVisible="@((bool isVisible) => isReport = isVisible)" />
+        }
+        @if (isPrice)
+        {
+            <PriceHistoryShort InfoName="@price" CompanyId="@Id" UpdateVisible="@((bool isVisible) => isPrice = isVisible)" />
+        }
+        @if (isDividend)
+        {
+            <DividendHistoryShort InfoName="@dividend" CompanyId="@Id" UpdateVisible="@((bool isVisible) => isDividend = isVisible)" />
+        }
+    </ActionBlock>
+</FrameTemplate>
+
+@code {
+    [Parameter] public long Id { get; set; }
+    [Parameter] public string Name { get; set; }
+
+    string additionalInfo = "Additional information";
+    string rating = "Rating details";
+    string transactions = "Transactions";
+    string buyRecommendations = "Recommendations for buying";
+    string sellRecommendations = "Recommendations for sale";
+    string coefficient = "Coefficient history";
+    string report = "Report history";
+    string price = "Price history";
+    string dividend = "Dividend history";
+
+    bool isAdditionalInfo;
+    bool isRating;
+    bool isTransactions;
+    bool isBuyRecommendations;
+    bool isSellRecommendations;
+    bool isCoefficient;
+    bool isReport;
+    bool isPrice;
+    bool isDividend;
+}

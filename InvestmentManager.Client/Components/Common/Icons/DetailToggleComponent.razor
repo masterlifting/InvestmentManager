@@ -1,0 +1,20 @@
+﻿<div @onclick="ToggleDetail" style="cursor:pointer">
+    @if (isDetail)
+    {
+        <span class="oi oi-fullscreen-exit"></span>
+    }
+    else
+    {
+        <span class="oi oi-fullscreen-enter"></span>
+    }
+</div>
+
+@code {
+    private bool isDetail;
+    [Parameter] public EventCallback<bool> ToggleAction { get; set; }
+    async void ToggleDetail()
+    {
+        isDetail = !isDetail;
+        await ToggleAction.InvokeAsync(isDetail);
+    }
+}

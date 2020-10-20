@@ -1,12 +1,12 @@
-﻿@inject CustomHttpClient httpClient
+﻿@inject CustomHttpClient http
 @inject Notification notice
 
 
 @foreach (var report in Reports)
 {
-    <div class="container idark iframe">
+    <div class="idark iframe">
 
-        <RowTitle Color="Choice.Color.warning" Text="@report.AccountId" />
+        <RowTitle Color="Choice.TextColor.warning" Text="@report.AccountId" />
         @if (report.AccountTransactions.Any())
         {
             <InfoAccountOperation AccountTransactions="@report.AccountTransactions" />
@@ -34,7 +34,7 @@
 
         @if (report.AccountTransactions.Any() || report.StockTransactions.Any() || report.Comissions.Any() || report.Dividends.Any() || report.ExchangeRates.Any())
         {
-            <ButtonAction Title="Сохранить" Color="Choice.Button.success" ClickAction="@(()=> SaveData(report.AccountId, report))" />
+            <ButtonAction Title="Сохранить" Color="Choice.InvestColor.isuccess" ClickAction="@(()=> SaveData(report.AccountId, report))" />
         }
     </div>
 }
@@ -44,7 +44,7 @@
 
     async Task SaveData(string accountId, CorrectBrokerReport report)
     {
-        if (await httpClient.PostBoolAsync("portfolio/savereports", accountId))
+        if (await http.PostBoolAsync("portfolio/savereports", accountId))
         {
             await Task.Run(() => Reports.Remove(report));
             await notice.NoticeSuccesAsync();

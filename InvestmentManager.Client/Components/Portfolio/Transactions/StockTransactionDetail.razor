@@ -1,4 +1,4 @@
-﻿@inject CustomHttpClient httpClient
+﻿@*@inject CustomHttpClient httpClient
 
 <div class="row icontent">
     <div class="col">
@@ -36,4 +36,4 @@
     {
         models = await httpClient.GetResultAsync<IEnumerable<StockTransactionDetailModel>>($"transaction/getstocktransactiondetail?companyId={CompanyId}", true);
     }
-}
+}*@

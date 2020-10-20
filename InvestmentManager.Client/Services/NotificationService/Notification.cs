@@ -16,7 +16,7 @@ namespace InvestmentManager.Client.Services.NotificationService
 
         public void ShowInfo(string title, string message)
         {
-            Info.ColorBg = string.Intern("i"+Choice.Color.info.ToString());
+            Info.ColorBg = Choice.InvestColor.iinfo.ToString();
             Info.Title = title;
             Info.Message = message;
             Info.Visible = true;
@@ -24,17 +24,17 @@ namespace InvestmentManager.Client.Services.NotificationService
         }
 
         public async Task NoticeAccessAsync(string message = null, int delay = 1500) =>
-            await GetNoticeAsync(Choice.Color.warning, string.IsNullOrWhiteSpace(message) ? DefaultData.noticeAccess : message, delay).ConfigureAwait(false);
+            await GetNoticeAsync(Choice.InvestColor.iwarning, string.IsNullOrWhiteSpace(message) ? DefaultData.noticeAccess : message, delay).ConfigureAwait(false);
         public async Task NoticeFailedAsync(string message = null, int delay = 1500) =>
-            await GetNoticeAsync(Choice.Color.danger, string.IsNullOrWhiteSpace(message) ? DefaultData.noticeFailed : message, delay).ConfigureAwait(false);
+            await GetNoticeAsync(Choice.InvestColor.idanger, string.IsNullOrWhiteSpace(message) ? DefaultData.noticeFailed : message, delay).ConfigureAwait(false);
         public async Task NoticeSuccesAsync(string message = null, int delay = 1500) =>
-            await GetNoticeAsync(Choice.Color.success, string.IsNullOrWhiteSpace(message) ? DefaultData.noticeSuccess : message, delay).ConfigureAwait(false);
+            await GetNoticeAsync(Choice.InvestColor.isuccess, string.IsNullOrWhiteSpace(message) ? DefaultData.noticeSuccess : message, delay).ConfigureAwait(false);
         public async Task NoticeInfoAsync(string message = null, int delay = 1500) =>
-            await GetNoticeAsync(Choice.Color.secondary, string.IsNullOrWhiteSpace(message) ? DefaultData.noticeInfo : message, delay).ConfigureAwait(false);
+            await GetNoticeAsync(Choice.InvestColor.isecondary, string.IsNullOrWhiteSpace(message) ? DefaultData.noticeInfo : message, delay).ConfigureAwait(false);
 
-        private async Task GetNoticeAsync(Choice.Color color, string message, int delay)
+        private async Task GetNoticeAsync(Choice.InvestColor color, string message, int delay)
         {
-            Notice.ColorBg = string.Intern("i"+color.ToString());
+            Notice.ColorBg = color.ToString();
             Notice.Message = message;
             Notice.Visible = true;
             NotifyStateChanged();

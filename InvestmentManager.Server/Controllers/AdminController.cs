@@ -1,10 +1,9 @@
 ﻿using InvestmentManager.Calculator;
-using InvestmentManager.DomainModels;
 using InvestmentManager.Entities.Market;
 using InvestmentManager.PriceFinder.Interfaces;
 using InvestmentManager.ReportFinder.Interfaces;
 using InvestmentManager.Repository;
-using InvestmentManager.ViewModels.ReportModels;
+using InvestmentManager.ViewModels.ReportModels.CompanyReportModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -13,14 +12,12 @@ using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
+using InvestmentManager.ViewModels;
 
 namespace InvestmentManager.Server.Controllers
 {
-    [ApiController]
-    [Route("[controller]")]
-    [Authorize(Roles = "pestunov")]
+    [ApiController, Route("[controller]"), Authorize(Roles = "pestunov")]
     public class AdminController : ControllerBase
     {
         private readonly IUnitOfWorkFactory unitOfWork;
@@ -45,24 +42,24 @@ namespace InvestmentManager.Server.Controllers
             this.reportService = reportService;
             this.userManager = userManager;
         }
-        [Route("getreports")]
-        [HttpGet]
-        public async Task<IEnumerable<NewCompanyReportModel>> GetReports()
+
+        [HttpGet("getreports")]
+        public async Task<IEnumerable<CompanyReportForm>> GetReports()
         {
-            var companies = new List<CompanyD>();
-            if (memoryCache.TryGetValue(nameof(CompanyD), out List<CompanyD> companyDs))
-                companies = companyDs;
+            var companies = new List<ViewModelBase>();
+            if (memoryCache.TryGetValue("aCompanies", out List<ViewModelBase> companyModels))
+                companies = companyModels;
             else
             {
-                companies = await unitOfWork.Company.GetAll().Select(x => new CompanyD { Id = x.Id, Name = x.Name }).ToListAsync().ConfigureAwait(false);
-                memoryCache.Set(nameof(CompanyD), companies, new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5) });
+                companies = await unitOfWork.Company.GetAll().Select(x => new ViewModelBase { Id = x.Id, Name = x.Name }).ToListAsync().ConfigureAwait(false);
+                memoryCache.Set("aCompanies", companies, new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5) });
             }
 
             return unitOfWork.Report.GetAll()
                 .Where(x => x.IsChecked == false)
                 .AsEnumerable()
                 .GroupBy(x => x.CompanyId)
-                .Join(companies, x => x.Key, y => y.Id, (x, y) => new NewCompanyReportModel
+                .Join(companies, x => x.Key, y => y.Id, (x, y) => new CompanyReportForm
                 {
                     CompanyName = y.Name,
                     Reports = x.Select(z => new NewReportModel
@@ -83,9 +80,7 @@ namespace InvestmentManager.Server.Controllers
                     }).ToList()
                 });
         }
-
-        [Route("deletereport")]
-        [HttpPost]
+        [HttpPost("deletereport")]
         public async Task<IActionResult> DeleteReport([FromBody] long id)
         {
             var deletedReport = await unitOfWork.Report.FindByIdAsync(id).ConfigureAwait(false);
@@ -104,9 +99,7 @@ namespace InvestmentManager.Server.Controllers
             }
             return BadRequest();
         }
-
-        [Route("savereport")]
-        [HttpPost]
+        [HttpPost("savereport")]
         public async Task<IActionResult> SaveReport([FromBody] NewReportModel report)
         {
             var savedReport = await unitOfWork.Report.FindByIdAsync(report.ReportId).ConfigureAwait(false);
@@ -138,9 +131,7 @@ namespace InvestmentManager.Server.Controllers
             }
             return BadRequest();
         }
-
-        [Route("recalculateall")]
-        [HttpGet]
+        [HttpGet("recalculateall")]
         public async Task<IActionResult> RecalculateAll()
         {
             try
@@ -179,9 +170,7 @@ namespace InvestmentManager.Server.Controllers
                 return BadRequest();
             }
         }
-
-        [Route("getnewprices")]
-        [HttpGet]
+        [HttpGet("getnewprices")]
         public async Task<IActionResult> GetNewPrices()
         {
             var newPricies = new List<Price>();
@@ -220,8 +209,7 @@ namespace InvestmentManager.Server.Controllers
 
             return Ok();
         }
-        [Route("getnewreports")]
-        [HttpGet]
+        [HttpGet("getnewreports")]
         public async Task<IActionResult> GetNewReports()
         {
             IDictionary<long, Report> lastReports = unitOfWork.Report.GetLastReports();

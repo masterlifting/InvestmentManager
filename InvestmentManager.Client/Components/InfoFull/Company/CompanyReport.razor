@@ -1,0 +1,51 @@
+﻿@inject CustomHttpClient http
+
+<DetailTemplate Name="Report details" DetailTemplateAction="ShowInfo">
+    <ChildContent>
+        <TableTemplate Headers="headers" Bodies="bodies" BodyColWidth="6" />
+    </ChildContent>
+</DetailTemplate>
+
+
+@code {
+    [Parameter] public long CompanyId { get; set; }
+    List<string> headers = new List<string>
+{
+        "Date Report"
+        ,"Quarter"
+        ,"Revenue"
+        ,"NetProfit"
+        ,"Gross Profit"
+        ,"Cash Flow"
+        ,"Assets"
+        ,"Turnover"
+        ,"Share Capital"
+        ,"Dividend"
+        ,"Obligation"
+        ,"Long Term Debt"
+    };
+    List<List<string>> bodies = new List<List<string>>();
+
+    async Task ShowInfo(bool isDetails)
+    {
+        if (isDetails == true)
+        {
+            var model = await http.GetResultAsync<List<ReportHistoryModel>>("report/history", CompanyId);
+            bodies = model.Select(x => new List<string>
+            {
+                x.DateReport,
+                x.Quarter,
+                x.Revenue,
+                x.NetProfit,
+                x.GrossProfit,
+                x.CashFlow,
+                x.Assets,
+                x.Turnover,
+                x.ShareCapital,
+                x.Dividend,
+                x.Obligation,
+                x.LongTermDebt
+                }).ToList();
+        }
+    }
+}

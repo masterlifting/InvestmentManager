@@ -1,4 +1,4 @@
-﻿@inject CustomHttpClient httpClient
+﻿@*@inject CustomHttpClient httpClient
 
 <RowTitleSub Text="Общая информация" />
 <div class="row icontent">
@@ -18,4 +18,4 @@
         if (user.Identity.IsAuthenticated)
             result = await httpClient.GetResultAsync<PortfolioCommonModel>($"portfolio/common");
     }
-}
+}*@

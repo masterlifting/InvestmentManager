@@ -1,5 +1,6 @@
 ﻿using InvestmentManager.Entities.Market;
 using InvestmentManager.Repository;
+using InvestmentManager.ViewModels.RecommendationsInfo;
 using InvestmentManager.ViewModels.RecommendationModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,8 +12,7 @@ using System.Threading.Tasks;
 
 namespace InvestmentManager.Server.Controllers
 {
-    [ApiController]
-    [Route("[controller]")]
+    [ApiController, Route("[controller]")]
     public class RecommendationController : ControllerBase
     {
         private readonly IUnitOfWorkFactory unitOfWork;
@@ -24,9 +24,9 @@ namespace InvestmentManager.Server.Controllers
             this.memoryCache = memoryCache;
         }
 
-        [Route("buyr")]
+        [Route("buyrecommendations")]
         [HttpGet]
-        public async Task<IEnumerable<BuyRecommendationModel>> GetBuyRecommendation()
+        public async Task<IEnumerable<BuyRecommendationModel>> GetBuyRecommendations()
         {
             var buyRecommendations = new List<BuyRecommendationModel>();
             if (!memoryCache.TryGetValue("lastPrices", out Dictionary<long, List<Price>> lastPrices))
@@ -65,6 +65,17 @@ namespace InvestmentManager.Server.Controllers
             }
 
             return buyRecommendations;
+        }
+
+        [HttpGet("buy")]
+        public async Task<RecommendationsForBuyingShortModel> GetBuyRecommendation(long id)
+        {
+            var result = await unitOfWork.BuyRecommendation.FindByIdAsync(id).ConfigureAwait(false);
+            return new RecommendationsForBuyingShortModel
+            {
+                Price = result.Price.ToString("f2"),
+                DateUpdate = result.DateUpdate.ToString("g")
+            };
         }
 
         [Route("sellr")]

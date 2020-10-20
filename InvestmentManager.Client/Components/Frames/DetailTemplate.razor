@@ -1,0 +1,39 @@
+﻿<div class="row">
+    <div class="col-10 text-right text-dark">@Name</div>
+    <div class="col-2 text-right text-dark">
+        <div @onclick="DetailToggle" style="cursor:pointer">
+            @if (isSelected == true)
+            {
+                <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-toggle2-on" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M7 5H3a3 3 0 0 0 0 6h4a4.995 4.995 0 0 1-.584-1H3a2 2 0 1 1 0-4h3.416c.156-.357.352-.692.584-1z" />
+                    <path d="M16 8A5 5 0 1 1 6 8a5 5 0 0 1 10 0z" />
+                </svg>
+            }
+            else
+            {
+                <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-toggle2-off" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 11c.628-.836 1-1.874 1-3a4.978 4.978 0 0 0-1-3h4a3 3 0 1 1 0 6H9z" />
+                    <path fill-rule="evenodd" d="M5 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 1A5 5 0 1 0 5 3a5 5 0 0 0 0 10z" />
+                </svg>
+            }
+        </div>
+    </div>
+</div>
+@if (isSelected == true)
+{
+    <div class="dropdown-divider"></div>
+    @ChildContent
+}
+
+@code {
+    bool isSelected;
+    [Parameter] public string Name { get; set; }
+    [Parameter] public EventCallback<bool> DetailTemplateAction { get; set; }
+    [Parameter] public RenderFragment ChildContent { get; set; }
+
+    async void DetailToggle()
+    {
+        isSelected = !isSelected;
+        await DetailTemplateAction.InvokeAsync(isSelected);
+    }
+}

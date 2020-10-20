@@ -1,0 +1,8 @@
+﻿<div class="col-@KeySize text-dark text-nowrap">@Key</div>
+<div class="col-@ValueSize text-right">@Value</div>
+@code {
+    [Parameter] public string Key { get; set; }
+    [Parameter] public string Value { get; set; }
+    [Parameter] public int KeySize { get; set; } = 4;
+    int ValueSize { get => 12 - KeySize; }
+}

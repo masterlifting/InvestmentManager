@@ -1,7 +1,7 @@
 ﻿using InvestmentManager.BrokerService.Models;
 using InvestmentManager.Mapper.Interfaces;
 using InvestmentManager.Repository;
-using InvestmentManager.ViewModels.PortfolioModels;
+using InvestmentManager.ViewModels.ReportModels.BrokerReportModels;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;

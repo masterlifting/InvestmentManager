@@ -1,4 +1,4 @@
-﻿@page "/stocktransactions"
+﻿@*@page "/stocktransactions"
 @inject CustomHttpClient httpClient
 @inject Notification notice
 
@@ -55,4 +55,4 @@
     }
     void GetDetail(string companyId) => _companyId = long.Parse(companyId);
     void CloseDetail() => _companyId = 0;
-}
+}*@

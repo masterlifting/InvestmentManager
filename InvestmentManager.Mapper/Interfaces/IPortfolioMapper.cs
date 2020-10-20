@@ -1,5 +1,5 @@
 ﻿using InvestmentManager.BrokerService.Models;
-using InvestmentManager.ViewModels.PortfolioModels;
+using InvestmentManager.ViewModels.ReportModels.BrokerReportModels;
 
 namespace InvestmentManager.Mapper.Interfaces
 {
