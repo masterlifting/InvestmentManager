@@ -1,6 +1,6 @@
 ﻿@inject Notification notice
 
-<span class="oi oi-info ilink" style="cursor:pointer" aria-hidden="true" @onclick="@(() => notice.ShowInfo(Title, Text))"></span>
+<span class="oi oi-info ilink" style="cursor:pointer" aria-hidden="true" @onclick="@(() => notice.ToastInfo(Title, Text))"></span>
 
 @code {
     [Parameter] public string Title { get; set; }

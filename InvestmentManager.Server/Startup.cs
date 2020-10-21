@@ -39,7 +39,7 @@ namespace InvestmentManager.Server
             services.AddDbContext<InvestmentContext>(provider =>
             {
                 provider.UseLazyLoadingProxies();
-                //*/
+                /*/
                 provider.UseNpgsql(configuration["ConnectionStrings:LocalPostgresConnection"]);
                 /*/
                 provider.UseNpgsql(configuration["ConnectionStrings:PostgresConnection"]);
@@ -116,7 +116,7 @@ namespace InvestmentManager.Server
             services.AddScoped<ISummaryService, SummaryService>();
             #endregion
             #region Mapper
-            services.AddScoped<IPortfolioMapper, PortfolioMapper>();
+            services.AddScoped<IInvestMapper, InvestMapper>();
             #endregion
         }
 

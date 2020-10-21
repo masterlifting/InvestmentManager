@@ -34,7 +34,7 @@
 
         @if (report.AccountTransactions.Any() || report.StockTransactions.Any() || report.Comissions.Any() || report.Dividends.Any() || report.ExchangeRates.Any())
         {
-            <ButtonAction Title="Сохранить" Color="Choice.InvestColor.isuccess" ClickAction="@(()=> SaveData(report.AccountId, report))" />
+            <ButtonAction Title="Save" Color="Choice.InvestColor.isuccess" ClickAction="@(()=> SaveData(report.AccountId, report))" />
         }
     </div>
 }
@@ -44,12 +44,12 @@
 
     async Task SaveData(string accountId, CorrectBrokerReport report)
     {
-        if (await http.PostBoolAsync("portfolio/savereports", accountId))
+        if (await http.PostBoolAsync(RouteName.brokerReport + "/saveparsed", accountId))
         {
             await Task.Run(() => Reports.Remove(report));
-            await notice.NoticeSuccesAsync();
+            await notice.AlertSuccesAsync();
         }
         else
-            await notice.NoticeFailedAsync();
+            await notice.AlertFailedAsync();
     }
 }

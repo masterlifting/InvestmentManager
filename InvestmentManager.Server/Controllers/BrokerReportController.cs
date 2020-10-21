@@ -7,6 +7,7 @@ using InvestmentManager.Repository;
 using InvestmentManager.ViewModels;
 using InvestmentManager.ViewModels.EntityViewModels;
 using InvestmentManager.ViewModels.ReportModels.BrokerReportModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -18,21 +19,21 @@ using System.Threading.Tasks;
 
 namespace InvestmentManager.Server.Controllers
 {
-    [ApiController, Route("[controller]")]
+    [ApiController, Route("[controller]"), Authorize]
     public class BrokerReportController : ControllerBase
     {
         private readonly IUnitOfWorkFactory unitOfWork;
         private readonly UserManager<IdentityUser> userManager;
         private readonly IMemoryCache memoryCache;
         private readonly IInvestBrokerService brokerService;
-        private readonly IPortfolioMapper portfolioMapper;
+        private readonly IInvestMapper portfolioMapper;
 
         public BrokerReportController(
             IUnitOfWorkFactory unitOfWork
             , UserManager<IdentityUser> userManager
             , IMemoryCache memoryCache
             , IInvestBrokerService brokerService
-            , IPortfolioMapper portfolioMapper)
+            , IInvestMapper portfolioMapper)
         {
             this.unitOfWork = unitOfWork;
             this.userManager = userManager;
@@ -41,7 +42,7 @@ namespace InvestmentManager.Server.Controllers
             this.portfolioMapper = portfolioMapper;
         }
 
-        [HttpPost("parsebcsreports")]
+        [HttpPost("parsebcs"), Authorize(Roles = "pestunov")]
         public async Task<IActionResult> ParseBcsReports()
         {
             var files = HttpContext.Request.Form.Files;
@@ -51,7 +52,7 @@ namespace InvestmentManager.Server.Controllers
                 var parsedReports = await brokerService.GetNewReportsAsync(files, userId).ConfigureAwait(false);
                 var result = portfolioMapper.MapBcsReports(parsedReports);
                 foreach (var entityReportModel in parsedReports.Reports)
-                    memoryCache.Set(entityReportModel.AccountName, entityReportModel, new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5) });
+                    memoryCache.Set(entityReportModel.AccountName, entityReportModel, TimeSpan.FromMinutes(5));
                 return Ok(result);
             }
             catch
@@ -59,7 +60,7 @@ namespace InvestmentManager.Server.Controllers
                 return BadRequest();
             }
         }
-        [HttpPost("savebrokerreports")]
+        [HttpPost("saveparsed"), Authorize(Roles = "pestunov")]
         public async Task<IActionResult> SeveBrokerReports([FromBody] string accountId)
         {
             var account = unitOfWork.Account.GetAll().FirstOrDefault(x => x.Name.Equals(accountId));
@@ -94,38 +95,34 @@ namespace InvestmentManager.Server.Controllers
         }
 
 
-        [HttpGet("stocktransactionerror")]
-        public async Task<StockTransactionErrorForm> GetStockTransactionError()
+        [HttpGet("stocktransactionerrordata")]
+        public async Task<StockTransactionErrorForm> GetStockTransactionErrorData()
         {
-            var result = new StockTransactionErrorForm();
-            if (memoryCache.TryGetValue("brCompanies", out List<ViewModelBase> companies))
-                result.Companies = companies;
-            else
+            if (!memoryCache.TryGetValue("companies", out List<ViewModelBase> companies))
             {
-                result.Companies = await unitOfWork.Company.GetAll().Select(x => new ViewModelBase { Id = x.Id, Name = x.Name }).OrderBy(x => x.Name).ToListAsync().ConfigureAwait(false);
-                memoryCache.Set("brCompanies", result.Companies, new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5) });
+                companies = await unitOfWork.Company.GetAll().Select(x => new ViewModelBase { Id = x.Id, Name = x.Name }).OrderBy(x => x.Name).ToListAsync().ConfigureAwait(false);
+                memoryCache.Set("companies", companies, TimeSpan.FromSeconds(30));
+            }
+            if (!memoryCache.TryGetValue("lots", out List<LotModel> lots))
+            {
+                lots = await unitOfWork.Lot.GetAll().Select(x => new LotModel { Id = x.Id, Value = x.Value }).ToListAsync().ConfigureAwait(false);
+                memoryCache.Set("lots", lots, TimeSpan.FromSeconds(30));
+            }
+            if (!memoryCache.TryGetValue("exchanges", out List<ViewModelBase> exchanges))
+            {
+                exchanges = await unitOfWork.Exchange.GetAll().Select(x => new ViewModelBase { Id = x.Id, Name = x.Name }).ToListAsync().ConfigureAwait(false);
+                memoryCache.Set("exchanges", exchanges, TimeSpan.FromSeconds(30));
             }
 
-            if (memoryCache.TryGetValue("brLots", out List<LotModel> lots))
-                result.Lots = lots;
-            else
+            return new StockTransactionErrorForm
             {
-                result.Lots = await unitOfWork.Lot.GetAll().Select(x => new LotModel { Id = x.Id, Value = x.Value }).ToListAsync().ConfigureAwait(false);
-                memoryCache.Set("brLots", result.Lots, new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5) });
-            }
-
-            if (memoryCache.TryGetValue("brExchanges", out List<ViewModelBase> exchanges))
-                result.Exchanges = exchanges;
-            else
-            {
-                result.Exchanges = await unitOfWork.Exchange.GetAll().Select(x => new ViewModelBase { Id = x.Id, Name = x.Name }).ToListAsync().ConfigureAwait(false);
-                memoryCache.Set("brExchanges", result.Exchanges, new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5) });
-            }
-
-            return result;
+                Companies = companies,
+                Lots = lots,
+                Exchanges = exchanges
+            };
         }
-        [HttpPost("stocktransactionerror")]
-        public async Task<IActionResult> SettockTransactionError([FromBody] StockTransactionErrorResultModel model)
+        [HttpPost("setticker")]
+        public async Task<IActionResult> SetTicker([FromBody] StockTransactionErrorResultModel model)
         {
             if (
                 long.TryParse(model.CompanyId, out long companyId)
@@ -154,8 +151,8 @@ namespace InvestmentManager.Server.Controllers
             return BadRequest();
         }
 
-        [HttpGet("dividenderror")]
-        public async Task<DividendErrorForm> GetDividendError()
+        [HttpGet("dividenderrordata")]
+        public async Task<DividendErrorForm> GetDividendErrorData()
         {
             var result = new DividendErrorForm();
             if (memoryCache.TryGetValue("brCompanies", out List<ViewModelBase> companyModels))
@@ -167,13 +164,13 @@ namespace InvestmentManager.Server.Controllers
             }
             return result;
         }
-        [HttpPost("dividenderror")]
-        public async Task<IActionResult> SetDividendError([FromBody] DividendErrorResultModel model)
+        [HttpPost("setisin")]
+        public async Task<IActionResult> SetIsisn([FromBody] DividendErrorResultModel model)
         {
-            if (memoryCache.TryGetValue(model.IdentifierName, out string _))
-                return Ok();
+            if (!memoryCache.TryGetValue(model.IdentifierName, out string _))
+                memoryCache.Set(model.IdentifierName, model.IdentifierName, TimeSpan.FromMinutes(1));
             else
-                memoryCache.Set(model.IdentifierName, model.IdentifierName, new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5) });
+                return Ok();
 
             if (long.TryParse(model.CompanyId, out long companyId))
             {
@@ -199,8 +196,8 @@ namespace InvestmentManager.Server.Controllers
             return BadRequest();
         }
 
-        [HttpPost("accounterror")]
-        public async Task<IActionResult> SetAccountError([FromBody] AccountErrorResultModel model)
+        [HttpPost("setaccount")]
+        public async Task<IActionResult> SetAccountError([FromBody] AccountErrorForm model)
         {
             if (!string.IsNullOrWhiteSpace(model.AccountName))
             {

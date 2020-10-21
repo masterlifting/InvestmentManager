@@ -1,20 +1,19 @@
 ﻿@inject Notification notice
-
 @implements IDisposable
 
-@if (notice.Notice.Visible)
+@if (notice.Alert.Visible)
 {
-    <div class="row fixed-top py-2 font-weight-bold iconvex @notice.Notice.ColorBg" style="height: 3em">
-        <div class="col-10 align-self-center pl-5"> @notice.Notice.Message </div>
+    <div class="row fixed-top py-2 font-weight-bold iconvex @notice.Alert.ColorBg" style="height: 3em">
+        <div class="col-10 align-self-center pl-5"> @notice.Alert.Message </div>
         <div class="col-2 text-center align-self-center">
             <span class="oi oi-bolt" aria-hidden="true"></span>
         </div>
     </div>
 }
-@if (notice.Info.Visible)
+@if (notice.Toast.Visible)
 {
     <div class="container fixed-bottom">
-        <div class="row py-2 iconvex @notice.Info.ColorBg irounded-top">
+        <div class="row py-2 iconvex @notice.Toast.ColorBg irounded-top">
             <div class="col-1">
                 <div class="row">
                     <div class="col text-center p-1">
@@ -24,16 +23,16 @@
             </div>
             <div class="col-10">
                 <div class="row py-1">
-                    <div class="col font-weight-bold text-warning">@notice.Info.Title</div>
+                    <div class="col font-weight-bold text-warning">@notice.Toast.Title</div>
                 </div>
                 <div class="row py-1">
                     <div class="col ">
-                        @notice.Info.Message
+                        @notice.Toast.Message
                     </div>
                 </div>
             </div>
             <div class="col-1">
-                <IconClose Action="HideInfo" />
+                <IconClose Action="@(() => notice.Toast.Visible = false)" />
             </div>
         </div>
     </div>
@@ -49,9 +48,7 @@
     </div>
 }
 
-
 @code{
     protected override void OnInitialized() => notice.OnChange += StateHasChanged;
     public void Dispose() => notice.OnChange -= StateHasChanged;
-    void HideInfo() => notice.Info.Visible = false;
 }

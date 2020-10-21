@@ -2,53 +2,48 @@
 @inject IAuthService AuthService
 @inject NavigationManager NavigationManager
 
-<div class="container h-100">
-    @if (withErrors)
-    {
-        <div class="alert alert-danger" role="alert">
-            <p>@error</p>
-        </div>
-    }
-    <div class="row h-100">
-        <div class="col offset-md-3 col-md-6 align-self-center">
-            <EditForm class="idark iframe" Model="loginModel" OnValidSubmit="HandleLogin">
-                <DataAnnotationsValidator />
-                <ValidationSummary />
-                <div class="row">
-                    <div class="col">
-                        <InputText type="email" placeholder="введите email" @bind-Value="loginModel.Email" />
-                    </div>
+    <div class="row isecodary iframe" style="margin-top:30vh">
+        <EditForm class="col-12" Model="loginModel" OnValidSubmit="HandleLogin">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            @if (withErrors)
+            {
+                <div class="row validation-message">
+                    <div class="col">@error</div>
                 </div>
-                <div class="row my-3">
-                    <div class="col">
-                        <InputText type="password" placeholder="введите пароль" @bind-Value="loginModel.Password" />
-                    </div>
+            }
+            <div class="row">
+                <div class="col">
+                    <InputText type="email" placeholder="email" @bind-Value="loginModel.Email" />
                 </div>
+            </div>
+            <div class="row my-3">
+                <div class="col">
+                    <InputText type="password" placeholder="password" @bind-Value="loginModel.Password" />
+                </div>
+            </div>
 
-                <ButtonSubmit Title="Войти" Color="Choice.InvestColor.isuccess"/>
-
-            </EditForm>
-        </div>
+            <ButtonSubmit Title="To come in" Color="Choice.InvestColor.isuccess" />
+        </EditForm>
     </div>
-</div>
 
-@code {
-    LoginModel loginModel = new LoginModel();
-    bool withErrors;
-    string error = "";
+    @code {
+        LoginModel loginModel = new LoginModel();
+        bool withErrors;
+        string error = "";
 
-    async Task HandleLogin()
-    {
-        withErrors = false;
-
-        var result = await AuthService.LoginAsync(loginModel);
-
-        if (result.Successful)
-            NavigationManager.NavigateTo("/");
-        else
+        async Task HandleLogin()
         {
-            error = result.Error;
-            withErrors = true;
+            withErrors = false;
+
+            var result = await AuthService.LoginAsync(loginModel);
+
+            if (result.Successful)
+                NavigationManager.NavigateTo("/");
+            else
+            {
+                error = result.Error;
+                withErrors = true;
+            }
         }
     }
-}

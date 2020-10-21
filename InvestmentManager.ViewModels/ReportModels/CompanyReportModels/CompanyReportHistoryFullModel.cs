@@ -1,6 +1,6 @@
 ﻿namespace InvestmentManager.ViewModels.ReportModels.CompanyReportModels
 {
-    public class CompanyReportHistoryModel
+    public class CompanyReportHistoryFullModel
     {
         public string DateReport { get; set; }
         public string Quarter { get; set; }

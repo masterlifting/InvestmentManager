@@ -13,14 +13,9 @@
     [Parameter] public string ErrorValue { get; set; }
     [Parameter] public string Title { get; set; }
 
-    AccountErrorResultModel result;
+    AccountErrorForm result;
     bool isDone = false;
 
-    protected override void OnParametersSet()
-    {
-        base.OnParametersSet();
-        result = new AccountErrorResultModel { AccountName = ErrorValue.Split('\'')[1] };
-    }
-
-    async Task SendData() => isDone = await http.PostBoolAsync("error/accounterror", result, true);
+    protected override void OnParametersSet() => result = new AccountErrorForm { AccountName = ErrorValue.Split('\'')[1] };
+    async Task SendData() => isDone = await http.PostBoolAsync(RouteName.brokerReport + "/setaccount", result, true);
 }

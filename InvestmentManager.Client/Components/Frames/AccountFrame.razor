@@ -1,7 +1,7 @@
 ﻿@inject CustomHttpClient http
 @inject ILocalStorageService localStorage
 
-<FrameTemplate Theme="Choice.InvestColor.isuccess" Name="@sum" TitleColor="Choice.Color.light">
+<FrameTemplate Theme="Choice.InvestColor.isuccess" Name="@sum" TitleColor="Choice.TextColor.light">
     <IconBlock>
         <div class="col-1 px-0"> <IconCustom IconName="info" /> </div>
         <div class="col-1 px-0"> <IconCustom IconName="yen" /> </div>
@@ -44,7 +44,7 @@
         user = (await AuthenticationState).User.Identity;
         if (user.IsAuthenticated)
         {
-            Accounts = await http.GetResultAsync<List<AccountFrameModel>>("accounts/all");
+            Accounts = await http.GetResultAsync<List<AccountFrameModel>>(RouteName.account + "/all");
             sum = Accounts.Sum(x => x.Sum).ToString("C");
             await localStorage.SetItemAsync($"{user.Name}{DefaultData.IdName.accountIds}", Accounts.Where(x => x.IsActive).Select(x => x.Id).ToArray());
         }
@@ -54,7 +54,7 @@
     {
         Accounts.First(x => x.Id == selector.selectedId).IsActive = selector.isSelected;
         long[] selectedIds = Accounts.Where(x => x.IsActive).Select(x => x.Id).ToArray();
-        sum = (await http.GetResultAsync<List<AccountFrameModel>>("accounts/selected", JsonSerializer.Serialize(selectedIds))).Sum(x => x.Sum).ToString("C");
+        sum = (await http.GetResultAsync<List<AccountFrameModel>>(RouteName.account + "/selected", JsonSerializer.Serialize(selectedIds))).Sum(x => x.Sum).ToString("C");
         await localStorage.SetItemAsync($"{user.Name}{DefaultData.IdName.accountIds}", selectedIds);
     }
 }

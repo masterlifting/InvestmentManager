@@ -1,39 +1,35 @@
 ﻿@page "/"
 @inject CustomHttpClient http
 
-<div class="container idark iframe">
-    <div class="row">
-        <div class="col-8"><span class="oi oi-dollar" aria-hidden="true"></span> сегодня:</div>
-        @if (dollar.HasValue)
-        {
-            <div class="col-4 text-right font-weight-bold text-danger">@dollar.Value.ToString("C")</div>
-        }
-        else
-        {
-            <text>@DefaultData.loading</text>
-        }
-    </div>
+<div class="row isecodary iframe py-1">
+    <div class="col-8"><span class="oi oi-dollar text-dark" aria-hidden="true"></span> today:</div>
+    @if (dollar.HasValue)
+    {
+        <div class="col-4 text-right font-weight-bold text-dark">@dollar.Value.ToString("C")</div>
+    }
+    else
+    {
+        <text>@DefaultData.loading</text>
+    }
 </div>
 
 <AdminFrame />
 <AccountFrame />
 
-@for (int i = 0; i < model.Count; i++)
+@for (int i = 0; i < companies.Count; i++)
 {
-    <CompanyFrame Id="@model[i].Id" Name="@model[i].Name" />
+    <CompanyFrame Id="@companies[i].Id" Name="@companies[i].Name" />
 }
-
 
 @code
 {
     decimal? dollar;
-    CBRF rate;
-    List<CompanyModel> model = new List<CompanyModel>();
+    List<ViewModelBase> companies = new List<ViewModelBase>();
 
     protected override async Task OnInitializedAsync()
     {
-        model = await http.GetResultAsync<List<CompanyModel>>("company/list");
-        rate = await http.GetResultAsync<CBRF>("outside/getrate");
+        companies = await http.GetResultAsync<List<ViewModelBase>>(RouteName.company + "/list");
+        CBRF rate = await http.GetResultAsync<CBRF>(RouteName.additional + "/getrate");
         dollar = rate.Valute.USD.Value;
     }
 }

@@ -57,6 +57,27 @@ namespace InvestmentManager.Client.Services.HttpService
 
             return result;
         }
+        public async Task<bool> GetBoolAsync(string route, long id, bool withConfirm = false)
+        {
+            var startTime = DateTime.Now;
+            var taskResponse = httpClient.GetAsync($"{route}?id={id}");
+
+            if ((DateTime.Now - startTime).TotalMilliseconds > timeThreshold && !taskResponse.IsCompleted)
+                notification.LoadStart();
+
+            var response = await taskResponse.ConfigureAwait(false);
+            notification.LoadStop();
+
+            if (withConfirm)
+            {
+                if (response.IsSuccessStatusCode)
+                    await notification.AlertSuccesAsync().ConfigureAwait(false);
+                else
+                    await notification.AlertFailedAsync().ConfigureAwait(false);
+            }
+
+            return response.IsSuccessStatusCode;
+        }
         public async Task<TResult> GetResultAsync<TResult>(string route, string ids, bool withLoading = false)
         {
             var taskResult = httpClient.GetFromJsonAsync<TResult>($"{route}?ids={ids}");
@@ -86,9 +107,9 @@ namespace InvestmentManager.Client.Services.HttpService
             if (withConfirm)
             {
                 if (result.IsSuccessStatusCode)
-                    await notification.NoticeSuccesAsync().ConfigureAwait(false);
+                    await notification.AlertSuccesAsync().ConfigureAwait(false);
                 else
-                    await notification.NoticeFailedAsync().ConfigureAwait(false);
+                    await notification.AlertFailedAsync().ConfigureAwait(false);
             }
         }
         public async Task<bool> PostBoolAsync<TModel>(string route, TModel model, bool withConfirm = false)
@@ -104,9 +125,9 @@ namespace InvestmentManager.Client.Services.HttpService
             if (withConfirm)
             {
                 if (response.IsSuccessStatusCode)
-                    await notification.NoticeSuccesAsync().ConfigureAwait(false);
+                    await notification.AlertSuccesAsync().ConfigureAwait(false);
                 else
-                    await notification.NoticeFailedAsync().ConfigureAwait(false);
+                    await notification.AlertFailedAsync().ConfigureAwait(false);
             }
 
             return response.IsSuccessStatusCode;
@@ -124,9 +145,9 @@ namespace InvestmentManager.Client.Services.HttpService
             if (withConfirm)
             {
                 if (response.IsSuccessStatusCode)
-                    await notification.NoticeSuccesAsync().ConfigureAwait(false);
+                    await notification.AlertSuccesAsync().ConfigureAwait(false);
                 else
-                    await notification.NoticeFailedAsync().ConfigureAwait(false);
+                    await notification.AlertFailedAsync().ConfigureAwait(false);
             }
 
             return response;
@@ -150,9 +171,9 @@ namespace InvestmentManager.Client.Services.HttpService
             if (withConfirm)
             {
                 if (response.IsSuccessStatusCode)
-                    await notification.NoticeSuccesAsync().ConfigureAwait(false);
+                    await notification.AlertSuccesAsync().ConfigureAwait(false);
                 else
-                    await notification.NoticeFailedAsync().ConfigureAwait(false);
+                    await notification.AlertFailedAsync().ConfigureAwait(false);
             }
 
             return response;

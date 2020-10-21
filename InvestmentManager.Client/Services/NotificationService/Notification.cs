@@ -7,42 +7,49 @@ namespace InvestmentManager.Client.Services.NotificationService
 {
     public class Notification
     {
-        public Notice Notice { get; set; } = new Notice();
-        public Info Info { get; set; } = new Info();
+        public Alert Alert { get; private set; } = new Alert();
+        public Toast Toast { get; private set; } = new Toast();
         public bool IsLoading { get; private set; }
 
         public event Action OnChange;
 
-
-        public void ShowInfo(string title, string message)
+        #region Toasts
+        public void ToastInfo(string title, string message) => ToastBase(Choice.InvestColor.iinfo, title, message);
+        public void ToastDanger(string title, string message) => ToastBase(Choice.InvestColor.idanger, title, message);
+        public void ToastSuccess(string title, string message) => ToastBase(Choice.InvestColor.isuccess, title, message);
+        public void ToastDark(string title, string message) => ToastBase(Choice.InvestColor.idark, title, message);
+        public void ToastWarning(string title, string message) => ToastBase(Choice.InvestColor.iwarning, title, message);
+        public void ToastSecondary(string title, string message) => ToastBase(Choice.InvestColor.isecondary, title, message);
+        private void ToastBase(Choice.InvestColor color, string title, string message)
         {
-            Info.ColorBg = Choice.InvestColor.iinfo.ToString();
-            Info.Title = title;
-            Info.Message = message;
-            Info.Visible = true;
+            Toast.ColorBg = color.ToString();
+            Toast.Title = title;
+            Toast.Message = message;
+            Toast.Visible = true;
             NotifyStateChanged();
         }
-
-        public async Task NoticeAccessAsync(string message = null, int delay = 1500) =>
-            await GetNoticeAsync(Choice.InvestColor.iwarning, string.IsNullOrWhiteSpace(message) ? DefaultData.noticeAccess : message, delay).ConfigureAwait(false);
-        public async Task NoticeFailedAsync(string message = null, int delay = 1500) =>
-            await GetNoticeAsync(Choice.InvestColor.idanger, string.IsNullOrWhiteSpace(message) ? DefaultData.noticeFailed : message, delay).ConfigureAwait(false);
-        public async Task NoticeSuccesAsync(string message = null, int delay = 1500) =>
-            await GetNoticeAsync(Choice.InvestColor.isuccess, string.IsNullOrWhiteSpace(message) ? DefaultData.noticeSuccess : message, delay).ConfigureAwait(false);
-        public async Task NoticeInfoAsync(string message = null, int delay = 1500) =>
-            await GetNoticeAsync(Choice.InvestColor.isecondary, string.IsNullOrWhiteSpace(message) ? DefaultData.noticeInfo : message, delay).ConfigureAwait(false);
-
-        private async Task GetNoticeAsync(Choice.InvestColor color, string message, int delay)
+        #endregion
+        #region Alerts
+        public async Task AlerAccessAsync(string message = null, int delay = 1500) =>
+            await AlertBaseAsync(Choice.InvestColor.iwarning, string.IsNullOrWhiteSpace(message) ? DefaultData.noticeAccess : message, delay).ConfigureAwait(false);
+        public async Task AlertFailedAsync(string message = null, int delay = 1500) =>
+            await AlertBaseAsync(Choice.InvestColor.idanger, string.IsNullOrWhiteSpace(message) ? DefaultData.noticeFailed : message, delay).ConfigureAwait(false);
+        public async Task AlertSuccesAsync(string message = null, int delay = 1500) =>
+            await AlertBaseAsync(Choice.InvestColor.isuccess, string.IsNullOrWhiteSpace(message) ? DefaultData.noticeSuccess : message, delay).ConfigureAwait(false);
+        public async Task AlertInfoAsync(string message = null, int delay = 1500) =>
+            await AlertBaseAsync(Choice.InvestColor.isecondary, string.IsNullOrWhiteSpace(message) ? DefaultData.noticeInfo : message, delay).ConfigureAwait(false);
+        private async Task AlertBaseAsync(Choice.InvestColor color, string message, int delay)
         {
-            Notice.ColorBg = color.ToString();
-            Notice.Message = message;
-            Notice.Visible = true;
+            Alert.ColorBg = color.ToString();
+            Alert.Message = message;
+            Alert.Visible = true;
             NotifyStateChanged();
             await Task.Delay(delay).ConfigureAwait(false);
-            Notice.Visible = false;
+            Alert.Visible = false;
             NotifyStateChanged();
         }
-
+        #endregion
+        #region Loading
         public void LoadStart()
         {
             if (!IsLoading)
@@ -59,15 +66,17 @@ namespace InvestmentManager.Client.Services.NotificationService
                 NotifyStateChanged();
             }
         }
+        #endregion
+
         private void NotifyStateChanged() => OnChange?.Invoke();
     }
-    public class Notice
+    public class Alert
     {
         public string ColorBg { get; set; }
         public string Message { get; set; }
         public bool Visible { get; set; }
     }
-    public class Info
+    public class Toast
     {
         public string ColorBg { get; set; }
         public string Message { get; set; }

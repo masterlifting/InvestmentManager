@@ -14,5 +14,5 @@
     RecommendationsForBuyingShortModel model = new RecommendationsForBuyingShortModel();
 
     protected async override Task OnInitializedAsync() =>
-        model = await http.GetResultAsync<RecommendationsForBuyingShortModel>("recommendation/buy", CompanyId);
+        model = await http.GetResultAsync<RecommendationsForBuyingShortModel>(RouteName.recommendation + "recommendation/buyshort", CompanyId);
 }

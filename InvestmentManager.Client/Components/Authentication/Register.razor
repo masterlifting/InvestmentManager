@@ -2,46 +2,41 @@
 @inject IAuthService  AuthService
 @inject NavigationManager NavigationManager
 
-<div class="container h-100">
-    @if (withErrors)
-    {
-        <div class="alert alert-danger" role="alert">
-            @foreach (var error in errors)
+<div class="row isecodary iframe" style="margin-top:30vh">
+    <EditForm class="col" Model="registerModel" OnValidSubmit="HandleRegistration">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        @if (withErrors)
+        {
+            foreach (var error in errors)
             {
-                <p>@error</p>
+                <div class="row validation-message">
+                    <div class="col">@error</div>
+                </div>
             }
+        }
+        <div class="row">
+            <div class="col ">
+                <InputText type="email" placeholder="email" @bind-Value="registerModel.Email" />
+            </div>
         </div>
-    }
-    <div class="row h-100">
-        <div class="col offset-md-3 col-md-6 align-self-center">
-            <EditForm class="idark iframe" Model="registerModel" OnValidSubmit="HandleRegistration">
-                <DataAnnotationsValidator />
-                <ValidationSummary />
 
-                <div class="row">
-                    <div class="col ">
-                        <InputText type="email" placeholder="введите email" @bind-Value="registerModel.Email" />
-                    </div>
-                </div>
-
-                <div class="row my-3">
-                    <div class="col">
-                        <InputText type="password" placeholder="введите пароль" @bind-Value="registerModel.Password" />
-                    </div>
-                </div>
-
-                <div class="row mb-3">
-                    <div class="col">
-                        <InputText type="password" placeholder="повторите пароль" @bind-Value="registerModel.PasswordConfirm" />
-                    </div>
-                </div>
-
-                <ButtonSubmit Title="Зарегистрироваться" Color="Choice.InvestColor.isuccess"/>
-
-            </EditForm>
+        <div class="row my-3">
+            <div class="col">
+                <InputText type="password" placeholder="password" @bind-Value="registerModel.Password" />
+            </div>
         </div>
-    </div>
+
+        <div class="row mb-3">
+            <div class="col">
+                <InputText type="password" placeholder="repeat password" @bind-Value="registerModel.PasswordConfirm" />
+            </div>
+        </div>
+
+        <ButtonSubmit Title="Register" Color="Choice.InvestColor.isuccess" />
+    </EditForm>
 </div>
+
 @code {
     RegisterModel registerModel = new RegisterModel();
     bool withErrors;

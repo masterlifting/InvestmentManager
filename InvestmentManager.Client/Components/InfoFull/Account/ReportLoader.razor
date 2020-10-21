@@ -4,13 +4,14 @@
 @inject NavigationManager navigationManager
 @inject Notification notice
 
-<LinkSmartAction LinkAction="@(async () => await ClickInputFileButtonAsync("inputButton"))" Name="Загрузить .xls отчеты от БКС" />
+<LinkAction Action="@(async () => await ClickInputFileButtonAsync("inputButton"))" Name="Load .xls reports from Bcs" />
 <InputFile multiple OnChange="HandleSelectionAsync" id="inputButton" style="display:none" />
 
 @code {
-    ClaimsPrincipal user;
+    ClaimsPrincipal user = null;
     [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; }
-
+    
+    protected override async Task OnInitializedAsync() => user = (await AuthenticationState).User;
     async Task HandleSelectionAsync(IFileListEntry[] files)
     {
         notice.LoadStart();
@@ -26,7 +27,7 @@
                 ms.Close();
             }
 
-            var response = await http.PostContentAsync("portfolio/bcsreports", content).ConfigureAwait(false);
+            var response = await http.PostContentAsync(RouteName.brokerReport + "/parsebcs", content).ConfigureAwait(false);
             content.Dispose();
 
             if (response.IsSuccessStatusCode)
@@ -38,18 +39,15 @@
             else
             {
                 notice.LoadStop();
-                await notice.NoticeFailedAsync("Не удалось загрузить отчеты.");
+                await notice.AlertFailedAsync();
             }
         }
     }
     async Task ClickInputFileButtonAsync(string inputFileId)
     {
-        if (!user.Identity.IsAuthenticated)
-        {
-            await notice.NoticeAccessAsync();
-            return;
-        }
-
-        await jsRuntime.InvokeVoidAsync("uploadBrokerReports", inputFileId);
+        if (user is null || !user.Identity.IsAuthenticated)
+            await notice.AlerAccessAsync();
+        else
+            await jsRuntime.InvokeVoidAsync("uploadBrokerReports", inputFileId);
     }
 }

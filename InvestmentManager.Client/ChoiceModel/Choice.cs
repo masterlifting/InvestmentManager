@@ -2,6 +2,15 @@
 {
     public static class Choice
     {
+        public enum InvestColor
+        {
+            isuccess,
+            idanger,
+            iwarning,
+            iinfo,
+            isecondary,
+            idark
+        }
         public enum TextColor
         {
             light,
@@ -19,15 +28,6 @@
             right,
             left,
             center
-        }
-        public enum InvestColor
-        {
-            isuccess,
-            idanger,
-            iwarning,
-            iinfo,
-            isecondary,
-            idark
         }
     }
 }

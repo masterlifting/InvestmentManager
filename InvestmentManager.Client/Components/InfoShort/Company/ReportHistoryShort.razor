@@ -20,7 +20,7 @@
     [Parameter] public string InfoName { get; set; }
     [Parameter] public long CompanyId { get; set; }
 
-    ReportHistoryShortModel model = new ReportHistoryShortModel();
+    CompanyReportHistoryShortModel model = new CompanyReportHistoryShortModel();
     protected async override Task OnInitializedAsync() =>
-       model = await http.GetResultAsync<ReportHistoryShortModel>("report/shorthistory", CompanyId);
+       model = await http.GetResultAsync<CompanyReportHistoryShortModel>(RouteName.companyReport + "/historyshort", CompanyId);
 }

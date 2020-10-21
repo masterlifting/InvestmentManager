@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace InvestmentManager.Client
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1052:Static holder types should be Static or NotInheritable", Justification = "<Pending>")]
     public class Program
     {
         public static async Task Main(string[] args)

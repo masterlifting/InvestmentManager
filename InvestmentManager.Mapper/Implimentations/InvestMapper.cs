@@ -1,6 +1,7 @@
 ﻿using InvestmentManager.BrokerService.Models;
 using InvestmentManager.Mapper.Interfaces;
 using InvestmentManager.Repository;
+using InvestmentManager.ViewModels;
 using InvestmentManager.ViewModels.ReportModels.BrokerReportModels;
 using System.Collections.Generic;
 using System.Globalization;
@@ -8,10 +9,10 @@ using System.Linq;
 
 namespace InvestmentManager.Mapper.Implimentations
 {
-    public class PortfolioMapper : IPortfolioMapper
+    public class InvestMapper : IInvestMapper
     {
         private readonly IUnitOfWorkFactory unitOfWork;
-        public PortfolioMapper(IUnitOfWorkFactory unitOfWork) => this.unitOfWork = unitOfWork;
+        public InvestMapper(IUnitOfWorkFactory unitOfWork) => this.unitOfWork = unitOfWork;
 
         public BrokerReportModel MapBcsReports(ResultBrokerReportModel resultReportsModel)
         {
@@ -121,5 +122,17 @@ namespace InvestmentManager.Mapper.Implimentations
             result.ReportErrors = reportErrors;
             return result;
         }
+
+        public CBRF MapCBRF(Services.Implimentations.CBRF currentModel) => new CBRF
+        {
+            Date = currentModel.Date,
+            Valute = new Valute
+            {
+                USD = new USD
+                {
+                    Value = currentModel.Valute.USD.Value
+                }
+            }
+        };
     }
 }

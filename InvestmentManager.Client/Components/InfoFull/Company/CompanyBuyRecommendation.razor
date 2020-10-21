@@ -1,4 +1,4 @@
-﻿@inject CustomHttpClient httpClient
+﻿@*@inject CustomHttpClient httpClient
 
 <div class="row icontent">
     @if (model != null)
@@ -33,4 +33,4 @@
     {
         model = await httpClient.GetResultAsync<BuyRecommendationModel>("recommendation/buyrecommendation", CompanyId);
     }
-}
+}*@

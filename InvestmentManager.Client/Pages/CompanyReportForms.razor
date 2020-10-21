@@ -1,12 +1,12 @@
-﻿@page "/financialreportsform"
-@inject CustomHttpClient httpClient
+﻿@page "/companyreportforms"
+@inject CustomHttpClient http
 @inject Notification notice
+@attribute [Authorize]
 
-
-@foreach (var result in newReports)
+@foreach (var result in checkingreports.Take(5))
 {
     <div class="container idark iframe">
-        <RowTitle Color="Choice.Color.warning" Text="@result.CompanyName" />
+        <RowTitle Color="Choice.TextColor.warning" Text="@result.CompanyName" />
 
         @foreach (var report in result.Reports)
         {
@@ -87,42 +87,47 @@
                 </div>
                 <div class="row">
                     <div class="col-6">
-                        <ButtonAction Title="Удалить" Color="Choice.Button.danger" ClickAction="@(() => DeleteReport(report, result.CompanyName))" />
+                        <ButtonAction Title="Delete" Color="Choice.InvestColor.idanger" ClickAction="@(() => DeleteReport(report, result.CompanyName))" />
                     </div>
                     <div class="col-6">
-                        <ButtonSubmit Title="Сохранить" Color="Choice.Button.success" />
+                        <ButtonSubmit Title="Save" Color="Choice.InvestColor.isuccess" />
                     </div>
                 </div>
             </EditForm>
         }
     </div>
+
+    <div class="row">
+        <div class="col text-center ilink" @onclick="GetCheckingReports">else...</div>
+    </div>
 }
 
 @code {
-    List<NewCompanyReportModel> newReports = new List<NewCompanyReportModel>();
+    List<CompanyReportForm> checkingreports = new List<CompanyReportForm>();
 
-    protected override async Task OnParametersSetAsync() => newReports = await httpClient.GetResultAsync<List<NewCompanyReportModel>>("admin/getreports");
+    protected override async Task OnParametersSetAsync() => await GetCheckingReports();
 
+    async Task GetCheckingReports() => checkingreports = await http.GetResultAsync<List<CompanyReportForm>>(RouteName.companyReport + "/checknew");
     async Task DeleteReport(NewReportModel report, string companyName)
     {
-        if (await httpClient.PostBoolAsync("admin/deletereport", report.ReportId))
+        if (await http.GetBoolAsync(RouteName.companyReport + "/deletechecked", report.ReportId))
         {
             await DeleteReportNodeAsync(report, companyName);
-            await notice.NoticeFailedAsync("Отчет удален", 700);
+            await notice.AlertSuccesAsync("Report deleted", 500);
         }
         else
-            await notice.NoticeFailedAsync();
+            await notice.AlertFailedAsync();
     }
     async Task SaveReport(NewReportModel report, string companyName)
     {
-        if (await httpClient.PostBoolAsync<NewReportModel>("admin/savereport", report))
+        if (await http.PostBoolAsync<NewReportModel>(RouteName.companyReport + "/savechecked", report))
         {
             await DeleteReportNodeAsync(report, companyName);
-            await notice.NoticeSuccesAsync("Отчет сохранен", 700);
+            await notice.AlertSuccesAsync("Report saved", 500);
         }
         else
-            await notice.NoticeFailedAsync();
+            await notice.AlertFailedAsync();
     }
     async Task DeleteReportNodeAsync(NewReportModel report, string companyName) =>
-        await Task.Run(() => { newReports.FirstOrDefault(x => x.CompanyName.Equals(companyName)).Reports.Remove(report); });
+        await Task.Run(() => { checkingreports.FirstOrDefault(x => x.CompanyName.Equals(companyName)).Reports.Remove(report); });
 }

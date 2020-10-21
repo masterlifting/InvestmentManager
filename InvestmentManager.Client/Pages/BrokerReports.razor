@@ -23,6 +23,6 @@ else if (ReportModel.CorrectReports.Any())
         var user = (await AuthenticationState).User;
         ReportModel = await localStorage.GetItemAsync<BrokerReportModel>($"{user.Identity.Name}_bcsReport");
         notice.LoadStop();
-        await notice.NoticeSuccesAsync("Отчеты разобраны успешно");
+        notice.ToastSuccess("Parsing bcs reports", "Success");
     }
 }

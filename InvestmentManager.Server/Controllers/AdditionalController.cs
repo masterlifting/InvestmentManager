@@ -1,4 +1,5 @@
-﻿using InvestmentManager.Services.Interfaces;
+﻿using InvestmentManager.Mapper.Interfaces;
+using InvestmentManager.Services.Interfaces;
 using InvestmentManager.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -9,23 +10,17 @@ namespace InvestmentManager.Server.Controllers
     public class AdditionalController : ControllerBase
     {
         private readonly IWebService webService;
-        public AdditionalController(IWebService webService) => this.webService = webService;
+        private readonly IInvestMapper mapper;
+
+        public AdditionalController(
+            IWebService webService
+            , IInvestMapper mapper)
+        {
+            this.webService = webService;
+            this.mapper = mapper;
+        }
 
         [HttpGet("getrate")]
-        public async Task<CBRF> GetDollar()
-        {
-            var rate = await webService.GetDollarRateAsync().ConfigureAwait(false);
-            return new CBRF
-            {
-                Date = rate.Date,
-                Valute = new Valute
-                {
-                    USD = new USD
-                    {
-                        Value = rate.Valute.USD.Value
-                    }
-                }
-            };
-        }
+        public async Task<CBRF> GetDollar() => mapper.MapCBRF(await webService.GetDollarRateAsync().ConfigureAwait(false));
     }
 }

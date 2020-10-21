@@ -30,7 +30,7 @@
     {
         if (isDetails == true)
         {
-            var model = await http.GetResultAsync<List<ReportHistoryModel>>("report/history", CompanyId);
+            var model = await http.GetResultAsync<List<CompanyReportHistoryFullModel>>(RouteName.companyReport + "/historyfull", CompanyId);
             bodies = model.Select(x => new List<string>
             {
                 x.DateReport,

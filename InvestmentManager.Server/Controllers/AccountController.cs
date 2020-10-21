@@ -6,13 +6,14 @@ using System.Threading.Tasks;
 using InvestmentManager.Repository;
 using InvestmentManager.Services.Interfaces;
 using InvestmentManager.ViewModels.AccountModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace InvestmentManager.Server.Controllers
 {
-    [ApiController, Route("[controller]")]
+    [ApiController, Route("[controller]"),Authorize]
     public class AccountController : ControllerBase
     {
         private readonly UserManager<IdentityUser> userManager;
@@ -63,6 +64,24 @@ namespace InvestmentManager.Server.Controllers
 
             return models;
         }
+        [HttpGet("transactions")]
+        public IEnumerable<AccountTransactionModel> GetAccountTransactions()
+        {
+            var accounts = unitOfWork.Account.GetAll().Where(x => x.UserId.Equals(userManager.GetUserId(User)));
+            var transactions = unitOfWork.AccountTransaction.GetAll().Where(x => accounts.Select(y => y.Id).Contains(x.AccountId));
+            var statuses = unitOfWork.TransactionStatus.GetAll();
 
+            return transactions
+                    .Join(statuses, x => x.TransactionStatusId, y => y.Id, (x, y) => new { x.AccountId, x.CurrencyId, x.Amount, x.DateOperation, TypeOperation = y.Name })
+                    .Join(accounts, x => x.AccountId, y => y.Id, (x, y) => new AccountTransactionModel
+                    {
+                        Account = y.Name,
+                        Sum = x.Amount,
+                        DateTransaction = x.DateOperation,
+                        CurrencyId = x.CurrencyId,
+                        Status = x.TypeOperation
+                    })
+                    .OrderByDescending(x => x.DateTransaction);
+        }
     }
 }

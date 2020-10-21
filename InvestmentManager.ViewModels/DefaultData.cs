@@ -2,14 +2,14 @@
 {
     public static class DefaultData
     {
-        public const string loading = "Загружаю...";
-        public const string errorData = "Данные отсутствуют.";
-        public const string errorLenght = "Не корректная длина значения.";
-        public const string errorRequired = "Поле обязательно для заполнения.";
-        public const string noticeSuccess = "Успешно.";
-        public const string noticeFailed = "Что-то пошло не так.";
-        public const string noticeAccess = "Необходимо войти!";
-        public const string noticeInfo = "Информация";
+        public const string loading = "loading...";
+        public const string errorData = "No data available";
+        public const string errorLenght = "Incorrect value length";
+        public const string errorRequired = "Required field";
+        public const string noticeSuccess = "Success";
+        public const string noticeAccess = "Login required";
+        public const string noticeFailed = "Sorry, something went wrong";
+        public const string noticeInfo = "Information";
         public static class Description
         {
             public const string companyInfo = "Common information about this company";

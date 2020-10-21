@@ -1,5 +1,6 @@
 ﻿using Blazored.LocalStorage;
 using InvestmentManager.Client.Services.NotificationService;
+using InvestmentManager.ViewModels;
 using InvestmentManager.ViewModels.ErrorModels;
 using InvestmentManager.ViewModels.SecurityModels;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -33,7 +34,7 @@ namespace InvestmentManager.Client.Services.AuthConfiguration
         public async Task<ErrorBaseModel> RegisterAsync(RegisterModel model)
         {
             notification.LoadStart();
-            var response = await httpClient.PostAsJsonAsync("authorization/register", model).ConfigureAwait(false);
+            var response = await httpClient.PostAsJsonAsync(RouteName.security + "/register", model).ConfigureAwait(false);
             var result = JsonSerializer.Deserialize<ErrorBaseModel>(await response.Content.ReadAsStringAsync().ConfigureAwait(false), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             notification.LoadStop();
             return result;
@@ -41,7 +42,7 @@ namespace InvestmentManager.Client.Services.AuthConfiguration
         public async Task<LoginResult> LoginAsync(LoginModel model)
         {
             notification.LoadStart();
-            var response = await httpClient.PostAsJsonAsync("authorization/login", model).ConfigureAwait(false);
+            var response = await httpClient.PostAsJsonAsync(RouteName.security + "/login", model).ConfigureAwait(false);
             var result = JsonSerializer.Deserialize<LoginResult>(await response.Content.ReadAsStringAsync().ConfigureAwait(false), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             notification.LoadStop();
 

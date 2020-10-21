@@ -16,6 +16,6 @@
     CompanyAdditionalInfoShortModel model = new CompanyAdditionalInfoShortModel();
 
     protected async override Task OnInitializedAsync() => 
-        model = await http.GetResultAsync<CompanyAdditionalInfoShortModel>("company/additional", CompanyId);
+        model = await http.GetResultAsync<CompanyAdditionalInfoShortModel>(RouteName.company + "/additionalshort", CompanyId);
 }
 
