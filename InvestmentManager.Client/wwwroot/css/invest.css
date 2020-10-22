@@ -151,7 +151,7 @@ input {
     width: 100%;
     margin: 2px 0px;
     padding: 7px 10px;
-    justify-self: center;
+    border-radius: 25px;
     color: rgb(24,24,24);
     background-color: aliceblue;
     box-shadow: inset 3px 3px 5px 3px rgba(20, 20, 20, 0.7);
@@ -163,6 +163,7 @@ select {
     height: 2.5em;
     line-height: 2.5em;
     padding-left: 1em;
+    border-radius: 25px;
     background: rgb(24,24,24) radial-gradient(150% 100% at 50% 5px, rgba(255,255,255,.2), rgba(255,255,255,.17));
     box-shadow: inset rgba(24,24,24,.6) 0 -2px 10px, inset rgba(252,255,255,.7) 0 2px 10px;
 }

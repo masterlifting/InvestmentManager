@@ -1,8 +1,8 @@
 ﻿@inject CustomHttpClient http
 <InfoTemplate InfoName="@InfoName" VisibleAction="@(async (bool isVisible) => await UpdateVisible.InvokeAsync(isVisible))">
     <ChildContent>
-        <InformationCols Key="Date Update" Value="@model.DateUpdate" />
-        <InformationCols KeySize="9" Key="Recommendation price for buying" Value="@model.Price" />
+        <InformationCols KeySize="6" Key="Date Update" Value="@model.DateUpdate" />
+        <InformationCols KeySize="6" Key="Buy if the price is less" Value="@model.Price" />
     </ChildContent>
 </InfoTemplate>
 
@@ -11,8 +11,8 @@
     [Parameter] public string InfoName { get; set; }
     [Parameter] public long CompanyId { get; set; }
 
-    RecommendationsForBuyingShortModel model = new RecommendationsForBuyingShortModel();
+    RecommendationsForBuyShortModel model = new RecommendationsForBuyShortModel();
 
     protected async override Task OnInitializedAsync() =>
-        model = await http.GetResultAsync<RecommendationsForBuyingShortModel>(RouteName.recommendation + "recommendation/buyshort", CompanyId);
+        model = await http.GetResultAsync<RecommendationsForBuyShortModel>(RouteName.recommendation + "/buyshort", CompanyId);
 }

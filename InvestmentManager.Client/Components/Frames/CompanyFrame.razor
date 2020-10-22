@@ -36,7 +36,7 @@
         }
         @if (isBuyRecommendations)
         {
-            <RecommendationsForBuyingShort InfoName="@buyRecommendations" CompanyId="@Id" UpdateVisible="@((bool isVisible) => isBuyRecommendations = isVisible)" />
+            <RecommendationsForBuyShort InfoName="@buyRecommendations" CompanyId="@Id" UpdateVisible="@((bool isVisible) => isBuyRecommendations = isVisible)" />
         }
         @if (isSellRecommendations)
         {
@@ -68,7 +68,7 @@
     string additionalInfo = "Additional information";
     string rating = "Rating details";
     string transactions = "Transactions";
-    string buyRecommendations = "Recommendations for buying";
+    string buyRecommendations = "Recommendations for buy";
     string sellRecommendations = "Recommendations for sale";
     string coefficient = "Coefficient history";
     string report = "Report history";

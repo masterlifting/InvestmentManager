@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using InvestmentManager.Entities.Market;
 using InvestmentManager.PriceFinder.Interfaces;
 using InvestmentManager.Repository;
+using InvestmentManager.ViewModels.PriceModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -60,6 +61,20 @@ namespace InvestmentManager.Server.Controllers
             }
 
             return Ok();
+        }
+        [HttpGet("historyshort")]
+        public async Task<PriceHistoryShortModel> GetHistoryShort(long id)
+        {
+            var result = new PriceHistoryShortModel
+            {
+                DateUpdate = "error",
+                LastPrice = "error"
+            };
+            var price = (await unitOfWork.Price.GetCustomPricesAsync(id, 1, OrderType.OrderByDesc).ConfigureAwait(false)).FirstOrDefault();
+            if (price != null)
+                result = new PriceHistoryShortModel { DateUpdate = price.BidDate.ToString("g"), LastPrice = price.Value.ToString("f2") };
+
+            return result;
         }
     }
 }

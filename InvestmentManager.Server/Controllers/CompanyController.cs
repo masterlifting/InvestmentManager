@@ -12,6 +12,7 @@ namespace InvestmentManager.Server.Controllers
     [ApiController, Route("[controller]")]
     public class CompanyController : ControllerBase
     {
+        private static int _size = 0;
         private readonly IUnitOfWorkFactory unitOfWork;
         public CompanyController(IUnitOfWorkFactory unitOfWork) => this.unitOfWork = unitOfWork;
 
@@ -22,6 +23,20 @@ namespace InvestmentManager.Server.Controllers
                 .OrderBy(x => x.Name)
                 .Select(x => new ViewModelBase { Id = x.Id, Name = x.Name })
                 .ToListAsync().ConfigureAwait(false);
+        }
+        [HttpGet("listsize")]
+        public async Task<List<ViewModelBase>> GetCompanyList(int size)
+        {
+            var result = await unitOfWork.Company.GetAll()
+                .OrderBy(x => x.Name)
+                .Skip(_size)
+                .Take(size)
+                .Select(x => new ViewModelBase { Id = x.Id, Name = x.Name })
+                .ToListAsync().ConfigureAwait(false);
+
+            _size += size;
+
+            return result;
         }
         [HttpGet("additionalshort")]
         public async Task<CompanyAdditionalInfoShortModel> GetAdditionalShort(long id)

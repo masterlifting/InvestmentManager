@@ -1,6 +1,18 @@
 ﻿@page "/"
 @inject CustomHttpClient http
 
+<div class="row">
+    <input class="col-12" placeholder="Search companies" />
+</div>
+
+<div class="row">
+    <select class="col-12">
+        <option selected>Order by</option>
+        <option @onclick="GetBuyRecommendationsFilter">recommendation for buy</option>
+    </select>
+</div>
+
+
 <div class="row isecodary iframe py-1">
     <div class="col-8"><span class="oi oi-dollar text-dark" aria-hidden="true"></span> today:</div>
     @if (dollar.HasValue)
@@ -21,6 +33,10 @@
     <CompanyFrame Id="@companies[i].Id" Name="@companies[i].Name" />
 }
 
+<div class="row mb-3">
+    <div class="col text-center ilink text-dark" @onclick="GetNextCompanyCount">else...</div>
+</div>
+
 @code
 {
     decimal? dollar;
@@ -28,8 +44,19 @@
 
     protected override async Task OnInitializedAsync()
     {
-        companies = await http.GetResultAsync<List<ViewModelBase>>(RouteName.company + "/list");
+
+        companies = await http.GetSizeAsync<List<ViewModelBase>>(RouteName.company + "/listsize", 7);
         CBRF rate = await http.GetResultAsync<CBRF>(RouteName.additional + "/getrate");
         dollar = rate.Valute.USD.Value;
+    }
+
+    async Task GetBuyRecommendationsFilter()
+    {
+        companies = await http.GetResultAsync<List<ViewModelBase>>(RouteName.recommendation + "/orderbuy", true);
+    }
+    async Task GetNextCompanyCount()
+    {
+        var nextCompanies = await http.GetSizeAsync<List<ViewModelBase>>(RouteName.company + "/listsize", 7);
+        companies.AddRange(nextCompanies);
     }
 }
