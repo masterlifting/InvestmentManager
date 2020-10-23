@@ -43,30 +43,6 @@ namespace InvestmentManager.Client.Services.HttpService
 
             return result;
         }
-        public async Task<TResult> GetSizeAsync<TResult>(string route, int size, bool withLoading = false)
-        {
-            if (withLoading)
-                notification.LoadStart();
-
-            var result = await httpClient.GetFromJsonAsync<TResult>($"{route}?size={size}").ConfigureAwait(false);
-
-            if (withLoading)
-                notification.LoadStop();
-
-            return result;
-        }
-        public async Task<TResult> GetResultAsync<TResult>(string route, string ids, bool withLoading = false)
-        {
-            if (withLoading)
-                notification.LoadStart();
-
-            var result = await httpClient.GetFromJsonAsync<TResult>($"{route}?ids={ids}").ConfigureAwait(false);
-
-            if (withLoading)
-                notification.LoadStop();
-
-            return result;
-        }
         public async Task<bool> GetBoolAsync(string route, long id, bool withConfirm = false)
         {
             notification.LoadStart();
@@ -82,6 +58,42 @@ namespace InvestmentManager.Client.Services.HttpService
             }
 
             return response.IsSuccessStatusCode;
+        }
+        public async Task<TResult> GetResultAsync<TResult>(string route, int value, bool withLoading = false)
+        {
+            if (withLoading)
+                notification.LoadStart();
+
+            var result = await httpClient.GetFromJsonAsync<TResult>($"{route}?value={value}").ConfigureAwait(false);
+
+            if (withLoading)
+                notification.LoadStop();
+
+            return result;
+        }
+        public async Task<TResult> GetResultAsync<TResult>(string route, long id, int value, bool withLoading = false)
+        {
+            if (withLoading)
+                notification.LoadStart();
+
+            var result = await httpClient.GetFromJsonAsync<TResult>($"{route}?id={id}&value={value}").ConfigureAwait(false);
+
+            if (withLoading)
+                notification.LoadStop();
+
+            return result;
+        }
+        public async Task<TResult> GetResultAsync<TResult>(string route, string values, bool withLoading = false)
+        {
+            if (withLoading)
+                notification.LoadStart();
+
+            var result = await httpClient.GetFromJsonAsync<TResult>($"{route}?values={values}").ConfigureAwait(false);
+
+            if (withLoading)
+                notification.LoadStop();
+
+            return result;
         }
 
 

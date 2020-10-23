@@ -2,14 +2,15 @@
 @inject CustomHttpClient http
 
 <div class="row">
-    <input class="col-12" placeholder="Search companies" />
-</div>
-
-<div class="row">
-    <select class="col-12">
-        <option selected>Order by</option>
-        <option @onclick="GetBuyRecommendationsFilter">recommendation for buy</option>
-    </select>
+    <div class="col-6 pl-0 pr-1">
+        <input placeholder="Search companies" />
+    </div>
+    <div class="col-6 pr-0 pl-1">
+        <select>
+            <option selected @onclick="GetDefaultOrder">Order by</option>
+            <option @onclick="GetBuyRecommendationsFilter">Recommendation for buy</option>
+        </select>
+    </div>
 </div>
 
 
@@ -28,35 +29,46 @@
 <AdminFrame />
 <AccountFrame />
 
-@for (int i = 0; i < companies.Count; i++)
+@if (companies != null)
 {
-    <CompanyFrame Id="@companies[i].Id" Name="@companies[i].Name" />
+    @for (int i = 0; i < companies.Items.Count; i++)
+    {
+        <CompanyFrame Id="@companies.Items[i].Id" Name="@companies.Items[i].Name" />
+    }
+    @if (companies.Pagination.HasNextPage)
+    {
+        <div class="row mb-3">
+            <div class="offset-4 col-4 text-center ilink text-dark" @onclick="GetNextCompanyCount">else...</div>
+        </div>
+    }
 }
-
-<div class="row mb-3">
-    <div class="col text-center ilink text-dark" @onclick="GetNextCompanyCount">else...</div>
-</div>
 
 @code
 {
     decimal? dollar;
-    List<ViewModelBase> companies = new List<ViewModelBase>();
+    PaginationViewModelBase companies;
+    string route = RouteName.company + "/list";
 
     protected override async Task OnInitializedAsync()
     {
-
-        companies = await http.GetSizeAsync<List<ViewModelBase>>(RouteName.company + "/listsize", 7);
+        companies = await http.GetResultAsync<PaginationViewModelBase>(route, true);
         CBRF rate = await http.GetResultAsync<CBRF>(RouteName.additional + "/getrate");
         dollar = rate.Valute.USD.Value;
     }
 
+    async Task GetDefaultOrder() =>
+        companies = await http.GetResultAsync<PaginationViewModelBase>(RouteName.company + "/list", true);
+
     async Task GetBuyRecommendationsFilter()
     {
-        companies = await http.GetResultAsync<List<ViewModelBase>>(RouteName.recommendation + "/orderbuy", true);
+        route = RouteName.recommendation + "/orderbuy";
+        companies = await http.GetResultAsync<PaginationViewModelBase>(route, true);
     }
+
     async Task GetNextCompanyCount()
     {
-        var nextCompanies = await http.GetSizeAsync<List<ViewModelBase>>(RouteName.company + "/listsize", 7);
-        companies.AddRange(nextCompanies);
+        var next = await http.GetResultAsync<PaginationViewModelBase>(route, companies.Pagination.PageNumber + 1, true);
+        companies.Pagination = next.Pagination;
+        companies.Items.AddRange(next.Items);
     }
 }

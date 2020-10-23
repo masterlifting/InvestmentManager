@@ -31,16 +31,28 @@ namespace InvestmentManager.Server.Controllers
             };
         }
         [HttpGet("orderbuy")]
-        public List<ViewModelBase> GetOrderBuyRecommendations()
+        public async Task<PaginationViewModelBase> GetOrderBuyRecommendations(int value = 1)
         {
+            int pageSize = 7;
             var companies = unitOfWork.Company.GetAll();
             var lastPricies = unitOfWork.Price.GetLastPrices(30);
             var buyRecommendations = unitOfWork.BuyRecommendation.GetAll();
 
-            return lastPricies
+            var pagination = new Pagination();
+            var count = await buyRecommendations.CountAsync().ConfigureAwait(false);
+            pagination.SetPagination(count, value, pageSize);
+
+            var items = lastPricies
                 .Join(buyRecommendations, x => x.Key, y => y.CompanyId, (x, y) => new { LastPrice = x.Value, RecommendationPrice = y.Price, y.CompanyId })
                 .OrderByDescending(x => x.RecommendationPrice / x.LastPrice)
+                .Skip((value - 1) * pageSize).Take(pageSize)
                 .Join(companies, x => x.CompanyId, y => y.Id, (x, y) => new ViewModelBase { Id = y.Id, Name = y.Name }).ToList();
+
+            return new PaginationViewModelBase
+            {
+                Items = items,
+                Pagination = pagination
+            };
         }
     }
 }

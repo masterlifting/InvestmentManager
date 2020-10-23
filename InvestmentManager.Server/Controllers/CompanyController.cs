@@ -3,7 +3,6 @@ using InvestmentManager.ViewModels;
 using InvestmentManager.ViewModels.CompanyModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -12,31 +11,24 @@ namespace InvestmentManager.Server.Controllers
     [ApiController, Route("[controller]")]
     public class CompanyController : ControllerBase
     {
-        private static int _size = 0;
         private readonly IUnitOfWorkFactory unitOfWork;
         public CompanyController(IUnitOfWorkFactory unitOfWork) => this.unitOfWork = unitOfWork;
 
         [HttpGet("list")]
-        public async Task<List<ViewModelBase>> GetCompanyList()
+        public async Task<PaginationViewModelBase> GetCompanyList(int value = 1)
         {
-            return await unitOfWork.Company.GetAll()
-                .OrderBy(x => x.Name)
-                .Select(x => new ViewModelBase { Id = x.Id, Name = x.Name })
-                .ToListAsync().ConfigureAwait(false);
-        }
-        [HttpGet("listsize")]
-        public async Task<List<ViewModelBase>> GetCompanyList(int size)
-        {
-            var result = await unitOfWork.Company.GetAll()
-                .OrderBy(x => x.Name)
-                .Skip(_size)
-                .Take(size)
-                .Select(x => new ViewModelBase { Id = x.Id, Name = x.Name })
-                .ToListAsync().ConfigureAwait(false);
-
-            _size += size;
-
-            return result;
+            int pageSize = 7;
+            var companies = unitOfWork.Company.GetAll().OrderBy(x => x.Name);
+            var count = await companies.CountAsync().ConfigureAwait(false);
+            var items = await companies.Skip((value - 1) * pageSize).Take(pageSize).Select(x => new ViewModelBase { Id = x.Id, Name = x.Name }).ToListAsync().ConfigureAwait(false);
+            
+            var pagination = new Pagination();
+            pagination.SetPagination(count, value, pageSize);
+            return new PaginationViewModelBase
+            {
+                Items = items,
+                Pagination = pagination
+            };
         }
         [HttpGet("additionalshort")]
         public async Task<CompanyAdditionalInfoShortModel> GetAdditionalShort(long id)

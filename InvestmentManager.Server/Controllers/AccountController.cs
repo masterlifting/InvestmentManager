@@ -48,9 +48,9 @@ namespace InvestmentManager.Server.Controllers
             return models;
         }
         [HttpGet("selected")]
-        public async Task<List<AccountFrameModel>> GetSelectedAccountInfo(string ids)
+        public async Task<List<AccountFrameModel>> GetSelectedAccountInfo(string values)
         {
-            var Ids = JsonSerializer.Deserialize<long[]>(ids);
+            var Ids = JsonSerializer.Deserialize<long[]>(values);
             var models = await unitOfWork.Account.GetAll().Where(x => Ids.Contains(x.Id)).Select(x => new AccountFrameModel
             {
                 Id = x.Id,
