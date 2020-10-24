@@ -3,17 +3,21 @@
     <div class="col-@HeaderWidth text-dark">
         @foreach (var header in Headers)
         {
-            <div class="row"> <div class="col">@header</div> </div>
+            <div class="row">
+                <div class="col">@header</div>
+            </div>
         }
     </div>
     <div class="col-@BodyWidth">
         <div class="row flex-nowrap" style="overflow-x:auto">
             @foreach (var values in Bodies)
             {
-                <div class="col-@BodyColWidth text-center">
+                <div class="col-@BodyColWidth">
                     @foreach (var value in values)
                     {
-                        <div class="row"> <div class="col">@value</div> </div>
+                        <div class="row">
+                            <div class="col">@value</div>
+                        </div>
                     }
                 </div>
             }

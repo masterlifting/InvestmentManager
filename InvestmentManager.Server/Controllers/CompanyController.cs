@@ -3,6 +3,7 @@ using InvestmentManager.ViewModels;
 using InvestmentManager.ViewModels.CompanyModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -14,10 +15,14 @@ namespace InvestmentManager.Server.Controllers
         private readonly IUnitOfWorkFactory unitOfWork;
         public CompanyController(IUnitOfWorkFactory unitOfWork) => this.unitOfWork = unitOfWork;
 
+        [HttpGet("all")]
+        public async Task<List<ViewModelBase>> GetAllCompanies() => 
+            await unitOfWork.Company.GetAll().OrderBy(x => x.Name).Select(x => new ViewModelBase { Id = x.Id, Name = x.Name }).ToListAsync().ConfigureAwait(false);
+
         [HttpGet("list")]
         public async Task<PaginationViewModelBase> GetCompanyList(int value = 1)
         {
-            int pageSize = 7;
+            int pageSize = 10;
             var companies = unitOfWork.Company.GetAll().OrderBy(x => x.Name);
             var count = await companies.CountAsync().ConfigureAwait(false);
             var items = await companies.Skip((value - 1) * pageSize).Take(pageSize).Select(x => new ViewModelBase { Id = x.Id, Name = x.Name }).ToListAsync().ConfigureAwait(false);
@@ -30,6 +35,7 @@ namespace InvestmentManager.Server.Controllers
                 Pagination = pagination
             };
         }
+        
         [HttpGet("additionalshort")]
         public async Task<CompanyAdditionalInfoShortModel> GetAdditionalShort(long id)
         {

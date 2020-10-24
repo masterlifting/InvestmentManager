@@ -1,19 +1,17 @@
 ﻿@page "/"
 @inject CustomHttpClient http
 
-<div class="row">
+<div class="row align-items-center">
     <div class="col-6 pl-0 pr-1">
-        <input placeholder="Search companies" />
+        <input @oninput="FindCompany" @onclick="GetAllCompanies" placeholder="Search companies" />
     </div>
     <div class="col-6 pr-0 pl-1">
-        <select>
-            <option selected @onclick="GetDefaultOrder">Order by</option>
-            <option @onclick="GetBuyRecommendationsFilter">Recommendation for buy</option>
+        <select @onchange="GetOrderBuy">
+            <option selected value="@(RouteName.company + "/list")">Order by</option>
+            <option value="@(RouteName.recommendation + "/orderbuy")">recommendation for buy</option>
         </select>
     </div>
 </div>
-
-
 <div class="row isecodary iframe py-1">
     <div class="col-8"><span class="oi oi-dollar text-dark" aria-hidden="true"></span> today:</div>
     @if (dollar.HasValue)
@@ -25,20 +23,23 @@
         <text>@DefaultData.loading</text>
     }
 </div>
-
 <AdminFrame />
 <AccountFrame />
-
 @if (companies != null)
 {
     @for (int i = 0; i < companies.Items.Count; i++)
     {
-        <CompanyFrame Id="@companies.Items[i].Id" Name="@companies.Items[i].Name" />
+        <div class="row">
+            <div class="px-0 col-1 text-muted font-weight-bold align-self-center">@(i+1)</div>
+            <div class="col-11">
+                <CompanyFrame Id="@companies.Items[i].Id" Name="@companies.Items[i].Name" />
+            </div>
+        </div>
     }
-    @if (companies.Pagination.HasNextPage)
+    @if (_else)
     {
-        <div class="row mb-3">
-            <div class="offset-4 col-4 text-center ilink text-dark" @onclick="GetNextCompanyCount">else...</div>
+        <div class="row my-3">
+            <span class="offset-4 col-4 text-center font-weight-bolder text-primary" style="cursor:pointer" @onclick="GetElse">else...</span>
         </div>
     }
 }
@@ -46,29 +47,39 @@
 @code
 {
     decimal? dollar;
+    bool _else;
     PaginationViewModelBase companies;
+    List<ViewModelBase> allCompanies;
     string route = RouteName.company + "/list";
 
     protected override async Task OnInitializedAsync()
     {
         companies = await http.GetResultAsync<PaginationViewModelBase>(route, true);
+        _else = companies.Pagination.HasNextPage;
         CBRF rate = await http.GetResultAsync<CBRF>(RouteName.additional + "/getrate");
         dollar = rate.Valute.USD.Value;
     }
+    async Task GetAllCompanies() =>
+        allCompanies = await http.GetResultAsync<List<ViewModelBase>>(RouteName.company + "/all");
 
-    async Task GetDefaultOrder() =>
-        companies = await http.GetResultAsync<PaginationViewModelBase>(RouteName.company + "/list", true);
-
-    async Task GetBuyRecommendationsFilter()
+    async Task GetOrderBuy(ChangeEventArgs e)
     {
-        route = RouteName.recommendation + "/orderbuy";
+        route = e.Value.ToString();
         companies = await http.GetResultAsync<PaginationViewModelBase>(route, true);
+        _else = companies.Pagination.HasNextPage;
     }
-
-    async Task GetNextCompanyCount()
+    async Task GetElse()
     {
         var next = await http.GetResultAsync<PaginationViewModelBase>(route, companies.Pagination.PageNumber + 1, true);
         companies.Pagination = next.Pagination;
+        _else = next.Pagination.HasNextPage;
         companies.Items.AddRange(next.Items);
+    }
+    void FindCompany(ChangeEventArgs e)
+    {
+        string phrase = e.Value.ToString();
+        var result = allCompanies.Where(x => x.Name.Contains(phrase, StringComparison.OrdinalIgnoreCase)).ToList();
+        companies.Items = result != null && result.Any() ? result : new List<ViewModelBase>();
+        _else = false;
     }
 }

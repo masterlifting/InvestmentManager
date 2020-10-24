@@ -33,7 +33,7 @@ namespace InvestmentManager.Server.Controllers
         [HttpGet("orderbuy")]
         public async Task<PaginationViewModelBase> GetOrderBuyRecommendations(int value = 1)
         {
-            int pageSize = 7;
+            int pageSize = 10   ;
             var companies = unitOfWork.Company.GetAll();
             var lastPricies = unitOfWork.Price.GetLastPrices(30);
             var buyRecommendations = unitOfWork.BuyRecommendation.GetAll();

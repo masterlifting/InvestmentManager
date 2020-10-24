@@ -17,15 +17,16 @@
 
 .iframe {
     border-radius: 25px;
-    margin-bottom: 1em;
-    margin-top: 1em;
-    padding: 1em;
+    margin-bottom: 0.5em;
+    margin-top: 0.5em;
+    padding: 0.7em;
     box-shadow: 7px 7px 25px 7px rgba(20, 20, 20, 0.9),inset rgba(24,24,24,.6) 0 -2px 5px, inset rgba(252,255,255,.7) 0 2px 5px, rgba(24,24,24,.8) 0 2px 5px -1px;
 }
 
 .iframe-info {
     border-radius: 25px;
     padding: 0.5em;
+    margin-bottom:0.1em;
     box-shadow: 7px 7px 25px 7px rgba(20, 20, 20, 0.9),inset rgba(24,24,24,.6) 0 -2px 5px, inset rgba(252,255,255,.7) 0 2px 5px, rgba(24,24,24,.8) 0 2px 5px -1px;
 }
 
