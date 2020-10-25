@@ -1,5 +1,6 @@
 ﻿using InvestmentManager.Repository;
 using InvestmentManager.ViewModels;
+using InvestmentManager.ViewModels.ErrorModels;
 using InvestmentManager.ViewModels.RecommendationModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -30,10 +31,37 @@ namespace InvestmentManager.Server.Controllers
                 DateUpdate = result.DateUpdate.ToString("g")
             };
         }
+        [HttpGet("saleshort")]
+        public async Task<RecommendationsForSaleShortModel> GetSellRecommendationShort(long id)
+        {
+            var result = await unitOfWork.SellRecommendation.GetAll().FirstOrDefaultAsync(x => x.CompanyId == id).ConfigureAwait(false);
+            if (result != null)
+            {
+                return new RecommendationsForSaleShortModel
+                {
+                    DateUpdate = result.DateUpdate.ToString("g"),
+
+                    LotMin = result.LotMin,
+                    LotMid = result.LotMid,
+                    LotMax = result.LotMax,
+
+                    PriceMin = result.PriceMin.ToString("f2"),
+                    PriceMid = result.PriceMid.ToString("f2"),
+                    PriceMax = result.PriceMax.ToString("f2"),
+                    Error = new ErrorBaseModel
+                    {
+                        IsSuccess = true
+                    }
+                };
+            }
+            else
+                return new RecommendationsForSaleShortModel();
+        }
+
         [HttpGet("orderbuy")]
         public async Task<PaginationViewModelBase> GetOrderBuyRecommendations(int value = 1)
         {
-            int pageSize = 10   ;
+            int pageSize = 10;
             var companies = unitOfWork.Company.GetAll();
             var lastPricies = unitOfWork.Price.GetLastPrices(30);
             var buyRecommendations = unitOfWork.BuyRecommendation.GetAll();

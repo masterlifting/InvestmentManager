@@ -1,7 +1,7 @@
 ﻿@page "/companyreportforms"
 @inject CustomHttpClient http
 @inject Notification notice
-@attribute [Authorize]
+@attribute [Authorize(Roles = "pestunov")]
 
 @foreach (var result in checkingreports.Take(5))
 {
@@ -97,17 +97,15 @@
         }
     </div>
 
-    <div class="row">
-        <div class="col text-center ilink" @onclick="GetCheckingReports">else...</div>
-    </div>
 }
+<div class="row">
+    <div class="col text-center ilink" @onclick="GetCheckingReports">else...</div>
+</div>
 
 @code {
     List<CompanyReportForm> checkingreports = new List<CompanyReportForm>();
-
-    protected override async Task OnParametersSetAsync() => await GetCheckingReports();
-
-    async Task GetCheckingReports() => checkingreports = await http.GetResultAsync<List<CompanyReportForm>>(RouteName.companyReport + "/checknew");
+    protected override async Task OnInitializedAsync() => await GetCheckingReports();
+    async Task GetCheckingReports() => checkingreports = await http.GetResultAsync<List<CompanyReportForm>>(RouteName.companyReport + "/checknew", true);
     async Task DeleteReport(NewReportModel report, string companyName)
     {
         if (await http.GetBoolAsync(RouteName.companyReport + "/deletechecked", report.ReportId))

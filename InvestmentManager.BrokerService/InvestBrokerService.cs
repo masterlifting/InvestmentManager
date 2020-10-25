@@ -54,7 +54,7 @@ namespace InvestmentManager.BrokerService
 
             foreach (var file in files)
             {
-                Match match = Regex.Match(Path.GetFileNameWithoutExtension(file.FileName), @"B_k(.+)_ALL(.+)");
+                Match match = Regex.Match(Path.GetFileNameWithoutExtension(file.FileName), @"B_k(.+)_ALL(.+)", RegexOptions.IgnoreCase);
                 if (match.Success && Path.GetExtension(file.FileName).Equals(".xls"))
                 {
                     using Stream stream = file.OpenReadStream();

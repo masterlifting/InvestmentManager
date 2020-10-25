@@ -1,8 +1,24 @@
 ﻿@inject CustomHttpClient http
 <InfoTemplate InfoName="@InfoName" VisibleAction="@(async (bool isVisible) => await UpdateVisible.InvokeAsync(isVisible))">
     <ChildContent>
-        <InformationCols Key="Date price" Value="@model.DateUpdate" />
-        <InformationCols Key="Last price" Value="@model.LastPrice" />
+        @if (model != null)
+        {
+            if (model.Error.IsSuccess)
+            {
+                <InformationCols Key="Date price" Value="@model.DateUpdate" />
+                <InformationCols Key="Last price" Value="@model.LastPrice" />
+            }
+            else
+            {
+                <div class="col-12">
+                    <ErrorComponent ServerErrors="@model.Error.Errors" />
+                </div>
+            }
+        }
+        else
+        {
+            <span>@DefaultData.loading</span>
+        }
     </ChildContent>
 </InfoTemplate>
 
@@ -11,6 +27,6 @@
     [Parameter] public string InfoName { get; set; }
     [Parameter] public long CompanyId { get; set; }
 
-    PriceHistoryShortModel model = new PriceHistoryShortModel { DateUpdate = DefaultData.loading, LastPrice = DefaultData.loading };
+    PriceHistoryShortModel model;
     protected override async Task OnInitializedAsync() => model = await http.GetResultAsync<PriceHistoryShortModel>(RouteName.price + "/historyshort", CompanyId);
 }

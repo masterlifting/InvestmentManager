@@ -1,10 +1,12 @@
 ﻿using InvestmentManager.Repository;
 using InvestmentManager.ViewModels;
 using InvestmentManager.ViewModels.CompanyModels;
+using InvestmentManager.ViewModels.ErrorModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace InvestmentManager.Server.Controllers
@@ -16,7 +18,7 @@ namespace InvestmentManager.Server.Controllers
         public CompanyController(IUnitOfWorkFactory unitOfWork) => this.unitOfWork = unitOfWork;
 
         [HttpGet("all")]
-        public async Task<List<ViewModelBase>> GetAllCompanies() => 
+        public async Task<List<ViewModelBase>> GetAllCompanies() =>
             await unitOfWork.Company.GetAll().OrderBy(x => x.Name).Select(x => new ViewModelBase { Id = x.Id, Name = x.Name }).ToListAsync().ConfigureAwait(false);
 
         [HttpGet("list")]
@@ -26,7 +28,7 @@ namespace InvestmentManager.Server.Controllers
             var companies = unitOfWork.Company.GetAll().OrderBy(x => x.Name);
             var count = await companies.CountAsync().ConfigureAwait(false);
             var items = await companies.Skip((value - 1) * pageSize).Take(pageSize).Select(x => new ViewModelBase { Id = x.Id, Name = x.Name }).ToListAsync().ConfigureAwait(false);
-            
+
             var pagination = new Pagination();
             pagination.SetPagination(count, value, pageSize);
             return new PaginationViewModelBase
@@ -35,7 +37,7 @@ namespace InvestmentManager.Server.Controllers
                 Pagination = pagination
             };
         }
-        
+
         [HttpGet("additionalshort")]
         public async Task<CompanyAdditionalInfoShortModel> GetAdditionalShort(long id)
         {
@@ -47,7 +49,27 @@ namespace InvestmentManager.Server.Controllers
                 Currency = result.Tickers.FirstOrDefault().Prices.FirstOrDefault().Currency.Name
             };
         }
+        [HttpGet("transactionshort")]
+        public async Task<CompanyTransactionHistoryShortModel> GetTransactionHistoryShort(long id, string values)
+        {
+            long[] accountIds = JsonSerializer.Deserialize<long[]>(values);
+            var transaction = await unitOfWork.StockTransaction.GetAll()
+                .Where(x => accountIds.Contains(x.AccountId) && x.Ticker.CompanyId == id)
+                .OrderBy(x => x.DateOperation)
+                .LastOrDefaultAsync();
 
+            if (transaction != null)
+                return new CompanyTransactionHistoryShortModel
+                {
+                    LastDateTransaction = transaction.DateOperation.ToString("g"),
+                    Lot = transaction.Quantity.ToString(),
+                    Price = transaction.Cost.ToString("f2"),
+                    Status = transaction.TransactionStatus.Name,
+                    Error = new ErrorBaseModel { IsSuccess = true }
+                };
+            else
+                return new CompanyTransactionHistoryShortModel();
+        }
         #region Old
         //[HttpGet("getstocktransactions")]
         //public async Task<IEnumerable<StockTransactionModel>> GetStockTransactions()

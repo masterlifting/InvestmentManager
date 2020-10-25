@@ -30,7 +30,7 @@ namespace InvestmentManager.Client.Services.NotificationService
         }
         #endregion
         #region Alerts
-        public async Task AlerAccessAsync(string message = null, int delay = 1500) =>
+        public async Task AlertAccessAsync(string message = null, int delay = 1500) =>
             await AlertBaseAsync(Choice.InvestColor.iwarning, string.IsNullOrWhiteSpace(message) ? DefaultData.noticeAccess : message, delay).ConfigureAwait(false);
         public async Task AlertFailedAsync(string message = null, int delay = 1500) =>
             await AlertBaseAsync(Choice.InvestColor.idanger, string.IsNullOrWhiteSpace(message) ? DefaultData.noticeFailed : message, delay).ConfigureAwait(false);

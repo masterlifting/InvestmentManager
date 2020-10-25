@@ -4,38 +4,39 @@
 
 @foreach (var report in Reports)
 {
-    <div class="idark iframe">
+    <div class="row idark iframe">
+        <div class="col">
+            <RowTitle Color="Choice.TextColor.warning" Text="@report.AccountId" />
+            @if (report.AccountTransactions.Any())
+            {
+                <InfoAccountOperation AccountTransactions="@report.AccountTransactions" />
+            }
 
-        <RowTitle Color="Choice.TextColor.warning" Text="@report.AccountId" />
-        @if (report.AccountTransactions.Any())
-        {
-            <InfoAccountOperation AccountTransactions="@report.AccountTransactions" />
-        }
+            @if (report.StockTransactions.Any())
+            {
+                <InfoStockOperation StockTransactions="@report.StockTransactions" />
+            }
 
-        @if (report.StockTransactions.Any())
-        {
-            <InfoStockOperation StockTransactions="@report.StockTransactions" />
-        }
+            @if (report.Comissions.Any())
+            {
+                <InfoComission Comissions="@report.Comissions" />
+            }
 
-        @if (report.Comissions.Any())
-        {
-            <InfoComission Comissions="@report.Comissions" />
-        }
+            @if (report.Dividends.Any())
+            {
+                <InfoDividend Dividends="@report.Dividends" />
+            }
 
-        @if (report.Dividends.Any())
-        {
-            <InfoDividend Dividends="@report.Dividends" />
-        }
+            @if (report.ExchangeRates.Any())
+            {
+                <InfoChangeRate ExchangeRates="@report.ExchangeRates" />
+            }
 
-        @if (report.ExchangeRates.Any())
-        {
-            <InfoChangeRate ExchangeRates="@report.ExchangeRates" />
-        }
-
-        @if (report.AccountTransactions.Any() || report.StockTransactions.Any() || report.Comissions.Any() || report.Dividends.Any() || report.ExchangeRates.Any())
-        {
-            <ButtonAction Title="Save" Color="Choice.InvestColor.isuccess" ClickAction="@(()=> SaveData(report.AccountId, report))" />
-        }
+            @if (report.AccountTransactions.Any() || report.StockTransactions.Any() || report.Comissions.Any() || report.Dividends.Any() || report.ExchangeRates.Any())
+            {
+                <ButtonAction Title="Save" Color="Choice.InvestColor.isuccess" ClickAction="@(()=> SaveData(report.AccountId, report))" />
+            }
+        </div>
     </div>
 }
 

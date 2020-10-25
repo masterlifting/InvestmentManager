@@ -4,13 +4,13 @@
 @inject NavigationManager navigationManager
 @inject Notification notice
 
-<LinkAction Action="@(async () => await ClickInputFileButtonAsync("inputButton"))" Name="Load .xls reports from Bcs" />
+<ButtonAction  ClickAction="@(async () => await ClickInputFileButtonAsync("inputButton"))" Title="Load .xls reports from Bcs" Color="@Choice.InvestColor.iinfo" />
 <InputFile multiple OnChange="HandleSelectionAsync" id="inputButton" style="display:none" />
 
 @code {
     ClaimsPrincipal user = null;
     [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; }
-    
+
     protected override async Task OnInitializedAsync() => user = (await AuthenticationState).User;
     async Task HandleSelectionAsync(IFileListEntry[] files)
     {
@@ -46,7 +46,7 @@
     async Task ClickInputFileButtonAsync(string inputFileId)
     {
         if (user is null || !user.Identity.IsAuthenticated)
-            await notice.AlerAccessAsync();
+            await notice.AlertAccessAsync();
         else
             await jsRuntime.InvokeVoidAsync("uploadBrokerReports", inputFileId);
     }

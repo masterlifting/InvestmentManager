@@ -1,4 +1,5 @@
 ﻿@inject CustomHttpClient http
+@inject Notification notice
 @inject ILocalStorageService localStorage
 
 <FrameTemplate Theme="Choice.InvestColor.isuccess" Name="@sum" TitleColor="Choice.TextColor.light">
@@ -7,7 +8,7 @@
         <div class="col-1 px-0"> <IconCustom IconName="yen" /> </div>
         <div class="col-1 px-0"> <IconCustom IconName="loop" /> </div>
         <div class="col-1 px-0"> <IconCustom IconName="pencil" /> </div>
-        <div class="col-1 px-0"> <IconCustom IconName="data-transfer-download" /> </div>
+        <div class="col-1 px-0"> <IconCustom IconName="data-transfer-download" Action="@(() => isLoadFile = !isLoadFile)" /> </div>
         <div class="col-1 px-0"> <IconCustom IconName="pie-chart" /> </div>
     </IconBlock>
     <AdditionalBlock>
@@ -28,14 +29,21 @@
         <IconRowInformation IconName="info" Name="Accounts information" />
         <IconRowInformation IconName="yen" Name="Transactions" />
         <IconRowInformation IconName="loop" Name="Exchange rate" />
-        <IconRowInformation IconName="pencil" Name="Add transactions" />
-        <IconRowInformation IconName="data-transfer-download" Name="Load .xls transactions" Description="Only by Russian Bcs broker"/>
+        <IconRowInformation IconName="pencil" Name="Add a transaction manually" />
+        <IconRowInformation IconName="data-transfer-download" Name="@fileLoader" Description="Available only for the Russian broker BCS" />
         <IconRowInformation IconName="pie-chart" Name="Analytics" />
     </InfoBlock>
 </FrameTemplate>
+@if (isLoadFile)
+{
+    <ReportLoader />
+}
 
 @code {
     string sum = "0.00";
+    string fileLoader = "Upload files (xls) with transactions";
+    bool isLoadFile;
+
     List<AccountFrameModel> Accounts = new List<AccountFrameModel>();
     [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; }
     IIdentity user;
@@ -46,7 +54,8 @@
         {
             Accounts = await http.GetResultAsync<List<AccountFrameModel>>(RouteName.account + "/all");
             sum = Accounts.Sum(x => x.Sum).ToString("C");
-            await localStorage.SetItemAsync($"{user.Name}{DefaultData.IdName.accountIds}", Accounts.Where(x => x.IsActive).Select(x => x.Id).ToArray());
+            if (Accounts.Any())
+                await localStorage.SetItemAsync($"{DefaultData.IdName.accountIds}_{user.Name}", Accounts.Where(x => x.IsActive).Select(x => x.Id).ToArray());
         }
     }
 
@@ -55,6 +64,6 @@
         Accounts.First(x => x.Id == selector.selectedId).IsActive = selector.isSelected;
         long[] selectedIds = Accounts.Where(x => x.IsActive).Select(x => x.Id).ToArray();
         sum = (await http.GetResultAsync<List<AccountFrameModel>>(RouteName.account + "/selected", JsonSerializer.Serialize(selectedIds))).Sum(x => x.Sum).ToString("C");
-        await localStorage.SetItemAsync($"{user.Name}{DefaultData.IdName.accountIds}", selectedIds);
+        await localStorage.SetItemAsync($"{DefaultData.IdName.accountIds}_{user.Name}", selectedIds);
     }
 }

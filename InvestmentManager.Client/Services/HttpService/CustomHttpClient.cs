@@ -83,6 +83,18 @@ namespace InvestmentManager.Client.Services.HttpService
 
             return result;
         }
+        public async Task<TResult> GetResultAsync<TResult>(string route, long id, string values, bool withLoading = false)
+        {
+            if (withLoading)
+                notification.LoadStart();
+
+            var result = await httpClient.GetFromJsonAsync<TResult>($"{route}?id={id}&values={values}").ConfigureAwait(false);
+
+            if (withLoading)
+                notification.LoadStop();
+
+            return result;
+        }
         public async Task<TResult> GetResultAsync<TResult>(string route, string values, bool withLoading = false)
         {
             if (withLoading)
@@ -95,8 +107,6 @@ namespace InvestmentManager.Client.Services.HttpService
 
             return result;
         }
-
-
         public async Task GetVoidAsync(string route, bool withConfirm = false)
         {
             notification.LoadStart();
@@ -111,6 +121,7 @@ namespace InvestmentManager.Client.Services.HttpService
                     await notification.AlertFailedAsync().ConfigureAwait(false);
             }
         }
+        
         public async Task<bool> PostBoolAsync<TModel>(string route, TModel model, bool withConfirm = false)
         {
             notification.LoadStart();

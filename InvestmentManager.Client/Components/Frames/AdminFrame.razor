@@ -1,11 +1,13 @@
 ﻿@inject CustomHttpClient http
+@inject Notification notice
+@inject NavigationManager navigation
 
 <FrameTemplate Theme="Choice.InvestColor.idanger" Name="Administrator" TitleColor="Choice.TextColor.light">
     <IconBlock>
-        <div class="col-1 px-0"> <IconCustom IconName="calculator" /> </div>
-        <div class="col-1 px-0"> <IconCustom IconName="script" /> </div>
-        <div class="col-1 px-0"> <IconCustom IconName="document" /> </div>
-        <div class="col-1 px-0"> <IconCustom IconName="check" /> </div>
+        <div class="col-1 px-0"> <IconCustom IconName="calculator" Action="RecalculateAll" /> </div>
+        <div class="col-1 px-0"> <IconCustom IconName="script" Action="GetNewPrice" /> </div>
+        <div class="col-1 px-0"> <IconCustom IconName="document" Action="ParseNewReports" /> </div>
+        <div class="col-1 px-0"> <IconCustom IconName="check" Action="CheckParsedReports" /> </div>
         <div class="col-1 px-0"> <IconCustom IconName="file" /> </div>
     </IconBlock>
     <InfoBlock>
@@ -19,4 +21,37 @@
 
 @code {
 
+    [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; }
+
+    async Task RecalculateAll()
+    {
+        if (await IsAdmin())
+            await http.GetVoidAsync(RouteName.admin + "/recalculateall", true);
+    }
+    async Task GetNewPrice()
+    {
+        if (await IsAdmin())
+            await http.GetVoidAsync(RouteName.price + "/getnew");
+    }
+    async Task ParseNewReports()
+    {
+        if (await IsAdmin())
+            await http.GetVoidAsync(RouteName.companyReport + "/parse");
+    }
+    async Task CheckParsedReports()
+    {
+        if (await IsAdmin())
+            navigation.NavigateTo("/companyreportforms");
+    }
+    async Task<bool> IsAdmin()
+    {
+        bool result = false;
+
+        if ((await AuthenticationState).User.IsInRole("pestunov"))
+            result = true;
+        else
+            await notice.AlertAccessAsync("You are not an admin!");
+
+        return result;
+    }
 }

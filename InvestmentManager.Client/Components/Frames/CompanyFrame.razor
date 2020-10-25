@@ -1,4 +1,6 @@
-﻿<FrameTemplate Name="@Name" TitleColor="Choice.TextColor.warning">
+﻿@inject Notification notice
+
+<FrameTemplate Name="@Name" TitleColor="Choice.TextColor.warning">
     <IconBlock>
         <div class="col-1 px-0"><IconCustom Action="@(() => isAdditionalInfo = !isAdditionalInfo)" IconName="info" /></div>
         <div class="col-1 px-0"><IconCustom Action="@(() => isTransactions = !isTransactions)" IconName="yen" /></div>
@@ -28,7 +30,15 @@
         }
         @if (isTransactions)
         {
-            <TransactionHistoryShort InfoName="@transactions" CompanyId="@Id" UpdateVisible="@((bool isVisible) => isTransactions = isVisible)" />
+            if (identity.IsAuthenticated)
+            {
+                <TransactionHistoryShort InfoName="@transactions" CompanyId="@Id" UpdateVisible="@((bool isVisible) => isTransactions = isVisible)" />
+            }
+            else
+            {
+                isTransactions = false;
+                Task.FromResult(notice.AlertAccessAsync());
+            }
         }
         @if (isRating)
         {
@@ -38,10 +48,20 @@
         {
             <RecommendationsForBuyShort InfoName="@buyRecommendations" CompanyId="@Id" UpdateVisible="@((bool isVisible) => isBuyRecommendations = isVisible)" />
         }
+
         @if (isSellRecommendations)
         {
-            <RecommendationsForSaleShort InfoName="@sellRecommendations" CompanyId="@Id" UpdateVisible="@((bool isVisible) => isSellRecommendations = isVisible)" />
+            if (identity.IsAuthenticated)
+            {
+                <RecommendationsForSaleShort InfoName="@sellRecommendations" CompanyId="@Id" UpdateVisible="@((bool isVisible) => isSellRecommendations = isVisible)" />
+            }
+            else
+            {
+                isSellRecommendations = false;
+                Task.FromResult(notice.AlertAccessAsync());
+            }
         }
+
         @if (isCoefficient)
         {
             <CoefficientHistoryShort InfoName="@coefficient" CompanyId="@Id" UpdateVisible="@((bool isVisible) => isCoefficient = isVisible)" />
@@ -64,6 +84,9 @@
 @code {
     [Parameter] public long Id { get; set; }
     [Parameter] public string Name { get; set; }
+    [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; }
+    IIdentity identity;
+    protected override async Task OnInitializedAsync() => identity = (await AuthenticationState).User.Identity;
 
     string additionalInfo = "Additional information";
     string rating = "Rating details";
