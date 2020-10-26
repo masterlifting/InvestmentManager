@@ -3,16 +3,7 @@
 @inject ILocalStorageService localStorage
 
 <FrameTemplate Theme="Choice.InvestColor.isuccess" Name="@sum" TitleColor="Choice.TextColor.light">
-    <IconBlock>
-        <div class="col-1 px-0"> <IconCustom IconName="info" /> </div>
-        <div class="col-1 px-0"> <IconCustom IconName="yen" /> </div>
-        <div class="col-1 px-0"> <IconCustom IconName="loop" /> </div>
-        <div class="col-1 px-0"> <IconCustom IconName="pencil" /> </div>
-        <div class="col-1 px-0"> <IconCustom IconName="data-transfer-download" Action="@(() => isLoadFile = !isLoadFile)" /> </div>
-        <div class="col-1 px-0"> <IconCustom IconName="pie-chart" /> </div>
-    </IconBlock>
     <AdditionalBlock>
-        <div class="dropdown-divider"></div>
         <div class="col-12">
             @foreach (var account in Accounts)
             {
@@ -26,12 +17,12 @@
         </div>
     </AdditionalBlock>
     <InfoBlock>
-        <IconRowInformation IconName="info" Name="Accounts information" />
-        <IconRowInformation IconName="yen" Name="Transactions" />
-        <IconRowInformation IconName="loop" Name="Exchange rate" />
-        <IconRowInformation IconName="pencil" Name="Add a transaction manually" />
-        <IconRowInformation IconName="data-transfer-download" Name="@fileLoader" Description="Available only for the Russian broker BCS" />
-        <IconRowInformation IconName="pie-chart" Name="Analytics" />
+        <MultiRow Name="Accounts information" IconName="info" />
+        <MultiRow Name="Transactions" IconName="yen" />
+        <MultiRow Name="Exchange rate" IconName="loop" />
+        <MultiRow Name="Add a transaction manually" IconName="pencil" />
+        <MultiRow Name="@fileLoader" IconName="data-transfer-download" Action="@(() => isLoadFile = !isLoadFile)" Description="Available only for the Russian broker BCS" />
+        <MultiRow Name="Analytics" IconName="pie-chart" />
     </InfoBlock>
 </FrameTemplate>
 @if (isLoadFile)

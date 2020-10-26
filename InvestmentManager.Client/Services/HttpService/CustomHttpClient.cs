@@ -2,13 +2,16 @@
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
+using System.Net;
+using System.Text.Json;
+using System;
 
 namespace InvestmentManager.Client.Services.HttpService
 {
     public class CustomHttpClient
     {
         private readonly HttpClient httpClient;
-        private readonly Notification notification;
+        private readonly Notification notice;
 
         public CustomHttpClient(
             HttpClient httpClient,
@@ -16,45 +19,45 @@ namespace InvestmentManager.Client.Services.HttpService
             )
         {
             this.httpClient = httpClient;
-            this.notification = notification;
+            this.notice = notification;
         }
 
         public async Task<TResult> GetResultAsync<TResult>(string route, bool withLoading = false)
         {
             if (withLoading)
-                notification.LoadStart();
+                notice.LoadStart();
 
             var result = await httpClient.GetFromJsonAsync<TResult>(route).ConfigureAwait(false);
 
             if (withLoading)
-                notification.LoadStop();
+                notice.LoadStop();
 
             return result;
         }
         public async Task<TResult> GetResultAsync<TResult>(string route, long id, bool withLoading = false)
         {
             if (withLoading)
-                notification.LoadStart();
+                notice.LoadStart();
 
             var result = await httpClient.GetFromJsonAsync<TResult>($"{route}?id={id}").ConfigureAwait(false);
 
             if (withLoading)
-                notification.LoadStop();
+                notice.LoadStop();
 
             return result;
         }
         public async Task<bool> GetBoolAsync(string route, long id, bool withConfirm = false)
         {
-            notification.LoadStart();
+            notice.LoadStart();
             var response = await httpClient.GetAsync($"{route}?id={id}").ConfigureAwait(false);
-            notification.LoadStop();
+            notice.LoadStop();
 
             if (withConfirm)
             {
                 if (response.IsSuccessStatusCode)
-                    await notification.AlertSuccesAsync().ConfigureAwait(false);
+                    await notice.AlertSuccesAsync().ConfigureAwait(false);
                 else
-                    await notification.AlertFailedAsync().ConfigureAwait(false);
+                    await notice.AlertFailedAsync().ConfigureAwait(false);
             }
 
             return response.IsSuccessStatusCode;
@@ -62,94 +65,94 @@ namespace InvestmentManager.Client.Services.HttpService
         public async Task<TResult> GetResultAsync<TResult>(string route, int value, bool withLoading = false)
         {
             if (withLoading)
-                notification.LoadStart();
+                notice.LoadStart();
 
             var result = await httpClient.GetFromJsonAsync<TResult>($"{route}?value={value}").ConfigureAwait(false);
 
             if (withLoading)
-                notification.LoadStop();
+                notice.LoadStop();
 
             return result;
         }
         public async Task<TResult> GetResultAsync<TResult>(string route, long id, int value, bool withLoading = false)
         {
             if (withLoading)
-                notification.LoadStart();
+                notice.LoadStart();
 
             var result = await httpClient.GetFromJsonAsync<TResult>($"{route}?id={id}&value={value}").ConfigureAwait(false);
 
             if (withLoading)
-                notification.LoadStop();
+                notice.LoadStop();
 
             return result;
         }
         public async Task<TResult> GetResultAsync<TResult>(string route, long id, string values, bool withLoading = false)
         {
             if (withLoading)
-                notification.LoadStart();
+                notice.LoadStart();
 
             var result = await httpClient.GetFromJsonAsync<TResult>($"{route}?id={id}&values={values}").ConfigureAwait(false);
 
             if (withLoading)
-                notification.LoadStop();
+                notice.LoadStop();
 
             return result;
         }
         public async Task<TResult> GetResultAsync<TResult>(string route, string values, bool withLoading = false)
         {
             if (withLoading)
-                notification.LoadStart();
+                notice.LoadStart();
 
             var result = await httpClient.GetFromJsonAsync<TResult>($"{route}?values={values}").ConfigureAwait(false);
 
             if (withLoading)
-                notification.LoadStop();
+                notice.LoadStop();
 
             return result;
         }
         public async Task GetVoidAsync(string route, bool withConfirm = false)
         {
-            notification.LoadStart();
+            notice.LoadStart();
             var result = await httpClient.GetAsync(route).ConfigureAwait(false);
-            notification.LoadStop();
+            notice.LoadStop();
 
             if (withConfirm)
             {
                 if (result.IsSuccessStatusCode)
-                    await notification.AlertSuccesAsync().ConfigureAwait(false);
+                    await notice.AlertSuccesAsync().ConfigureAwait(false);
                 else
-                    await notification.AlertFailedAsync().ConfigureAwait(false);
+                    await notice.AlertFailedAsync().ConfigureAwait(false);
             }
         }
-        
+
         public async Task<bool> PostBoolAsync<TModel>(string route, TModel model, bool withConfirm = false)
         {
-            notification.LoadStart();
+            notice.LoadStart();
             var response = await httpClient.PostAsJsonAsync(route, model).ConfigureAwait(false);
-            notification.LoadStop();
+            notice.LoadStop();
 
             if (withConfirm)
             {
                 if (response.IsSuccessStatusCode)
-                    await notification.AlertSuccesAsync().ConfigureAwait(false);
+                    await notice.AlertSuccesAsync().ConfigureAwait(false);
                 else
-                    await notification.AlertFailedAsync().ConfigureAwait(false);
+                    await notice.AlertFailedAsync().ConfigureAwait(false);
             }
 
             return response.IsSuccessStatusCode;
         }
         public async Task<HttpResponseMessage> PostModelAsync<TModel>(string route, TModel model, bool withConfirm = false)
         {
-            notification.LoadStart();
+            notice.LoadStart();
             var response = await httpClient.PostAsJsonAsync(route, model).ConfigureAwait(false);
-            notification.LoadStop();
+            notice.LoadStop();
 
             if (withConfirm)
             {
                 if (response.IsSuccessStatusCode)
-                    await notification.AlertSuccesAsync().ConfigureAwait(false);
+                    await notice.AlertSuccesAsync().ConfigureAwait(false);
                 else
-                    await notification.AlertFailedAsync().ConfigureAwait(false);
+                    await notice.AlertFailedAsync().ConfigureAwait(false);
             }
 
             return response;
@@ -157,17 +160,17 @@ namespace InvestmentManager.Client.Services.HttpService
         public async Task<HttpResponseMessage> PostContentAsync(string route, HttpContent content, bool withLoading = false, bool withConfirm = false)
         {
             if (withLoading)
-                notification.LoadStart();
+                notice.LoadStart();
             var response = await httpClient.PostAsync(route, content).ConfigureAwait(false);
             if (withLoading)
-                notification.LoadStop();
+                notice.LoadStop();
 
             if (withConfirm)
             {
                 if (response.IsSuccessStatusCode)
-                    await notification.AlertSuccesAsync().ConfigureAwait(false);
+                    await notice.AlertSuccesAsync().ConfigureAwait(false);
                 else
-                    await notification.AlertFailedAsync().ConfigureAwait(false);
+                    await notice.AlertFailedAsync().ConfigureAwait(false);
             }
 
             return response;

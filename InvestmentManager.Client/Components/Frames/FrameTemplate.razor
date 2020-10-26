@@ -1,25 +1,13 @@
 ﻿<div class="row @Theme iframe">
-    <div class="col-6 text-@TitleColor.ToString() font-weight-bold text-nowrap">@Name</div>
-    <div class="col-6 text-right">
-        <DetailToggleComponent ToggleAction="ToggleDetail" />
-    </div>
+    <div class="col-10 text-@TitleColor.ToString() font-weight-bold">@Name</div>
+    <div class="col-2 text-right"><DetailToggleComponent ToggleAction="ToggleDetail" /></div>
     @if (isDetail)
     {
+        <div class="col-12">@AdditionalBlock</div>
         <div class="dropdown-divider"></div>
-        <div class="col-12">
-            <div class="row justify-content-around text-center">
-                @IconBlock
-            </div>
-        </div>
-        @AdditionalBlock
-
-        <div class="dropdown-divider"></div>
-        <div class="col-12">
-            @InfoBlock
-        </div>
+        <div class="col-12">@InfoBlock</div>
     }
 </div>
-
 @ActionBlock
 
 @code {
@@ -27,7 +15,6 @@
     [Parameter] public Choice.TextColor TitleColor { get; set; }
     [Parameter] public Choice.InvestColor Theme { get; set; } = Choice.InvestColor.idark;
     [Parameter] public RenderFragment AdditionalBlock { get; set; }
-    [Parameter] public RenderFragment IconBlock { get; set; }
     [Parameter] public RenderFragment InfoBlock { get; set; }
     [Parameter] public RenderFragment ActionBlock { get; set; }
 

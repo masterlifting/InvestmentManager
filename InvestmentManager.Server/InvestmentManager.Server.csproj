@@ -24,4 +24,7 @@
     <ProjectReference Include="..\InvestmentManager.Repository\InvestmentManager.Repository.csproj" />
     <ProjectReference Include="..\InvestmentManager.Services\InvestmentManager.Services.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Views\" />
+  </ItemGroup>
 </Project>

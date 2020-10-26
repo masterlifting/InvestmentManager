@@ -2,6 +2,7 @@
 using InvestmentManager.ViewModels;
 using InvestmentManager.ViewModels.ErrorModels;
 using InvestmentManager.ViewModels.RecommendationModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -14,6 +15,7 @@ namespace InvestmentManager.Server.Controllers
     public class RecommendationController : ControllerBase
     {
         private readonly IUnitOfWorkFactory unitOfWork;
+        const int pageSize = 10;
 
         public RecommendationController(
             IUnitOfWorkFactory unitOfWork)
@@ -31,7 +33,7 @@ namespace InvestmentManager.Server.Controllers
                 DateUpdate = result.DateUpdate.ToString("g")
             };
         }
-        [HttpGet("saleshort")]
+        [HttpGet("saleshort"), Authorize]
         public async Task<RecommendationsForSaleShortModel> GetSellRecommendationShort(long id)
         {
             var result = await unitOfWork.SellRecommendation.GetAll().FirstOrDefaultAsync(x => x.CompanyId == id).ConfigureAwait(false);
@@ -59,22 +61,67 @@ namespace InvestmentManager.Server.Controllers
         }
 
         [HttpGet("orderbuy")]
-        public async Task<PaginationViewModelBase> GetOrderBuyRecommendations(int value = 1)
+        public PaginationViewModelBase GetOrderBuyRecommendations(int value = 1)
         {
-            int pageSize = 10;
             var companies = unitOfWork.Company.GetAll();
             var lastPricies = unitOfWork.Price.GetLastPrices(30);
-            var buyRecommendations = unitOfWork.BuyRecommendation.GetAll();
+            var recommendations = lastPricies
+                .Join(unitOfWork.BuyRecommendation.GetAll(), x => x.Key, y => y.CompanyId, (x, y) => new
+                {
+                    y.CompanyId,
+                    LastPrice = x.Value,
+                    RecommendationPrice = y.Price,
+                })
+                .OrderByDescending(x => x.RecommendationPrice / x.LastPrice);
+
+            var items = recommendations.Skip((value - 1) * pageSize).Take(pageSize)
+                .Join(companies, x => x.CompanyId, y => y.Id, (x, y) => new ViewModelBase { Id = y.Id, Name = y.Name }).ToList();
 
             var pagination = new Pagination();
-            var count = await buyRecommendations.CountAsync().ConfigureAwait(false);
+            var count = recommendations.Count();
             pagination.SetPagination(count, value, pageSize);
 
-            var items = lastPricies
-                .Join(buyRecommendations, x => x.Key, y => y.CompanyId, (x, y) => new { LastPrice = x.Value, RecommendationPrice = y.Price, y.CompanyId })
-                .OrderByDescending(x => x.RecommendationPrice / x.LastPrice)
-                .Skip((value - 1) * pageSize).Take(pageSize)
+            return new PaginationViewModelBase
+            {
+                Items = items,
+                Pagination = pagination
+            };
+        }
+        [HttpGet("ordersale"), Authorize]
+        public PaginationViewModelBase GetOrderSaleRecommendations(int value = 1)
+        {
+            var pagination = new Pagination();
+
+            var companies = unitOfWork.Company.GetAll();
+            var lastPricies = unitOfWork.Price.GetLastPrices(30);
+            var recommendations = lastPricies.Join(unitOfWork.SellRecommendation.GetAll(), x => x.Key, y => y.CompanyId, (x, y) => new
+            {
+                y.CompanyId,
+                LastPrice = x.Value,
+                RecommendationPriceMin = y.PriceMin,
+                RecommendationPriceMid = y.PriceMid,
+                RecommendationPriceMax = y.PriceMax,
+            })
+                .Where(x =>
+                x.LastPrice >= x.RecommendationPriceMin
+                || x.LastPrice >= x.RecommendationPriceMid
+                || x.LastPrice >= x.RecommendationPriceMax)
+                .OrderBy(x => x.RecommendationPriceMax / x.LastPrice)
+                .ThenBy(x => x.RecommendationPriceMid / x.LastPrice)
+                .ThenBy(x => x.RecommendationPriceMin / x.LastPrice);
+
+            if (recommendations is null)
+                return new PaginationViewModelBase
+                {
+                    Items = new List<ViewModelBase>(),
+                    Pagination = pagination
+                };
+
+            var items = recommendations.Skip((value - 1) * pageSize).Take(pageSize)
                 .Join(companies, x => x.CompanyId, y => y.Id, (x, y) => new ViewModelBase { Id = y.Id, Name = y.Name }).ToList();
+
+            var count = recommendations.Count();
+            pagination.SetPagination(count, value, pageSize);
 
             return new PaginationViewModelBase
             {

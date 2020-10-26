@@ -3,100 +3,101 @@
 @inject Notification notice
 @attribute [Authorize(Roles = "pestunov")]
 
+
 @foreach (var result in checkingreports.Take(5))
 {
-    <div class="container idark iframe">
-        <RowTitle Color="Choice.TextColor.warning" Text="@result.CompanyName" />
-
-        @foreach (var report in result.Reports)
-        {
-            <EditForm class="icontent small text-nowrap" Model="@report" OnValidSubmit="@(() => SaveReport(report, result.CompanyName))">
-                <DataAnnotationsValidator />
-                <ValidationSummary />
-                <div class="row ">
-                    <span class="col-6">Дата</span>
-                    <div class="col-6">
-                        <InputDate @bind-Value="@report.DateReport" />
+    <FrameTemplate Name="@result.CompanyName" TitleColor="Choice.TextColor.warning">
+        <InfoBlock>
+            @foreach (var report in result.Reports)
+            {
+                <EditForm Model="@report" OnValidSubmit="@(() => SaveReport(report, result.CompanyName))">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+                    <div class="row ">
+                        <span class="col-6">Дата</span>
+                        <div class="col-6">
+                            <InputDate @bind-Value="@report.DateReport" />
+                        </div>
                     </div>
-                </div>
-                <div class="row">
-                    <span class="col-6">Всего акций</span>
-                    <div class="col-6">
-                        <InputNumber ParsingErrorMessage="Колличество акций должно быть числом" @bind-Value="@report.StockVolume" />
+                    <div class="row">
+                        <span class="col-6">Всего акций</span>
+                        <div class="col-6">
+                            <InputNumber ParsingErrorMessage="Колличество акций должно быть числом" @bind-Value="@report.StockVolume" />
+                        </div>
                     </div>
-                </div>
-                <div class="row">
-                    <span class="col-6">Дивиденды</span>
-                    <div class="col-6">
-                        <InputNumber ParsingErrorMessage="Дивиденды должны быть числом" @bind-Value="@report.Dividend" />
+                    <div class="row">
+                        <span class="col-6">Дивиденды</span>
+                        <div class="col-6">
+                            <InputNumber ParsingErrorMessage="Дивиденды должны быть числом" @bind-Value="@report.Dividend" />
+                        </div>
                     </div>
-                </div>
-                <div class="row">
-                    <span class="col-6">Выручка</span>
-                    <div class="col-6">
-                        <InputNumber ParsingErrorMessage="Выручка должна быть числом" @bind-Value="@report.Revenue" />
+                    <div class="row">
+                        <span class="col-6">Выручка</span>
+                        <div class="col-6">
+                            <InputNumber ParsingErrorMessage="Выручка должна быть числом" @bind-Value="@report.Revenue" />
+                        </div>
                     </div>
-                </div>
-                <div class="row">
-                    <span class="col-6">Валовая прибыль</span>
-                    <div class="col-6">
-                        <InputNumber ParsingErrorMessage="Валовая прибыль должна быть числом" @bind-Value="@report.GrossProfit" />
+                    <div class="row">
+                        <span class="col-6">Валовая прибыль</span>
+                        <div class="col-6">
+                            <InputNumber ParsingErrorMessage="Валовая прибыль должна быть числом" @bind-Value="@report.GrossProfit" />
+                        </div>
                     </div>
-                </div>
-                <div class="row">
-                    <span class="col-6">Чистая прибыль</span>
-                    <div class="col-6">
-                        <InputNumber ParsingErrorMessage="Чистая прибыль должна быть числом" @bind-Value="@report.NetProfit" />
+                    <div class="row">
+                        <span class="col-6">Чистая прибыль</span>
+                        <div class="col-6">
+                            <InputNumber ParsingErrorMessage="Чистая прибыль должна быть числом" @bind-Value="@report.NetProfit" />
+                        </div>
                     </div>
-                </div>
-                <div class="row">
-                    <span class="col-6">Денежный поток</span>
-                    <div class="col-6">
-                        <InputNumber ParsingErrorMessage="Денежный поток должен быть числом" @bind-Value="@report.CashFlow" />
+                    <div class="row">
+                        <span class="col-6">Денежный поток</span>
+                        <div class="col-6">
+                            <InputNumber ParsingErrorMessage="Денежный поток должен быть числом" @bind-Value="@report.CashFlow" />
+                        </div>
                     </div>
-                </div>
-                <div class="row">
-                    <span class="col-6">Активы</span>
-                    <div class="col-6">
-                        <InputNumber ParsingErrorMessage="Активы должны быть числом" @bind-Value="@report.Assets" />
+                    <div class="row">
+                        <span class="col-6">Активы</span>
+                        <div class="col-6">
+                            <InputNumber ParsingErrorMessage="Активы должны быть числом" @bind-Value="@report.Assets" />
+                        </div>
                     </div>
-                </div>
-                <div class="row">
-                    <span class="col-6">Акционерный капитал</span>
-                    <div class="col-6">
-                        <InputNumber ParsingErrorMessage="Капитал должен быть числом" @bind-Value="@report.ShareCapital" />
+                    <div class="row">
+                        <span class="col-6">Акционерный капитал</span>
+                        <div class="col-6">
+                            <InputNumber ParsingErrorMessage="Капитал должен быть числом" @bind-Value="@report.ShareCapital" />
+                        </div>
                     </div>
-                </div>
-                <div class="row">
-                    <span class="col-6">Оборот</span>
-                    <div class="col-6">
-                        <InputNumber ParsingErrorMessage="Оборот должен быть числом" @bind-Value="@report.Turnover" />
+                    <div class="row">
+                        <span class="col-6">Оборот</span>
+                        <div class="col-6">
+                            <InputNumber ParsingErrorMessage="Оборот должен быть числом" @bind-Value="@report.Turnover" />
+                        </div>
                     </div>
-                </div>
-                <div class="row">
-                    <span class="col-6">Задолженность</span>
-                    <div class="col-6">
-                        <InputNumber ParsingErrorMessage="Задолженность должна быть числом" @bind-Value="@report.LongTermDebt" />
+                    <div class="row">
+                        <span class="col-6">Задолженность</span>
+                        <div class="col-6">
+                            <InputNumber ParsingErrorMessage="Задолженность должна быть числом" @bind-Value="@report.LongTermDebt" />
+                        </div>
                     </div>
-                </div>
-                <div class="row">
-                    <span class="col-6">Обязательства</span>
-                    <div class="col-6">
-                        <InputNumber ParsingErrorMessage="Обязательства должны быть числом" @bind-Value="@report.Obligation" />
+                    <div class="row">
+                        <span class="col-6">Обязательства</span>
+                        <div class="col-6">
+                            <InputNumber ParsingErrorMessage="Обязательства должны быть числом" @bind-Value="@report.Obligation" />
+                        </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-6">
-                        <ButtonAction Title="Delete" Color="Choice.InvestColor.idanger" ClickAction="@(() => DeleteReport(report, result.CompanyName))" />
+                    <div class="row">
+                        <div class="col-6">
+                            <ButtonAction Title="Delete" Color="Choice.InvestColor.idanger" ClickAction="@(() => DeleteReport(report, result.CompanyName))" />
+                        </div>
+                        <div class="col-6">
+                            <ButtonSubmit Title="Save" Color="Choice.InvestColor.isuccess" />
+                        </div>
                     </div>
-                    <div class="col-6">
-                        <ButtonSubmit Title="Save" Color="Choice.InvestColor.isuccess" />
-                    </div>
-                </div>
-            </EditForm>
-        }
-    </div>
-
+                </EditForm>
+                <div class="dropdown-divider"></div>
+            }
+        </InfoBlock>
+    </FrameTemplate>
 }
 <div class="row">
     <div class="col text-center ilink" @onclick="GetCheckingReports">else...</div>

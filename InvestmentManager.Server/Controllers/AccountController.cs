@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace InvestmentManager.Server.Controllers
 {
-    [ApiController, Route("[controller]"),Authorize]
+    [ApiController, Route("[controller]"), Authorize]
     public class AccountController : ControllerBase
     {
         private readonly UserManager<IdentityUser> userManager;
@@ -29,7 +29,6 @@ namespace InvestmentManager.Server.Controllers
             this.unitOfWork = unitOfWork;
             this.summaryService = summaryService;
         }
-
         [HttpGet("all")]
         public async Task<List<AccountFrameModel>> GetAllAccontInfo()
         {

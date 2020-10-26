@@ -1,27 +1,16 @@
 ﻿@inject Notification notice
 
 <FrameTemplate Name="@Name" TitleColor="Choice.TextColor.warning">
-    <IconBlock>
-        <div class="col-1 px-0"><IconCustom Action="@(() => isAdditionalInfo = !isAdditionalInfo)" IconName="info" /></div>
-        <div class="col-1 px-0"><IconCustom Action="@(() => isTransactions = !isTransactions)" IconName="yen" /></div>
-        <div class="col-1 px-0"><IconCustom Action="@(() => isRating = !isRating )" IconName="bar-chart" /></div>
-        <div class="col-1 px-0"><IconCustom Action="@(() => isBuyRecommendations = !isBuyRecommendations)" IconName="plus" /></div>
-        <div class="col-1 px-0"><IconCustom Action="@(() => isSellRecommendations = !isSellRecommendations)" IconName="minus" /></div>
-        <div class="col-1 px-0"><IconCustom Action="@(() => isCoefficient = !isCoefficient)" IconName="calculator" /></div>
-        <div class="col-1 px-0"><IconCustom Action="@(() => isReport = !isReport )" IconName="document" /></div>
-        <div class="col-1 px-0"><IconCustom Action="@(() => isPrice = !isPrice)" IconName="graph" /></div>
-        <div class="col-1 px-0"><IconCustom Action="@(() => isDividend = !isDividend)" IconName="target" /></div>
-    </IconBlock>
     <InfoBlock>
-        <IconRowInformation IconName="info" Name="@additionalInfo" Description="@DefaultData.Description.companyInfo" />
-        <IconRowInformation IconName="yen" Name="@transactions" />
-        <IconRowInformation IconName="bar-chart" Name="@rating" />
-        <IconRowInformation IconName="plus" Name="@buyRecommendations" />
-        <IconRowInformation IconName="minus" Name="@sellRecommendations" />
-        <IconRowInformation IconName="calculator" Name="@coefficient" />
-        <IconRowInformation IconName="document" Name="@report" />
-        <IconRowInformation IconName="graph" Name="@price" />
-        <IconRowInformation IconName="target" Name="@dividend" />
+        <MultiRow Name="@additionalInfo" IconName="info" Action="@(() => isAdditionalInfo = !isAdditionalInfo)" Description="@DefaultData.Description.companyInfo" />
+        <MultiRow Name="@transactions" IconName="yen" Action="@(() => isTransactions = !isTransactions)" />
+        <MultiRow Name="@rating" IconName="bar-chart" Action="@(() => isRating = !isRating )" />
+        <MultiRow Name="@buyRecommendations" IconName="plus" Action="@(() => isBuyRecommendations = !isBuyRecommendations)" />
+        <MultiRow Name="@sellRecommendations" IconName="minus" Action="@(() => isSellRecommendations = !isSellRecommendations)" />
+        <MultiRow Name="@coefficient" IconName="calculator" Action="@(() => isCoefficient = !isCoefficient)" />
+        <MultiRow Name="@report" IconName="document" Action="@(() => isReport = !isReport )" />
+        <MultiRow Name="@price" IconName="graph" Action="@(() => isPrice = !isPrice)" />
+        <MultiRow Name="@dividend" IconName="target" Action="@(() => isDividend = !isDividend)" />
     </InfoBlock>
     <ActionBlock>
         @if (isAdditionalInfo)
