@@ -43,7 +43,7 @@
         user = (await AuthenticationState).User.Identity;
         if (user.IsAuthenticated)
         {
-            Accounts = await http.GetResultAsync<List<AccountFrameModel>>(RouteName.account + "/all");
+            Accounts = await http.GetNoParametersAsync<List<AccountFrameModel>>(RouteName.account + "/all");
             sum = Accounts.Sum(x => x.Sum).ToString("C");
             if (Accounts.Any())
                 await localStorage.SetItemAsync($"{DefaultData.IdName.accountIds}_{user.Name}", Accounts.Where(x => x.IsActive).Select(x => x.Id).ToArray());
@@ -54,7 +54,7 @@
     {
         Accounts.First(x => x.Id == selector.selectedId).IsActive = selector.isSelected;
         long[] selectedIds = Accounts.Where(x => x.IsActive).Select(x => x.Id).ToArray();
-        sum = (await http.GetResultAsync<List<AccountFrameModel>>(RouteName.account + "/selected", JsonSerializer.Serialize(selectedIds))).Sum(x => x.Sum).ToString("C");
+        sum = (await http.GetByValuesAsync<List<AccountFrameModel>>(RouteName.account + "/selected", JsonSerializer.Serialize(selectedIds))).Sum(x => x.Sum).ToString("C");
         await localStorage.SetItemAsync($"{DefaultData.IdName.accountIds}_{user.Name}", selectedIds);
     }
 }

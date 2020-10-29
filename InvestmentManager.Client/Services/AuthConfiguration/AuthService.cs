@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Components.Authorization;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace InvestmentManager.Client.Services.AuthConfiguration
@@ -35,7 +34,7 @@ namespace InvestmentManager.Client.Services.AuthConfiguration
         {
             notification.LoadStart();
             var response = await httpClient.PostAsJsonAsync(RouteName.security + "/register", model).ConfigureAwait(false);
-            var result = JsonSerializer.Deserialize<ErrorBaseModel>(await response.Content.ReadAsStringAsync().ConfigureAwait(false), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var result = await response.Content.ReadFromJsonAsync<ErrorBaseModel>().ConfigureAwait(false);
             notification.LoadStop();
             return result;
         }
@@ -43,7 +42,7 @@ namespace InvestmentManager.Client.Services.AuthConfiguration
         {
             notification.LoadStart();
             var response = await httpClient.PostAsJsonAsync(RouteName.security + "/login", model).ConfigureAwait(false);
-            var result = JsonSerializer.Deserialize<LoginResult>(await response.Content.ReadAsStringAsync().ConfigureAwait(false), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var result = await response.Content.ReadFromJsonAsync<LoginResult>().ConfigureAwait(false);
             notification.LoadStop();
 
             if (!response.IsSuccessStatusCode)

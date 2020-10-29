@@ -28,5 +28,5 @@
     [Parameter] public long CompanyId { get; set; }
 
     PriceHistoryShortModel model;
-    protected override async Task OnInitializedAsync() => model = await http.GetResultAsync<PriceHistoryShortModel>(RouteName.price + "/historyshort", CompanyId);
+    protected override async Task OnInitializedAsync() => model = await http.GetByIdAsync<PriceHistoryShortModel>(RouteName.price + "/historyshort", CompanyId);
 }

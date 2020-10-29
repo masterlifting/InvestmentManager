@@ -42,7 +42,7 @@
         identity = (await AuthenticationState).User.Identity;
 
         if (await localStorage.ContainKeyAsync($"{DefaultData.IdName.accountIds}_{identity.Name}"))
-            model = await http.GetResultAsync<RecommendationsForSaleShortModel>(RouteName.recommendation + "/saleshort", CompanyId);
+            model = await http.GetByIdAsync<RecommendationsForSaleShortModel>(RouteName.recommendation + "/saleshort", CompanyId);
         else
             await notice.AlertFailedAsync("you have no saved transactions");
     }

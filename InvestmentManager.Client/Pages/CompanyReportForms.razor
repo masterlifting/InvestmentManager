@@ -106,7 +106,7 @@
 @code {
     List<CompanyReportForm> checkingreports = new List<CompanyReportForm>();
     protected override async Task OnInitializedAsync() => await GetCheckingReports();
-    async Task GetCheckingReports() => checkingreports = await http.GetResultAsync<List<CompanyReportForm>>(RouteName.companyReport + "/checknew", true);
+    async Task GetCheckingReports() => checkingreports = await http.GetNoParametersAsync<List<CompanyReportForm>>(RouteName.companyReport + "/checknew", true);
     async Task DeleteReport(NewReportModel report, string companyName)
     {
         if (await http.GetBoolAsync(RouteName.companyReport + "/deletechecked", report.ReportId))

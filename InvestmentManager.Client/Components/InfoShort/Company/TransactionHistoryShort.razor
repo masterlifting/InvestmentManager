@@ -39,7 +39,7 @@
         if (await localStorage.ContainKeyAsync($"{DefaultData.IdName.accountIds}_{user.Name}"))
         {
             string values = JsonSerializer.Serialize(await localStorage.GetItemAsync<long[]>($"{DefaultData.IdName.accountIds}_{user.Name}"));
-            model = await http.GetResultAsync<CompanyTransactionHistoryShortModel>(RouteName.company + "/transactionshort", CompanyId, values);
+            model = await http.GetByIdValuesAsync<CompanyTransactionHistoryShortModel>(RouteName.company + "/transactionshort", CompanyId, values);
         }
         else
             await notice.AlertFailedAsync("you have no saved transactions");

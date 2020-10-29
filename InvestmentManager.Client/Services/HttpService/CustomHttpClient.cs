@@ -1,10 +1,10 @@
 ﻿using InvestmentManager.Client.Services.NotificationService;
+using Microsoft.AspNetCore.Components;
+using System;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
-using System.Net;
-using System.Text.Json;
-using System;
 
 namespace InvestmentManager.Client.Services.HttpService
 {
@@ -22,30 +22,60 @@ namespace InvestmentManager.Client.Services.HttpService
             this.notice = notification;
         }
 
-        public async Task<TResult> GetResultAsync<TResult>(string route, bool withLoading = false)
+        #region Get
+        async Task<TResult> BaseGetAsync<TResult>(string uri, bool withLoading) where TResult : class
         {
+            TResult result;
+
             if (withLoading)
                 notice.LoadStart();
 
-            var result = await httpClient.GetFromJsonAsync<TResult>(route).ConfigureAwait(false);
+            var response = await httpClient.GetAsync(uri).ConfigureAwait(false);
+
+            if (response.IsSuccessStatusCode)
+                result = await response.Content.ReadFromJsonAsync<TResult>().ConfigureAwait(false);
+            else
+            {
+                await notice.AlertFailedAsync($"Sorry, something went wrong. Try relogin").ConfigureAwait(false);
+                result = Activator.CreateInstance<TResult>();
+            }
 
             if (withLoading)
                 notice.LoadStop();
 
             return result;
         }
-        public async Task<TResult> GetResultAsync<TResult>(string route, long id, bool withLoading = false)
+
+        public async Task<TResult> GetNoParametersAsync<TResult>(string route, bool withLoading = false) where TResult : class
         {
-            if (withLoading)
-                notice.LoadStart();
-
-            var result = await httpClient.GetFromJsonAsync<TResult>($"{route}?id={id}").ConfigureAwait(false);
-
-            if (withLoading)
-                notice.LoadStop();
-
-            return result;
+            return await BaseGetAsync<TResult>(route, withLoading).ConfigureAwait(false);
         }
+        public async Task<TResult> GetByIdAsync<TResult>(string route, long id, bool withLoading = false) where TResult : class
+        {
+            string uri = $"{route}?id={id}";
+            return await BaseGetAsync<TResult>(uri, withLoading).ConfigureAwait(false);
+        }
+        public async Task<TResult> GetByValueAsync<TResult>(string route, int value, bool withLoading = false) where TResult : class
+        {
+            string uri = $"{route}?value={value}";
+            return await BaseGetAsync<TResult>(uri, withLoading).ConfigureAwait(false);
+        }
+        public async Task<TResult> GetByIdValueAsync<TResult>(string route, long id, int value, bool withLoading = false) where TResult : class
+        {
+            string uri = $"{route}?id={id}&value={value}";
+            return await BaseGetAsync<TResult>(uri, withLoading).ConfigureAwait(false);
+        }
+        public async Task<TResult> GetByValuesAsync<TResult>(string route, string values, bool withLoading = false) where TResult : class
+        {
+            string uri = $"{route}?values={values}";
+            return await BaseGetAsync<TResult>(uri, withLoading).ConfigureAwait(false);
+        }
+        public async Task<TResult> GetByIdValuesAsync<TResult>(string route, long id, string values, bool withLoading = false) where TResult : class
+        {
+            string uri = $"{route}?id={id}&values={values}";
+            return await BaseGetAsync<TResult>(uri, withLoading).ConfigureAwait(false);
+        }
+
         public async Task<bool> GetBoolAsync(string route, long id, bool withConfirm = false)
         {
             notice.LoadStart();
@@ -62,54 +92,6 @@ namespace InvestmentManager.Client.Services.HttpService
 
             return response.IsSuccessStatusCode;
         }
-        public async Task<TResult> GetResultAsync<TResult>(string route, int value, bool withLoading = false)
-        {
-            if (withLoading)
-                notice.LoadStart();
-
-            var result = await httpClient.GetFromJsonAsync<TResult>($"{route}?value={value}").ConfigureAwait(false);
-
-            if (withLoading)
-                notice.LoadStop();
-
-            return result;
-        }
-        public async Task<TResult> GetResultAsync<TResult>(string route, long id, int value, bool withLoading = false)
-        {
-            if (withLoading)
-                notice.LoadStart();
-
-            var result = await httpClient.GetFromJsonAsync<TResult>($"{route}?id={id}&value={value}").ConfigureAwait(false);
-
-            if (withLoading)
-                notice.LoadStop();
-
-            return result;
-        }
-        public async Task<TResult> GetResultAsync<TResult>(string route, long id, string values, bool withLoading = false)
-        {
-            if (withLoading)
-                notice.LoadStart();
-
-            var result = await httpClient.GetFromJsonAsync<TResult>($"{route}?id={id}&values={values}").ConfigureAwait(false);
-
-            if (withLoading)
-                notice.LoadStop();
-
-            return result;
-        }
-        public async Task<TResult> GetResultAsync<TResult>(string route, string values, bool withLoading = false)
-        {
-            if (withLoading)
-                notice.LoadStart();
-
-            var result = await httpClient.GetFromJsonAsync<TResult>($"{route}?values={values}").ConfigureAwait(false);
-
-            if (withLoading)
-                notice.LoadStop();
-
-            return result;
-        }
         public async Task GetVoidAsync(string route, bool withConfirm = false)
         {
             notice.LoadStart();
@@ -124,7 +106,8 @@ namespace InvestmentManager.Client.Services.HttpService
                     await notice.AlertFailedAsync().ConfigureAwait(false);
             }
         }
-
+        #endregion
+        #region Post
         public async Task<bool> PostBoolAsync<TModel>(string route, TModel model, bool withConfirm = false)
         {
             notice.LoadStart();
@@ -175,5 +158,6 @@ namespace InvestmentManager.Client.Services.HttpService
 
             return response;
         }
+        #endregion
     }
 }

@@ -22,5 +22,5 @@
 
     CompanyReportHistoryShortModel model = new CompanyReportHistoryShortModel();
     protected async override Task OnInitializedAsync() =>
-       model = await http.GetResultAsync<CompanyReportHistoryShortModel>(RouteName.companyReport + "/historyshort", CompanyId);
+       model = await http.GetByIdAsync<CompanyReportHistoryShortModel>(RouteName.companyReport + "/historyshort", CompanyId);
 }
