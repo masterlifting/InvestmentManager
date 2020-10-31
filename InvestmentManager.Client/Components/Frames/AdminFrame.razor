@@ -1,5 +1,5 @@
 ﻿@inject CustomHttpClient http
-@inject Notification notice
+@inject CustomNotification notice
 @inject NavigationManager navigation
 
 <FrameTemplate Theme="Choice.InvestColor.idanger" Name="Administrator" TitleColor="Choice.TextColor.light">
@@ -24,7 +24,7 @@
     async Task GetNewPrice()
     {
         if (await IsAdmin())
-            await http.GetVoidAsync(RouteName.price + "/getnew");
+            await http.GetVoidAsync(RouteName.price + "/new");
     }
     async Task ParseNewReports()
     {

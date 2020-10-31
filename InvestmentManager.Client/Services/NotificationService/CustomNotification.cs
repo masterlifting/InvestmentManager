@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace InvestmentManager.Client.Services.NotificationService
 {
-    public class Notification
+    public class CustomNotification
     {
         public Alert Alert { get; private set; } = new Alert();
         public Toast Toast { get; private set; } = new Toast();

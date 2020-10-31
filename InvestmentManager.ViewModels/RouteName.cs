@@ -2,6 +2,8 @@
 {
     public static class RouteName
     {
+        public const string Short = "/short";
+        public const string Full = "/full";
         public const string account = "account";
         public const string additional = "additional";
         public const string admin = "admin";

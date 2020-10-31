@@ -1,5 +1,5 @@
 ﻿@page "/login"
-@inject IAuthService AuthService
+@inject IAuthenticationService authenticationService
 @inject NavigationManager navigation
 
 <div class="row isecodary iframe" style="margin-top:30vh">
@@ -36,7 +36,7 @@
     {
         withErrors = false;
 
-        var result = await AuthService.LoginAsync(loginModel);
+        var result = await authenticationService.LoginAsync(loginModel);
 
         if (result.Successful)
             navigation.NavigateTo("/");

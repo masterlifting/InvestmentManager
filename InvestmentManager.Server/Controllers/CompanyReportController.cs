@@ -34,12 +34,12 @@ namespace InvestmentManager.Server.Controllers
             this.reportService = reportService;
             this.memoryCache = memoryCache;
         }
-        [HttpGet("historyshort")]
-        public CompanyReportHistoryShortModel GetShortHistory(long id)
+        [HttpGet("short")]
+        public CompanyReportShortModel GetShortHistory(long id)
         {
             var reports = unitOfWork.Report.GetAll().Where(x => x.CompanyId == id).OrderBy(x => x.DateReport);
             var dateLastReport = reports.Last().DateReport;
-            return new CompanyReportHistoryShortModel
+            return new CompanyReportShortModel
             {
                 DateLastReport = dateLastReport.ToShortDateString(),
                 DateUpdate = reports.Last().DateUpdate.ToShortDateString(),
@@ -48,27 +48,27 @@ namespace InvestmentManager.Server.Controllers
                 LastQuarter = converterService.ConvertToQuarter(dateLastReport.Month).ToString()
             };
         }
-        [HttpGet("historyfull")]
-        public List<CompanyReportHistoryFullModel> GetFullHistory(long id)
+        [HttpGet("full")]
+        public List<CompanyReportFullModel> GetFullHistory(long id)
         {
             var reports = unitOfWork.Report.GetAll().Where(x => x.CompanyId == id).OrderByDescending(x => x.DateReport);
-            var result = new List<CompanyReportHistoryFullModel>();
+            var result = new List<CompanyReportFullModel>();
             foreach (var report in reports)
             {
-                result.Add(new CompanyReportHistoryFullModel
+                result.Add(new CompanyReportFullModel
                 {
-                    DateReport = report.DateReport.ToShortDateString(),
-                    Quarter = converterService.ConvertToQuarter(report.DateReport.Month).ToString(),
-                    Assets = report.Assets.ToString("f0"),
-                    CashFlow = report.CashFlow.ToString("f0"),
-                    Dividend = report.Dividends.ToString("f2"),
-                    GrossProfit = report.GrossProfit.ToString("f0"),
-                    LongTermDebt = report.LongTermDebt.ToString("f0"),
-                    NetProfit = report.NetProfit.ToString("f0"),
-                    Obligation = report.Obligations.ToString("f0"),
-                    Revenue = report.Revenue.ToString("f0"),
-                    ShareCapital = report.ShareCapital.ToString("f0"),
-                    Turnover = report.Turnover.ToString("f0")
+                    DateReport = report.DateReport,
+                    Quarter = converterService.ConvertToQuarter(report.DateReport.Month),
+                    Assets = report.Assets,
+                    CashFlow = report.CashFlow,
+                    Dividend = report.Dividends,
+                    GrossProfit = report.GrossProfit,
+                    LongTermDebt = report.LongTermDebt,
+                    NetProfit = report.NetProfit,
+                    Obligation = report.Obligations,
+                    Revenue = report.Revenue,
+                    ShareCapital = report.ShareCapital,
+                    Turnover = report.Turnover
                 });
             }
 

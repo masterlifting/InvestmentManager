@@ -1,6 +1,6 @@
 ﻿@inject CustomHttpClient http
 @inject ILocalStorageService localStorage
-@inject Notification notice
+@inject CustomNotification notice
 
 <InfoTemplate InfoName="@InfoName" VisibleAction="@(async (bool isVisible) => await UpdateVisible.InvokeAsync(isVisible))">
     <ChildContent>

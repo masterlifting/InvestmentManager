@@ -7,6 +7,10 @@
             {
                 <InformationCols Key="Date price" Value="@model.DateUpdate" />
                 <InformationCols Key="Last price" Value="@model.LastPrice" />
+
+                <div class="col">
+                    <CompanyPrice CompanyId="CompanyId" />
+                </div>
             }
             else
             {
@@ -27,6 +31,6 @@
     [Parameter] public string InfoName { get; set; }
     [Parameter] public long CompanyId { get; set; }
 
-    PriceHistoryShortModel model;
-    protected override async Task OnInitializedAsync() => model = await http.GetByIdAsync<PriceHistoryShortModel>(RouteName.price + "/historyshort", CompanyId);
+    PriceShortModel model;
+    protected override async Task OnInitializedAsync() => model = await http.GetByIdAsync<PriceShortModel>(RouteName.price + RouteName.Short, CompanyId);
 }

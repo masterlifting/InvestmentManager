@@ -7,6 +7,7 @@
     <UserSecretsId>2f365732-2fe0-4cbd-896a-5e7734748fd2</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Components\Frames\ve-E4B2.tmp" />
     <None Remove="Pages\ve-431E.tmp" />
   </ItemGroup>
   <ItemGroup>

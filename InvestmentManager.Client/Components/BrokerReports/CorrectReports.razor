@@ -1,5 +1,5 @@
 ﻿@inject CustomHttpClient http
-@inject Notification notice
+@inject CustomNotification notice
 
 
 @foreach (var report in Reports)
@@ -45,7 +45,7 @@
 
     async Task SaveData(string accountId, CorrectBrokerReport report)
     {
-        if (await http.PostBoolAsync(RouteName.brokerReport + "/saveparsed", accountId))
+        if (await http.PostAsBoolAsync(RouteName.brokerReport + "/saveparsed", accountId))
         {
             await Task.Run(() => Reports.Remove(report));
             await notice.AlertSuccesAsync();

@@ -1,6 +1,6 @@
 ﻿@page "/brokerreports"
 @inject ILocalStorageService localStorage
-@inject Notification notice
+@inject CustomNotification notice
 @attribute [Authorize]
 
 @if (ReportModel.ReportErrors.Any())

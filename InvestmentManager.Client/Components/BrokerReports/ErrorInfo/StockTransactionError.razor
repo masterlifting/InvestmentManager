@@ -48,5 +48,5 @@
         form = await http.GetNoParametersAsync<StockTransactionErrorForm>(RouteName.brokerReport + "/stocktransactionerrordata");
     }
 
-    async Task SendData() => isDone =  await http.PostBoolAsync(RouteName.brokerReport + "/setticker", result, true);
+    async Task SendData() => isDone =  await http.PostAsBoolAsync(RouteName.brokerReport + "/setticker", result, true);
 }

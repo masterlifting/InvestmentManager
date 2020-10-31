@@ -2,9 +2,9 @@
 using InvestmentManager.ViewModels.SecurityModels;
 using System.Threading.Tasks;
 
-namespace InvestmentManager.Client.Services.AuthConfiguration
+namespace InvestmentManager.Client.Services.AuthenticationConfiguration
 {
-    public interface IAuthService
+    public interface IAuthenticationService
     {
         Task<ErrorBaseModel> RegisterAsync(RegisterModel model);
         Task<LoginResult> LoginAsync(LoginModel model);

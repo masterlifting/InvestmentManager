@@ -2,10 +2,9 @@ using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Blazored.LocalStorage;
-using InvestmentManager.Client.Services.AuthConfiguration;
+using InvestmentManager.Client.Services.AuthenticationConfiguration;
 using InvestmentManager.Client.Services.HttpService;
 using InvestmentManager.Client.Services.NotificationService;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -19,14 +18,13 @@ namespace InvestmentManager.Client
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("app");
 
+            builder.Services.AddScoped<CustomNotification>();
             builder.Services.AddBlazoredLocalStorage();
-            builder.Services.AddAuthorizationCore();
-            builder.Services.AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>();
-            builder.Services.AddScoped<IAuthService, AuthService>();
-            builder.Services.AddScoped<Notification>();
-            builder.Services.AddScoped<CustomHttpClient>();
-
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+            builder.Services.AddAuthorizationCore();
+            builder.Services.AddCustomAuthenticationStateProvider();
+            builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+            builder.Services.AddScoped<CustomHttpClient>();
 
             await builder.Build().RunAsync().ConfigureAwait(false);
         }

@@ -2,7 +2,7 @@
 
 namespace InvestmentManager.ViewModels.PriceModels
 {
-    public class PriceHistoryShortModel
+    public class PriceShortModel
     {
         public string DateUpdate { get; set; }
         public string LastPrice { get; set; }

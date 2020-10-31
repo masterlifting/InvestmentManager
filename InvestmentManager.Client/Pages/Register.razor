@@ -1,6 +1,6 @@
 ﻿@page "/register"
-@inject IAuthService  AuthService
-@inject NavigationManager NavigationManager
+@inject IAuthenticationService  authenticationService
+@inject NavigationManager navigation
 
 <div class="row isecodary iframe" style="margin-top:30vh">
     <EditForm class="col" Model="registerModel" OnValidSubmit="HandleRegistration">
@@ -45,10 +45,10 @@
     async Task HandleRegistration()
     {
         withErrors = false;
-        var result = await AuthService.RegisterAsync(registerModel);
+        var result = await authenticationService.RegisterAsync(registerModel);
 
         if (result.IsSuccess)
-            NavigationManager.NavigateTo("/login");
+            navigation.NavigateTo("/login");
         else
         {
             errors = result.Errors;

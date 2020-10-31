@@ -1,6 +1,6 @@
 ﻿@page "/companyreportforms"
 @inject CustomHttpClient http
-@inject Notification notice
+@inject CustomNotification notice
 @attribute [Authorize(Roles = "pestunov")]
 
 
@@ -119,7 +119,7 @@
     }
     async Task SaveReport(NewReportModel report, string companyName)
     {
-        if (await http.PostBoolAsync<NewReportModel>(RouteName.companyReport + "/savechecked", report))
+        if (await http.PostAsBoolAsync<NewReportModel>(RouteName.companyReport + "/savechecked", report))
         {
             await DeleteReportNodeAsync(report, companyName);
             await notice.AlertSuccesAsync("Report saved", 500);

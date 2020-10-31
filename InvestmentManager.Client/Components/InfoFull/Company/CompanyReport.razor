@@ -2,50 +2,45 @@
 
 <DetailTemplate Name="Report details" DetailTemplateAction="ShowInfo">
     <ChildContent>
-        <TableTemplate Headers="headers" Bodies="bodies" BodyColWidth="6" />
+        @if (reportModels != null)
+        {
+            <TableHorizontal TItem="CompanyReportFullModel" DataItems="reportModels" Columns="columns" BodyColWidth="6" />
+        }
+        else
+        {
+            <span>@DefaultData.loading</span>
+        }
     </ChildContent>
 </DetailTemplate>
 
 
 @code {
     [Parameter] public long CompanyId { get; set; }
-    List<string> headers = new List<string>
-{
-        "Date Report"
-        ,"Quarter"
-        ,"Revenue"
-        ,"Net Profit"
-        ,"Gross Profit"
-        ,"Cash Flow"
-        ,"Assets"
-        ,"Turnover"
-        ,"Share Capital"
-        ,"Dividend"
-        ,"Obligation"
-        ,"Long Term Debt"
-    };
-    List<List<string>> bodies = new List<List<string>>();
+
+    List<CompanyReportFullModel> reportModels;
+    List<ColumnConfig> columns;
 
     async Task ShowInfo(bool isDetails)
     {
         if (isDetails == true)
         {
-            var model = await http.GetByIdAsync<List<CompanyReportHistoryFullModel>>(RouteName.companyReport + "/historyfull", CompanyId);
-            bodies = model.Select(x => new List<string>
+            columns = new List<ColumnConfig>();
+            reportModels = await http.GetByIdAsync<List<CompanyReportFullModel>>(RouteName.companyReport + RouteName.Full, CompanyId);
+            columns.AddRange(new ColumnConfig[]
             {
-                x.DateReport,
-                x.Quarter,
-                x.Revenue,
-                x.NetProfit,
-                x.GrossProfit,
-                x.CashFlow,
-                x.Assets,
-                x.Turnover,
-                x.ShareCapital,
-                x.Dividend,
-                x.Obligation,
-                x.LongTermDebt
-                }).ToList();
+                new ColumnConfig{DataField = nameof(CompanyReportFullModel.DateReport), Caption = "Date Report", DataType = Enums.DataType.Date, Format = "d" },
+                new ColumnConfig{DataField = nameof(CompanyReportFullModel.Quarter), Caption = "Quarter", DataType = Enums.DataType.Number, Format = "f0" },
+                new ColumnConfig{DataField = nameof(CompanyReportFullModel.Revenue), Caption = "Revenue", DataType = Enums.DataType.Number, Format = "f0" },
+                new ColumnConfig{DataField = nameof(CompanyReportFullModel.NetProfit), Caption = "Net Profit", DataType = Enums.DataType.Number, Format = "f0" },
+                new ColumnConfig{DataField = nameof(CompanyReportFullModel.GrossProfit), Caption = "Gross Profit", DataType = Enums.DataType.Number, Format = "f0" },
+                new ColumnConfig{DataField = nameof(CompanyReportFullModel.CashFlow), Caption = "Cash Flow", DataType = Enums.DataType.Number, Format = "f0" },
+                new ColumnConfig{DataField = nameof(CompanyReportFullModel.Assets), Caption = "Assets", DataType = Enums.DataType.Number, Format = "f0" },
+                new ColumnConfig{DataField = nameof(CompanyReportFullModel.Turnover), Caption = "Turnover", DataType = Enums.DataType.Number, Format = "f0" },
+                new ColumnConfig{DataField = nameof(CompanyReportFullModel.ShareCapital), Caption = "Share Capital", DataType = Enums.DataType.Number, Format = "f0" },
+                new ColumnConfig{DataField = nameof(CompanyReportFullModel.Dividend), Caption = "Dividend", DataType = Enums.DataType.Number, Format = "f2" },
+                new ColumnConfig{DataField = nameof(CompanyReportFullModel.Obligation), Caption = "Obligation", DataType = Enums.DataType.Number, Format = "f0" },
+                new ColumnConfig{DataField = nameof(CompanyReportFullModel.LongTermDebt), Caption = "Long Term Debt", DataType = Enums.DataType.Number, Format = "f0" },
+            });
         }
     }
 }

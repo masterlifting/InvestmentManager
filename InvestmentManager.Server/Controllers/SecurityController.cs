@@ -35,7 +35,6 @@ namespace InvestmentManager.Server.Controllers
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
             var result = await signInManager.PasswordSignInAsync(model.Email.Split('@')[0], model.Password, false, false).ConfigureAwait(false);
-
             if (!result.Succeeded)
                 return BadRequest(new LoginResult { Successful = false, Error = "Username or password are invalid." });
 
@@ -52,7 +51,7 @@ namespace InvestmentManager.Server.Controllers
 
             var token = new JwtSecurityToken(configuration["JwtIssuer"], configuration["JwtAudience"], claims, expires: expiry, signingCredentials: creds);
 
-            return Ok(new LoginResult { Successful = true, Token = new JwtSecurityTokenHandler().WriteToken(token) });
+            return Ok(new LoginResult { Successful = true, Token = new JwtSecurityTokenHandler().WriteToken(token) , Expiry = expiry});
         }
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterModel model)

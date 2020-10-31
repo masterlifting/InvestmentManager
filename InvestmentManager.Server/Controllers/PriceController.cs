@@ -24,7 +24,8 @@ namespace InvestmentManager.Server.Controllers
             this.unitOfWork = unitOfWork;
             this.priceService = priceService;
         }
-        [HttpGet("getnew"), Authorize(Roles = "pestunov")]
+
+        [HttpGet("new"), Authorize(Roles = "pestunov")]
         public async Task<IActionResult> GetNewPrices()
         {
             var newPricies = new List<Price>();
@@ -63,14 +64,25 @@ namespace InvestmentManager.Server.Controllers
 
             return Ok();
         }
-        [HttpGet("historyshort")]
-        public async Task<PriceHistoryShortModel> GetHistoryShort(long id)
+
+        [HttpGet("short")]
+        public async Task<PriceShortModel> GetHistoryShort(long id)
         {
             var price = (await unitOfWork.Price.GetCustomPricesAsync(id, 1, OrderType.OrderByDesc).ConfigureAwait(false)).FirstOrDefault();
             if (price != null)
-                return new PriceHistoryShortModel { DateUpdate = price.BidDate.ToString("g"), LastPrice = price.Value.ToString("f2"), Error = new ErrorBaseModel { IsSuccess = true } };
+                return new PriceShortModel { DateUpdate = price.BidDate.ToString("g"), LastPrice = price.Value.ToString("f2"), Error = new ErrorBaseModel { IsSuccess = true } };
             else
-                return new PriceHistoryShortModel {Error = new ErrorBaseModel {Errors = new string[] { "Maybe the price is out of date." } } };
+                return new PriceShortModel { Error = new ErrorBaseModel { Errors = new string[] { "Maybe the price is out of date." } } };
+        }
+        [HttpGet("full")]
+        public async Task<List<PriceFullModel>> GetFull(long id)
+        {
+            var prices = await unitOfWork.Price.GetCustomPricesAsync(id, 12, OrderType.OrderByDesc).ConfigureAwait(false);
+            return prices.Select(x => new PriceFullModel
+            {
+                DateBid = x.BidDate,
+                Price = x.Value
+            }).ToList();
         }
     }
 }

@@ -2,9 +2,9 @@
 @inject ILocalStorageService localStorage
 @inject CustomHttpClient http
 @inject NavigationManager navigationManager
-@inject Notification notice
+@inject CustomNotification notice
 
-<ButtonAction  ClickAction="@(async () => await ClickInputFileButtonAsync("inputButton"))" Title="Load .xls reports from Bcs" Color="@Choice.InvestColor.iinfo" />
+<ButtonAction ClickAction="@(async () => await ClickInputFileButtonAsync("inputButton"))" Title="Load .xls reports from Bcs" Color="@Choice.InvestColor.iinfo" />
 <InputFile multiple OnChange="HandleSelectionAsync" id="inputButton" style="display:none" />
 
 @code {
@@ -27,7 +27,7 @@
                 ms.Close();
             }
 
-            var response = await http.PostContentAsync(RouteName.brokerReport + "/parsebcs", content).ConfigureAwait(false);
+            var response = await http.PostAsContentAsync(RouteName.brokerReport + "/parsebcs", content).ConfigureAwait(false);
             content.Dispose();
 
             if (response.IsSuccessStatusCode)

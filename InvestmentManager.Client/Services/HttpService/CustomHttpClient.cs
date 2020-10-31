@@ -1,8 +1,8 @@
-﻿using InvestmentManager.Client.Services.NotificationService;
-using Microsoft.AspNetCore.Components;
+﻿using InvestmentManager.Client.Services.AuthenticationConfiguration;
+using InvestmentManager.Client.Services.NotificationService;
 using System;
-using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 
@@ -11,21 +11,24 @@ namespace InvestmentManager.Client.Services.HttpService
     public class CustomHttpClient
     {
         private readonly HttpClient httpClient;
-        private readonly Notification notice;
+        private readonly CustomNotification notice;
+        private readonly CustomAuthenticationStateProvider customAuthenticationState;
 
         public CustomHttpClient(
-            HttpClient httpClient,
-            Notification notification
-            )
+            HttpClient httpClient
+            , CustomNotification notice
+            , CustomAuthenticationStateProvider customAuthenticationState)
         {
+            this.notice = notice;
             this.httpClient = httpClient;
-            this.notice = notification;
+            this.customAuthenticationState = customAuthenticationState;
         }
 
         #region Get
         async Task<TResult> BaseGetAsync<TResult>(string uri, bool withLoading) where TResult : class
         {
             TResult result;
+            await SetAuthHeaderAsync().ConfigureAwait(false);
 
             if (withLoading)
                 notice.LoadStart();
@@ -36,7 +39,7 @@ namespace InvestmentManager.Client.Services.HttpService
                 result = await response.Content.ReadFromJsonAsync<TResult>().ConfigureAwait(false);
             else
             {
-                await notice.AlertFailedAsync($"Sorry, something went wrong. Try relogin").ConfigureAwait(false);
+                await notice.AlertFailedAsync($"Sorry, something went wrong.").ConfigureAwait(false);
                 result = Activator.CreateInstance<TResult>();
             }
 
@@ -78,6 +81,7 @@ namespace InvestmentManager.Client.Services.HttpService
 
         public async Task<bool> GetBoolAsync(string route, long id, bool withConfirm = false)
         {
+            await SetAuthHeaderAsync().ConfigureAwait(false);
             notice.LoadStart();
             var response = await httpClient.GetAsync($"{route}?id={id}").ConfigureAwait(false);
             notice.LoadStop();
@@ -94,6 +98,7 @@ namespace InvestmentManager.Client.Services.HttpService
         }
         public async Task GetVoidAsync(string route, bool withConfirm = false)
         {
+            await SetAuthHeaderAsync().ConfigureAwait(false);
             notice.LoadStart();
             var result = await httpClient.GetAsync(route).ConfigureAwait(false);
             notice.LoadStop();
@@ -108,8 +113,9 @@ namespace InvestmentManager.Client.Services.HttpService
         }
         #endregion
         #region Post
-        public async Task<bool> PostBoolAsync<TModel>(string route, TModel model, bool withConfirm = false)
+        public async Task<bool> PostAsBoolAsync<TModel>(string route, TModel model, bool withConfirm = false)
         {
+            await SetAuthHeaderAsync().ConfigureAwait(false);
             notice.LoadStart();
             var response = await httpClient.PostAsJsonAsync(route, model).ConfigureAwait(false);
             notice.LoadStop();
@@ -124,12 +130,11 @@ namespace InvestmentManager.Client.Services.HttpService
 
             return response.IsSuccessStatusCode;
         }
-        public async Task<HttpResponseMessage> PostModelAsync<TModel>(string route, TModel model, bool withConfirm = false)
+        public async Task<TResult> PostAsModelAsync<TResult, TModel>(string route, TModel model, bool withConfirm = false)
         {
+            await SetAuthHeaderAsync().ConfigureAwait(false);
             notice.LoadStart();
             var response = await httpClient.PostAsJsonAsync(route, model).ConfigureAwait(false);
-            notice.LoadStop();
-
             if (withConfirm)
             {
                 if (response.IsSuccessStatusCode)
@@ -137,11 +142,13 @@ namespace InvestmentManager.Client.Services.HttpService
                 else
                     await notice.AlertFailedAsync().ConfigureAwait(false);
             }
+            notice.LoadStop();
 
-            return response;
+            return await response.Content.ReadFromJsonAsync<TResult>().ConfigureAwait(false);
         }
-        public async Task<HttpResponseMessage> PostContentAsync(string route, HttpContent content, bool withLoading = false, bool withConfirm = false)
+        public async Task<HttpResponseMessage> PostAsContentAsync(string route, HttpContent content, bool withLoading = false, bool withConfirm = false)
         {
+            await SetAuthHeaderAsync().ConfigureAwait(false);
             if (withLoading)
                 notice.LoadStart();
             var response = await httpClient.PostAsync(route, content).ConfigureAwait(false);
@@ -159,5 +166,15 @@ namespace InvestmentManager.Client.Services.HttpService
             return response;
         }
         #endregion
+        public async Task SetAuthHeaderAsync()
+        {
+            string token = await customAuthenticationState.GetTokenAsync().ConfigureAwait(false);
+            if (token != null)
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        }
+        public void SetDefaultAuthHeader()
+        {
+            httpClient.DefaultRequestHeaders.Authorization = null;
+        }
     }
 }
