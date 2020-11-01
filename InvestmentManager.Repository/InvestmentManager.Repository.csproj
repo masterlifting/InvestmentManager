@@ -5,6 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\20201101081011_AddDateSplitField.cs" />
+    <Compile Remove="Migrations\20201101081011_AddDateSplitField.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="IRepository.cs~RF14aa3b8f.TMP" />
     <None Remove="Query.sql" />
     <None Remove="Перенос отчетов.sql" />

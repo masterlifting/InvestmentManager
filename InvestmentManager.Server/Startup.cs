@@ -39,7 +39,7 @@ namespace InvestmentManager.Server
             services.AddDbContext<InvestmentContext>(provider =>
             {
                 provider.UseLazyLoadingProxies();
-                /*/
+               /*/
                 provider.UseNpgsql(configuration["ConnectionStrings:LocalPostgresConnection"]);
                 /*/
                 provider.UseNpgsql(configuration["ConnectionStrings:PostgresConnection"]);

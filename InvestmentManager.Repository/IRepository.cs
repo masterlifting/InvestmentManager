@@ -70,7 +70,9 @@ namespace InvestmentManager.Repository
     public interface IPriceRepository : IRepository<Price>
     {
         Task<IEnumerable<Price>> GetCustomPricesAsync(long companyId, int lastMonths, OrderType orderDate);
+        Task<IEnumerable<Price>> GetCustomPricesAsync(long companyId, int lastMonths, OrderType orderDate, DateTime? startDate = null);
         Dictionary<long, List<Price>> GetGroupedPrices(int lastMonths, OrderType orderDate);
+        Dictionary<long, List<Price>> GetGroupedPricesByDateSplit(int lastMonths, OrderType orderDate);
         IDictionary<long, decimal> GetLastPrices(double lastDays);
         IDictionary<long, DateTime> GetLastDates(double lastDays);
         IQueryable<DateTime> GetLastDates(long tickerId, int count);

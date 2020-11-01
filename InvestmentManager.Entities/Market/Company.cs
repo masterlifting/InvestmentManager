@@ -2,7 +2,7 @@
 using InvestmentManager.Entities.Calculate;
 using InvestmentManager.Entities.Relationship.InterfaceForeignKey;
 using InvestmentManager.Entities.Relationship.InterfaceNavigationProperty;
-
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -22,6 +22,7 @@ namespace InvestmentManager.Entities.Market
         [StringLength(500)]
         [Required]
         public string Name { get; set; }
+        public DateTime? DateSplit { get; set; }
 
         public long IndustryId { get; set; }
         public virtual Industry Industry { get; set; }

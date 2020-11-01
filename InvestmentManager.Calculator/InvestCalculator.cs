@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
 namespace InvestmentManager.Calculator
@@ -308,18 +309,18 @@ namespace InvestmentManager.Calculator
         public async Task<List<Rating>> GetCompleatedRatingsAsync()
         {
             var result = new List<Rating>();
-            var companyIds = unitOfWork.Company.GetAll().Select(x => x.Id).ToList();
-            foreach (long companyId in companyIds)
+            var companyData = unitOfWork.Company.GetAll().Select(x => new { x.Id, x.DateSplit }).ToList();
+            foreach (var company in companyData)
             {
                 var calculatorArgs = new CalculatedArgs
                 {
-                    CurrentRating = unitOfWork.Rating.GetAll().FirstOrDefault(x => x.CompanyId == companyId),
-                    Coefficients = await unitOfWork.Coefficient.GetSortedCoefficientsAsync(companyId).ConfigureAwait(false),
-                    Prices = await unitOfWork.Price.GetCustomPricesAsync(companyId, 24, OrderType.OrderBy).ConfigureAwait(false),
-                    Reports = unitOfWork.Report.GetAll().Where(x => x.CompanyId == companyId && x.IsChecked == true).OrderBy(x => x.DateReport.Date)
+                    CurrentRating = unitOfWork.Rating.GetAll().FirstOrDefault(x => x.CompanyId == company.Id),
+                    Coefficients = await unitOfWork.Coefficient.GetSortedCoefficientsAsync(company.Id).ConfigureAwait(false),
+                    Prices = await unitOfWork.Price.GetCustomPricesAsync(company.Id, 12, OrderType.OrderBy, company.DateSplit).ConfigureAwait(false),
+                    Reports = unitOfWork.Report.GetAll().Where(x => x.CompanyId == company.Id && x.IsChecked == true).OrderBy(x => x.DateReport.Date)
                 };
 
-                result.Add(await CalculateRatingAsync(calculatorArgs, companyId).ConfigureAwait(false));
+                result.Add(await CalculateRatingAsync(calculatorArgs, company.Id).ConfigureAwait(false));
             }
 
             var comparer = new CustomCompare<Rating>();
@@ -381,7 +382,7 @@ namespace InvestmentManager.Calculator
             var result = new List<BuyRecommendation>();
             int ratingCount = ratings.Count();
             int companyCountWithPrices = unitOfWork.Price.GetCompanyCountWithPrices();
-            var prices = unitOfWork.Price.GetGroupedPrices(12, OrderType.OrderBy);
+            var prices = unitOfWork.Price.GetGroupedPricesByDateSplit(12, OrderType.OrderBy);
             
             foreach (var i in unitOfWork.Company.GetAll().AsEnumerable()
                 .Join(prices, x => x.Id, y => y.Key, (x, y) => new { CompanyId = x.Id, Prices = y.Value })

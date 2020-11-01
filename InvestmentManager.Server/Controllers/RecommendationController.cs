@@ -98,17 +98,20 @@ namespace InvestmentManager.Server.Controllers
             {
                 y.CompanyId,
                 LastPrice = x.Value,
-                RecommendationPriceMin = y.PriceMin,
-                RecommendationPriceMid = y.PriceMid,
-                RecommendationPriceMax = y.PriceMax,
+                y.PriceMin,
+                y.PriceMid,
+                y.PriceMax,
+                y.LotMin,
+                y.LotMid,
+                y.LotMax
             })
                 .Where(x =>
-                x.LastPrice >= x.RecommendationPriceMin
-                || x.LastPrice >= x.RecommendationPriceMid
-                || x.LastPrice >= x.RecommendationPriceMax)
-                .OrderBy(x => x.RecommendationPriceMax / x.LastPrice)
-                .ThenBy(x => x.RecommendationPriceMid / x.LastPrice)
-                .ThenBy(x => x.RecommendationPriceMin / x.LastPrice);
+                x.LastPrice >= x.PriceMin
+                | x.LastPrice >= x.PriceMid
+                | x.LastPrice >= x.PriceMax)
+                .OrderBy(x => x.PriceMin / x.LastPrice)
+                .ThenBy(x => x.PriceMid / x.LastPrice)
+                .ThenBy(x => x.PriceMax / x.LastPrice);
 
             if (recommendations is null)
                 return new PaginationViewModelBase
