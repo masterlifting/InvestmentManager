@@ -32,5 +32,5 @@
     [Parameter] public long CompanyId { get; set; }
 
     PriceShortModel model;
-    protected override async Task OnInitializedAsync() => model = await http.GetByIdAsync<PriceShortModel>(RouteName.price + RouteName.Short, CompanyId);
+    protected override async Task OnInitializedAsync() => model = await http.GetByIdAsync<PriceShortModel>(Routes.C.Price + Routes.A.Short, CompanyId);
 }

@@ -10,16 +10,16 @@ app {
 
 .valid.modified:not([type=checkbox]) {
     border-radius: 25px;
-    border: 2px solid darkgreen;
+    border: 3px solid darkgreen;
 }
 
 .invalid {
     border-radius: 25px;
-    border: 2px solid darkred;
+    border: 3px solid darkred;
 }
 
 .validation-message {
-    color: khaki;
+    color: red;
 }
 
 #blazor-error-ui {

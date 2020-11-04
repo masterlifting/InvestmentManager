@@ -1,10 +1,8 @@
-﻿using System.Collections.Generic;
-
-namespace InvestmentManager.ViewModels.ErrorModels
+﻿namespace InvestmentManager.ViewModels.ErrorModels
 {
     public class ErrorBaseModel
     {
         public bool IsSuccess { get; set; } = false;
-        public IEnumerable<string> Errors { get; set; }
+        public string[] Errors { get; set; }
     }
 }

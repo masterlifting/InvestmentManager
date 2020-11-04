@@ -45,8 +45,8 @@
     protected override async Task OnParametersSetAsync()
     {
         result = new StockTransactionErrorResultModel { TikerName = ErrorValue.Split('\'')[1] };
-        form = await http.GetNoParametersAsync<StockTransactionErrorForm>(RouteName.brokerReport + "/stocktransactionerrordata");
+        form = await http.GetNoParametersAsync<StockTransactionErrorForm>(Routes.C.BrokerReport + "/stocktransactionerrordata");
     }
 
-    async Task SendData() => isDone =  await http.PostAsBoolAsync(RouteName.brokerReport + "/setticker", result, true);
+    async Task SendData() => isDone =  await http.PostAsBoolAsync(Routes.C.BrokerReport + "/setticker", result, true);
 }

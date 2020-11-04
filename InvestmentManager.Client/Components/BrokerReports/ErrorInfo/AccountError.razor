@@ -17,5 +17,5 @@
     bool isDone = false;
 
     protected override void OnParametersSet() => result = new AccountErrorForm { AccountName = ErrorValue.Split('\'')[1] };
-    async Task SendData() => isDone = await http.PostAsBoolAsync(RouteName.brokerReport + "/setaccount", result, true);
+    async Task SendData() => isDone = await http.PostAsBoolAsync(Routes.C.BrokerReport + "/setaccount", result, true);
 }

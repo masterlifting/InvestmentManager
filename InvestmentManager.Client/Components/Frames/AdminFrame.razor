@@ -8,33 +8,46 @@
         <MultiRow Name="Load prices" IconName="script" Action="GetNewPrice" />
         <MultiRow Name="Load reports" IconName="document" Action="ParseNewReports" />
         <MultiRow Name="Check reports" IconName="check" Action="CheckParsedReports" />
-        <MultiRow Name="Add company" IconName="file" />
+        <MultiRow Name="@addCompany" IconName="file" Action="AddCompany" />
     </InfoBlock>
+    <ActionBlock>
+        @if (isAddingCompany)
+        {
+            <CompanyForm InfoName="@addCompany" CompanyId="null" UpdateVisible="@((bool isVisible) => isAddingCompany = isVisible)" />
+        }
+    </ActionBlock>
 </FrameTemplate>
 
 @code {
+    string addCompany = "Add new company";
+    bool isAddingCompany;
 
     [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; }
 
     async Task RecalculateAll()
     {
         if (await IsAdmin())
-            await http.GetVoidAsync(RouteName.admin + "/recalculateall", true);
+            await http.GetVoidAsync(Routes.C.Admin + "/recalculateall", true);
     }
     async Task GetNewPrice()
     {
         if (await IsAdmin())
-            await http.GetVoidAsync(RouteName.price + "/new");
+            await http.GetVoidAsync(Routes.C.Price + Routes.A.New);
     }
     async Task ParseNewReports()
     {
         if (await IsAdmin())
-            await http.GetVoidAsync(RouteName.companyReport + "/parse");
+            await http.GetVoidAsync(Routes.C.CompanyReport + Routes.A.Parse);
     }
     async Task CheckParsedReports()
     {
         if (await IsAdmin())
             navigation.NavigateTo("/companyreportforms");
+    }
+    async Task AddCompany()
+    {
+        if (await IsAdmin())
+            isAddingCompany = !isAddingCompany;
     }
     async Task<bool> IsAdmin()
     {

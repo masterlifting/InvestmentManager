@@ -85,7 +85,18 @@ namespace InvestmentManager.Repository
         public ICurrencyRepository Currency { get; }
 
 
-        public async Task<int> CompleteAsync() => await context.SaveChangesAsync().ConfigureAwait(false);
+        public async Task<int> CompleteAsync()
+        {
+            try
+            {
+               return await context.SaveChangesAsync().ConfigureAwait(false);
+            }
+            catch
+            {
+                return -1;
+            }
+        }
+
         public async Task CustomAllUpdateAsync<T>(IEnumerable<T> entities, WithDelete withDelete = WithDelete.False) where T : class, IBaseEntity
         {
             if (entities is null || !entities.Any())

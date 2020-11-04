@@ -45,7 +45,7 @@
 
     async Task SaveData(string accountId, CorrectBrokerReport report)
     {
-        if (await http.PostAsBoolAsync(RouteName.brokerReport + "/saveparsed", accountId))
+        if (await http.PostAsBoolAsync(Routes.C.BrokerReport + Routes.A.Save, accountId))
         {
             await Task.Run(() => Reports.Remove(report));
             await notice.AlertSuccesAsync();

@@ -11,6 +11,7 @@
         <MultiRow Name="@report" IconName="document" Action="@(() => isReport = !isReport )" />
         <MultiRow Name="@price" IconName="graph" Action="@(() => isPrice = !isPrice)" />
         <MultiRow Name="@dividend" IconName="target" Action="@(() => isDividend = !isDividend)" />
+        <MultiRow Name="@edit" IconName="target" Action="@(() => isEdit = !isEdit)" />
     </InfoBlock>
     <ActionBlock>
         @if (isAdditionalInfo)
@@ -19,7 +20,7 @@
         }
         @if (isTransactions)
         {
-            if (identity.IsAuthenticated)
+            if (user.Identity.IsAuthenticated)
             {
                 <TransactionHistoryShort InfoName="@transactions" CompanyId="@Id" UpdateVisible="@((bool isVisible) => isTransactions = isVisible)" />
             }
@@ -40,7 +41,7 @@
 
         @if (isSellRecommendations)
         {
-            if (identity.IsAuthenticated)
+            if (user.Identity.IsAuthenticated)
             {
                 <RecommendationsForSaleShort InfoName="@sellRecommendations" CompanyId="@Id" UpdateVisible="@((bool isVisible) => isSellRecommendations = isVisible)" />
             }
@@ -67,6 +68,18 @@
         {
             <DividendHistoryShort InfoName="@dividend" CompanyId="@Id" UpdateVisible="@((bool isVisible) => isDividend = isVisible)" />
         }
+        @if (isEdit)
+        {
+            if (user.IsInRole("pestunov"))
+            {
+            <CompanyForm InfoName="@edit" CompanyId="Id" UpdateVisible="@((bool isVisible) => isEdit = isVisible)" />
+            }
+            else
+            {
+                isEdit = false;
+                Task.FromResult(notice.AlertAccessAsync("You are not an admin!"));
+            }
+        }
     </ActionBlock>
 </FrameTemplate>
 
@@ -74,8 +87,8 @@
     [Parameter] public long Id { get; set; }
     [Parameter] public string Name { get; set; }
     [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; }
-    IIdentity identity;
-    protected override async Task OnInitializedAsync() => identity = (await AuthenticationState).User.Identity;
+    ClaimsPrincipal user;
+    protected override async Task OnInitializedAsync() => user = (await AuthenticationState).User;
 
     string additionalInfo = "Additional information";
     string rating = "Rating details";
@@ -86,6 +99,7 @@
     string report = "Report history";
     string price = "Price history";
     string dividend = "Dividend history";
+    string edit = "Edit company";
 
     bool isAdditionalInfo;
     bool isRating;
@@ -96,4 +110,5 @@
     bool isReport;
     bool isPrice;
     bool isDividend;
+    bool isEdit;
 }

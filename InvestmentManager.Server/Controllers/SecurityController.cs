@@ -62,7 +62,7 @@ namespace InvestmentManager.Server.Controllers
             if (!result.Succeeded)
             {
                 var errors = result.Errors.Select(x => x.Description);
-                return Ok(new ErrorBaseModel { IsSuccess = false, Errors = errors });
+                return Ok(new ErrorBaseModel { IsSuccess = false, Errors = errors.ToArray() });
             }
             return Ok(new ErrorBaseModel { IsSuccess = true });
         }

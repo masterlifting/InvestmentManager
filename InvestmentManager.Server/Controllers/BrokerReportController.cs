@@ -60,7 +60,7 @@ namespace InvestmentManager.Server.Controllers
                 return BadRequest();
             }
         }
-        [HttpPost("saveparsed"), Authorize(Roles = "pestunov")]
+        [HttpPost("save"), Authorize(Roles = "pestunov")]
         public async Task<IActionResult> SeveBrokerReports([FromBody] string accountId)
         {
             var account = unitOfWork.Account.GetAll().FirstOrDefault(x => x.Name.Equals(accountId));

@@ -22,5 +22,5 @@
 
     CompanyReportShortModel model = new CompanyReportShortModel();
     protected async override Task OnInitializedAsync() =>
-       model = await http.GetByIdAsync<CompanyReportShortModel>(RouteName.companyReport + RouteName.Short, CompanyId);
+       model = await http.GetByIdAsync<CompanyReportShortModel>(Routes.C.CompanyReport + Routes.A.Short, CompanyId);
 }

@@ -25,7 +25,7 @@
         if (isDetails == true)
         {
             columns = new List<ColumnConfig>();
-            reportModels = await http.GetByIdAsync<List<CompanyReportFullModel>>(RouteName.companyReport + RouteName.Full, CompanyId);
+            reportModels = await http.GetByIdAsync<List<CompanyReportFullModel>>(Routes.C.CompanyReport + Routes.A.Full, CompanyId);
             columns.AddRange(new ColumnConfig[]
             {
                 new ColumnConfig{DataField = nameof(CompanyReportFullModel.DateReport), Caption = "Date Report", DataType = Enums.DataType.Date, Format = "d" },

@@ -21,7 +21,7 @@ namespace InvestmentManager.Client.Services.AuthenticationConfiguration
 
         public async Task<LoginResult> LoginAsync(LoginModel model)
         {
-            var result = await http.PostAsModelAsync<LoginResult, LoginModel>(RouteName.security + "/login", model, true).ConfigureAwait(false);
+            var result = await http.PostAsModelAsync<LoginResult, LoginModel>(Routes.C.Security + "/login", model, true).ConfigureAwait(false);
             
             if (result.Successful)
                 await customAuthenticationState.SetTokenAsync(result.Token, result.Expiry).ConfigureAwait(false);
@@ -29,7 +29,7 @@ namespace InvestmentManager.Client.Services.AuthenticationConfiguration
             return result;
         }
         public async Task<ErrorBaseModel> RegisterAsync(RegisterModel model) =>
-            await http.PostAsModelAsync<ErrorBaseModel, RegisterModel>(RouteName.security + "/register", model, true).ConfigureAwait(false);
+            await http.PostAsModelAsync<ErrorBaseModel, RegisterModel>(Routes.C.Security + "/register", model, true).ConfigureAwait(false);
         public async Task LogoutAsync() => await customAuthenticationState.SetTokenAsync(null).ConfigureAwait(false);
     }
 }

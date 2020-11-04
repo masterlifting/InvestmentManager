@@ -40,7 +40,7 @@ namespace InvestmentManager.Client.Services.HttpService
             else
             {
                 await notice.AlertFailedAsync($"Sorry, something went wrong.").ConfigureAwait(false);
-                result = Activator.CreateInstance<TResult>();
+                result = null;
             }
 
             if (withLoading)

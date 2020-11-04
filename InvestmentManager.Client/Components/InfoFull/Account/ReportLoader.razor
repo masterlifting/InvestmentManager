@@ -27,7 +27,7 @@
                 ms.Close();
             }
 
-            var response = await http.PostAsContentAsync(RouteName.brokerReport + "/parsebcs", content).ConfigureAwait(false);
+            var response = await http.PostAsContentAsync(Routes.C.BrokerReport + "/parsebcs", content).ConfigureAwait(false);
             content.Dispose();
 
             if (response.IsSuccessStatusCode)

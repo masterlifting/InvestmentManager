@@ -115,12 +115,12 @@
     async Task GetCheckingReports()
     {
         checkingreports = null;
-        checkingreports = await http.GetNoParametersAsync<List<CompanyReportForm>>(RouteName.companyReport + "/checknew", true);
+        checkingreports = await http.GetNoParametersAsync<List<CompanyReportForm>>(Routes.C.CompanyReport + "/checknew", true);
     }
 
     async Task DeleteReport(NewReportModel report, string companyName)
     {
-        if (await http.GetBoolAsync(RouteName.companyReport + "/deletechecked", report.ReportId))
+        if (await http.GetBoolAsync(Routes.C.CompanyReport + "/deletechecked", report.ReportId))
         {
             await DeleteReportNodeAsync(report, companyName);
             await notice.AlertSuccesAsync("Report deleted", 500);
@@ -130,7 +130,7 @@
     }
     async Task SaveReport(NewReportModel report, string companyName)
     {
-        if (await http.PostAsBoolAsync<NewReportModel>(RouteName.companyReport + "/savechecked", report))
+        if (await http.PostAsBoolAsync<NewReportModel>(Routes.C.CompanyReport + "/savechecked", report))
         {
             await DeleteReportNodeAsync(report, companyName);
             await notice.AlertSuccesAsync("Report saved", 500);

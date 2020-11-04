@@ -1,7 +1,9 @@
-﻿using InvestmentManager.Repository;
+﻿using InvestmentManager.Entities.Market;
+using InvestmentManager.Repository;
 using InvestmentManager.ViewModels;
 using InvestmentManager.ViewModels.CompanyModels;
 using InvestmentManager.ViewModels.ErrorModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -70,6 +72,179 @@ namespace InvestmentManager.Server.Controllers
             else
                 return new CompanyTransactionHistoryShortModel();
         }
+
+        #region Company form
+        [HttpGet("edit"), Authorize(Roles = "pestunov")]
+        public async Task<CompanyFormModel> EditCompany(long id)
+        {
+            var result = new CompanyFormModel();
+
+            var comapny = await unitOfWork.Company.FindByIdAsync(id).ConfigureAwait(false);
+            if (comapny is null)
+                return result;
+
+            result.Id = comapny.Id;
+            result.Name = comapny.Name;
+            result.DateSplit = comapny.DateSplit;
+            result.IndustryId = comapny.IndustryId.ToString();
+            result.SectorId = comapny.SectorId.ToString();
+
+            result.Tickers = comapny.Tickers.Select(x => new TickerModel
+            {
+                Id = x.Id,
+                Name = x.Name,
+                ExcangeId = x.ExchangeId.ToString(),
+                LotId = x.LotId.ToString()
+            }).ToList();
+            result.Isins = comapny.Isins.Select(x => new IsinModel
+            {
+                Id = x.Id,
+                Name = x.Name
+            }).ToList();
+            result.ReportSource = new ReportSourceModel
+            {
+                Id = comapny.ReportSource.Id,
+                Key = comapny.ReportSource.Key,
+                Value = comapny.ReportSource.Value
+            };
+
+            return result;
+        }
+        [HttpGet("new"), Authorize(Roles = "pestunov")]
+        public async Task<CompanyFormModelData> GetNewCompany()
+        {
+            var result = new CompanyFormModelData
+            {
+                Exchanges = await unitOfWork.Exchange.GetAll().OrderBy(x => x.Name).Select(x => new ViewModelBase { Id = x.Id, Name = x.Name }).ToListAsync().ConfigureAwait(false),
+                Lots = await unitOfWork.Lot.GetAll().OrderBy(x => x.Value).Select(x => new ViewModelBase { Id = x.Id, Name = x.Value.ToString() }).ToListAsync().ConfigureAwait(false),
+                Industries = await unitOfWork.Industry.GetAll().OrderBy(x => x.Name).Select(x => new ViewModelBase { Id = x.Id, Name = x.Name }).ToListAsync().ConfigureAwait(false),
+                Sectors = await unitOfWork.Sector.GetAll().OrderBy(x => x.Name).Select(x => new ViewModelBase { Id = x.Id, Name = x.Name }).ToListAsync().ConfigureAwait(false)
+            };
+
+            return result;
+        }
+        [HttpPost("save"), Authorize(Roles = "pestunov")]
+        public async Task<IActionResult> SaveCompany([FromBody] CompanyFormModel model)
+        {
+            string[] errors = new string[] { "Errors: " };
+            if (ModelState.IsValid)
+            {
+                var company = new Company
+                {
+                    Name = model.Name,
+                    DateSplit = model.DateSplit,
+                    SectorId = long.Parse(model.SectorId),
+                    IndustryId = long.Parse(model.IndustryId)
+                };
+                await unitOfWork.Company.CreateEntityAsync(company).ConfigureAwait(false);
+
+                if (!(await unitOfWork.CompleteAsync().ConfigureAwait(false) < 0))
+                {
+                    foreach (var ticker in model.Tickers)
+                    {
+                        await unitOfWork.Ticker.CreateEntityAsync(new Ticker
+                        {
+                            CompanyId = company.Id,
+                            Name = ticker.Name,
+                            ExchangeId = long.Parse(ticker.ExcangeId),
+                            LotId = long.Parse(ticker.LotId)
+                        }).ConfigureAwait(false);
+                    }
+                    foreach (var isin in model.Isins)
+                    {
+                        if (!string.IsNullOrWhiteSpace(isin.Name))
+                        {
+                            await unitOfWork.Isin.CreateEntityAsync(new Isin
+                            {
+                                CompanyId = company.Id,
+                                Name = isin.Name
+                            }).ConfigureAwait(false);
+                        }
+                    }
+                    await unitOfWork.ReportSource.CreateEntityAsync(new ReportSource
+                    {
+                        CompanyId = company.Id,
+                        Key = model.ReportSource.Key,
+                        Value = model.ReportSource.Value
+                    }).ConfigureAwait(false);
+
+                    if (!(await unitOfWork.CompleteAsync().ConfigureAwait(false) < 0))
+                        return Ok(new ErrorBaseModel { IsSuccess = true });
+
+                    return BadRequest(new ErrorBaseModel { IsSuccess = false, Errors = new string[] { "Error in company additional fields." } });
+                }
+
+                return BadRequest(new ErrorBaseModel { IsSuccess = false, Errors = errors.Append("Additional fields error.").ToArray() });
+            }
+
+            return BadRequest(new ErrorBaseModel { IsSuccess = false, Errors = errors.Append("Model validating errors.").ToArray() });
+        }
+        [HttpPost("update"), Authorize(Roles = "pestunov")]
+        public async Task<IActionResult> UpdateCompany([FromBody] CompanyFormModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                string[] errors = new string[] { "Errors:" };
+
+                var company = await unitOfWork.Company.FindByIdAsync(model.Id.Value).ConfigureAwait(false);
+                if (company is null)
+                    return BadRequest(new ErrorBaseModel { IsSuccess = false, Errors = new string[] { "Company not found." } });
+
+                company.Name = model.Name;
+                company.DateSplit = model.DateSplit;
+                company.SectorId = long.Parse(model.SectorId);
+                company.IndustryId = long.Parse(model.IndustryId);
+                if (!(await unitOfWork.CompleteAsync().ConfigureAwait(false) < 0))
+                {
+                    for (int i = 0; i < model.Tickers.Count; i++)
+                    {
+                        var ticker = await unitOfWork.Ticker.FindByIdAsync(model.Tickers[i].Id.Value).ConfigureAwait(false);
+                        if (ticker is null)
+                        {
+                            errors.Append($"Ticker '{model.Tickers[i].Name}' not found.");
+                            continue;
+                        }
+
+                        ticker.Name = model.Tickers[i].Name;
+                        ticker.ExchangeId = long.Parse(model.Tickers[i].ExcangeId);
+                        ticker.LotId = long.Parse(model.Tickers[i].LotId);
+                    }
+
+                    for (int i = 0; i < model.Isins.Count; i++)
+                    {
+                        var isin = await unitOfWork.Isin.FindByIdAsync(model.Isins[i].Id.Value).ConfigureAwait(false);
+                        if (isin is null)
+                        {
+                            errors.Append($"Isin '{model.Isins[i].Name}' not found.");
+                            continue;
+                        }
+                        
+                        if (!string.IsNullOrWhiteSpace(model.Isins[i].Name))
+                            isin.Name = model.Isins[i].Name;
+                    }
+
+                    var reportSource = await unitOfWork.ReportSource.FindByIdAsync(model.ReportSource.Id.Value).ConfigureAwait(false);
+                    if (reportSource is null)
+                        errors.Append($"Reportsource '{model.ReportSource.Key}-{model.ReportSource.Value}' not found.");
+                    else
+                    {
+                        reportSource.Key = model.ReportSource.Key;
+                        reportSource.Value = model.ReportSource.Value;
+                    }
+
+                    if (!(await unitOfWork.CompleteAsync().ConfigureAwait(false) < 0))
+                        return Ok(new ErrorBaseModel { IsSuccess = true });
+
+                    return BadRequest(new ErrorBaseModel { IsSuccess = false, Errors = new string[] { "Additional fields error." } });
+                }
+
+                return BadRequest(new ErrorBaseModel { IsSuccess = false, Errors = errors });
+            }
+
+            return BadRequest(new ErrorBaseModel { IsSuccess = false, Errors = new string[] { "Model validating error." } });
+        }
+        #endregion
+
         #region Old
         //[HttpGet("getstocktransactions")]
         //public async Task<IEnumerable<StockTransactionModel>> GetStockTransactions()

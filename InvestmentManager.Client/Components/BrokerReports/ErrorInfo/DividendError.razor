@@ -34,8 +34,8 @@
     protected override async Task OnParametersSetAsync()
     {
         result = new DividendErrorResultModel { IdentifierName = Regex.Match(ErrorValue.Split('\'')[1], @", (\w*), налог").Groups[1].Value };
-        form = await http.GetNoParametersAsync<DividendErrorForm>(RouteName.brokerReport + "/dividenderrordata");
+        form = await http.GetNoParametersAsync<DividendErrorForm>(Routes.C.BrokerReport + "/dividenderrordata");
     }
 
-    async Task SendData() => isDone = await http.PostAsBoolAsync(RouteName.brokerReport + "/setisin", result, true);
+    async Task SendData() => isDone = await http.PostAsBoolAsync(Routes.C.BrokerReport + "/setisin", result, true);
 }
