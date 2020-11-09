@@ -1,4 +1,4 @@
-﻿using InvestmentManager.ViewModels.ErrorModels;
+﻿using InvestmentManager.ViewModels.ResultModels;
 
 namespace InvestmentManager.ViewModels.CompanyModels
 {
@@ -8,6 +8,6 @@ namespace InvestmentManager.ViewModels.CompanyModels
         public string Status { get; set; }
         public string Lot { get; set; }
         public string Price { get; set; }
-        public ErrorBaseModel Error { get; set; } = new ErrorBaseModel();
+        public ResultBaseModel Error { get; set; } = new ResultBaseModel();
     }
 }

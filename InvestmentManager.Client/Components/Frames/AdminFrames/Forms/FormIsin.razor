@@ -1,0 +1,118 @@
+﻿@inject CustomHttpClient http
+@inject CustomNotification notice
+
+<h5>Isins</h5>
+@if (editContexts != null)
+{
+    foreach (var context in editContexts)
+    {
+        var isin = context.Model as FormIsinModel;
+        <EditForm EditContext="context">
+            <DataAnnotationsValidator />
+            <div class="row mt-1 align-items-center">
+                <div class="col">
+                    <ValidationMessage For="@(() => isin.Name)" />
+                    <InputText placeholder="Enter isin (optional)" @bind-Value="isin.Name" />
+                </div>
+            </div>
+            <div class="row">
+                <span class="col-md-3 col-6 ilink text-danger text-nowrap" @onclick="@(() => RemoveIsin(context))">remove this</span>
+            </div>
+            <div class="row">
+                <span class="offset-md-9 col-md-3 offset-6 col-6 text-right ilink text-nowrap" @onclick="AddIsin">add isin</span>
+            </div>
+            @if (editContexts.Count == 1)
+            {
+                <div class="row">
+                    <div class="col-6">
+                        <ButtonAction Color="@Choice.InvestColor.idark" ClickAction="@(() => SaveClose(context))" Title="Save and close" />
+                    </div>
+                    <div class="col-6">
+                        <ButtonAction Color="@Choice.InvestColor.isuccess" ClickAction="@(() => SaveNext(context))" Title="Save and next" />
+                    </div>
+                </div>
+            }
+            else
+            {
+                <ButtonAction Color="@Choice.InvestColor.isuccess" ClickAction="@(() => Save(context))" Title="Save" />
+            }
+        </EditForm>
+    }
+}
+else
+{
+    <span>@DefaultData.loading</span>
+}
+
+@code {
+    [Parameter] public long CompanyId { get; set; }
+    [Parameter] public EventCallback<int> Step { get; set; }
+
+    List<EditContext> editContexts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        List<FormIsinModel> isins = await http.GetByIdAsync<List<FormIsinModel>>(Routes.C.Company + "/getisinforms", CompanyId);
+        editContexts = isins.Select(x => new EditContext(x)).ToList();
+    }
+
+    async Task SaveClose(EditContext editContext)
+    {
+        if (editContext.Validate())
+        {
+            var model = editContext.Model as FormIsinModel;
+            await FormSubmit(model, 200);
+        }
+    }
+    async Task SaveNext(EditContext editContext)
+    {
+        if (editContext.Validate())
+        {
+            var model = editContext.Model as FormIsinModel;
+            await FormSubmit(model, 1);
+        }
+    }
+    async Task Save(EditContext editContext)
+    {
+        if (editContext.Validate())
+        {
+            var model = editContext.Model as FormIsinModel;
+
+            if (model != null)
+            {
+                var result = await http.PostAsModelAsync<ResultBaseModel, FormIsinModel>(Routes.C.Company + "/setisin", model);
+
+                if (result.IsSuccess)
+                {
+                    editContexts.Remove(editContext);
+                    await notice.AlertSuccesAsync();
+                }
+                else
+                    notice.ToastDanger("Errors", string.Join("; ", result.Errors));
+            }
+            else
+                notice.ToastDanger("Errors", "Model is null");
+        }
+    }
+
+    async Task FormSubmit(FormIsinModel model, int step)
+    {
+        if (model != null)
+        {
+            var result = await http.PostAsModelAsync<ResultBaseModel, FormIsinModel>(Routes.C.Company + "/setisin", model);
+            if (result.IsSuccess)
+            {
+                await Step.InvokeAsync(step);
+                await notice.AlertSuccesAsync();
+            }
+            else
+                notice.ToastDanger("Errors", string.Join("; ", result.Errors));
+        }
+        else
+            notice.ToastDanger("Errors", "Model is null");
+    }
+
+    void AddIsin() => editContexts.Add(new EditContext(new FormIsinModel { CompanyId = CompanyId }));
+    void RemoveIsin(EditContext editContext) => editContexts.Remove(editContext);
+}

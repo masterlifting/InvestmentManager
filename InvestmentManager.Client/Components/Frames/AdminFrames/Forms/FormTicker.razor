@@ -1,0 +1,150 @@
+﻿@inject CustomHttpClient http
+@inject CustomNotification notice
+
+<h5>Tickers</h5>
+@if (editContexts != null)
+{
+    foreach (var context in editContexts)
+    {
+        var ticker = context.Model as FormTickerModel;
+        <EditForm EditContext="context">
+            <DataAnnotationsValidator />
+            <div class="row mt-1 align-items-center">
+                <div class="col">
+                    <ValidationMessage For="@(() => ticker.Name)" />
+                    <InputText placeholder="Enter company ticker (required)" @bind-Value="ticker.Name" />
+                </div>
+            </div>
+            <div class="row mt-1 align-items-center">
+                <div class="col-3 text-nowrap">Lot value</div>
+                <div class="col-9">
+                    <ValidationMessage For="@(() => ticker.LotId)" />
+                    <InputSelect @bind-Value="@ticker.LotId">
+                        @foreach (var lot in ticker.Lots)
+                                {
+                            <option value="@lot.Id">@lot.Name</option>
+                                }
+                    </InputSelect>
+                </div>
+            </div>
+            <div class="row mt-1 align-items-center">
+                <div class="col-3">Exchange</div>
+                <div class="col-9">
+                    <ValidationMessage For="@(() => ticker.ExcangeId)" />
+                    <InputSelect @bind-Value="ticker.ExcangeId">
+                        @foreach (var exchange in ticker.Exchanges)
+                                {
+                            <option value="@exchange.Id">@exchange.Name</option>
+                                }
+                    </InputSelect>
+                </div>
+            </div>
+            <div class="row">
+                <span class="col-md-3 col-6 ilink text-danger text-nowrap" @onclick="@(() => RemoveTicker(context))">remove this</span>
+            </div>
+            <div class="row">
+                <span class="offset-md-9 col-md-3 offset-6 col-6 text-right ilink text-nowrap" @onclick="AddTicker">add ticker</span>
+            </div>
+            @if (editContexts.Count == 1)
+            {
+                <div class="row">
+                    <div class="col-6">
+                        <ButtonAction Color="@Choice.InvestColor.idark" ClickAction="@(() => SaveClose(context))" Title="Save and close" />
+                    </div>
+                    <div class="col-6">
+                        <ButtonAction Color="@Choice.InvestColor.isuccess" ClickAction="@(() => SaveNext(context))" Title="Save and next" />
+                    </div>
+                </div>
+            }
+            else
+            {
+                <ButtonAction Color="@Choice.InvestColor.isuccess" ClickAction="@(() => Save(context))" Title="Save" />
+            }
+        </EditForm>
+    }
+}
+else
+{
+    <span>@DefaultData.loading</span>
+}
+
+@code {
+    [Parameter] public long CompanyId { get; set; }
+    [Parameter] public EventCallback<int> Step { get; set; }
+
+    List<EditContext> editContexts;
+    List<FormTickerModel> tickers;
+
+    protected override async Task OnInitializedAsync()
+    {
+        tickers = await http.GetByIdAsync<List<FormTickerModel>>(Routes.C.Company + "/gettickerforms", CompanyId);
+        editContexts = tickers.Select(x => new EditContext(x)).ToList();
+
+        await base.OnInitializedAsync();
+    }
+
+    async Task SaveClose(EditContext editContext)
+    {
+        if (editContext.Validate())
+        {
+            var model = editContext.Model as FormTickerModel;
+            await FormSubmit(model, 200);
+        }
+    }
+    async Task SaveNext(EditContext editContext)
+    {
+        if (editContext.Validate())
+        {
+            var model = editContext.Model as FormTickerModel;
+            await FormSubmit(model, 1);
+        }
+    }
+    async Task Save(EditContext editContext)
+    {
+        if (editContext.Validate())
+        {
+            var model = editContext.Model as FormTickerModel;
+
+            if (model != null)
+            {
+                var result = await http.PostAsModelAsync<ResultBaseModel, FormTickerModel>(Routes.C.Company + "/setticker", model);
+
+                if (result.IsSuccess)
+                {
+                    editContexts.Remove(editContext);
+                    await notice.AlertSuccesAsync();
+                }
+                else
+                    notice.ToastDanger("Errors", string.Join("; ", result.Errors));
+            }
+            else
+                notice.ToastDanger("Errors", "Model is null");
+        }
+    }
+    async Task FormSubmit(FormTickerModel model, int step)
+    {
+        if (model != null)
+        {
+            var result = await http.PostAsModelAsync<ResultBaseModel, FormTickerModel>(Routes.C.Company + "/setticker", model);
+
+            if (result.IsSuccess)
+            {
+                await Step.InvokeAsync(step);
+                await notice.AlertSuccesAsync();
+            }
+            else
+                notice.ToastDanger("Errors", string.Join("; ", result.Errors));
+        }
+        else
+            notice.ToastDanger("Errors", "Model is null");
+    }
+
+    void AddTicker()
+    {
+        var exchanges = tickers.First().Exchanges;
+        var lots = tickers.First().Lots;
+        var ticker = new FormTickerModel { CompanyId = CompanyId, Exchanges = exchanges, ExcangeId = exchanges.First().Id.ToString(), Lots = lots, LotId = lots.First().Id.ToString() };
+        editContexts.Add(new EditContext(ticker));
+    }
+    void RemoveTicker(EditContext context) => editContexts.Remove(context);
+}

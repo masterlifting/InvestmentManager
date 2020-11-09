@@ -1,4 +1,4 @@
-﻿using InvestmentManager.ViewModels.ErrorModels;
+﻿using InvestmentManager.ViewModels.ResultModels;
 
 namespace InvestmentManager.ViewModels.RecommendationModels
 {
@@ -14,6 +14,6 @@ namespace InvestmentManager.ViewModels.RecommendationModels
         public string PriceMid { get; set; }
         public string PriceMax { get; set; }
 
-        public ErrorBaseModel Error { get; set; } = new ErrorBaseModel { };
+        public ResultBaseModel Error { get; set; } = new ResultBaseModel { };
     }
 }

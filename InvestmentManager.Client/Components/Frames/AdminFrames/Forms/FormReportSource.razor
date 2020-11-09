@@ -1,0 +1,58 @@
+﻿@inject CustomHttpClient http
+@inject CustomNotification notice
+
+<h3>Roport source</h3>
+@if (reportSource != null)
+{
+    <EditForm EditContext="@editContext">
+        <DataAnnotationsValidator />
+        <div class="row mt-1 align-items-center">
+            <div class="col">
+                <ValidationMessage For="@(() => reportSource.Key)" />
+                <InputText placeholder="Enter report source key (required)" @bind-Value="reportSource.Key" />
+                <ValidationMessage For="@(() => reportSource.Value)" />
+                <InputText placeholder="Enter report source value (required)" @bind-Value="reportSource.Value" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <ButtonAction Color="@Choice.InvestColor.isuccess" ClickAction="SaveClose" Title="Save" />
+            </div>
+        </div>
+    </EditForm>
+}
+else
+{
+    <span>@DefaultData.loading</span>
+}
+
+@code {
+    [Parameter] public long CompanyId { get; set; }
+    [Parameter] public EventCallback<int> Step { get; set; }
+    
+    EditContext editContext;
+    FormReportSourceModel reportSource;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        reportSource = await http.GetByIdAsync<FormReportSourceModel>(Routes.C.Company + "/getreportsourceform", CompanyId);
+        editContext = new EditContext(reportSource);
+    }
+
+    async Task SaveClose()
+    {
+        if (editContext.Validate())
+        {
+            var result = await http.PostAsModelAsync<ResultBaseModel, FormReportSourceModel>(Routes.C.Company + "/setreportsource", reportSource);
+
+            if (result.IsSuccess)
+            {
+                await Step.InvokeAsync(200);
+                await notice.AlertSuccesAsync();
+            }
+            else
+                notice.ToastDanger("Errors", string.Join("; ", result.Errors));
+        }
+    }
+}

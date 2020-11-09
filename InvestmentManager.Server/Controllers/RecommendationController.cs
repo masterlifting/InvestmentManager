@@ -1,6 +1,6 @@
 ﻿using InvestmentManager.Repository;
 using InvestmentManager.ViewModels;
-using InvestmentManager.ViewModels.ErrorModels;
+using InvestmentManager.ViewModels.ResultModels;
 using InvestmentManager.ViewModels.RecommendationModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -50,7 +50,7 @@ namespace InvestmentManager.Server.Controllers
                     PriceMin = result.PriceMin.ToString("f2"),
                     PriceMid = result.PriceMid.ToString("f2"),
                     PriceMax = result.PriceMax.ToString("f2"),
-                    Error = new ErrorBaseModel
+                    Error = new ResultBaseModel
                     {
                         IsSuccess = true
                     }

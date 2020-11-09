@@ -1,6 +1,6 @@
-﻿namespace InvestmentManager.ViewModels.ErrorModels
+﻿namespace InvestmentManager.ViewModels.ResultModels
 {
-    public class ErrorBaseModel
+    public class ResultBaseModel
     {
         public bool IsSuccess { get; set; } = false;
         public string[] Errors { get; set; }

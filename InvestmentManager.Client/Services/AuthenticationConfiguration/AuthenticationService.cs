@@ -1,6 +1,6 @@
 ﻿using InvestmentManager.Client.Services.HttpService;
 using InvestmentManager.ViewModels;
-using InvestmentManager.ViewModels.ErrorModels;
+using InvestmentManager.ViewModels.ResultModels;
 using InvestmentManager.ViewModels.SecurityModels;
 using System.Threading.Tasks;
 
@@ -28,8 +28,8 @@ namespace InvestmentManager.Client.Services.AuthenticationConfiguration
 
             return result;
         }
-        public async Task<ErrorBaseModel> RegisterAsync(RegisterModel model) =>
-            await http.PostAsModelAsync<ErrorBaseModel, RegisterModel>(Routes.C.Security + "/register", model, true).ConfigureAwait(false);
+        public async Task<ResultBaseModel> RegisterAsync(RegisterModel model) =>
+            await http.PostAsModelAsync<ResultBaseModel, RegisterModel>(Routes.C.Security + "/register", model, true).ConfigureAwait(false);
         public async Task LogoutAsync() => await customAuthenticationState.SetTokenAsync(null).ConfigureAwait(false);
     }
 }

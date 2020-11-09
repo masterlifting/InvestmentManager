@@ -58,6 +58,11 @@ namespace InvestmentManager.Client.Services.HttpService
             string uri = $"{route}?id={id}";
             return await BaseGetAsync<TResult>(uri, withLoading).ConfigureAwait(false);
         }
+        public async Task<TResult> GetByIdAsync<TResult>(string route, long? id, bool withLoading = false) where TResult : class
+        {
+            string uri = $"{route}?id={id}";
+            return await BaseGetAsync<TResult>(uri, withLoading).ConfigureAwait(false);
+        }
         public async Task<TResult> GetByValueAsync<TResult>(string route, int value, bool withLoading = false) where TResult : class
         {
             string uri = $"{route}?value={value}";

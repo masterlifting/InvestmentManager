@@ -6,7 +6,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
-using InvestmentManager.ViewModels.ErrorModels;
+using InvestmentManager.ViewModels.ResultModels;
 using InvestmentManager.ViewModels.SecurityModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -62,9 +62,9 @@ namespace InvestmentManager.Server.Controllers
             if (!result.Succeeded)
             {
                 var errors = result.Errors.Select(x => x.Description);
-                return Ok(new ErrorBaseModel { IsSuccess = false, Errors = errors.ToArray() });
+                return Ok(new ResultBaseModel { IsSuccess = false, Errors = errors.ToArray() });
             }
-            return Ok(new ErrorBaseModel { IsSuccess = true });
+            return Ok(new ResultBaseModel { IsSuccess = true });
         }
     }
 }

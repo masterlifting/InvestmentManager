@@ -1,4 +1,4 @@
-﻿using InvestmentManager.ViewModels.ErrorModels;
+﻿using InvestmentManager.ViewModels.ResultModels;
 
 namespace InvestmentManager.ViewModels.PriceModels
 {
@@ -6,6 +6,6 @@ namespace InvestmentManager.ViewModels.PriceModels
     {
         public string DateUpdate { get; set; }
         public string LastPrice { get; set; }
-        public ErrorBaseModel Error { get; set; } = new ErrorBaseModel();
+        public ResultBaseModel Error { get; set; } = new ResultBaseModel();
     }
 }
