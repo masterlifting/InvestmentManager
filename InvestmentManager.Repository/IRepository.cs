@@ -24,6 +24,7 @@ namespace InvestmentManager.Repository
         void TruncateAndReseedSQL();
         void DeleteAndReseedPostgres();
         void PostgresAutoReseed();
+        Task<bool> CompletePostgresAsync();
     }
 
     #region Repository Interfaces

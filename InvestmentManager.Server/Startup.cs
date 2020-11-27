@@ -8,6 +8,7 @@ using InvestmentManager.PriceFinder.Interfaces;
 using InvestmentManager.ReportFinder.Implimentations;
 using InvestmentManager.ReportFinder.Interfaces;
 using InvestmentManager.Repository;
+using InvestmentManager.Server.RestServices;
 using InvestmentManager.Services.Implimentations;
 using InvestmentManager.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -27,22 +28,23 @@ namespace InvestmentManager.Server
 {
     public class Startup
     {
-        private readonly IConfiguration configuration;
-        public Startup(IConfiguration configuration) => this.configuration = configuration;
+        public Startup(IConfiguration configuration) => Configuration = configuration;
+
+        public IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
-            configuration.Bind("CalculatedWeight", new WeightConfig());
-            configuration.Bind("SellRecommendation", new SellRecommendationConfig());
-            configuration.Bind("BuyRecommendation", new BuyRecommendationConfig());
+            Configuration.Bind("CalculatedWeight", new WeightConfig());
+            Configuration.Bind("SellRecommendation", new SellRecommendationConfig());
+            Configuration.Bind("BuyRecommendation", new BuyRecommendationConfig());
 
             services.AddDbContext<InvestmentContext>(provider =>
             {
                 provider.UseLazyLoadingProxies();
-               /*/
-                provider.UseNpgsql(configuration["ConnectionStrings:LocalPostgresConnection"]);
                 /*/
-                provider.UseNpgsql(configuration["ConnectionStrings:PostgresConnection"]);
+                provider.UseNpgsql(Configuration["ConnectionStrings:LocalPostgresConnection"]);
+                /*/
+                provider.UseNpgsql(Configuration["ConnectionStrings:PostgresConnection"]);
                 //*/
             });
             services.AddIdentity<IdentityUser, IdentityRole>(options =>
@@ -63,9 +65,9 @@ namespace InvestmentManager.Server
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = configuration["JwtIssuer"],
-                    ValidAudience = configuration["JwtAudience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSecurityKey"]))
+                    ValidIssuer = Configuration["JwtIssuer"],
+                    ValidAudience = Configuration["JwtAudience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtSecurityKey"]))
                 };
             });
 
@@ -73,6 +75,7 @@ namespace InvestmentManager.Server
             services.AddControllers();
             services.AddRazorPages();
 
+            services.AddScoped<IBaseRestMethod, BaseRestMethod>();
             #region Unit of work factory
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<IAccountTransactionRepository, AccountTransactionRepository>();
@@ -127,14 +130,12 @@ namespace InvestmentManager.Server
                 app.UseDeveloperExceptionPage();
                 app.UseWebAssemblyDebugging();
             }
-            else
-            {
-                app.UseExceptionHandler("/Error");
-            }
 
             app.UseResponseCompression();
+            app.UseHttpsRedirection();
             app.UseBlazorFrameworkFiles();
             app.UseStaticFiles();
+
             app.UseRouting();
 
             app.UseAuthentication();
@@ -142,7 +143,6 @@ namespace InvestmentManager.Server
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapRazorPages();
                 endpoints.MapControllers();
                 endpoints.MapFallbackToFile("index.html");
             });

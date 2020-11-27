@@ -1,0 +1,177 @@
+﻿@inject CustomHttpClient http
+@inject CustomNotification notice
+
+<RowTitleSub Text="Tickers" />
+@if (editContexts != null)
+{
+    foreach (var context in editContexts)
+    {
+        var ticker = context.Model as TickerModel;
+        <EditForm EditContext="context">
+            <DataAnnotationsValidator />
+            <div class="row mt-1 align-items-center">
+                <div class="col">
+                    <ValidationMessage For="(() => ticker.Name)" />
+                    <InputText placeholder="Enter company ticker (required)" @bind-Value="ticker.Name" />
+                </div>
+            </div>
+            <div class="row mt-1 align-items-center">
+                <div class="col-3 text-nowrap">Lot value</div>
+                <div class="col-9">
+                    <ValidationMessage For="(() => ticker.LotId)" />
+                    <InputSelect TValue="long" @bind-Value="ticker.LotId">
+                        @foreach (var lot in lots)
+                        {
+                            <option value="@lot.Id">@lot.Name</option>
+                        }
+                    </InputSelect>
+                </div>
+            </div>
+            <div class="row mt-1 align-items-center">
+                <div class="col-3">Exchange</div>
+                <div class="col-9">
+                    <ValidationMessage For="(() => ticker.ExchangeId)" />
+                    <InputSelect TValue="long" @bind-Value="ticker.ExchangeId">
+                        @foreach (var exchange in exchanges)
+                        {
+                            <option value="@exchange.Id">@exchange.Name</option>
+                        }
+                    </InputSelect>
+                </div>
+            </div>
+            @if (editContexts.Count > 1)
+            {
+                <div class="row">
+                    <span class="col-md-3 col-6 ilink text-danger text-nowrap" @onclick="(() => RemoveTicker(context))">remove this</span>
+                </div>
+            }
+            <div class="row">
+                <span class="offset-md-9 col-md-3 offset-6 col-6 text-right ilink text-nowrap" @onclick="AddTicker">add ticker</span>
+            </div>
+            @if (editContexts.Count == 1)
+            {
+                <div class="row">
+                    <div class="col-6">
+                        <ButtonAction Color="ColorCustom.idark" ClickAction="(() => SaveClose(context))" Title="Save and close" />
+                    </div>
+                    <div class="col-6">
+                        <ButtonAction Color="ColorCustom.isuccess" ClickAction="(() => SaveNext(context))" Title="Save and next" />
+                    </div>
+                </div>
+            }
+            else
+            {
+                <ButtonAction Color="ColorCustom.isuccess" ClickAction="(() => Save(context))" Title="Save" />
+            }
+        </EditForm>
+    }
+}
+else
+{
+    <span>@DefaultString.loading</span>
+}
+
+@code {
+    [Parameter] public long CompanyId { get; set; }
+    [Parameter] public EventCallback<int> Step { get; set; }
+
+    List<BaseView> exchanges = new List<BaseView>();
+    List<BaseView> lots = new List<BaseView>();
+    List<EditContext> editContexts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await http.GetAsync<List<TickerModel>>(new UrlBuilder(UrlController.Tickers, UrlPath.ByCompanyId, CompanyId).Result);
+
+        var tickers = response is null
+            ? new List<TickerModel> { new TickerModel { CompanyId = CompanyId, ExchangeId = exchanges.First().Id, LotId = lots.First().Id } }
+            : response;
+
+        editContexts = tickers.Select(x => new EditContext(x)).ToList();
+
+        exchanges = await http.GetAsync<List<BaseView>>(new UrlBuilder(UrlCatalog.ExchangeTypes).Result);
+        lots = await http.GetAsync<List<BaseView>>(new UrlBuilder(UrlCatalog.LotTypes).Result);
+
+        await base.OnInitializedAsync();
+    }
+
+    async Task SaveClose(EditContext editContext)
+    {
+        if (editContext.Validate())
+        {
+            var model = editContext.Model as TickerModel;
+            if (await FormIsSubmitAsync(model))
+                await Step.InvokeAsync(200);
+        }
+    }
+    async Task SaveNext(EditContext editContext)
+    {
+        if (editContext.Validate())
+        {
+            var model = editContext.Model as TickerModel;
+            if (await FormIsSubmitAsync(model))
+                await Step.InvokeAsync(1);
+        }
+    }
+    async Task Save(EditContext editContext)
+    {
+        if (editContext.Validate())
+        {
+            var model = editContext.Model as TickerModel;
+            if (await FormIsSubmitAsync(model))
+                editContexts.Remove(editContext);
+        }
+    }
+    async Task<bool> FormIsSubmitAsync(TickerModel model)
+    {
+        if (model is null)
+        {
+            notice.ToastDanger("Errors", "Model is null");
+            return false;
+        }
+
+        var result = model.IsEditeble
+            ? await http.PutAsync<BaseResult, TickerModel>(new UrlBuilder(UrlController.Tickers, model.Id).Result, model)
+            : await http.PostAsync<BaseResult, TickerModel>(new UrlBuilder(UrlController.Tickers).Result, model);
+
+        if (result.IsSuccess)
+        {
+            await notice.AlertSuccesAsync(result.Info);
+            return true;
+        }
+        else
+        {
+            notice.ToastDanger("Errors", result.Info);
+            return false;
+        }
+    }
+
+    void AddTicker()
+    {
+        var ticker = new TickerModel { CompanyId = CompanyId, ExchangeId = exchanges.First().Id, LotId = lots.First().Id };
+        editContexts.Add(new EditContext(ticker));
+    }
+    void RemoveTicker(EditContext editContext)
+    {
+        var model = editContext.Model as TickerModel;
+
+        if (model.IsEditeble)
+            notice.ConfirmAction(ColorCustom.idanger, "Delete ticker from data base?", (async () => await RemoveFromDbAsync()));
+        else
+            editContexts.Remove(editContext);
+
+        async Task RemoveFromDbAsync()
+        {
+            var result = await http.DeleteAsync<BaseResult>(new UrlBuilder(UrlController.Tickers, model.Id).Result);
+
+            if (result.IsSuccess)
+            {
+                editContexts.Remove(editContext);
+                StateHasChanged();
+                await notice.AlertSuccesAsync(result.Info);
+            }
+            else
+                await notice.AlertFailedAsync(result.Info);
+        }
+    }
+}

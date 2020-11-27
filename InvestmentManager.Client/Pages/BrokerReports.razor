@@ -3,25 +3,30 @@
 @inject CustomNotification notice
 @attribute [Authorize]
 
-@if (ReportModel.ReportErrors.Any())
+@if (model.Errors.Any())
 {
-    <ReportErrors Errors="@ReportModel.ReportErrors" />
+    <ReportErrors Errors="@model.Errors" />
 }
-else if (ReportModel.CorrectReports.Any())
+else if (model.Reports.Any())
 {
-    <CorrectReports Reports="@ReportModel.CorrectReports.ToList()" />
+    <ReportSuccessed Reports="@model.Reports" />
+}
+else
+{
+    <RowTitle Position="AlignType.Center" Color="ColorBootstrap.primary" Text="Out new data."/>
 }
 
 
 @code
 {
-    BrokerReportModel ReportModel = new BrokerReportModel();
+    BrokerReportModel model = new BrokerReportModel();
     [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         var user = (await AuthenticationState).User;
-        ReportModel = await localStorage.GetItemAsync<BrokerReportModel>($"{user.Identity.Name}_bcsReport");
+        model = await localStorage.GetItemAsync<BrokerReportModel>($"{user.Identity.Name}_{DefaultString.Id.brokerReport}");
+
         notice.LoadStop();
         notice.ToastSuccess("Parsing bcs reports", "Success");
     }

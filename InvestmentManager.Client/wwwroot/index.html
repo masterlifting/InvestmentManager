@@ -4,17 +4,18 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>InvestmentManager</title>
+    <title>Investment Manager</title>
     <base href="/" />
     <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
     <link href="css/invest.css" rel="stylesheet" />
     <link href="css/app.css" rel="stylesheet" />
+    <link href="InvestmentManager.Client.styles.css" rel="stylesheet" />
     <link href="manifest.json" rel="manifest" />
     <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png" />
 </head>
 
 <body>
-    <app>
+    <div id="app">
         <div class="container-fluid" style="background-color:black;">
             <div class="row">
                 <div class="col text-center" style="height:100vh">
@@ -24,17 +25,14 @@
                 </div>
             </div>
         </div>
-    </app>
-
-    <div id="blazor-error-ui">
-        Что-то пошло не так...
-        <a href="" class="reload">Перезагрузить</a>
-        <a class="dismiss">🗙</a>
     </div>
 
+    <div id="blazor-error-ui">
+        An unhandled error has occurred.
+        <a class="dismiss">🗙</a>
+    </div>
     <script src="/js/bootstrap/bootstrap.min.js"></script>
     <script src="/js/investScript.js"></script>
-    <script src="_content/BlazorInputFile/inputfile.js"></script>
     <script src="_framework/blazor.webassembly.js"></script>
     <script>navigator.serviceWorker.register('service-worker.js');</script>
 </body>

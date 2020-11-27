@@ -1,28 +1,28 @@
 ﻿@inject CustomNotification notice
 
-<FrameTemplate Name="@Name" TitleColor="Choice.TextColor.warning">
+<FrameTemplate Name="@Name" TitleColor="ColorBootstrap.warning">
     <InfoBlock>
-        <MultiRow Name="@additionalInfo" IconName="info" Action="@(() => isAdditionalInfo = !isAdditionalInfo)" Description="@DefaultData.Description.companyInfo" />
-        <MultiRow Name="@transactions" IconName="yen" Action="@(() => isTransactions = !isTransactions)" />
-        <MultiRow Name="@rating" IconName="bar-chart" Action="@(() => isRating = !isRating )" />
-        <MultiRow Name="@buyRecommendations" IconName="plus" Action="@(() => isBuyRecommendations = !isBuyRecommendations)" />
-        <MultiRow Name="@sellRecommendations" IconName="minus" Action="@(() => isSellRecommendations = !isSellRecommendations)" />
-        <MultiRow Name="@coefficient" IconName="calculator" Action="@(() => isCoefficient = !isCoefficient)" />
-        <MultiRow Name="@report" IconName="document" Action="@(() => isReport = !isReport )" />
-        <MultiRow Name="@price" IconName="graph" Action="@(() => isPrice = !isPrice)" />
-        <MultiRow Name="@dividend" IconName="target" Action="@(() => isDividend = !isDividend)" />
-        <MultiRow Name="@edit" IconName="target" Action="@(() => isEdit = !isEdit)" />
+        <MultiRow Name="@additionalInfo" IconName="info" Action="(() => isAdditionalInfo = !isAdditionalInfo)" Description="Test description" />
+        <MultiRow Name="@transactions" IconName="yen" Action="(() => isTransactions = !isTransactions)" />
+        <MultiRow Name="@rating" IconName="bar-chart" Action="(() => isRating = !isRating )" />
+        <MultiRow Name="@buyRecommendations" IconName="plus" Action="(() => isBuyRecommendations = !isBuyRecommendations)" />
+        <MultiRow Name="@sellRecommendations" IconName="minus" Action="(() => isSellRecommendations = !isSellRecommendations)" />
+        <MultiRow Name="@coefficient" IconName="calculator" Action="(() => isCoefficient = !isCoefficient)" />
+        <MultiRow Name="@report" IconName="document" Action="(() => isReport = !isReport )" />
+        <MultiRow Name="@price" IconName="graph" Action="(() => isPrice = !isPrice)" />
+        <MultiRow Name="@dividend" IconName="target" Action="(() => isDividend = !isDividend)" />
+        <MultiRow Name="@edit" IconName="pencil" Action="(() => isEdit = !isEdit)" />
     </InfoBlock>
     <ActionBlock>
         @if (isAdditionalInfo)
         {
-            <AdditionalInfoShort InfoName="@additionalInfo" CompanyId="@Id" UpdateVisible="@((bool isVisible) => isAdditionalInfo = isVisible)" />
+            <AdditionalInfoS InfoName="@additionalInfo" CompanyId="CompanyId" UpdateVisible="((bool isVisible) => isAdditionalInfo = isVisible)" />
         }
         @if (isTransactions)
         {
             if (user.Identity.IsAuthenticated)
             {
-                <TransactionHistoryShort InfoName="@transactions" CompanyId="@Id" UpdateVisible="@((bool isVisible) => isTransactions = isVisible)" />
+                <StockTransactionS InfoName="@transactions" CompanyId="CompanyId" UpdateVisible="((bool isVisible) => isTransactions = isVisible)" />
             }
             else
             {
@@ -32,18 +32,17 @@
         }
         @if (isRating)
         {
-            <RatingDetailsShort InfoName="@rating" CompanyId="@Id" UpdateVisible="@((bool isVisible) => isRating = isVisible)" />
+            <RatingS InfoName="@rating" CompanyId="CompanyId" UpdateVisible="((bool isVisible) => isRating = isVisible)" />
         }
         @if (isBuyRecommendations)
         {
-            <RecommendationsForBuyShort InfoName="@buyRecommendations" CompanyId="@Id" UpdateVisible="@((bool isVisible) => isBuyRecommendations = isVisible)" />
+            <BuyRecommendationS InfoName="@buyRecommendations" CompanyId="CompanyId" UpdateVisible="((bool isVisible) => isBuyRecommendations = isVisible)" />
         }
-
         @if (isSellRecommendations)
         {
             if (user.Identity.IsAuthenticated)
             {
-                <RecommendationsForSaleShort InfoName="@sellRecommendations" CompanyId="@Id" UpdateVisible="@((bool isVisible) => isSellRecommendations = isVisible)" />
+                <SellRecommendationS InfoName="@sellRecommendations" CompanyId="CompanyId" UpdateVisible="((bool isVisible) => isSellRecommendations = isVisible)" />
             }
             else
             {
@@ -51,28 +50,27 @@
                 Task.FromResult(notice.AlertAccessAsync());
             }
         }
-
         @if (isCoefficient)
         {
-            <CoefficientHistoryShort InfoName="@coefficient" CompanyId="@Id" UpdateVisible="@((bool isVisible) => isCoefficient = isVisible)" />
+            <CoefficientS InfoName="@coefficient" CompanyId="CompanyId" UpdateVisible="((bool isVisible) => isCoefficient = isVisible)" />
         }
         @if (isReport)
         {
-            <ReportHistoryShort InfoName="@report" CompanyId="@Id" UpdateVisible="@((bool isVisible) => isReport = isVisible)" />
+            <ReportS InfoName="@report" CompanyId="CompanyId" UpdateVisible="((bool isVisible) => isReport = isVisible)" />
         }
         @if (isPrice)
         {
-            <PriceHistoryShort InfoName="@price" CompanyId="@Id" UpdateVisible="@((bool isVisible) => isPrice = isVisible)" />
+            <PriceS InfoName="@price" CompanyId="CompanyId" UpdateVisible="((bool isVisible) => isPrice = isVisible)" />
         }
         @if (isDividend)
         {
-            <DividendHistoryShort InfoName="@dividend" CompanyId="@Id" UpdateVisible="@((bool isVisible) => isDividend = isVisible)" />
+            <DividendS InfoName="@dividend" CompanyId="CompanyId" UpdateVisible="((bool isVisible) => isDividend = isVisible)" />
         }
         @if (isEdit)
         {
             if (user.IsInRole("pestunov"))
             {
-            <FormCompanyComplex InfoName="@edit" CompanyId="Id" UpdateVisible="@((bool isVisible) => isEdit = isVisible)" />
+            <FormCompanyComplex InfoName="@edit" CompanyId="CompanyId" UpdateVisible="((bool isVisible) => isEdit = isVisible)" />
             }
             else
             {
@@ -84,8 +82,9 @@
 </FrameTemplate>
 
 @code {
-    [Parameter] public long Id { get; set; }
+    [Parameter] public long CompanyId { get; set; }
     [Parameter] public string Name { get; set; }
+
     [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; }
     ClaimsPrincipal user;
     protected override async Task OnInitializedAsync() => user = (await AuthenticationState).User;

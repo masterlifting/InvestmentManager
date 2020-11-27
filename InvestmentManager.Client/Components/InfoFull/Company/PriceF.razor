@@ -1,0 +1,35 @@
+﻿@inject CustomHttpClient http
+
+<DetailTemplate Name="Price list" DetailTemplateAction="ShowInfo">
+    <ChildContent>
+        @if (prices != null)
+        {
+            <TableVertical TItem="PriceModel" DataItems="prices" Columns="columns" />
+        }
+        else
+        {
+            <span>@DefaultString.loading</span>
+        }
+    </ChildContent>
+</DetailTemplate>
+
+@code {
+    [Parameter] public long CompanyId { get; set; }
+
+    List<PriceModel> prices;
+    List<ColumnConfig> columns;
+
+    async Task ShowInfo(bool isDetails)
+    {
+        if (isDetails == true)
+        {
+            columns = new List<ColumnConfig>();
+            prices = await http.GetAsync<List<PriceModel>>(new UrlBuilder(UrlController.Prices, UrlPath.ByCompanyId, CompanyId).Result);
+            columns.AddRange(new ColumnConfig[]
+            {
+                new ColumnConfig{DataField = nameof(PriceModel.BidDate), Caption = "Date price", DataType = HtmlDataType.Date, Format = "g"},
+                new ColumnConfig{DataField = nameof(PriceModel.Value), Caption = "Price", DataType = HtmlDataType.Number, Format = "f2"}
+                });
+        }
+    }
+}

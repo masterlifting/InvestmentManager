@@ -5,7 +5,6 @@ namespace InvestmentManager.BrokerService.Models
 {
     public class EntityReportModel
     {
-        public string AccountName { get; set; }
         public long AccountId { get; set; }
 
         public IEnumerable<ExchangeRate> ExchangeRates { get; set; } = new List<ExchangeRate>();

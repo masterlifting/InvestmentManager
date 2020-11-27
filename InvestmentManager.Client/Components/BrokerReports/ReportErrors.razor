@@ -3,34 +3,30 @@
     switch (error.ErrorType)
     {
         case BrokerReportErrorTypes.AccountError:
-            <AccountError Title="Ошибка при поиске соглашения..." ErrorValue="@error.ErrorValue" />
+            <ErrorsAccount Title="Account error" ErrorValue="@error.ErrorValue" />
             break;
         case BrokerReportErrorTypes.AccountTransactionError:
-            <AccountTransactionError Title="Ошибка при операции с счетом..." ErrorValue="@error.ErrorValue" />
+            <ErrorsAccountTransactions Title="Account transaction error" ErrorValue="@error.ErrorValue" />
             break;
-
         case BrokerReportErrorTypes.StockTransactionError:
-            <StockTransactionError Title="Ошибка при операции с акцией..." ErrorValue="@error.ErrorValue" />
+            <ErrorsStockTransactions Title="Stock transaction error" ErrorValue="@error.ErrorValue" />
             break;
-
         case BrokerReportErrorTypes.DividendError:
-            <DividendError Title="Ошибка при поиске дивидендов..." ErrorValue="@error.ErrorValue" />
+            <ErrorsDividends Title="Dividend error" ErrorValue="@error.ErrorValue" />
             break;
-
         case BrokerReportErrorTypes.ComissionError:
-            <ComissionError Title="Ошибка при поиске комиссий..." ErrorValue="@error.ErrorValue" />
+            <ErrorsComissions Title="Comission error" ErrorValue="@error.ErrorValue" />
             break;
-
         case BrokerReportErrorTypes.ExchangeRateError:
-            <ExchangeRateError Title="Ошибка при операции с валютой..." ErrorValue="@error.ErrorValue" />
+            <ErrorsExchangeRates Title="Exchange rate error" ErrorValue="@error.ErrorValue" />
             break;
         case BrokerReportErrorTypes.UndefinedError:
-            <UndefinedError Title="Неизвестная ошибка..." ErrorValue="@error.ErrorValue" />
+            <ErrorsDefault Title="Undefiend error" ErrorValue="@error.ErrorValue" />
             break;
     }
 }
 
 
 @code {
-    [Parameter] public IEnumerable<BrokerReportError> Errors { get; set; }
+    [Parameter] public List<BrokerReportErrorModel> Errors { get; set; }
 }

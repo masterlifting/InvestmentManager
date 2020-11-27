@@ -1,0 +1,43 @@
+﻿
+<FormTemplate InfoName="@InfoName" VisibleAction="((bool isVisible) => UpdateVisible.InvokeAsync(isVisible))">
+    <ChildContent>
+        <div class="col">
+            @switch (start)
+            {
+                case 0:
+                    <FormCompany CompanyId="CompanyId" FirstStep="UpdateStep" />
+                    break;
+                case 1:
+                    <FormTicker CompanyId="companyId" Step="((int step) => start += step)" />
+                    break;
+                case 2:
+                    <FormIsin CompanyId="companyId" Step="((int step) => start += step)" />
+                    break;
+                case 3:
+                    <FormReportSource CompanyId="companyId" Step="((int step) => start += step)" />
+                    break;
+                default:
+                    {
+                        Task.FromResult(UpdateVisible.InvokeAsync(false));
+                    }
+                    break;
+            }
+        </div>
+    </ChildContent>
+</FormTemplate>
+
+@code{
+    [Parameter] public long? CompanyId { get; set; }
+    [Parameter] public EventCallback<bool> UpdateVisible { get; set; }
+    [Parameter] public string InfoName { get; set; }
+
+    int start = 0;
+    long companyId = 0;
+
+    void UpdateStep((int step, long companyId) parameter)
+    {
+        start += parameter.step;
+        companyId = parameter.companyId;
+    }
+}
+

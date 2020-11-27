@@ -1,0 +1,142 @@
+﻿@inject CustomHttpClient http
+@inject CustomNotification notice
+
+<RowTitleSub Text="Isins" />
+@if (editContexts != null)
+{
+    foreach (var context in editContexts)
+    {
+        var isin = context.Model as IsinModel;
+        <EditForm EditContext="context">
+            <DataAnnotationsValidator />
+            <div class="row mt-1 align-items-center">
+                <div class="col">
+                    <ValidationMessage For="(() => isin.Name)" />
+                    <InputText placeholder="Enter isin (optional)" @bind-Value="isin.Name" />
+                </div>
+            </div>
+            <div class="row">
+                <span class="col-md-3 col-6 ilink text-danger text-nowrap" @onclick="(() => RemoveIsin(context))">remove this</span>
+            </div>
+            <div class="row">
+                <span class="offset-md-9 col-md-3 offset-6 col-6 text-right ilink text-nowrap" @onclick="AddIsin">add isin</span>
+            </div>
+            @if (editContexts.Count == 1)
+            {
+                <div class="row">
+                    <div class="col-6">
+                        <ButtonAction Color="ColorCustom.idark" ClickAction="(() => SaveClose(context))" Title="Save and close" />
+                    </div>
+                    <div class="col-6">
+                        <ButtonAction Color="ColorCustom.isuccess" ClickAction="(() => SaveNext(context))" Title="Save and next" />
+                    </div>
+                </div>
+            }
+            else if (editContexts.Count > 1)
+            {
+                <ButtonAction Color="ColorCustom.isuccess" ClickAction="(() => Save(context))" Title="Save" />
+            }
+        </EditForm>
+    }
+    <ButtonAction Color="ColorCustom.isecondary" ClickAction="(() => Step.InvokeAsync(1))" Title="Next" />
+}
+else
+{
+    <span>@DefaultString.loading</span>
+}
+
+@code {
+    [Parameter] public long CompanyId { get; set; }
+    [Parameter] public EventCallback<int> Step { get; set; }
+    List<EditContext> editContexts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await http.GetAsync<List<IsinModel>>(new UrlBuilder(UrlController.Isins, UrlPath.ByCompanyId, CompanyId).Result);
+
+        var isins = response is null
+            ? new List<IsinModel> { new IsinModel { CompanyId = CompanyId } }
+            : response;
+
+        editContexts = isins.Select(x => new EditContext(x)).ToList();
+
+        await base.OnInitializedAsync();
+    }
+
+    async Task SaveClose(EditContext editContext)
+    {
+        if (editContext.Validate())
+        {
+            var model = editContext.Model as IsinModel;
+            if (await FormIsSubmitAsync(model))
+                await Step.InvokeAsync(200);
+        }
+    }
+    async Task SaveNext(EditContext editContext)
+    {
+        if (editContext.Validate())
+        {
+            var model = editContext.Model as IsinModel;
+            if (await FormIsSubmitAsync(model))
+                await Step.InvokeAsync(1);
+        }
+    }
+    async Task Save(EditContext editContext)
+    {
+        if (editContext.Validate())
+        {
+            var model = editContext.Model as IsinModel;
+            if (await FormIsSubmitAsync(model))
+                editContexts.Remove(editContext);
+        }
+    }
+
+    async Task<bool> FormIsSubmitAsync(IsinModel model)
+    {
+        if (model is null)
+        {
+            notice.ToastDanger("Errors", "Model is null");
+            return false;
+        }
+
+        var result = model.IsEditeble
+            ? await http.PutAsync<BaseResult, IsinModel>(new UrlBuilder(UrlController.Isins, model.Id).Result, model)
+            : await http.PostAsync<BaseResult, IsinModel>(new UrlBuilder(UrlController.Isins).Result, model);
+
+        if (result.IsSuccess)
+        {
+            await notice.AlertSuccesAsync(result.Info);
+            return true;
+        }
+        else
+        {
+            notice.ToastDanger("Errors", result.Info);
+            return false;
+        }
+    }
+
+    void AddIsin() => editContexts.Add(new EditContext(new IsinModel { CompanyId = CompanyId }));
+    void RemoveIsin(EditContext editContext)
+    {
+        var model = editContext.Model as IsinModel;
+
+        if (model.IsEditeble)
+            notice.ConfirmAction(ColorCustom.idanger, "Delete isin from data base?", (async () => await RemoveFromDbAsync()));
+        else
+            editContexts.Remove(editContext);
+
+        async Task RemoveFromDbAsync()
+        {
+            var result = await http.DeleteAsync<BaseResult>(new UrlBuilder(UrlController.Isins, model.Id).Result);
+
+            if (result.IsSuccess)
+            {
+                editContexts.Remove(editContext);
+                StateHasChanged();
+                await notice.AlertSuccesAsync(result.Info);
+            }
+            else
+                await notice.AlertFailedAsync(result.Info);
+        }
+    }
+}

@@ -6,8 +6,8 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
-using InvestmentManager.ViewModels.ResultModels;
-using InvestmentManager.ViewModels.SecurityModels;
+using InvestmentManager.Models;
+using InvestmentManager.Models.Security;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -31,12 +31,12 @@ namespace InvestmentManager.Server.Controllers
             this.userManager = userManager;
         }
 
-        [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginModel model)
+        [HttpPost("login/")]
+        public async Task<IActionResult> Login(LoginModel model)
         {
             var result = await signInManager.PasswordSignInAsync(model.Email.Split('@')[0], model.Password, false, false).ConfigureAwait(false);
             if (!result.Succeeded)
-                return BadRequest(new LoginResult { Successful = false, Error = "Username or password are invalid." });
+                return BadRequest(new LoginResult { IsSuccess = false, Info = "Username or password are invalid." });
 
             var currentUser = await userManager.FindByEmailAsync(model.Email).ConfigureAwait(false);
             var roles = await userManager.GetRolesAsync(currentUser).ConfigureAwait(false);
@@ -51,10 +51,10 @@ namespace InvestmentManager.Server.Controllers
 
             var token = new JwtSecurityToken(configuration["JwtIssuer"], configuration["JwtAudience"], claims, expires: expiry, signingCredentials: creds);
 
-            return Ok(new LoginResult { Successful = true, Token = new JwtSecurityTokenHandler().WriteToken(token) , Expiry = expiry});
+            return Ok(new LoginResult { IsSuccess = true, Token = new JwtSecurityTokenHandler().WriteToken(token), Expiry = expiry });
         }
-        [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterModel model)
+        [HttpPost("register/")]
+        public async Task<IActionResult> Register(RegisterModel model)
         {
             var newUser = new IdentityUser { Email = model.Email, UserName = model.Email.Split('@')[0] };
             var result = await userManager.CreateAsync(newUser, model.Password).ConfigureAwait(false);
@@ -62,9 +62,9 @@ namespace InvestmentManager.Server.Controllers
             if (!result.Succeeded)
             {
                 var errors = result.Errors.Select(x => x.Description);
-                return Ok(new ResultBaseModel { IsSuccess = false, Errors = errors.ToArray() });
+                return BadRequest(new BaseResult { IsSuccess = false, Info = string.Join(";", errors) });
             }
-            return Ok(new ResultBaseModel { IsSuccess = true });
+            return Ok(new BaseResult { IsSuccess = true });
         }
     }
 }

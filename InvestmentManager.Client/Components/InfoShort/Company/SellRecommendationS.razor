@@ -1,0 +1,46 @@
+﻿@inject CustomHttpClient http
+@inject ILocalStorageService localStorage
+@inject CustomNotification notice
+
+<InfoTemplate InfoName="@InfoName" VisibleAction="@((bool isVisible) => UpdateVisible.InvokeAsync(isVisible))">
+    <ChildContent>
+        @if (model != null)
+        {
+            if (model.IsHave)
+            {
+                <KeyValueCols Key="Date Update" Value="@model.DateUpdate.ToShortDateString()" />
+                <KeyValueCols Key="Profit of 20%" Value="@($"{model.LotMin} lot(s) by price > {model.PriceMin}")" />
+                <KeyValueCols Key="Profit of 50%" Value="@($"{model.LotMid} lot(s) by price > {model.PriceMid}")" />
+                <KeyValueCols Key="Profit of 80%" Value="@($"{model.LotMax} lot(s) by price > {model.PriceMax}")" />
+            }
+            else
+            {
+                <span>There are no recommendations for this company.</span>
+            }
+        }
+        else
+        {
+            <span>@DefaultString.loading</span>
+        }
+    </ChildContent>
+</InfoTemplate>
+
+@code{
+    [Parameter] public EventCallback<bool> UpdateVisible { get; set; }
+    [Parameter] public string InfoName { get; set; }
+    [Parameter] public long CompanyId { get; set; }
+    [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; }
+
+    ClaimsPrincipal user;
+    SellRecommendationModel model;
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = (await AuthenticationState).User;
+
+        if (await localStorage.ContainKeyAsync($"{user.Identity.Name}_{DefaultString.Id.accountId}"))
+            model = await http.GetAsync<SellRecommendationModel>(new UrlBuilder(UrlController.SellRecommendations, UrlPath.ByCompanyId, CompanyId).Result);
+        else
+            await notice.AlertInfoAsync("Accounts not found!");
+    }
+}

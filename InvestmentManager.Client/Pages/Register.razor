@@ -1,9 +1,9 @@
 ﻿@page "/register"
-@inject IAuthenticationService  authenticationService
+@inject InvestmentManager.Client.Services.AuthenticationConfiguration.IAuthenticationService authenticationService
 @inject NavigationManager navigation
 
-<div class="row isecodary iframe" style="margin-top:30vh">
-    <EditForm class="col" Model="registerModel" OnValidSubmit="HandleRegistration">
+<div class="row" style="margin-top:30vh">
+    <EditForm class="offset-md-4 col-md-4 col isecodary iframe" Model="registerModel" OnValidSubmit="HandleRegistration">
         <DataAnnotationsValidator />
         <ValidationSummary />
         @if (withErrors)
@@ -33,7 +33,7 @@
             </div>
         </div>
 
-        <ButtonSubmit Title="Register" Color="Choice.InvestColor.isuccess" />
+        <ButtonSubmit Title="Register" Color="ColorCustom.isuccess" />
     </EditForm>
 </div>
 
@@ -51,7 +51,7 @@
             navigation.NavigateTo("/login");
         else
         {
-            errors = result.Errors;
+            errors = result.Info.Split(';');
             withErrors = true;
         }
     }

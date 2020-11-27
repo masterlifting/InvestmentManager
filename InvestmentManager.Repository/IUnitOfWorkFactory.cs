@@ -37,7 +37,7 @@ namespace InvestmentManager.Repository
         ICurrencyRepository Currency { get; }
 
 
-        Task<int> CompleteAsync();
+        Task<bool> CompleteAsync();
         Task CustomAllUpdateAsync<T>(IEnumerable<T> entities, WithDelete withDelete = WithDelete.False) where T : class, IBaseEntity;
     }
 }

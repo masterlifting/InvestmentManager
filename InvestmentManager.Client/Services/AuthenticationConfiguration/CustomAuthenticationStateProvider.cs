@@ -9,7 +9,6 @@ namespace InvestmentManager.Client.Services.AuthenticationConfiguration
     public class CustomAuthenticationStateProvider : AuthenticationStateProvider
     {
         private readonly ILocalStorageService localStorage;
-
         public CustomAuthenticationStateProvider(ILocalStorageService localStorage) => this.localStorage = localStorage;
 
         public async Task SetTokenAsync(string token, DateTime expiry = default)

@@ -9,19 +9,11 @@ namespace InvestmentManager.Services.Implimentations
     public class SummaryService : ISummaryService
     {
         private readonly IUnitOfWorkFactory unitOfWork;
-        private readonly IWebService webService;
-
-        public SummaryService(
-            IUnitOfWorkFactory unitOfWork
-            , IWebService webService)
+        public SummaryService(IUnitOfWorkFactory unitOfWork) => this.unitOfWork = unitOfWork;
+        
+        public async Task<decimal> GetAccountSumAsync(long accountId, decimal dollar)
         {
-            this.unitOfWork = unitOfWork;
-            this.webService = webService;
-        }
-        public async Task<decimal> GetAccountSumAsync(long accountId)
-        {
-            #region Загрузка данных
-            decimal dollar = (await webService.GetDollarRateAsync().ConfigureAwait(false)).Valute.USD.Value;
+            #region Загрузка данных из БД
             var companyIds = await unitOfWork.Company.GetAll().Select(x => x.Id).ToArrayAsync().ConfigureAwait(false);
             var dividends = unitOfWork.Dividend.GetAll().Where(x => accountId == x.AccountId);
             var comissions = unitOfWork.Comission.GetAll().Where(x => accountId == x.AccountId);

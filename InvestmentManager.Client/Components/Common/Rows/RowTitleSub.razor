@@ -1,0 +1,8 @@
+﻿<div class="row font-italic font-weight-light text-@Color.ToString() py-0">
+    <div class="col">@Text</div>
+</div>
+
+@code {
+    [Parameter] public ColorBootstrap Color { get; set; } = ColorBootstrap.secondary;
+    [Parameter] public string Text { get; set; }
+}

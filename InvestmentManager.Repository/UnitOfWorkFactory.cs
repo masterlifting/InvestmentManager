@@ -85,15 +85,15 @@ namespace InvestmentManager.Repository
         public ICurrencyRepository Currency { get; }
 
 
-        public async Task<int> CompleteAsync()
+        public async Task<bool> CompleteAsync()
         {
             try
             {
-               return await context.SaveChangesAsync().ConfigureAwait(false);
+                return await context.SaveChangesAsync().ConfigureAwait(false) > 0;
             }
             catch
             {
-                return -1;
+                return false;
             }
         }
 

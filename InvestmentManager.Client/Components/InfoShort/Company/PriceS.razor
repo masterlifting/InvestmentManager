@@ -1,0 +1,32 @@
+﻿@inject CustomHttpClient http
+
+<InfoTemplate InfoName="@InfoName" VisibleAction="((bool isVisible) => UpdateVisible.InvokeAsync(isVisible))">
+    <ChildContent>
+        <KeyValueCols Key="Date price" Value="@dateUpdate" />
+        <KeyValueCols Key="Last price" Value="@lastPrice" />
+
+        <div class="col">
+            <PriceF CompanyId="CompanyId" />
+        </div>
+
+    </ChildContent>
+</InfoTemplate>
+
+@code{
+    [Parameter] public EventCallback<bool> UpdateVisible { get; set; }
+    [Parameter] public string InfoName { get; set; }
+    [Parameter] public long CompanyId { get; set; }
+
+    string dateUpdate = DefaultString.loading;
+    string lastPrice = DefaultString.loading;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var price = await http.GetAsync<PriceModel>(new UrlBuilder(UrlController.Prices, UrlPath.ByCompanyId, CompanyId, UrlOption.Last).Result);
+        if (price != null)
+        {
+            dateUpdate = price.DateUpdate.ToShortDateString();
+            lastPrice = price.Value.ToString("f3");
+        }
+    }
+}

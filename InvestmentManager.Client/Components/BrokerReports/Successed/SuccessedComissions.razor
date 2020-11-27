@@ -1,0 +1,67 @@
+﻿@inject CustomHttpClient http
+@inject CustomNotification notice
+
+<RowTitleSub Text="Comissions" />
+
+<div class="row icontent small">
+    <div class="col">
+        <div class="row text-info text-nowrap">
+            <div class="col-7">
+                <div class="row">
+                    <div class="col">Type</div>
+                </div>
+            </div>
+            <div class="col-5">
+                <div class="row">
+                    <div class="col-6 px-0">Sum</div>
+                    <div class="col-6 px-0 text-center">Date</div>
+                </div>
+            </div>
+        </div>
+
+        @foreach (var item in comissions.Join(comissionTypes, x => x.TypeId, y => y.Id, (x, y) => new { Comission = x, Type = y.Name }))
+        {
+            <div class="row text-danger ilink" @onclick="(() => SaveData(item.Comission))">
+                <div class="col-7">
+                    <div class="row">
+                        <div class="col">@item.Type</div>
+                    </div>
+                </div>
+                <div class="col-5">
+                    <div class="row">
+                        <div class="col-6 px-0">@item.Comission.Amount</div>
+                        <div class="col-6 px-0 text-center">@item.Comission.DateOperation.ToShortDateString()</div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public List<ComissionModel> Comissions { get; set; }
+
+    List<ComissionModel> comissions { get; set; }
+    List<BaseView> comissionTypes = new List<BaseView>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        comissions = Comissions;
+        comissionTypes = await http.GetAsync<List<BaseView>>(new UrlBuilder(UrlCatalog.ComissionTypes).Result);
+
+        await base.OnInitializedAsync();
+    }
+
+    async Task SaveData(ComissionModel comission)
+    {
+        var result = await http.PostAsync<BaseResult, ComissionModel>(new UrlBuilder(UrlController.Comissions).Result, comission);
+
+        if (result.IsSuccess)
+        {
+            await notice.AlertSuccesAsync(result.Info);
+            comissions.Remove(comission);
+        }
+        else
+            notice.ToastDanger("Comission error.", result.Info);
+    }
+}

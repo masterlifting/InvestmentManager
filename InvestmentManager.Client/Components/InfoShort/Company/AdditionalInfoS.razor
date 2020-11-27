@@ -1,0 +1,31 @@
+﻿@inject CustomHttpClient http
+
+<InfoTemplate InfoName="@InfoName" VisibleAction="@((bool isVisible) => UpdateVisible.InvokeAsync(isVisible))">
+    <ChildContent>
+        <KeyValueCols Key="Sector" Value="@sector" />
+        <KeyValueCols Key="Industry" Value="@industry" />
+    </ChildContent>
+</InfoTemplate>
+
+@code{
+    [Parameter] public EventCallback<bool> UpdateVisible { get; set; }
+    [Parameter] public string InfoName { get; set; }
+    [Parameter] public long CompanyId { get; set; }
+
+    string sector = DefaultString.loading;
+    string industry = DefaultString.loading;
+
+    protected async override Task OnInitializedAsync()
+    {
+        var company = await http.GetAsync<CompanyModel>(new UrlBuilder(UrlController.Companies, CompanyId).Result);
+        if (company != null)
+        {
+            var dbsector = await http.GetAsync<BaseView>(new UrlBuilder(UrlController.Sectors, company.SectorId).Result);
+            var dbindustry = await http.GetAsync<BaseView>(new UrlBuilder(UrlController.Industries, company.IndustryId).Result);
+
+            sector = dbsector.Name;
+            industry = dbindustry.Name;
+        }
+    }
+}
+

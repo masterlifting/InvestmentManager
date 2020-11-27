@@ -1,0 +1,27 @@
+﻿@inject CustomHttpClient http
+
+<InfoTemplate InfoName="@InfoName" VisibleAction="@((bool isVisible) => UpdateVisible.InvokeAsync(isVisible))">
+    <ChildContent>
+        <KeyValueCols KeySize="6" Key="Date Update" Value="@dateUpdate" />
+        <KeyValueCols KeySize="6" Key="Buy if the price is less" Value="@buyPrice" />
+    </ChildContent>
+</InfoTemplate>
+
+@code{
+    [Parameter] public EventCallback<bool> UpdateVisible { get; set; }
+    [Parameter] public string InfoName { get; set; }
+    [Parameter] public long CompanyId { get; set; }
+
+    string dateUpdate = DefaultString.loading;
+    string buyPrice = DefaultString.loading;
+
+    protected async override Task OnInitializedAsync()
+    {
+        var result = await http.GetAsync<BuyRecommendationModel>(new UrlBuilder(UrlController.BuyRecommendations, UrlPath.ByCompanyId, CompanyId).Result);
+        if (result != null)
+        {
+            dateUpdate = result.DateUpdate.ToShortDateString();
+            buyPrice = result.Price.ToString("f2");
+        }
+    }
+}

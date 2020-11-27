@@ -5,93 +5,93 @@
 
 @if (checkingreports != null)
 {
-    foreach (var result in checkingreports.Take(5))
+    foreach (var result in checkingreports.Take(5).GroupBy(x => x.CompanyId).Join(companies, x => x.Key, y => y.Id, (x, y) => new { Reports = x, CompanyName = y.Name }))
     {
-        <FrameTemplate Name="@result.CompanyName" TitleColor="Choice.TextColor.warning">
+        <FrameTemplate Name="@result.CompanyName" TitleColor="ColorBootstrap.warning">
             <InfoBlock>
-                @foreach (var report in result.Reports)
+                @foreach (ReportModel report in result.Reports)
                 {
-                    <EditForm Model="@report" OnValidSubmit="@(() => SaveReport(report, result.CompanyName))">
+                    <EditForm Model="report" OnValidSubmit="(() => SaveReport(report))">
                         <DataAnnotationsValidator />
                         <ValidationSummary />
                         <div class="row ">
                             <span class="col-6">Дата</span>
                             <div class="col-6">
-                                <InputDate @bind-Value="@report.DateReport" />
+                                <InputDate @bind-Value="report.DateReport" />
                             </div>
                         </div>
                         <div class="row">
-                            <span class="col-6">Всего акций</span>
+                            <span class="col-6">Stock volume</span>
                             <div class="col-6">
-                                <InputNumber ParsingErrorMessage="Колличество акций должно быть числом" @bind-Value="@report.StockVolume" />
+                                <InputNumber ParsingErrorMessage="The volume of shares must be a number" @bind-Value="report.StockVolume" />
                             </div>
                         </div>
                         <div class="row">
-                            <span class="col-6">Дивиденды</span>
+                            <span class="col-6">Dividends</span>
                             <div class="col-6">
-                                <InputNumber ParsingErrorMessage="Дивиденды должны быть числом" @bind-Value="@report.Dividend" />
+                                <InputNumber ParsingErrorMessage="The dividents must be a number" @bind-Value="report.Dividend" />
                             </div>
                         </div>
                         <div class="row">
-                            <span class="col-6">Выручка</span>
+                            <span class="col-6">Revenue</span>
                             <div class="col-6">
-                                <InputNumber ParsingErrorMessage="Выручка должна быть числом" @bind-Value="@report.Revenue" />
+                                <InputNumber ParsingErrorMessage="The revenue must be a number" @bind-Value="report.Revenue" />
                             </div>
                         </div>
                         <div class="row">
-                            <span class="col-6">Валовая прибыль</span>
+                            <span class="col-6">Gross profit</span>
                             <div class="col-6">
-                                <InputNumber ParsingErrorMessage="Валовая прибыль должна быть числом" @bind-Value="@report.GrossProfit" />
+                                <InputNumber ParsingErrorMessage="The gross profit must be a number" @bind-Value="report.GrossProfit" />
                             </div>
                         </div>
                         <div class="row">
-                            <span class="col-6">Чистая прибыль</span>
+                            <span class="col-6">Net profit</span>
                             <div class="col-6">
-                                <InputNumber ParsingErrorMessage="Чистая прибыль должна быть числом" @bind-Value="@report.NetProfit" />
+                                <InputNumber ParsingErrorMessage="The net profit must be a number" @bind-Value="report.NetProfit" />
                             </div>
                         </div>
                         <div class="row">
-                            <span class="col-6">Денежный поток</span>
+                            <span class="col-6">Cash folw</span>
                             <div class="col-6">
-                                <InputNumber ParsingErrorMessage="Денежный поток должен быть числом" @bind-Value="@report.CashFlow" />
+                                <InputNumber ParsingErrorMessage="The cash flow must be a number" @bind-Value="report.CashFlow" />
                             </div>
                         </div>
                         <div class="row">
-                            <span class="col-6">Активы</span>
+                            <span class="col-6">Assets</span>
                             <div class="col-6">
-                                <InputNumber ParsingErrorMessage="Активы должны быть числом" @bind-Value="@report.Assets" />
+                                <InputNumber ParsingErrorMessage="The assets must be a number" @bind-Value="report.Assets" />
                             </div>
                         </div>
                         <div class="row">
-                            <span class="col-6">Акционерный капитал</span>
+                            <span class="col-6">Share capital</span>
                             <div class="col-6">
-                                <InputNumber ParsingErrorMessage="Капитал должен быть числом" @bind-Value="@report.ShareCapital" />
+                                <InputNumber ParsingErrorMessage="The share capital must be a number" @bind-Value="report.ShareCapital" />
                             </div>
                         </div>
                         <div class="row">
-                            <span class="col-6">Оборот</span>
+                            <span class="col-6">Turnover</span>
                             <div class="col-6">
-                                <InputNumber ParsingErrorMessage="Оборот должен быть числом" @bind-Value="@report.Turnover" />
+                                <InputNumber ParsingErrorMessage="The turnover must be a number" @bind-Value="report.Turnover" />
                             </div>
                         </div>
                         <div class="row">
-                            <span class="col-6">Задолженность</span>
+                            <span class="col-6">Long term debt</span>
                             <div class="col-6">
-                                <InputNumber ParsingErrorMessage="Задолженность должна быть числом" @bind-Value="@report.LongTermDebt" />
+                                <InputNumber ParsingErrorMessage="The long term debt must be a number" @bind-Value="report.LongTermDebt" />
                             </div>
                         </div>
                         <div class="row">
-                            <span class="col-6">Обязательства</span>
+                            <span class="col-6">Obligations</span>
                             <div class="col-6">
-                                <InputNumber ParsingErrorMessage="Обязательства должны быть числом" @bind-Value="@report.Obligation" />
+                                <InputNumber ParsingErrorMessage="The obligations must be a number" @bind-Value="report.Obligation" />
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-6">
-                                <ButtonAction Title="Delete" Color="Choice.InvestColor.idanger" ClickAction="@(() => DeleteReport(report, result.CompanyName))" />
+                                <ButtonAction Title="Delete" Color="ColorCustom.idanger" ClickAction="(() => DeleteReport(report))" />
                             </div>
                             <div class="col-6">
-                                <ButtonSubmit Title="Save" Color="Choice.InvestColor.isuccess" />
+                                <ButtonSubmit Title="Save" Color="ColorCustom.isuccess" />
                             </div>
                         </div>
                     </EditForm>
@@ -100,44 +100,40 @@
             </InfoBlock>
         </FrameTemplate>
     }
-
-    if (checkingreports.Count() > 5)
-    {
-        <div class="row my-3">
-            <span class="offset-4 col-4 text-center font-weight-bolder text-primary" style="cursor:pointer" @onclick="GetCheckingReports">else...</span>
-        </div>
-    }
 }
 
 @code {
-    List<CompanyReportForm> checkingreports;
-    protected override async Task OnInitializedAsync() => await GetCheckingReports();
-    async Task GetCheckingReports()
+    List<ReportModel> checkingreports;
+    List<BaseView> companies = new List<BaseView>();
+    protected override async Task OnInitializedAsync()
     {
-        checkingreports = null;
-        checkingreports = await http.GetNoParametersAsync<List<CompanyReportForm>>(Routes.C.CompanyReport + "/checknew", true);
+        companies = await http.GetAsync<List<BaseView>>(new UrlBuilder(UrlController.Companies).Result);
+        checkingreports = await http.GetAsync<List<ReportModel>>(new UrlBuilder(UrlController.Reports, UrlOption.New).Result);
     }
 
-    async Task DeleteReport(NewReportModel report, string companyName)
+    async Task DeleteReport(ReportModel report)
     {
-        if (await http.GetBoolAsync(Routes.C.CompanyReport + "/deletechecked", report.ReportId))
+        var result = await http.DeleteAsync<BaseResult>(new UrlBuilder(UrlController.Reports, report.Id).Result);
+
+        if (result.IsSuccess)
         {
-            await DeleteReportNodeAsync(report, companyName);
-            await notice.AlertSuccesAsync("Report deleted", 500);
+            await notice.AlertSuccesAsync(result.Info, 500);
+            checkingreports.Remove(report);
         }
         else
-            await notice.AlertFailedAsync();
+            await notice.AlertFailedAsync(result.Info);
     }
-    async Task SaveReport(NewReportModel report, string companyName)
+    async Task SaveReport(ReportModel report)
     {
-        if (await http.PostAsBoolAsync<NewReportModel>(Routes.C.CompanyReport + "/savechecked", report))
+        report.IsChecked = true;
+        var result = await http.PostAsync<BaseResult, ReportModel>(new UrlBuilder(UrlController.Reports).Result, report);
+
+        if (result.IsSuccess)
         {
-            await DeleteReportNodeAsync(report, companyName);
-            await notice.AlertSuccesAsync("Report saved", 500);
+            await notice.AlertSuccesAsync(result.Info, 500);
+            checkingreports.Remove(report);
         }
         else
-            await notice.AlertFailedAsync();
+            await notice.AlertFailedAsync(result.Info);
     }
-    async Task DeleteReportNodeAsync(NewReportModel report, string companyName) =>
-            await Task.Run(() => { checkingreports.FirstOrDefault(x => x.CompanyName.Equals(companyName)).Reports.Remove(report); });
 }

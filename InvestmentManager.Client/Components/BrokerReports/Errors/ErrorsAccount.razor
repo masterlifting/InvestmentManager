@@ -1,0 +1,36 @@
+﻿@inject CustomHttpClient http
+@inject CustomNotification notice
+
+<BaseError Title="@Title" IsDone="isDone" ErrorValue="@ErrorValue">
+    <ChildContent>
+
+    <EditForm class="col-12" Model="model" OnValidSubmit="SendData">
+        <DataAnnotationsValidator />
+        <ValidationMessage For="(() => model.Name)" />
+        <InputText class="mb-2" @bind-Value="model.Name" />
+        <ButtonSubmit Title="Добавить" Color="ColorCustom.iwarning" />
+    </EditForm>
+
+    </ChildContent>
+</BaseError>
+
+@code {
+    [Parameter] public string ErrorValue { get; set; }
+    [Parameter] public string Title { get; set; }
+
+    AccountModel model = new AccountModel();
+    bool isDone = false;
+
+    protected override void OnParametersSet() => model.Name = ErrorValue.Split('\'')[1];
+    async Task SendData()
+    {
+        var result = await http.PostAsync<BaseResult, AccountModel>(new UrlBuilder(UrlController.Accounts).Result, model);
+        if (result.IsSuccess)
+        {
+            isDone = true;
+            await notice.AlertSuccesAsync(result.Info);
+        }
+        else
+            notice.ToastDanger("Account error.", result.Info);
+    }
+}

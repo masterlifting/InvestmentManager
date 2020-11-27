@@ -1,0 +1,54 @@
+﻿@inject CustomHttpClient http
+@inject ILocalStorageService localStorage
+@inject CustomNotification notice
+@using System.Text.Json
+
+<InfoTemplate InfoName="@InfoName" VisibleAction="@(async (bool isVisible) => await UpdateVisible.InvokeAsync(isVisible))">
+    <ChildContent>
+        @if (model != null)
+        {
+            if (model.IsHave)
+            {
+                <KeyValueCols Key="Last operation" Value="@model.DateOperation.ToShortDateString()" />
+                <KeyValueCols Key="Status" Value="@status" />
+                <KeyValueCols Key="Lot" Value="@model.Quantity.ToString()" />
+                <KeyValueCols Key="Price" Value="@model.Cost.ToString("f2")" />
+            }
+            else
+            {
+                <span>There are no transactions for this company.</span>
+            }
+        }
+        else
+        {
+            <span>@DefaultString.loading</span>
+        }
+    </ChildContent>
+</InfoTemplate>
+
+@code{
+    [Parameter] public EventCallback<bool> UpdateVisible { get; set; }
+    [Parameter] public string InfoName { get; set; }
+    [Parameter] public long CompanyId { get; set; }
+    [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; }
+
+    StockTransactionModel model;
+    string status = "wait...";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await AuthenticationState).User;
+
+        if (await localStorage.ContainKeyAsync($"{user.Identity.Name}_{DefaultString.Id.accountId}"))
+        {
+            string accountIds = JsonSerializer.Serialize(await localStorage.GetItemAsync<long[]>($"{user.Identity.Name}_{DefaultString.Id.accountId}"));
+            model = await http.GetAsync<StockTransactionModel>(new UrlBuilder(UrlController.StockTransactions, UrlPath.ByAccountIds, accountIds, UrlPath.ByCompanyId, CompanyId).Result);
+            if(model.IsHave)
+            {
+                status = InvestHelper.GetTransactionStatus(model.StatusId).ToString();
+            }
+        }
+        else
+            await notice.AlertInfoAsync("Accounts not found!");
+    }
+}

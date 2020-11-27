@@ -5,7 +5,6 @@ using InvestmentManager.Repository;
 using InvestmentManager.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -110,7 +109,7 @@ namespace InvestmentManager.BrokerService
                     continue;
                 }
 
-                var entityReportModel = new EntityReportModel { AccountId = account.Id, AccountName = model.AccountId };
+                var entityReportModel = new EntityReportModel { AccountId = account.Id};
                 try
                 {
                     entityReportModel.AccountTransactions = await reportMapper.MapToAccountTransactionsAsync(model.AccountTransactions, account.Id, errors).ConfigureAwait(false);
@@ -138,14 +137,14 @@ namespace InvestmentManager.BrokerService
         {
             var newReports = new List<EntityReportModel>();
 
-            foreach (var i in checkedReports.Reports.GroupBy(x => new { x.AccountId, x.AccountName }))
+            foreach (var i in checkedReports.Reports.GroupBy(x => x.AccountId))
             {
-                var reportModel = new EntityReportModel { AccountId = i.Key.AccountId, AccountName = i.Key.AccountName };
-                reportModel.AccountTransactions = reportFilter.GetNewTransactions(i.Select(x => x.AccountTransactions).Aggregate((x, y) => x.Union(y)), i.Key.AccountId);
-                reportModel.StockTransactions = reportFilter.GetNewTransactions(i.Select(x => x.StockTransactions).Aggregate((x, y) => x.Union(y)), i.Key.AccountId);
-                reportModel.Dividends = reportFilter.GetNewTransactions(i.Select(x => x.Dividends).Aggregate((x, y) => x.Union(y)), i.Key.AccountId);
-                reportModel.Comissions = reportFilter.GetNewTransactions(i.Select(x => x.Comissions).Aggregate((x, y) => x.Union(y)), i.Key.AccountId);
-                reportModel.ExchangeRates = reportFilter.GetNewTransactions(i.Select(x => x.ExchangeRates).Aggregate((x, y) => x.Union(y)), i.Key.AccountId);
+                var reportModel = new EntityReportModel { AccountId = i.Key};
+                reportModel.AccountTransactions = reportFilter.GetNewTransactions(i.Select(x => x.AccountTransactions).Aggregate((x, y) => x.Union(y)), i.Key);
+                reportModel.StockTransactions = reportFilter.GetNewTransactions(i.Select(x => x.StockTransactions).Aggregate((x, y) => x.Union(y)), i.Key);
+                reportModel.Dividends = reportFilter.GetNewTransactions(i.Select(x => x.Dividends).Aggregate((x, y) => x.Union(y)), i.Key);
+                reportModel.Comissions = reportFilter.GetNewTransactions(i.Select(x => x.Comissions).Aggregate((x, y) => x.Union(y)), i.Key);
+                reportModel.ExchangeRates = reportFilter.GetNewTransactions(i.Select(x => x.ExchangeRates).Aggregate((x, y) => x.Union(y)), i.Key);
 
                 newReports.Add(reportModel);
             }

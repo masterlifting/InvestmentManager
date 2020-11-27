@@ -1,0 +1,46 @@
+﻿@typeparam TItem
+
+<div class="row">
+    @foreach (ColumnConfig column in Columns)
+    {
+        <div class="col text-center text-dark">@column.Caption</div>
+    }
+</div>
+
+<div class="row">
+    <div class="col" style="max-height:20vh;overflow-y:auto;overflow-x:hidden">
+        @foreach (TItem item in DataItems)
+        {
+            <div class="row">
+                @foreach (var column in Columns)
+                {
+                    @if (!string.IsNullOrWhiteSpace(column.Format) && column.DataType != HtmlDataType.NotSet)
+                    {
+                        string value = typeof(TItem).GetProperty(column.DataField).GetValue(item).ToString();
+                        string result = column.DataType switch
+                        {
+                            HtmlDataType.Date => DateTime.Parse(value, CultureInfo.CurrentCulture).ToString(column.Format),
+                            HtmlDataType.Boolean => bool.Parse(value).ToString(),
+                            HtmlDataType.Currency => Math.Round(decimal.Parse(value, CultureInfo.CurrentCulture), 2).ToString(column.Format),
+                            HtmlDataType.Number => decimal.Parse(value, CultureInfo.CurrentCulture).ToString(column.Format),
+                            _ => value
+                        };
+                        <div class="col text-@column.AlignType.ToString().ToLower()">@result</div>
+                    }
+                    else
+                    {
+                        <div class="col text-@column.AlignType.ToString().ToLower()">@typeof(TItem).GetProperty(column.DataField).GetValue(item)</div>
+                    }
+
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@code
+{
+    [Parameter] public List<TItem> DataItems { get; set; }
+    [Parameter] public List<ColumnConfig> Columns { get; set; }
+}
+

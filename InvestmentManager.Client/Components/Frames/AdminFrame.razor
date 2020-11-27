@@ -2,18 +2,18 @@
 @inject CustomNotification notice
 @inject NavigationManager navigation
 
-<FrameTemplate Theme="Choice.InvestColor.idanger" Name="Administrator" TitleColor="Choice.TextColor.light">
+<FrameTemplate Theme="ColorCustom.idanger" Name="Administrator" TitleColor="ColorBootstrap.light">
     <InfoBlock>
         <MultiRow Name="Recalculate all" IconName="calculator" Action="RecalculateAll" />
-        <MultiRow Name="Load prices" IconName="script" Action="GetNewPrice" />
-        <MultiRow Name="Load reports" IconName="document" Action="ParseNewReports" />
-        <MultiRow Name="Check reports" IconName="check" Action="CheckParsedReports" />
-        <MultiRow Name="@addCompany" IconName="file" Action="AddCompany" />
+        <MultiRow Name="Load prices" IconName="script" Action="ParsePrices" />
+        <MultiRow Name="Load reports" IconName="document" Action="ParseReports" />
+        <MultiRow Name="Check reports" IconName="check" Action="  CheckParsedReports" />
+        <MultiRow Name="@addCompany" IconName="file" Action="     AddCompany" />
     </InfoBlock>
     <ActionBlock>
         @if (isAddingCompany)
         {
-            <FormCompanyComplex InfoName="@addCompany" CompanyId="null" UpdateVisible="@((bool isVisible) => isAddingCompany = isVisible)" />
+            <FormCompanyComplex InfoName="@addCompany" CompanyId="null" UpdateVisible="((bool isVisible) => isAddingCompany = isVisible)" />
         }
     </ActionBlock>
 </FrameTemplate>
@@ -27,17 +27,24 @@
     async Task RecalculateAll()
     {
         if (await IsAdmin())
-            await http.GetVoidAsync(Routes.C.Admin + "/recalculateall", true);
+        {
+            var result = await http.GetAsync<BaseResult>(new UrlBuilder(UrlService.RecalculateAll).Result);
+
+            if (result.IsSuccess)
+                notice.ToastSuccess("Recalculating info", result.Info);
+            else
+                notice.ToastDanger("Recalculating info", result.Info);
+        }
     }
-    async Task GetNewPrice()
+    async Task ParsePrices()
     {
         if (await IsAdmin())
-            await http.GetVoidAsync(Routes.C.Price + Routes.A.New);
+            await http.GetAsync(new UrlBuilder(UrlService.ParsePrices).Result);
     }
-    async Task ParseNewReports()
+    async Task ParseReports()
     {
         if (await IsAdmin())
-            await http.GetVoidAsync(Routes.C.CompanyReport + Routes.A.Parse);
+            await http.GetAsync(new UrlBuilder(UrlService.ParseReports).Result);
     }
     async Task CheckParsedReports()
     {

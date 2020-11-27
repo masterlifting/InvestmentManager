@@ -1,0 +1,70 @@
+﻿@inject CustomHttpClient http
+@inject CustomNotification notice
+
+<RowTitleSub Text="Dividends" />
+
+<div class="row icontent small">
+    <div class="col">
+        <div class="row text-info text-nowrap">
+            <div class="col-7">
+                <div class="row">
+                    <div class="col">Company</div>
+                </div>
+            </div>
+            <div class="col-5">
+                <div class="row">
+                    <div class="col-6 px-0">Sum</div>
+                    <div class="col-6 px-0 text-center">Date</div>
+                </div>
+            </div>
+        </div>
+
+        @foreach (var item in dividends
+        .Join(isins, x => x.IsinId, y => y.Id, (x, y) => new { Dividend = x, CompanyId = y.CompanyId })
+        .Join(companies, x => x.CompanyId, y => y.Id, (x, y) => new { x.Dividend, Company = y.Name }))
+        {
+            <div class="row text-success ilink" @onclick="(() => SaveData(item.Dividend))">
+                <div class="col-7">
+                    <div class="row">
+                        <div class="col">@item.Company</div>
+                    </div>
+                </div>
+                <div class="col-5">
+                    <div class="row">
+                        <div class="col-6 px-0">@item.Dividend.Amount</div>
+                        <div class="col-6 px-0 text-center">@item.Dividend.DateOperation.ToShortDateString()</div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public List<DividendModel> Dividends { get; set; }
+
+    List<DividendModel> dividends { get; set; }
+    List<IsinModel> isins = new List<IsinModel>();
+    List<BaseView> companies = new List<BaseView>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        dividends = Dividends;
+        isins = await http.GetAsync<List<IsinModel>>(new UrlBuilder(UrlController.Isins).Result);
+        companies = await http.GetAsync<List<BaseView>>(new UrlBuilder(UrlController.Companies).Result);
+        await base.OnInitializedAsync();
+    }
+
+    async Task SaveData(DividendModel dividend)
+    {
+        var result = await http.PostAsync<BaseResult, DividendModel>(new UrlBuilder(UrlController.Dividends).Result, dividend);
+
+        if (result.IsSuccess)
+        {
+            await notice.AlertSuccesAsync(result.Info);
+            dividends.Remove(dividend);
+        }
+        else
+            notice.ToastDanger("Dividend error.", result.Info);
+    }
+}

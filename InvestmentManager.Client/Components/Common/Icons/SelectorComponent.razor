@@ -17,11 +17,11 @@
 
 @code {
     [Parameter] public bool IsSelected { get; set; }
-    [Parameter] public long SelectedId { get; set; }
-    [Parameter] public EventCallback<(bool, long)> SelectorAction { get; set; }
-    async void ChangeSelector()
+    [Parameter] public object Key { get; set; }
+    [Parameter] public EventCallback<(bool, object)> SelectorAction { get; set; }
+    async Task ChangeSelector()
     {
         IsSelected = !IsSelected;
-        await SelectorAction.InvokeAsync((IsSelected, SelectedId));
+        await SelectorAction.InvokeAsync((IsSelected, Key));
     }
 }

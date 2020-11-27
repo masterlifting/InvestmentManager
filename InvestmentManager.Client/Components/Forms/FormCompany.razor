@@ -1,0 +1,103 @@
+﻿@inject CustomHttpClient http
+@inject CustomNotification notice
+
+<RowTitleSub Text="Company" />
+@if (editContext != null)
+{
+    <EditForm EditContext="editContext">
+        <DataAnnotationsValidator />
+        <div class="row mt-1 align-items-center">
+            <div class="col">
+                <ValidationMessage For="(() => company.Name)" />
+                <InputText placeholder="Enter company name (required)" @bind-Value="company.Name" />
+            </div>
+        </div>
+        <div class="row mt-1 align-items-center">
+            <div class="col-3">Sector</div>
+            <div class="col-9">
+                <ValidationMessage For="(() => company.SectorId)" />
+                <InputSelect @bind-Value="company.SectorId">
+                    @foreach (var sector in sectors)
+                        {
+                        <option value="@sector.Id">@sector.Name</option>
+                        }
+                </InputSelect>
+            </div>
+        </div>
+        <div class="row mt-1 align-items-center">
+            <div class="col-3">Industry</div>
+            <div class="col-9">
+                <ValidationMessage For="(() => company.IndustryId)" />
+                <InputSelect @bind-Value="company.IndustryId">
+                    @foreach (var industry in industries)
+                        {
+                        <option value="@industry.Id">@industry.Name</option>
+                        }
+                </InputSelect>
+            </div>
+        </div>
+        <div class="row mt-1 align-items-center">
+            <div class="col-3 text-nowrap">Date split</div>
+            <div class="col-9">
+                <ValidationMessage For="(() => company.DateSplit)" />
+                <InputDate @bind-Value="company.DateSplit" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <ButtonAction Color="ColorCustom.idark" ClickAction="SaveClose" Title="Save and close" />
+            </div>
+            <div class="col-6">
+                <ButtonAction Color="ColorCustom.isuccess" ClickAction="SaveNext" Title="Save and next" />
+            </div>
+        </div>
+    </EditForm>
+}
+else
+{
+    <span>@DefaultString.loading</span>
+}
+
+@code {
+    [Parameter] public long? CompanyId { get; set; }
+    [Parameter] public EventCallback<(int, long)> FirstStep { get; set; }
+
+    List<BaseView> industries = new List<BaseView>();
+    List<BaseView> sectors = new List<BaseView>();
+    CompanyModel company;
+    EditContext editContext;
+
+    protected override async Task OnInitializedAsync()
+    {
+        industries = await http.GetAsync<List<BaseView>>(new UrlBuilder(UrlController.Industries).Result);
+        sectors = await http.GetAsync<List<BaseView>>(new UrlBuilder(UrlController.Sectors).Result);
+
+        company = CompanyId.HasValue
+            ? await http.GetAsync<CompanyModel>(new UrlBuilder(UrlController.Companies, CompanyId.Value).Result)
+            : new CompanyModel();
+
+        editContext = new EditContext(company);
+
+        await base.OnInitializedAsync();
+    }
+
+    async Task SaveClose() => await FormSubmit(200);
+    async Task SaveNext() => await FormSubmit(1);
+    async Task FormSubmit(int step)
+    {
+        if (editContext.Validate())
+        {
+            var result = CompanyId.HasValue
+                ? await http.PutAsync<BaseResult, CompanyModel>(new UrlBuilder(UrlController.Companies, CompanyId.Value).Result, company)
+                : await http.PostAsync<BaseResult, CompanyModel>(new UrlBuilder(UrlController.Companies).Result, company);
+
+            if (result.IsSuccess)
+            {
+                await notice.AlertSuccesAsync(result.Info);
+                await FirstStep.InvokeAsync((step, result.ResultId));
+            }
+            else
+                notice.ToastDanger("Errors", result.Info);
+        }
+    }
+}

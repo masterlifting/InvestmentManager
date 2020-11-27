@@ -1,9 +1,9 @@
 ﻿@page "/login"
-@inject IAuthenticationService authenticationService
+@inject InvestmentManager.Client.Services.AuthenticationConfiguration.IAuthenticationService authenticationService
 @inject NavigationManager navigation
 
-<div class="row isecodary iframe" style="margin-top:30vh">
-    <EditForm class="col-12" Model="loginModel" OnValidSubmit="HandleLogin">
+<div class="row" style="margin-top:30vh">
+    <EditForm class="offset-md-4 col-md-4 col isecodary iframe" Model="loginModel" OnValidSubmit="HandleLogin">
         <DataAnnotationsValidator />
         <ValidationSummary />
         @if (withErrors)
@@ -23,7 +23,7 @@
             </div>
         </div>
 
-        <ButtonSubmit Title="To come in" Color="Choice.InvestColor.isuccess" />
+        <ButtonSubmit Title="To come in" Color="ColorCustom.isuccess" />
     </EditForm>
 </div>
 
@@ -38,11 +38,11 @@
 
         var result = await authenticationService.LoginAsync(loginModel);
 
-        if (result.Successful)
+        if (result.IsSuccess)
             navigation.NavigateTo("/");
         else
         {
-            error = result.Error;
+            error = result.Info;
             withErrors = true;
         }
     }

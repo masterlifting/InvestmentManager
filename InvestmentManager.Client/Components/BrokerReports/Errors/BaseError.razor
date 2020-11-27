@@ -1,0 +1,22 @@
+﻿@if (!IsDone)
+{
+    <div class="row idanger iframe">
+        <div class="col-12 text-center text-warning">@Title</div>
+        <div class="col-12 text-dark">Error: </div>
+        <label class="col-12 text-center text-light">@ErrorValue</label>
+        <div class="col-12 text-info">Decision:</div>
+        <div class="col-12 icontent">
+            <div class="row">
+                @ChildContent
+            </div>
+        </div>
+    </div>
+}
+
+
+@code {
+    [Parameter] public string Title { get; set; }
+    [Parameter] public bool IsDone { get; set; }
+    [Parameter] public string ErrorValue { get; set; }
+    [Parameter] public RenderFragment ChildContent { get; set; }
+}

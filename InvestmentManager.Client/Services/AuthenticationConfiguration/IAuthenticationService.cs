@@ -1,12 +1,12 @@
-﻿using InvestmentManager.ViewModels.ResultModels;
-using InvestmentManager.ViewModels.SecurityModels;
+﻿using InvestmentManager.Models;
+using InvestmentManager.Models.Security;
 using System.Threading.Tasks;
 
 namespace InvestmentManager.Client.Services.AuthenticationConfiguration
 {
     public interface IAuthenticationService
     {
-        Task<ResultBaseModel> RegisterAsync(RegisterModel model);
+        Task<BaseResult> RegisterAsync(RegisterModel model);
         Task<LoginResult> LoginAsync(LoginModel model);
         Task LogoutAsync();
     }

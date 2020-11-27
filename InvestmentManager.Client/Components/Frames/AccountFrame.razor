@@ -1,17 +1,19 @@
 ﻿@inject CustomHttpClient http
 @inject CustomNotification notice
+@inject IJSRuntime jsscript
 @inject ILocalStorageService localStorage
+@inject NavigationManager navigationManager
 
-<FrameTemplate Theme="Choice.InvestColor.isuccess" Name="@sum" TitleColor="Choice.TextColor.light">
+<FrameTemplate Theme="ColorCustom.isuccess" Name="@sumResult.ToString("C")" TitleColor="ColorBootstrap.light">
     <AdditionalBlock>
         <div class="col-12">
-            @foreach (var account in Accounts)
+            @foreach (var account in accountCollection)
             {
                 <div class="row align-items-center pt-1">
                     <div class="col-2 col-md-1">
-                        <SelectorComponent IsSelected="account.IsActive" SelectedId="account.Id" SelectorAction="ToggleSelector" />
+                        <SelectorComponent IsSelected="account.Value" Key="account.Key" SelectorAction="ToggleSelector" />
                     </div>
-                    <div class="col-10 col-md-11 small">@account.Name</div>
+                    <div class="col-10 col-md-11 small">@account.Key.Name</div>
                 </div>
             }
         </div>
@@ -20,41 +22,119 @@
         <MultiRow Name="Accounts information" IconName="info" />
         <MultiRow Name="Transactions" IconName="yen" />
         <MultiRow Name="Exchange rate" IconName="loop" />
-        <MultiRow Name="Add a transaction manually" IconName="pencil" />
-        <MultiRow Name="@fileLoader" IconName="data-transfer-download" Action="@(() => isLoadFile = !isLoadFile)" Description="Available only for the Russian broker BCS" />
+        <MultiRow Name="Add a transaction manually" IconName="plus" />
+        <MultiRow Name="Upload files (xls) with transactions" IconName="data-transfer-download" Action="@(() => ClickInputFileButtonAsync("inputButton"))" Description="Available only for the Russian broker BCS" />
         <MultiRow Name="Analytics" IconName="pie-chart" />
     </InfoBlock>
 </FrameTemplate>
-@if (isLoadFile)
-{
-    <ReportLoader />
-}
+
+<InputFile multiple OnChange="HandleSelectionAsync" id="inputButton" style="display:none" />
 
 @code {
-    string sum = "0.00";
-    string fileLoader = "Upload files (xls) with transactions";
-    bool isLoadFile;
-
-    List<AccountFrameModel> Accounts = new List<AccountFrameModel>();
     [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; }
-    IIdentity user;
+
+    decimal sumResult = 0;
+
+    Dictionary<AccountModel, bool> accountCollection = new Dictionary<AccountModel, bool>();
+    Dictionary<long, decimal> sumAccounts = new Dictionary<long, decimal>();
+    ClaimsPrincipal user;
+
     protected override async Task OnInitializedAsync()
     {
-        user = (await AuthenticationState).User.Identity;
-        if (user.IsAuthenticated)
+        user = (await AuthenticationState).User;
+
+        if (user.Identity.IsAuthenticated)
         {
-            Accounts = await http.GetNoParametersAsync<List<AccountFrameModel>>(Routes.C.Account + Routes.A.All);
-            sum = Accounts.Sum(x => x.Sum).ToString("C");
-            if (Accounts.Any())
-                await localStorage.SetItemAsync($"{DefaultData.IdName.accountIds}_{user.Name}", Accounts.Where(x => x.IsActive).Select(x => x.Id).ToArray());
+            try
+            {
+                var accounts = await http.GetAsync<List<AccountModel>>(new UrlBuilder(UrlController.Accounts).Result);
+
+                foreach (var account in accounts)
+                {
+                    decimal accountSum = await http.GetAsync<decimal>(new UrlBuilder(UrlController.Accounts, account.Id, UrlOption.Summary).Result);
+                    sumAccounts.Add(account.Id, accountSum);
+                    accountCollection.Add(account, true);
+                }
+            }
+            catch
+            {
+                navigationManager.NavigateTo("login");
+                await notice.AlertInfoAsync("Relogin please", 2000);
+            }
+        }
+
+        if (accountCollection.Any())
+        {
+            sumResult = sumAccounts.Values.Sum();
+            await localStorage.SetItemAsync<long[]>($"{user.Identity.Name}_{DefaultString.Id.accountId}", accountCollection.Select(x => x.Key.Id).ToArray());
         }
     }
-
-    public async Task ToggleSelector((bool isSelected, long selectedId) selector)
+    public async Task ToggleSelector((bool isSelected, object Key) selector)
     {
-        Accounts.First(x => x.Id == selector.selectedId).IsActive = selector.isSelected;
-        long[] selectedIds = Accounts.Where(x => x.IsActive).Select(x => x.Id).ToArray();
-        sum = (await http.GetByValuesAsync<List<AccountFrameModel>>(Routes.C.Account + "/selected", JsonSerializer.Serialize(selectedIds))).Sum(x => x.Sum).ToString("C");
-        await localStorage.SetItemAsync($"{DefaultData.IdName.accountIds}_{user.Name}", selectedIds);
+        var account = selector.Key as AccountModel;
+        accountCollection[account] = selector.isSelected;
+
+        if (!accountCollection[account])
+            sumResult -= sumAccounts[account.Id];
+        else
+            sumResult += await http.GetAsync<decimal>(new UrlBuilder(UrlController.Accounts, account.Id, UrlOption.Summary).Result);
+
+        await localStorage.SetItemAsync<long[]>($"{user.Identity.Name}_{DefaultString.Id.accountId}", accountCollection.Where(x => x.Value == true).Select(x => x.Key.Id).ToArray());
+    }
+    async Task ClickInputFileButtonAsync(string inputFileId)
+    {
+        if (!user.Identity.IsAuthenticated)
+            await notice.AlertAccessAsync();
+        else
+            await jsscript.InvokeVoidAsync("uploadBrokerReports", inputFileId);
+    }
+    async Task HandleSelectionAsync(InputFileChangeEventArgs args)
+    {
+        string fileType = "application/vnd.ms-excel";
+        long maxFileSize = 512000;
+
+        if (args.FileCount > 10)
+        {
+            await notice.AlertInfoAsync("File count must be < 11");
+            return;
+        }
+
+        notice.LoadStart();
+
+        var content = new MultipartFormDataContent();
+
+        foreach (var file in args.GetMultipleFiles())
+        {
+            if (!file.ContentType.Equals(fileType))
+            {
+                await notice.AlertFailedAsync("File type is only excel!");
+                continue;
+            }
+
+            if (file.Size > maxFileSize)
+            {
+                await notice.AlertFailedAsync("File size is very big!");
+                continue;
+            }
+
+            byte[] buffer = new byte[file.Size];
+            await file.OpenReadStream(maxFileSize).ReadAsync(buffer);
+            content.Add(new ByteArrayContent(buffer), file.Name, file.Name);
+        }
+
+        var model = await http.PostContentAsync<BrokerReportModel>(new UrlBuilder(UrlService.ParseBrokerReports).Result, content).ConfigureAwait(false);
+
+        content.Dispose();
+
+        if (model is not null)
+        {
+            await localStorage.SetItemAsync<BrokerReportModel>($"{user.Identity.Name}_{DefaultString.Id.brokerReport}", model).ConfigureAwait(false);
+            navigationManager.NavigateTo("brokerreports");
+        }
+        else
+        {
+            notice.LoadStop();
+            await notice.AlertFailedAsync();
+        }
     }
 }

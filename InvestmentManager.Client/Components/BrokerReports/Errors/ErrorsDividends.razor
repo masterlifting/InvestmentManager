@@ -1,0 +1,58 @@
+﻿@inject CustomHttpClient http
+@inject CustomNotification notice
+@using System.Text.RegularExpressions
+
+<BaseError Title="Title" IsDone="isDone" ErrorValue="ErrorValue">
+    <ChildContent>
+
+    <EditForm class="col-12" Model="model" OnValidSubmit="SendData">
+        <DataAnnotationsValidator />
+
+        <ValidationMessage For="(() => model.CompanyId)" />
+        <InputSelect class="mb-2" @bind-Value="model.CompanyId">
+            @foreach (var i in companies)
+            {
+            <option value="@i.Id">@i.Name</option>
+            }
+        </InputSelect>
+
+        <div class="row mb-1">
+            <div class="col text-info">Identifier for dividend:</div>
+        </div>
+
+        <ValidationMessage For="(() => model.Name)" />
+        <InputText class="mb-2" @bind-Value="model.Name" />
+
+        <ButtonSubmit Title="Исправить" Color="ColorCustom.iwarning" />
+    </EditForm>
+
+    </ChildContent>
+</BaseError>
+
+@code {
+    [Parameter] public string ErrorValue { get; set; }
+    [Parameter] public string Title { get; set; }
+
+    IsinModel model = new IsinModel();
+    List<BaseView> companies = new List<BaseView>();
+    bool isDone = false;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        companies = await http.GetAsync<List<BaseView>>(new UrlBuilder(UrlController.Companies).Result);
+
+        model.Name = Regex.Match(ErrorValue.Split('\'')[1], @", (\w*), налог").Groups[1].Value;
+        model.CompanyId = companies.FirstOrDefault().Id;
+    }
+    async Task SendData()
+    {
+        var result = await http.PostAsync<BaseResult, IsinModel>(new UrlBuilder(UrlController.Isins).Result, model);
+        if (result.IsSuccess)
+        {
+            isDone = true;
+            await notice.AlertSuccesAsync(result.Info);
+        }
+        else
+            notice.ToastDanger("Isin error.", result.Info);
+    }
+}

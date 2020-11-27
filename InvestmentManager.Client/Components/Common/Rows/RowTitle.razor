@@ -1,0 +1,9 @@
+﻿<div class="row">
+    <div class="col text-@Position.ToString().ToLower() text-@Color.ToString() mb-0 font-weight-bold text-uppercase">@Text</div>
+</div>
+
+@code {
+    [Parameter] public string Text { get; set; }
+    [Parameter] public ColorBootstrap Color { get; set; } = ColorBootstrap.info;
+    [Parameter] public AlignType Position { get; set; } = AlignType.Right;
+}

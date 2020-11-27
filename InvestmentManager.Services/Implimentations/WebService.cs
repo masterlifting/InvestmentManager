@@ -1,7 +1,5 @@
 ﻿using InvestmentManager.Services.Interfaces;
-using System;
 using System.Net.Http;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace InvestmentManager.Services.Implimentations
@@ -19,29 +17,10 @@ namespace InvestmentManager.Services.Implimentations
             response.EnsureSuccessStatusCode();
             return response;
         }
-
-        public async Task<CBRF> GetDollarRateAsync()
+        public async Task<HttpResponseMessage> GetCBRateAsync()
         {
             var request = new HttpRequestMessage(HttpMethod.Get, "https://www.cbr-xml-daily.ru/daily_json.js");
-            var response = await httpClient.SendAsync(request).ConfigureAwait(false);
-            response.EnsureSuccessStatusCode();
-            var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            return JsonSerializer.Deserialize<CBRF>(content);
+            return await httpClient.SendAsync(request).ConfigureAwait(false);
         }
-    }
-    public class CBRF
-    {
-        public CBRF() => Valute = new Valute();
-        public DateTime Date { get; set; }
-        public Valute Valute { get; set; }
-    }
-    public class Valute
-    {
-        public Valute() => USD = new USD();
-        public USD USD { get; set; }
-    }
-    public class USD
-    {
-        public decimal Value { get; set; }
     }
 }

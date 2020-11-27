@@ -1,0 +1,71 @@
+﻿@inject CustomHttpClient http
+@inject CustomNotification notice
+
+<BaseError Title="@Title" IsDone="isDone" ErrorValue="@ErrorValue">
+    <ChildContent>
+
+        <EditForm class="col-12" Model="model" OnValidSubmit="SendData">
+            <DataAnnotationsValidator />
+
+                    <ValidationMessage For="(() => model.CompanyId)" />
+                    <InputSelect class="mb-2" @bind-Value="model.CompanyId">
+                        @foreach (var i in companies)
+                        {
+                            <option value="@i.Id">@i.Name</option>
+                        }
+                    </InputSelect>
+
+                    <ValidationMessage For="(() => model.LotId)" />
+                    <InputSelect class="mb-2" @bind-Value="model.LotId">
+                        @foreach (var i in lots)
+                        {
+                            <option value="@i.Id">@i.Name</option>
+                        }
+                    </InputSelect>
+
+                    <ValidationMessage For="(() => model.ExchangeId)" />
+                    <InputSelect class="mb-2" @bind-Value="model.ExchangeId">
+                        @foreach (var i in exchanges)
+                        {
+                            <option value="@i.Id">@i.Name</option>
+                        }
+                    </InputSelect>
+
+                    <ButtonSubmit Title="Исправить" Color="ColorCustom.iwarning" />
+        </EditForm>
+
+    </ChildContent>
+</BaseError>
+@code {
+    [Parameter] public string ErrorValue { get; set; }
+    [Parameter] public string Title { get; set; }
+
+    TickerModel model = new TickerModel();
+    List<BaseView> companies = new List<BaseView>();
+    List<BaseView> exchanges = new List<BaseView>();
+    List<BaseView> lots = new List<BaseView>();
+    bool isDone = false;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        model.Name = ErrorValue.Split('\'')[1];
+        companies = await http.GetAsync<List<BaseView>>(new UrlBuilder(UrlController.Companies).Result);
+        exchanges = await http.GetAsync<List<BaseView>>(new UrlBuilder(UrlCatalog.ExchangeTypes).Result);
+        lots = await http.GetAsync<List<BaseView>>(new UrlBuilder(UrlCatalog.LotTypes).Result);
+        
+        model.CompanyId = companies.FirstOrDefault().Id;
+        model.ExchangeId = exchanges.FirstOrDefault().Id;
+        model.LotId = lots.FirstOrDefault().Id;
+    }
+
+    async Task SendData()
+    {
+        var result = await http.PostAsync<BaseResult, TickerModel>(new UrlBuilder(UrlController.Tickers).Result, model);
+        if (result.IsSuccess)
+        {
+            isDone = true;
+            await notice.AlertSuccesAsync(result.Info);
+        }
+        else
+            notice.ToastDanger("Ticker error.", result.Info);
+    }}

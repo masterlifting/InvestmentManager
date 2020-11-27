@@ -5,11 +5,9 @@ using InvestmentManager.Entities.Broker;
 using InvestmentManager.Entities.Calculate;
 using InvestmentManager.Entities.Market;
 using InvestmentManager.Repository;
-using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
 namespace InvestmentManager.Calculator
@@ -333,7 +331,7 @@ namespace InvestmentManager.Calculator
 
             return result;
         }
-        public List<SellRecommendation> GetCompleatedSellRecommendations(IQueryable<IdentityUser> users, IEnumerable<Rating> ratings)
+        public List<SellRecommendation> GetCompleatedSellRecommendations(IEnumerable<string> userIds, IEnumerable<Rating> ratings)
         {
             var result = new List<SellRecommendation>();
             var accounts = unitOfWork.Account.GetAll();
@@ -342,9 +340,9 @@ namespace InvestmentManager.Calculator
             var companies = unitOfWork.Company.GetAll();
             int ratingCount = ratings.Count();
 
-            foreach (var user in users.ToList())
+            foreach (var userId in userIds.ToList())
             {
-                var userStockTransactions = stockTransactions.Join(accounts.Where(x => x.UserId.Equals(user.Id)), x => x.AccountId, y => y.Id, (x, y) => x);
+                var userStockTransactions = stockTransactions.Join(accounts.Where(x => x.UserId.Equals(userId)), x => x.AccountId, y => y.Id, (x, y) => x);
                 var companyIds = userStockTransactions.Join(tickers, x => x.TickerId, y => y.Id, (x, y) => y.CompanyId);
 
                 foreach (var companyId in companyIds.Distinct().ToList())
@@ -370,7 +368,7 @@ namespace InvestmentManager.Calculator
                         recommendationArgs.CompanyId = companyId;
                         recommendationArgs.StockTransactions = companyTransactions;
                         var sellRecommendation = CalculateSellRecommendation(recommendationArgs);
-                        sellRecommendation.UserId = user.Id;
+                        sellRecommendation.UserId = userId;
                         result.Add(sellRecommendation);
                     }
                 }

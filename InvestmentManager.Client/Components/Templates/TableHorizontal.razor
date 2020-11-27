@@ -1,0 +1,53 @@
+﻿@typeparam TItem
+
+<div class="row">
+    <div class="col-@HeaderWidth text-dark">
+        @foreach (var column in Columns)
+        {
+            <div class="row">
+                <div class="col">@column.Caption</div>
+            </div>
+        }
+    </div>
+    <div class="col-@BodyWidth">
+        <div class="row flex-nowrap" style="overflow-x:auto">
+            @foreach (var item in DataItems)
+            {
+                <div class="col-@BodyColWidth">
+                    @foreach (var column in Columns)
+                    {
+                        <div class="row">
+                            @if (!string.IsNullOrWhiteSpace(column.Format) && column.DataType != HtmlDataType.NotSet)
+                            {
+                                string value = typeof(TItem).GetProperty(column.DataField).GetValue(item).ToString();
+                                string result = column.DataType switch
+                                {
+                                    HtmlDataType.Date => DateTime.Parse(value, CultureInfo.CurrentCulture).ToString(column.Format),
+                                    HtmlDataType.Boolean => bool.Parse(value).ToString(),
+                                    HtmlDataType.Currency => Math.Round(decimal.Parse(value, CultureInfo.CurrentCulture), 2).ToString(column.Format),
+                                    HtmlDataType.Number => decimal.Parse(value, CultureInfo.CurrentCulture).ToString(column.Format),
+                                    _ => value
+                                };
+                                <div class="col text-@column.AlignType.ToString().ToLower()">@result</div>
+                            }
+                            else
+                            {
+                                <div class="col text-@column.AlignType.ToString().ToLower()">@typeof(TItem).GetProperty(column.DataField).GetValue(item)</div>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code
+{
+    [Parameter] public List<TItem> DataItems { get; set; }
+    [Parameter] public List<ColumnConfig> Columns { get; set; }
+
+    [Parameter] public int HeaderWidth { get; set; } = 5;
+    [Parameter] public int BodyWidth { get; set; } = 7;
+    [Parameter] public int BodyColWidth { get; set; } = 3;
+}

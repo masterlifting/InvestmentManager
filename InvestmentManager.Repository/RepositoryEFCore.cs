@@ -45,6 +45,25 @@ namespace InvestmentManager.Repository
             long nextId = (long)idlimit + 1;
             context.Database.ExecuteSqlRaw($"ALTER SEQUENCE \"{tableName}_Id_seq\" RESTART WITH {nextId}");
         }
+        public async Task<bool> CompletePostgresAsync()
+        {
+            try
+            {
+                return await context.SaveChangesAsync().ConfigureAwait(false) > 0;
+            }
+            catch
+            {
+                try
+                {
+                    PostgresAutoReseed();
+                    return await context.SaveChangesAsync().ConfigureAwait(false) > 0;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+        }
     }
     public enum OrderType
     {

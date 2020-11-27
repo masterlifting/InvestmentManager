@@ -1,10 +1,6 @@
-﻿<div class="row mt-2">
-    <div class="col">
-        <button type="submit" class="@Color.ToString() iconvex">@Title</button>
-    </div>
-</div>
+﻿<button type="submit" class="w-100 mt-2 @Color.ToString() iconvex">@Title</button>
 
 @code{
     [Parameter] public string Title { get; set; }
-    [Parameter] public Choice.InvestColor Color { get; set; }
+    [Parameter] public ColorCustom Color { get; set; }
 }

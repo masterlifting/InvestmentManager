@@ -1,0 +1,17 @@
+﻿<div class="row iwarning iframe">
+    <div class="col-11 text-dark font-weight-bold text-right">@InfoName</div>
+    <div class="col-1 text-right">
+        <IconClose Action="(()=> VisibleAction.InvokeAsync(false))" />
+    </div>
+    <div class="col-12">
+        <div class="row">
+            @ChildContent
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string InfoName { get; set; }
+    [Parameter] public EventCallback<bool> VisibleAction { get; set; }
+    [Parameter] public RenderFragment ChildContent { get; set; }
+}
