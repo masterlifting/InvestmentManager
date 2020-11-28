@@ -30,23 +30,23 @@ namespace InvestmentManager.Server.Controllers
         [HttpGet("new/")]
         public async Task<List<ReportModel>> GetNew()
         {
-            return await unitOfWork.Report.GetAll().Where(x => x.IsChecked == false).Select(z => new ReportModel
+            return await unitOfWork.Report.GetAll().Where(x => x.IsChecked == false).Select(x => new ReportModel
             {
-                Id = z.Id,
-                CompanyId = z.CompanyId,
+                Id = x.Id,
+                CompanyId = x.CompanyId,
                 IsChecked = false,
-                DateReport = z.DateReport,
-                Revenue = z.Revenue,
-                Assets = z.Assets,
-                CashFlow = z.CashFlow,
-                Dividend = z.Dividends,
-                GrossProfit = z.GrossProfit,
-                LongTermDebt = z.LongTermDebt,
-                NetProfit = z.NetProfit,
-                Obligation = z.Obligations,
-                ShareCapital = z.ShareCapital,
-                StockVolume = z.StockVolume,
-                Turnover = z.Turnover
+                DateReport = x.DateReport,
+                Revenue = x.Revenue,
+                Assets = x.Assets,
+                CashFlow = x.CashFlow,
+                Dividend = x.Dividends,
+                GrossProfit = x.GrossProfit,
+                LongTermDebt = x.LongTermDebt,
+                NetProfit = x.NetProfit,
+                Obligation = x.Obligations,
+                ShareCapital = x.ShareCapital,
+                StockVolume = x.StockVolume,
+                Turnover = x.Turnover
             }).ToListAsync().ConfigureAwait(false);
         }
 
@@ -95,8 +95,8 @@ namespace InvestmentManager.Server.Controllers
         {
             void UpdateReport(Report report)
             {
-                report.IsChecked = true;
                 report.DateUpdate = DateTime.Now;
+                report.IsChecked = model.IsChecked;
                 report.DateReport = model.DateReport;
                 report.StockVolume = model.StockVolume;
                 report.Revenue = model.Revenue;

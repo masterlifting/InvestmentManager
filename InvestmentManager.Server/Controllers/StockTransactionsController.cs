@@ -5,6 +5,7 @@ using InvestmentManager.Server.RestServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -22,8 +23,8 @@ namespace InvestmentManager.Server.Controllers
             this.restMethod = restMethod;
         }
 
-        [HttpGet("byaccountids/{values}/bycompanyid/{id}")]
-        public async Task<StockTransactionModel> GetByAccountIds(string values, long id)
+        [HttpGet("byaccountids/{values}/bycompanyid/{id}/last/")]
+        public async Task<StockTransactionModel> GetLastByAccountIds(string values, long id)
         {
             long[] accountIds = JsonSerializer.Deserialize<long[]>(values);
             var lastTransaction = await unitOfWork.StockTransaction.GetAll()
@@ -37,10 +38,32 @@ namespace InvestmentManager.Server.Controllers
                     IsHave = true,
                     DateOperation = lastTransaction.DateOperation,
                     StatusId = lastTransaction.TransactionStatusId,
+                    StatusName = lastTransaction.TransactionStatusId == 3 ? "Buy" : "Sell",
                     Quantity = lastTransaction.Quantity,
                     Cost = lastTransaction.Cost
                 }
                 : new StockTransactionModel { IsHave = false };
+        }
+        [HttpGet("byaccountids/{values}/bycompanyid/{id}")]
+        public async Task<List<StockTransactionModel>> GetByAccountIds(string values, long id)
+        {
+            long[] accountIds = JsonSerializer.Deserialize<long[]>(values);
+            var transactions = await unitOfWork.StockTransaction.GetAll()
+                .Where(x => accountIds.Contains(x.AccountId) && x.Ticker.CompanyId == id)
+                .OrderByDescending(x => x.DateOperation)
+                .ToListAsync().ConfigureAwait(false);
+
+            return transactions is not null && transactions.Any() 
+                ? transactions.Select(x => new StockTransactionModel
+                {
+                    IsHave = true,
+                    DateOperation = x.DateOperation,
+                    StatusId = x.TransactionStatusId,
+                    StatusName = x.TransactionStatusId == 3 ? "Buy" : "Sell",
+                    Quantity = x.Quantity,
+                    Cost = x.Cost
+                }).ToList()
+                : null;
         }
 
         [HttpPost]

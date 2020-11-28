@@ -8,6 +8,7 @@
         public int Quantity { get; set; }
         public long TickerId { get; set; }
         public long StatusId { get; set; }
+        public string StatusName { get; set; }
         public long ExchangeId { get; set; }
     }
 }

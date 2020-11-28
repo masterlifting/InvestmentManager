@@ -29,9 +29,11 @@ namespace InvestmentManager.Client.Services.HttpService
             if (option != UrlOption.None)
                 Result += $"/{SetOption(option)}/";
         }
-        public UrlBuilder(UrlController controller, UrlPath path1, string values, UrlPath path2, long id)
+        public UrlBuilder(UrlController controller, UrlPath path1, string values, UrlPath path2, long id, UrlOption option = UrlOption.None)
         {
             Result = string.Intern($"{SetController(controller)}/{SetPath(path1)}/{values}/{SetPath(path2)}/{id}");
+            if (option != UrlOption.None)
+                Result += $"/{SetOption(option)}/";
         }
         public UrlBuilder(UrlCatalog catalog)
         {

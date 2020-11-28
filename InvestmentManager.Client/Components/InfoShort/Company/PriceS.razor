@@ -2,8 +2,9 @@
 
 <InfoTemplate InfoName="@InfoName" VisibleAction="((bool isVisible) => UpdateVisible.InvokeAsync(isVisible))">
     <ChildContent>
-        <KeyValueCols Key="Date price" Value="@dateUpdate" />
-        <KeyValueCols Key="Last price" Value="@lastPrice" />
+        <KeyValueCols Key="Date update" Value="@dateUpdate" />
+        <KeyValueCols Key="Date price" Value="@datePrice" />
+        <KeyValueCols Key="Cost" Value="@lastPrice" />
 
         <div class="col">
             <PriceF CompanyId="CompanyId" />
@@ -18,6 +19,7 @@
     [Parameter] public long CompanyId { get; set; }
 
     string dateUpdate = DefaultString.loading;
+    string datePrice = DefaultString.loading;
     string lastPrice = DefaultString.loading;
 
     protected override async Task OnInitializedAsync()
@@ -25,7 +27,8 @@
         var price = await http.GetAsync<PriceModel>(new UrlBuilder(UrlController.Prices, UrlPath.ByCompanyId, CompanyId, UrlOption.Last).Result);
         if (price != null)
         {
-            dateUpdate = price.DateUpdate.ToShortDateString();
+            dateUpdate = price.DateUpdate.ToString("g");
+            datePrice = price.BidDate.ToString("g");
             lastPrice = price.Value.ToString("f3");
         }
     }

@@ -108,7 +108,7 @@ namespace InvestmentManager.Server.Controllers
                 return null;
             }
         }
-        [HttpPost("parsereports/"), Authorize(Roles = "pestunov")]
+        [HttpGet("parsereports/"), Authorize(Roles = "pestunov")]
         public async Task ParseReports()
         {
             IDictionary<long, Report> lastReports = unitOfWork.Report.GetLastReports();
@@ -140,15 +140,13 @@ namespace InvestmentManager.Server.Controllers
             await unitOfWork.Report.CompletePostgresAsync().ConfigureAwait(false);
 
         }
-        [HttpPost("parseprices/"), Authorize(Roles = "pestunov")]
+        [HttpGet("parseprices/"), Authorize(Roles = "pestunov")]
         public async Task ParsePrices()
         {
             var newPricies = new List<Price>();
             var exchanges = unitOfWork.Exchange.GetAll();
             var tickers = unitOfWork.Ticker.GetPriceTikers();
             var priceConfigure = tickers.Join(exchanges, x => x.ExchangeId, y => y.Id, (x, y) => new { TickerId = x.Id, Ticker = x.Name, y.ProviderName, y.ProviderUri });
-
-            int count = priceConfigure.Count();
 
             foreach (var i in priceConfigure)
             {
@@ -162,9 +160,11 @@ namespace InvestmentManager.Server.Controllers
                     continue;
                 }
             }
-
-            await unitOfWork.Price.CreateEntitiesAsync(newPricies).ConfigureAwait(false);
-            await unitOfWork.Price.CompletePostgresAsync().ConfigureAwait(false);
+            if (newPricies.Any())
+            {
+                await unitOfWork.Price.CreateEntitiesAsync(newPricies).ConfigureAwait(false);
+                await unitOfWork.Price.CompletePostgresAsync().ConfigureAwait(false);
+            }
         }
         [HttpGet("rate/")]
         public async Task<CBRF> GetRate()

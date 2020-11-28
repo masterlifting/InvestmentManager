@@ -15,7 +15,7 @@
                         <DataAnnotationsValidator />
                         <ValidationSummary />
                         <div class="row ">
-                            <span class="col-6">Дата</span>
+                            <span class="col-6">Date</span>
                             <div class="col-6">
                                 <InputDate @bind-Value="report.DateReport" />
                             </div>
@@ -117,8 +117,8 @@
 
         if (result.IsSuccess)
         {
-            await notice.AlertSuccesAsync(result.Info, 500);
             checkingreports.Remove(report);
+            await notice.AlertSuccesAsync(result.Info);
         }
         else
             await notice.AlertFailedAsync(result.Info);
@@ -126,12 +126,12 @@
     async Task SaveReport(ReportModel report)
     {
         report.IsChecked = true;
-        var result = await http.PostAsync<BaseResult, ReportModel>(new UrlBuilder(UrlController.Reports).Result, report);
+        var result = await http.PutAsync<BaseResult, ReportModel>(new UrlBuilder(UrlController.Reports,report.Id).Result, report);
 
         if (result.IsSuccess)
         {
-            await notice.AlertSuccesAsync(result.Info, 500);
             checkingreports.Remove(report);
+            await notice.AlertSuccesAsync(result.Info);
         }
         else
             await notice.AlertFailedAsync(result.Info);
