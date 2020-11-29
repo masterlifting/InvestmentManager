@@ -93,7 +93,7 @@ namespace InvestmentManager.Server.Controllers
                 return new BaseResult { IsSuccess = false, Info = "Recalculated failed!" };
             }
         }
-        [HttpPost("parsebrokerreports/"), Authorize(Roles = "pestunov")]
+        [HttpPost("parsebrokerreports/"), Authorize]
         public async Task<BrokerReportModel> ParseBcsReports()
         {
             var files = HttpContext.Request.Form.Files;

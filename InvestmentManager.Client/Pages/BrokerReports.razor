@@ -3,23 +3,28 @@
 @inject CustomNotification notice
 @attribute [Authorize]
 
-@if (model.Errors.Any())
+@if (model != null)
 {
-    <ReportErrors Errors="@model.Errors" />
-}
-else if (model.Reports.Any())
-{
-    <ReportSuccessed Reports="@model.Reports" />
+    if (model.Errors.Any())
+    {
+        <ReportErrors Errors="@model.Errors" />
+    }
+    else if (model.Reports.Any())
+    {
+        <ReportSuccessed Reports="@model.Reports" />
+    }
+    else
+        Task.FromResult(notice.AlertInfoAsync("Out of new data"));
 }
 else
 {
-    <RowTitle Position="AlignType.Center" Color="ColorBootstrap.primary" Text="Out new data."/>
+    <RowTitle Position="AlignType.Center" Color="ColorBootstrap.primary" Text="Out of data." />
 }
 
 
 @code
 {
-    BrokerReportModel model = new BrokerReportModel();
+    BrokerReportModel model;
     [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; }
 
     protected override async Task OnInitializedAsync()

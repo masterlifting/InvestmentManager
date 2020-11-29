@@ -16,7 +16,7 @@ namespace InvestmentManager.Server.Controllers
         [HttpGet("bycompanyid/{id}")]
         public async Task<List<PriceModel>> GetByCompanyId(long id)
         {
-            var prices = (await unitOfWork.Company.FindByIdAsync(id).ConfigureAwait(false))?.Tickers.FirstOrDefault().Prices;
+            var prices = await unitOfWork.Price.GetCustomPricesAsync(id,12,OrderType.OrderByDesc).ConfigureAwait(false);
             return prices is null ? null : prices.Select(x => new PriceModel
             {
                 DateUpdate = x.DateUpdate,

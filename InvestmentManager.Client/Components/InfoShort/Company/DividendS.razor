@@ -1,5 +1,31 @@
-﻿<InfoTemplate InfoName="@InfoName" VisibleAction="@(async (bool isVisible) => await UpdateVisible.InvokeAsync(isVisible))">
+﻿@inject CustomHttpClient http
+@inject ILocalStorageService localStorage
+@inject CustomNotification notice
+@using System.Text.Json
+
+<InfoTemplate InfoName="@InfoName" VisibleAction="(async (bool isVisible) => await UpdateVisible.InvokeAsync(isVisible))">
     <ChildContent>
+        @if (model != null)
+        {
+            if (model.IsHave)
+            {
+                <KeyValueCols Key="Last dividend" Value="@model.DateOperation.ToShortDateString()" />
+                <KeyValueCols Key="Ammount" Value="@model.Amount.ToString("f3")" />
+                <KeyValueCols Key="Sum" Value="@sum" />
+
+                <div class="col">
+                    <DividendF CompanyId="CompanyId" />
+                </div>
+            }
+            else
+            {
+                <span>There are no dividends for this company.</span>
+            }
+        }
+        else
+        {
+            <span>@DefaultString.loading</span>
+        }
     </ChildContent>
 </InfoTemplate>
 
@@ -7,4 +33,27 @@
     [Parameter] public EventCallback<bool> UpdateVisible { get; set; }
     [Parameter] public string InfoName { get; set; }
     [Parameter] public long CompanyId { get; set; }
+    [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; }
+
+    DividendModel model;
+    string sum = "calculating...";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await AuthenticationState).User;
+
+        if (await localStorage.ContainKeyAsync($"{user.Identity.Name}_{DefaultString.Id.accountId}"))
+        {
+            string accountIds = JsonSerializer.Serialize(await localStorage.GetItemAsync<long[]>($"{user.Identity.Name}_{DefaultString.Id.accountId}"));
+            model = await http.GetAsync<DividendModel>(new UrlBuilder(UrlController.Dividends, UrlPath.ByAccountIds, accountIds, UrlPath.ByCompanyId, CompanyId, UrlOption.Last).Result);
+            if(model is not null && model.IsHave)
+            {
+                var dividends = await http.GetAsync<List<DividendModel>>(new UrlBuilder(UrlController.Dividends, UrlPath.ByAccountIds, accountIds, UrlPath.ByCompanyId, CompanyId).Result);
+                decimal _sum = dividends.Sum(x => x.Amount);
+                sum = _sum.ToString("f3");
+            }
+        }
+        else
+            await notice.AlertInfoAsync("Accounts not found!");
+    }
 }

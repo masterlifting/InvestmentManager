@@ -53,8 +53,8 @@ namespace InvestmentManager.Server.Controllers
                 .OrderByDescending(x => x.DateOperation)
                 .ToListAsync().ConfigureAwait(false);
 
-            return transactions is not null && transactions.Any() 
-                ? transactions.Select(x => new StockTransactionModel
+            return transactions is null ? null
+                : transactions.Select(x => new StockTransactionModel
                 {
                     IsHave = true,
                     DateOperation = x.DateOperation,
@@ -62,8 +62,7 @@ namespace InvestmentManager.Server.Controllers
                     StatusName = x.TransactionStatusId == 3 ? "Buy" : "Sell",
                     Quantity = x.Quantity,
                     Cost = x.Cost
-                }).ToList()
-                : null;
+                }).ToList();
         }
 
         [HttpPost]

@@ -1,6 +1,7 @@
 ﻿using InvestmentManager.Models;
 using InvestmentManager.Repository;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,17 +13,27 @@ namespace InvestmentManager.Server.Controllers
     public class SellRecommendationsController : ControllerBase
     {
         private readonly IUnitOfWorkFactory unitOfWork;
-        public SellRecommendationsController(IUnitOfWorkFactory unitOfWork) => this.unitOfWork = unitOfWork;
+        private readonly UserManager<IdentityUser> userManager;
+
+        public SellRecommendationsController(
+            IUnitOfWorkFactory unitOfWork
+            , UserManager<IdentityUser> userManager)
+        {
+            this.unitOfWork = unitOfWork;
+            this.userManager = userManager;
+        }
 
         [HttpGet("pagination/{value}")]
         public BaseViewPagination GetPagination(int value = 1)
         {
+            string userId = userManager.GetUserId(User);
             int pageSize = 10;
             var pagination = new Pagination();
 
             var companies = unitOfWork.Company.GetAll();
             var lastPricies = unitOfWork.Price.GetLastPrices(30);
-            var recommendations = lastPricies.Join(unitOfWork.SellRecommendation.GetAll(), x => x.Key, y => y.CompanyId, (x, y) => new
+            var recommendations = lastPricies
+                .Join(unitOfWork.SellRecommendation.GetAll().Where(x => x.UserId.Equals(userId)), x => x.Key, y => y.CompanyId, (x, y) => new
             {
                 y.CompanyId,
                 LastPrice = x.Value,
@@ -58,6 +69,11 @@ namespace InvestmentManager.Server.Controllers
         [HttpGet("bycompanyid/{id}")]
         public async Task<SellRecommendationModel> GetByCompanyId(long id)
         {
+            string userId = userManager.GetUserId(User);
+
+            if (!unitOfWork.SellRecommendation.GetAll().Where(x => x.UserId.Equals(userId)).Any())
+                return new SellRecommendationModel { IsHave = false };
+
             var entity = (await unitOfWork.Company.FindByIdAsync(id).ConfigureAwait(false))?.SellRecommendation;
             return entity is null
                 ? new SellRecommendationModel { IsHave = false }

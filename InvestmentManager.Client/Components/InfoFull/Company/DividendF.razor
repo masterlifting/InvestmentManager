@@ -1,5 +1,47 @@
-﻿<h3>CompanyDividend</h3>
+﻿@inject CustomHttpClient http
+@inject ILocalStorageService localStorage
+@inject CustomNotification notice
+@using System.Text.Json
+
+<DetailTemplate Name="Dividend list" DetailTemplateAction="ShowInfo">
+    <ChildContent>
+        @if (dividends != null)
+        {
+            <TableVertical TItem="DividendModel" DataItems="dividends" Columns="columns" />
+        }
+        else
+        {
+            <span>@DefaultString.loading</span>
+        }
+    </ChildContent>
+</DetailTemplate>
 
 @code {
+    [Parameter] public long CompanyId { get; set; }
+    [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; }
 
+    List<DividendModel> dividends;
+    List<ColumnConfig> columns;
+
+    async Task ShowInfo(bool isDetails)
+    {
+        if (isDetails == true)
+        {
+            var user = (await AuthenticationState).User;
+
+            if (await localStorage.ContainKeyAsync($"{user.Identity.Name}_{DefaultString.Id.accountId}"))
+            {
+                columns = new List<ColumnConfig>();
+                columns.AddRange(new ColumnConfig[]
+                {
+                    new ColumnConfig{DataField = nameof(DividendModel.DateOperation), Caption = "Date", DataType = HtmlDataType.Date, Format = "d"},
+                    new ColumnConfig{DataField = nameof(DividendModel.Amount), Caption = "Ammount", DataType = HtmlDataType.Number, Format = "f3"},
+                    });
+                string accountIds = JsonSerializer.Serialize(await localStorage.GetItemAsync<long[]>($"{user.Identity.Name}_{DefaultString.Id.accountId}"));
+                dividends = await http.GetAsync<List<DividendModel>>(new UrlBuilder(UrlController.Dividends, UrlPath.ByAccountIds, accountIds, UrlPath.ByCompanyId, CompanyId).Result);
+            }
+            else
+                await notice.AlertInfoAsync("Accounts not found!");
+        }
+    }
 }

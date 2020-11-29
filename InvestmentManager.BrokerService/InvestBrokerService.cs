@@ -86,7 +86,7 @@ namespace InvestmentManager.BrokerService
                 errors.Add(new ErrorReportModel
                 {
                     ErrorType = ParseErrorTypes.AccountError,
-                    ErrorValue = "Для получения данных необходимо добавить ваш номер соглашения из отчета",
+                    ErrorValue = $"Для получения данных необходимо добавить ваш номер соглашения из отчета '{stringReportModels.FirstOrDefault().AccountId}'",
                 });
 
                 result.Errors = errors;

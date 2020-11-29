@@ -3,7 +3,7 @@
 @inject CustomNotification notice
 @using System.Text.Json
 
-<InfoTemplate InfoName="@InfoName" VisibleAction="@(async (bool isVisible) => await UpdateVisible.InvokeAsync(isVisible))">
+<InfoTemplate InfoName="@InfoName" VisibleAction="((bool isVisible) => UpdateVisible.InvokeAsync(isVisible))">
     <ChildContent>
         @if (model != null)
         {

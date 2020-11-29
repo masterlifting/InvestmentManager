@@ -27,9 +27,9 @@
             prices = await http.GetAsync<List<PriceModel>>(new UrlBuilder(UrlController.Prices, UrlPath.ByCompanyId, CompanyId).Result);
             columns.AddRange(new ColumnConfig[]
             {
-                new ColumnConfig{DataField = nameof(PriceModel.BidDate), Caption = "Date price", DataType = HtmlDataType.Date, Format = "g"},
-                new ColumnConfig{DataField = nameof(PriceModel.Value), Caption = "Price", DataType = HtmlDataType.Number, Format = "f2"}
-                });
+                new ColumnConfig{DataField = nameof(PriceModel.BidDate), Caption = "Date", DataType = HtmlDataType.Date, Format = "d", AlignType = AlignType.Center},
+                new ColumnConfig{DataField = nameof(PriceModel.Value), Caption = "Price", DataType = HtmlDataType.Number, Format = "f2", AlignType = AlignType.Center}
+            });
         }
     }
 }
