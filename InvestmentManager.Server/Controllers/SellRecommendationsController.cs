@@ -1,8 +1,11 @@
 ﻿using InvestmentManager.Models;
+using InvestmentManager.Models.EntityModels;
+using InvestmentManager.Models.SummaryModels;
 using InvestmentManager.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,7 +26,7 @@ namespace InvestmentManager.Server.Controllers
             this.userManager = userManager;
         }
 
-        [HttpGet("pagination/{value}")]
+        [HttpGet("bypagination/{value}")]
         public BaseViewPagination GetPagination(int value = 1)
         {
             string userId = userManager.GetUserId(User);
@@ -34,16 +37,16 @@ namespace InvestmentManager.Server.Controllers
             var lastPricies = unitOfWork.Price.GetLastPrices(30);
             var recommendations = lastPricies
                 .Join(unitOfWork.SellRecommendation.GetAll().Where(x => x.UserId.Equals(userId)), x => x.Key, y => y.CompanyId, (x, y) => new
-            {
-                y.CompanyId,
-                LastPrice = x.Value,
-                y.PriceMin,
-                y.PriceMid,
-                y.PriceMax,
-                y.LotMin,
-                y.LotMid,
-                y.LotMax
-            })
+                {
+                    y.CompanyId,
+                    LastPrice = x.Value,
+                    y.PriceMin,
+                    y.PriceMid,
+                    y.PriceMax,
+                    y.LotMin,
+                    y.LotMid,
+                    y.LotMax
+                })
                 .Where(x =>
                 x.LastPrice >= x.PriceMin
                 | x.LastPrice >= x.PriceMid
@@ -70,24 +73,37 @@ namespace InvestmentManager.Server.Controllers
         public async Task<SellRecommendationModel> GetByCompanyId(long id)
         {
             string userId = userManager.GetUserId(User);
+            var recommentation = await unitOfWork.SellRecommendation.GetAll().FirstOrDefaultAsync(x => x.UserId.Equals(userId) && x.CompanyId == id).ConfigureAwait(false);
 
-            if (!unitOfWork.SellRecommendation.GetAll().Where(x => x.UserId.Equals(userId)).Any())
-                return new SellRecommendationModel { IsHave = false };
-
-            var entity = (await unitOfWork.Company.FindByIdAsync(id).ConfigureAwait(false))?.SellRecommendation;
-            return entity is null
-                ? new SellRecommendationModel { IsHave = false }
-                : new SellRecommendationModel
-                {
-                    IsHave = true,
-                    DateUpdate = entity.DateUpdate,
-                    LotMin = entity.LotMin,
-                    LotMid = entity.LotMid,
-                    LotMax = entity.LotMax,
-                    PriceMin = entity.PriceMin,
-                    PriceMid = entity.PriceMid,
-                    PriceMax = entity.PriceMax
-                };
+            return recommentation is null ? new SellRecommendationModel() : new SellRecommendationModel
+            {
+                DateUpdate = recommentation.DateUpdate,
+                LotMin = recommentation.LotMin,
+                LotMid = recommentation.LotMid,
+                LotMax = recommentation.LotMax,
+                PriceMin = recommentation.PriceMin,
+                PriceMid = recommentation.PriceMid,
+                PriceMax = recommentation.PriceMax
+            };
         }
+        [HttpGet("bycompanyid/{id}/summary/")]
+        public async Task<SummarySellRecommendation> GetSummaryByCompanyId(long id)
+        {
+            string userId = userManager.GetUserId(User);
+            var recommentation = await unitOfWork.SellRecommendation.GetAll().FirstOrDefaultAsync(x => x.UserId.Equals(userId) && x.CompanyId == id).ConfigureAwait(false);
+
+            return recommentation is null ? new SummarySellRecommendation() : new SummarySellRecommendation
+            {
+                IsHave = true,
+                DateUpdate = recommentation.DateUpdate,
+                LotMin = recommentation.LotMin,
+                LotMid = recommentation.LotMid,
+                LotMax = recommentation.LotMax,
+                PriceMin = recommentation.PriceMin,
+                PriceMid = recommentation.PriceMid,
+                PriceMax = recommentation.PriceMax
+            };
+        }
+
     }
 }

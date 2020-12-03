@@ -1,6 +1,6 @@
 ﻿@inject CustomHttpClient http
 @inject CustomNotification notice
-@using static InvestmentManager.Client.Configurations.InvestHelper
+@inject ICatalogService catalogService
 
 <RowTitleSub Text="Stock transactions" />
 
@@ -23,26 +23,24 @@
         </div>
 
         @foreach (var item in stockTransactions
-      .Join(tickers, x => x.TickerId, y => y.Id, (x, y) => new { Transaction = x, CompanyId = y.CompanyId, Ticker = y.Name })
-      .Join(companies, x => x.CompanyId, y => y.Id, (x, y) => new
-      {
-          x.Transaction,
-          x.Ticker,
-          Company = y.Name
-      }))
+              .Join(tickers, x => x.TickerId, y => y.Id, (x, y) => new { Transaction = x, CompanyId = y.CompanyId, Ticker = y.Name })
+              .Join(companies, x => x.CompanyId, y => y.Id, (x, y) => new
+              {
+                  x.Transaction,
+                  x.Ticker,
+                  Company = y.Name
+              }))
         {
-            ColorBootstrap color = ColorBootstrap.danger;
-            TransactionStatus status = GetTransactionStatus(item.Transaction.StatusId);
-
-            if (status == TransactionStatus.Sell)
-                color = ColorBootstrap.success;
+            string color = catalogService.GetStatusBootstrapColor(item.Transaction.StatusId);
+            string status = catalogService.GetStatusName(item.Transaction.StatusId);
+            string exchange = catalogService.GetExchangeName(item.Transaction.ExchangeId);
 
             <div class="row ilink" @onclick="(() => SaveData(item.Transaction))" >
                 <div class="col-12">@item.Ticker | @item.Company</div>
                 <div class="col-7">
-                    <div class="row text-@color.ToString()">
-                        <div class="col-4">@status.ToString()</div>
-                        <div class="col-4">@GetExchange(item.Transaction.ExchangeId).ToString()</div>
+                    <div class="row text-@color">
+                        <div class="col-4">@status</div>
+                        <div class="col-4">@exchange</div>
                         <div class="col-4">@item.Transaction.Quantity</div>
                     </div>
                 </div>

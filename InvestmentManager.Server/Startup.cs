@@ -103,20 +103,20 @@ namespace InvestmentManager.Server
             services.AddScoped<IUnitOfWorkFactory, UnitOfWorkFactory>();
             #endregion
             #region Service
+            services.AddSingleton<ICatalogService, CatalogService>();
             services.AddScoped<IInvestBrokerService, InvestBrokerService>();
             services.AddScoped<IPriceService, PriceService>();
             services.AddScoped<IReportService, ReportService>();
             services.AddScoped<IInvestCalculator, InvestCalculator>();
-
+            services.AddScoped<IIOService, IOService>();
+            services.AddScoped<IConverterService, ConverterService>();
+            services.AddScoped<ISummaryService, SummaryService>();
             services.AddHttpClient<IWebService, WebService>(x =>
             {
                 x.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:80.0) Gecko/20100101 Firefox/80.0");
                 x.DefaultRequestHeaders.Add("Accept", "application/json, text/html, */*; q=0.01");
                 x.DefaultRequestHeaders.Add("Connection", "keep-alive");
             });
-            services.AddScoped<IIOService, IOService>();
-            services.AddScoped<IConverterService, ConverterService>();
-            services.AddScoped<ISummaryService, SummaryService>();
             #endregion
             #region Mapper
             services.AddScoped<IInvestMapper, InvestMapper>();

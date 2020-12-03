@@ -1,6 +1,6 @@
 ﻿using InvestmentManager.BrokerService.Models;
 using InvestmentManager.Mapper.Interfaces;
-using InvestmentManager.Models;
+using InvestmentManager.Models.EntityModels;
 using InvestmentManager.Models.Services;
 using System.Collections.Generic;
 using System.Linq;

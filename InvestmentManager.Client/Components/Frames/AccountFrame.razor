@@ -3,8 +3,9 @@
 @inject IJSRuntime jsscript
 @inject ILocalStorageService localStorage
 @inject NavigationManager navigationManager
+@inject IAuthenticationService authenticationService
 
-<FrameTemplate Theme="ColorCustom.isuccess" Name="@sumResult.ToString("C")" TitleColor="ColorBootstrap.light">
+<FrameTemplate Theme="ColorCustom.isuccess" Name="@sumResult.ToString("C", new CultureInfo("ru-RU"))" TitleColor="ColorBootstrap.light">
     <AdditionalBlock>
         <div class="col-12">
             @foreach (var account in accountCollection)
@@ -20,17 +21,26 @@
     </AdditionalBlock>
     <InfoBlock>
         <MultiRow Name="Accounts information" IconName="info" />
-        <MultiRow Name="Transactions" IconName="yen" />
+        <MultiRow Name="@transactions" IconName="yen" />
         <MultiRow Name="Exchange rate" IconName="loop" />
         <MultiRow Name="Add a transaction manually" IconName="plus" />
         <MultiRow Name="Download files (xls) with transactions" IconName="data-transfer-download" Action="@(() => ClickInputFileButtonAsync("inputButton"))" Description="Available only for the Russian broker BCS" />
         <MultiRow Name="Analytics" IconName="pie-chart" />
     </InfoBlock>
+    <ActionBlock>
+        @if (isTransactions)
+        {
+            <AccountTransactionS InfoName="@transactions" UpdateVisible="((bool isVisible) => isTransactions =isVisible)" />
+        }
+    </ActionBlock>
 </FrameTemplate>
 
 <InputFile multiple OnChange="HandleSelectionAsync" id="inputButton" style="display:none" />
 
 @code {
+    bool isTransactions;
+    string transactions = "Transactions";
+
     [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; }
 
     decimal sumResult = 0;
@@ -59,6 +69,7 @@
             catch
             {
                 navigationManager.NavigateTo("login");
+                await authenticationService.LogoutAsync();
                 await notice.AlertInfoAsync("Relogin please", 2000);
             }
         }

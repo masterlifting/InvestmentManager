@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace InvestmentManager.Models
+namespace InvestmentManager.Models.EntityModels
 {
     public class BuyRecommendationModel
     {

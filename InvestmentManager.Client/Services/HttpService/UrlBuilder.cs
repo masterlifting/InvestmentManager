@@ -7,34 +7,41 @@ namespace InvestmentManager.Client.Services.HttpService
     {
         public string Result { get; }
 
-        public UrlBuilder(UrlController controller, long id = default)
+        public UrlBuilder(UrlController controller, long? id = null)
         {
             Result = string.Intern($"{SetController(controller)}");
-            if (id != default)
-                Result += string.Intern($"/{id}");
+            if (id.HasValue)
+                Result += string.Intern($"/{id.Value}");
+        }
+        public UrlBuilder(UrlController controller, UrlOption option)
+        {
+            Result = string.Intern($"{SetController(controller)}/{SetOption(option)}/");
         }
         public UrlBuilder(UrlController controller, long id, UrlOption option)
         {
             Result = string.Intern($"{SetController(controller)}/{id}/{SetOption(option)}/");
         }
-        public UrlBuilder(UrlController controller, UrlOption option, int? value = default)
-        {
-            Result = string.Intern($"{SetController(controller)}/{SetOption(option)}/");
-            if (value.HasValue)
-                Result += string.Intern($"{value}");
-        }
-        public UrlBuilder(UrlController controller, UrlPath path, long id, UrlOption option = UrlOption.None)
+        public UrlBuilder(UrlController controller, UrlPath path, long id)
         {
             Result = string.Intern($"{SetController(controller)}/{SetPath(path)}/{id}");
-            if (option != UrlOption.None)
-                Result += $"/{SetOption(option)}/";
         }
-        public UrlBuilder(UrlController controller, UrlPath path1, string values, UrlPath path2, long id, UrlOption option = UrlOption.None)
+        public UrlBuilder(UrlController controller, UrlPath path, int value)
         {
-            Result = string.Intern($"{SetController(controller)}/{SetPath(path1)}/{values}/{SetPath(path2)}/{id}");
-            if (option != UrlOption.None)
-                Result += $"/{SetOption(option)}/";
+            Result = string.Intern($"{SetController(controller)}/{SetPath(path)}/{value}");
         }
+        public UrlBuilder(UrlController controller, UrlPath path, long id, UrlOption option)
+        {
+            Result = string.Intern($"{SetController(controller)}/{SetPath(path)}/{id}/{SetOption(option)}/");
+        }
+        public UrlBuilder(UrlController controller, UrlPath path, long id, UrlPath path2, long id2)
+        {
+            Result = string.Intern($"{SetController(controller)}/{SetPath(path)}/{id}/{SetPath(path2)}/{id2}");
+        }
+        public UrlBuilder(UrlController controller, UrlPath path, long id, UrlPath path2, long id2, UrlOption option)
+        {
+            Result = string.Intern($"{SetController(controller)}/{SetPath(path)}/{id}/{SetPath(path2)}/{id2}/{SetOption(option)}/");
+        }
+
         public UrlBuilder(UrlCatalog catalog)
         {
             Result = string.Intern($"catalog/{SetCatalog(catalog)}/");
@@ -69,14 +76,12 @@ namespace InvestmentManager.Client.Services.HttpService
         static string SetPath(UrlPath path) => path switch
         {
             UrlPath.ByCompanyId => PathName.ByCompanyId,
-            UrlPath.ByAccountIds => PathName.ByAccountIds,
+            UrlPath.ByAccountId => PathName.ByAccountId,
+            UrlPath.ByPagination => PathName.ByPaginationl,
             _ => ""
         };
         static string SetOption(UrlOption option) => option switch
         {
-            UrlOption.Pagination => OptionName.Pagination,
-            UrlOption.OrderBy => OptionName.OrderBy,
-            UrlOption.OrderDesc => OptionName.OrderDesc,
             UrlOption.New => OptionName.New,
             UrlOption.Last => OptionName.Last,
             UrlOption.Summary => OptionName.Summary,
@@ -123,15 +128,12 @@ namespace InvestmentManager.Client.Services.HttpService
     }
     static class PathName
     {
-        public const string Model = "model";
+        public const string ByPaginationl = "bypagination";
         public const string ByCompanyId = "bycompanyid";
-        public const string ByAccountIds = "byaccountids";
+        public const string ByAccountId = "byaccountid";
     }
     static class OptionName
     {
-        public const string Pagination = "pagination";
-        public const string OrderBy = "orderby";
-        public const string OrderDesc = "orderdesc";
         public const string New = "new";
         public const string Last = "last";
         public const string Summary = "summary";

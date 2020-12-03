@@ -1,5 +1,6 @@
 ﻿using InvestmentManager.Entities.Broker;
-using InvestmentManager.Models;
+using InvestmentManager.Models.EntityModels;
+using InvestmentManager.Models.SummaryModels;
 using InvestmentManager.Repository;
 using InvestmentManager.Server.RestServices;
 using Microsoft.AspNetCore.Authorization;
@@ -7,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace InvestmentManager.Server.Controllers
@@ -23,42 +23,43 @@ namespace InvestmentManager.Server.Controllers
             this.restMethod = restMethod;
         }
 
-        [HttpGet("byaccountids/{values}/bycompanyid/{id}/last/")]
-        public async Task<DividendModel> GetLastByAccountIds(string values, long id)
+        [HttpGet("byaccountid/{accountId}/bycompanyid/{companyId}")]
+        public async Task<List<DividendModel>> GetByAccountIds(long accountId, long companyId)
         {
-            long[] accountIds = JsonSerializer.Deserialize<long[]>(values);
-            var lastDividend = await unitOfWork.Dividend.GetAll()
-                .Where(x => accountIds.Contains(x.AccountId) && x.Isin.CompanyId == id)
-                .OrderBy(x => x.DateOperation)
-                .LastOrDefaultAsync();
-
-            return lastDividend is not null
-                ? new DividendModel
-                {
-                    IsHave = true,
-                    DateOperation = lastDividend.DateOperation,
-                    Amount = lastDividend.Amount,
-                    Tax = lastDividend.Tax
-                }
-                : new DividendModel { IsHave = false };
-        }
-        [HttpGet("byaccountids/{values}/bycompanyid/{id}")]
-        public async Task<List<DividendModel>> GetByAccountIds(string values, long id)
-        {
-            long[] accountIds = JsonSerializer.Deserialize<long[]>(values);
             var transactions = await unitOfWork.Dividend.GetAll()
-                .Where(x => accountIds.Contains(x.AccountId) && x.Isin.CompanyId == id)
+                .Where(x => x.AccountId == accountId && x.Isin.CompanyId == companyId)
                 .OrderByDescending(x => x.DateOperation)
                 .ToListAsync().ConfigureAwait(false);
 
-            return transactions is null ? null
+            return transactions is null 
+                ? new List<DividendModel>() 
                 : transactions.Select(x => new DividendModel
-                {
-                    IsHave = true,
-                    DateOperation = x.DateOperation,
-                    Amount = x.Amount,
-                    Tax = x.Tax
-                }).ToList();
+            {
+                DateOperation = x.DateOperation,
+                Amount = x.Amount,
+                Tax = x.Tax
+            }).ToList();
+        }
+        [HttpGet("byaccountid/{accountId}/bycompanyid/{companyId}/summary/")]
+        public async Task<SummaryDividend> GetSummaryByAccountIds(long accountId, long companyId)
+        {
+            var dividends = await unitOfWork.Dividend.GetAll()
+                .Where(x => x.AccountId == accountId && x.Isin.CompanyId == companyId)
+                .OrderBy(x => x.DateOperation)
+                .ToListAsync();
+            
+            if (dividends is null || !dividends.Any())
+                return new SummaryDividend();
+
+            var lastDividend = dividends.Last();
+
+            return new SummaryDividend
+            {
+                IsHave = true,
+                DateLastDividend = lastDividend.DateOperation,
+                LastAmount = lastDividend.Amount,
+                TotalSum = dividends.Sum(x => x.Amount)
+            };
         }
         [HttpPost]
         public async Task<IActionResult> Post(DividendModel model)

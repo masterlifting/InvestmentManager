@@ -2,7 +2,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace InvestmentManager.Models
+namespace InvestmentManager.Models.EntityModels
 {
     public class CompanyModel : BaseView
     {

@@ -1,5 +1,5 @@
 ﻿using InvestmentManager.Entities.Market;
-using InvestmentManager.Models;
+using InvestmentManager.Models.EntityModels;
 using InvestmentManager.Repository;
 using InvestmentManager.Server.RestServices;
 using Microsoft.AspNetCore.Authorization;
@@ -23,7 +23,7 @@ namespace InvestmentManager.Server.Controllers
             this.unitOfWork = unitOfWork;
             this.restMethod = restMethod;
         }
-        
+
         [HttpGet]
         public async Task<List<TickerModel>> Get() =>
             await unitOfWork.Ticker.GetAll().Select(x => new TickerModel
@@ -38,15 +38,17 @@ namespace InvestmentManager.Server.Controllers
         public async Task<List<TickerModel>> GetByCompanyId(long id)
         {
             var tickers = (await unitOfWork.Company.FindByIdAsync(id).ConfigureAwait(false))?.Tickers;
-            return tickers is null ? null : tickers.Select(x => new TickerModel
-            {
-                Id = x.Id,
-                Name = x.Name,
-                CompanyId = x.CompanyId,
-                ExchangeId = x.ExchangeId,
-                LotId = x.LotId,
-                IsEditeble = true
-            }).ToList();
+            return tickers is null
+                ? new List<TickerModel>()
+                : tickers.Select(x => new TickerModel
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    CompanyId = x.CompanyId,
+                    ExchangeId = x.ExchangeId,
+                    LotId = x.LotId,
+                    IsEditeble = true
+                }).ToList();
         }
         [HttpPost, Authorize(Roles = "pestunov")]
         public async Task<IActionResult> Post(TickerModel model)

@@ -1,5 +1,6 @@
 ﻿using InvestmentManager.Entities.Market;
-using InvestmentManager.Models;
+using InvestmentManager.Models.EntityModels;
+using InvestmentManager.Models.SummaryModels;
 using InvestmentManager.Repository;
 using InvestmentManager.Server.RestServices;
 using InvestmentManager.Services.Interfaces;
@@ -19,7 +20,6 @@ namespace InvestmentManager.Server.Controllers
         private readonly IUnitOfWorkFactory unitOfWork;
         private readonly IBaseRestMethod restMethod;
         private readonly IConverterService converterService;
-
         public ReportsController(IUnitOfWorkFactory unitOfWork, IBaseRestMethod restMethod, IConverterService converterService)
         {
             this.unitOfWork = unitOfWork;
@@ -27,7 +27,47 @@ namespace InvestmentManager.Server.Controllers
             this.converterService = converterService;
         }
 
-        [HttpGet("new/")]
+
+        [HttpGet("bycompanyid/{id}")]
+        public async Task<List<ReportModel>> GetByCompanyId(long id)
+        {
+            var reports = (await unitOfWork.Company.FindByIdAsync(id).ConfigureAwait(false))?.Reports;
+            return reports is null
+                ? new List<ReportModel>()
+                : reports.Select(x => new ReportModel
+                {
+                    DateReport = x.DateReport,
+                    Quarter = converterService.ConvertToQuarter(x.DateReport.Month),
+                    Assets = x.Assets,
+                    CashFlow = x.CashFlow,
+                    Dividend = x.Dividends,
+                    GrossProfit = x.GrossProfit,
+                    LongTermDebt = x.LongTermDebt,
+                    NetProfit = x.NetProfit,
+                    Obligation = x.Obligations,
+                    Revenue = x.Revenue,
+                    ShareCapital = x.ShareCapital,
+                    Turnover = x.Turnover
+
+                }).ToList();
+        }
+        [HttpGet("bycompanyid/{id}/summary/")]
+        public async Task<SummaryReport> GetSummaryByCompanyId(long id)
+        {
+            var reports = (await unitOfWork.Company.FindByIdAsync(id).ConfigureAwait(false))?.Reports.OrderBy(x => x.DateReport);
+            
+            return reports is null || !reports.Any() ? new SummaryReport() : new SummaryReport
+            {
+                IsHave = true,
+                DateLastReport = reports.Last().DateReport,
+                DateUpdate = reports.Last().DateUpdate,
+                ReportsCount = reports.Count(),
+                LastReportYear = reports.Last().DateReport.Year,
+                LastReportQuarter = converterService.ConvertToQuarter(reports.Last().DateReport.Month)
+            };
+        }
+
+        [HttpGet("new/"), Authorize(Roles = "pestunov")]
         public async Task<List<ReportModel>> GetNew()
         {
             return await unitOfWork.Report.GetAll().Where(x => x.IsChecked == false).Select(x => new ReportModel
@@ -48,46 +88,6 @@ namespace InvestmentManager.Server.Controllers
                 StockVolume = x.StockVolume,
                 Turnover = x.Turnover
             }).ToListAsync().ConfigureAwait(false);
-        }
-
-        [HttpGet("bycompanyid/{id}")]
-        public async Task<List<ReportModel>> GetByCompanyId(long id)
-        {
-            var reports = (await unitOfWork.Company.FindByIdAsync(id).ConfigureAwait(false))?.Reports;
-            return reports is null ? null : reports.Select(x => new ReportModel
-            {
-                DateReport = x.DateReport,
-                Quarter = converterService.ConvertToQuarter(x.DateReport.Month),
-                Assets = x.Assets,
-                CashFlow = x.CashFlow,
-                Dividend = x.Dividends,
-                GrossProfit = x.GrossProfit,
-                LongTermDebt = x.LongTermDebt,
-                NetProfit = x.NetProfit,
-                Obligation = x.Obligations,
-                Revenue = x.Revenue,
-                ShareCapital = x.ShareCapital,
-                Turnover = x.Turnover
-
-            }).ToList();
-        }
-        [HttpGet("bycompanyid/{id}/summary/")]
-        public async Task<ReportSummaryModel> GetSummaryByCompanyId(long id)
-        {
-            var reports = (await unitOfWork.Company.FindByIdAsync(id).ConfigureAwait(false))?.Reports.OrderBy(x => x.DateReport);
-            if (reports is null)
-                return new ReportSummaryModel { IsHave = false };
-
-            var dateLastReport = reports.Last().DateReport;
-            return new ReportSummaryModel
-            {
-                IsHave = true,
-                DateLastReport = dateLastReport,
-                DateUpdate = reports.Last().DateUpdate,
-                ReportsCount = reports.Count(),
-                LastReportYear = dateLastReport.Year,
-                LastReportQuarter = converterService.ConvertToQuarter(dateLastReport.Month)
-            };
         }
 
         [HttpPut("{id}"), Authorize(Roles = "pestunov")]

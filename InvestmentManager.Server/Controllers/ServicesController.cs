@@ -53,6 +53,29 @@ namespace InvestmentManager.Server.Controllers
             this.webService = webService;
         }
 
+        [HttpGet("rate/")]
+        public async Task<CBRF> GetRate()
+        {
+            var response = await webService.GetCBRateAsync().ConfigureAwait(false);
+            return response.IsSuccessStatusCode ? await response.Content.ReadFromJsonAsync<CBRF>().ConfigureAwait(false) : null;
+        }
+        
+        [HttpPost("parsebrokerreports/"), Authorize]
+        public async Task<BrokerReportModel> ParseBcsReports()
+        {
+            var files = HttpContext.Request.Form.Files;
+            string userId = userManager.GetUserId(User);
+            try
+            {
+                var parsedReports = await brokerService.GetNewReportsAsync(files, userId).ConfigureAwait(false);
+                return mapper.MapBcsReports(parsedReports);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+        
         [HttpGet("recalculateall/"), Authorize(Roles = "pestunov")]
         public async Task<BaseResult> RecalculateAll()
         {
@@ -91,21 +114,6 @@ namespace InvestmentManager.Server.Controllers
             catch (Exception)
             {
                 return new BaseResult { IsSuccess = false, Info = "Recalculated failed!" };
-            }
-        }
-        [HttpPost("parsebrokerreports/"), Authorize]
-        public async Task<BrokerReportModel> ParseBcsReports()
-        {
-            var files = HttpContext.Request.Form.Files;
-            string userId = userManager.GetUserId(User);
-            try
-            {
-                var parsedReports = await brokerService.GetNewReportsAsync(files, userId).ConfigureAwait(false);
-                return mapper.MapBcsReports(parsedReports);
-            }
-            catch
-            {
-                return null;
             }
         }
         [HttpGet("parsereports/"), Authorize(Roles = "pestunov")]
@@ -165,12 +173,6 @@ namespace InvestmentManager.Server.Controllers
                 await unitOfWork.Price.CreateEntitiesAsync(newPricies).ConfigureAwait(false);
                 await unitOfWork.Price.CompletePostgresAsync().ConfigureAwait(false);
             }
-        }
-        [HttpGet("rate/")]
-        public async Task<CBRF> GetRate()
-        {
-            var response = await webService.GetCBRateAsync().ConfigureAwait(false);
-            return response.IsSuccessStatusCode ? await response.Content.ReadFromJsonAsync<CBRF>().ConfigureAwait(false) : null;
         }
     }
 }

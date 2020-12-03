@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using InvestmentManager.Models.EntityModels;
+using System.Collections.Generic;
 using static InvestmentManager.Models.Enums;
 
 namespace InvestmentManager.Models.Services

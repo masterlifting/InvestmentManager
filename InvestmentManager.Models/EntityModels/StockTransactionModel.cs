@@ -1,8 +1,7 @@
-﻿namespace InvestmentManager.Models
+﻿namespace InvestmentManager.Models.EntityModels
 {
     public class StockTransactionModel : BaseBrokerReport
     {
-        public bool IsHave { get; set; }
         public long Identifier { get; set; }
         public decimal Cost { get; set; }
         public int Quantity { get; set; }

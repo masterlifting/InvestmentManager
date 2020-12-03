@@ -1,10 +1,10 @@
 ﻿using System;
 
-namespace InvestmentManager.Models
+namespace InvestmentManager.Models.SummaryModels
 {
-    public class ReportSummaryModel
+    public class SummaryReport
     {
-        public bool IsHave { get; set; }
+        public bool IsHave { get; set; } = false;
         public DateTime DateUpdate { get; set; }
         public DateTime DateLastReport { get; set; }
         public int LastReportYear { get; set; }

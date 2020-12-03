@@ -1,10 +1,11 @@
 ﻿using System;
 
-namespace InvestmentManager.Models
+namespace InvestmentManager.Models.SummaryModels
 {
-    public class SellRecommendationModel
+    public class SummarySellRecommendation
     {
-        public bool IsHave { get; set; }
+        public bool IsHave { get; set; } = false;
+
         public DateTime DateUpdate { get; set; }
 
         public int LotMin { get; set; }
@@ -14,5 +15,6 @@ namespace InvestmentManager.Models
         public decimal PriceMin { get; set; }
         public decimal PriceMid { get; set; }
         public decimal PriceMax { get; set; }
+
     }
 }

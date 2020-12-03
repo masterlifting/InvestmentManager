@@ -12,6 +12,7 @@ namespace InvestmentManager.Client.Services.AuthenticationConfiguration
     {
         public static void AddCustomAuthenticationStateProvider(this IServiceCollection services)
         {
+            services.AddSingleton<IAuthenticationService, AuthenticationService>();
             services.AddScoped<CustomAuthenticationStateProvider>();
             services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<CustomAuthenticationStateProvider>());
         }

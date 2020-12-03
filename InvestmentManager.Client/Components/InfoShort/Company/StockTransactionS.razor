@@ -1,53 +1,82 @@
 ﻿@inject CustomHttpClient http
 @inject ILocalStorageService localStorage
 @inject CustomNotification notice
-@using System.Text.Json
 
 <InfoTemplate InfoName="@InfoName" VisibleAction="((bool isVisible) => UpdateVisible.InvokeAsync(isVisible))">
     <ChildContent>
-        @if (model != null)
+        @if (model is not null && model.IsHave)
         {
-            if (model.IsHave)
-            {
-                <KeyValueCols Key="Last operation" Value="@model.DateOperation.ToShortDateString()" />
-                <KeyValueCols Key="Status" Value="@model.StatusName" />
-                <KeyValueCols Key="Lot" Value="@model.Quantity.ToString()" />
-                <KeyValueCols Key="Price" Value="@model.Cost.ToString("f2")" />
+            <KeyValueCols Key="Last operation" Value="@model.DateTransaction.ToShortDateString()" />
+            <KeyValueCols Key="Status" Value="@model.StatusName" />
+            <KeyValueCols Key="Lot" Value="@model.Quantity.ToString()" />
+            <KeyValueCols Key="Price" Value="@model.Cost.ToString("f2")" />
 
-                <div class="col">
-                    <StockTransactionF CompanyId="CompanyId" />
-                </div>
-            }
-            else
-            {
-                <span>There are no transactions for this company.</span>
-            }
+            <div class="col">
+                <StockTransactionF CompanyId="CompanyId" />
+            </div>
         }
         else
         {
-            <span>@DefaultString.loading</span>
+            <span>@info</span>
         }
     </ChildContent>
 </InfoTemplate>
 
 @code{
+    [CascadingParameter] Task<AuthenticationState> AuthenticationStateTask { get; set; }
+
     [Parameter] public EventCallback<bool> UpdateVisible { get; set; }
     [Parameter] public string InfoName { get; set; }
     [Parameter] public long CompanyId { get; set; }
-    [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; }
 
-    StockTransactionModel model;
-    
+    string info = DefaultString.loading;
+    SummaryStockTransaction model;
+
     protected override async Task OnInitializedAsync()
     {
-        var user = (await AuthenticationState).User;
+        var user = (await AuthenticationStateTask).User;
 
-        if (await localStorage.ContainKeyAsync($"{user.Identity.Name}_{DefaultString.Id.accountId}"))
+        if (user.Identity.IsAuthenticated)
         {
-            string accountIds = JsonSerializer.Serialize(await localStorage.GetItemAsync<long[]>($"{user.Identity.Name}_{DefaultString.Id.accountId}"));
-            model = await http.GetAsync<StockTransactionModel>(new UrlBuilder(UrlController.StockTransactions, UrlPath.ByAccountIds, accountIds, UrlPath.ByCompanyId, CompanyId, UrlOption.Last).Result);
+            if (await localStorage.ContainKeyAsync($"{user.Identity.Name}_{DefaultString.Id.accountId}"))
+            {
+                var accountIds = await localStorage.GetItemAsync<long[]>($"{user.Identity.Name}_{DefaultString.Id.accountId}");
+
+                if (accountIds.Any())
+                {
+                    var models = new List<SummaryStockTransaction>();
+
+                    foreach (var accountId in accountIds)
+                    {
+                        var summary = await http.GetAsync<SummaryStockTransaction>(new UrlBuilder(UrlController.StockTransactions, UrlPath.ByAccountId, accountId, UrlPath.ByCompanyId, CompanyId, UrlOption.Summary).Result);
+
+                        if (summary.IsHave)
+                            models.Add(summary);
+                    }
+
+                    if (models.Any())
+                    {
+                        var targetData = models.OrderBy(x => x.DateTransaction).Last();
+
+                        model = new SummaryStockTransaction
+                        {
+                            IsHave = true,
+                            DateTransaction = targetData.DateTransaction,
+                            StatusName = targetData.StatusName,
+                            Cost = targetData.Cost,
+                            Quantity = targetData.Quantity
+                        };
+                    }
+                    else
+                        info = DefaultString.notFound;
+                }
+                else
+                    info = DefaultString.accountDisabled;
+            }
+            else
+                info = DefaultString.accountNotFound;
         }
         else
-            await notice.AlertInfoAsync("Accounts not found!");
+            info = DefaultString.noticeAccess;
     }
 }

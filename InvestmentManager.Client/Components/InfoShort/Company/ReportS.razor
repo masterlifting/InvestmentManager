@@ -2,28 +2,21 @@
 
 <InfoTemplate InfoName="@InfoName" VisibleAction="((bool isVisible) => UpdateVisible.InvokeAsync(isVisible))">
     <ChildContent>
-        @if (model != null)
+        @if (model is not null && model.IsHave)
         {
-            if (model.IsHave)
-            {
-                <KeyValueCols Key="Date update" Value="@model.DateUpdate.ToShortDateString()" />
-                <KeyValueCols Key="Last report" Value="@model.DateLastReport.ToShortDateString()" />
-                <KeyValueCols Key="Report count" Value="@model.ReportsCount.ToString()" />
-                <KeyValueCols Key="Last year" Value="@model.LastReportYear.ToString()" />
-                <KeyValueCols Key="Last quarter" Value="@model.LastReportQuarter.ToString()" />
+            <KeyValueCols Key="Date update" Value="@model.DateUpdate.ToShortDateString()" />
+            <KeyValueCols Key="Last report" Value="@model.DateLastReport.ToShortDateString()" />
+            <KeyValueCols Key="Report count" Value="@model.ReportsCount.ToString()" />
+            <KeyValueCols Key="Last year" Value="@model.LastReportYear.ToString()" />
+            <KeyValueCols Key="Last quarter" Value="@model.LastReportQuarter.ToString()" />
 
-                <div class="col">
-                    <ReportF CompanyId="CompanyId" />
-                </div>
-            }
-            else
-            {
-                <span>There are no reports for this company.</span>
-            }
+            <div class="col">
+                <ReportF CompanyId="CompanyId" />
+            </div>
         }
         else
         {
-            <span>@DefaultString.loading</span>
+            <span>@info</span>
         }
 
     </ChildContent>
@@ -34,7 +27,16 @@
     [Parameter] public string InfoName { get; set; }
     [Parameter] public long CompanyId { get; set; }
 
-    ReportSummaryModel model;
-    protected async override Task OnInitializedAsync() =>
-       model = await http.GetAsync<ReportSummaryModel>(new UrlBuilder(UrlController.Reports, UrlPath.ByCompanyId, CompanyId, UrlOption.Summary).Result);
+    string info = DefaultString.loading;
+    SummaryReport model;
+
+    protected async override Task OnInitializedAsync()
+    {
+        var summary = await http.GetAsync<SummaryReport>(new UrlBuilder(UrlController.Reports, UrlPath.ByCompanyId, CompanyId, UrlOption.Summary).Result);
+        
+        if (summary.IsHave)
+            model = summary;
+        else
+            info = DefaultString.notFound;
+    }
 }

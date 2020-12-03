@@ -1,5 +1,5 @@
 ﻿using InvestmentManager.Entities.Broker;
-using InvestmentManager.Models;
+using InvestmentManager.Models.EntityModels;
 using InvestmentManager.Server.RestServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

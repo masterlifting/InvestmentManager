@@ -1,4 +1,6 @@
 ﻿using InvestmentManager.Models;
+using InvestmentManager.Models.EntityModels;
+using InvestmentManager.Models.SummaryModels;
 using InvestmentManager.Repository;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +16,7 @@ namespace InvestmentManager.Server.Controllers
         private readonly IUnitOfWorkFactory unitOfWork;
         public BuyRecommendationsController(IUnitOfWorkFactory unitOfWork) => this.unitOfWork = unitOfWork;
 
-        [HttpGet("pagination/{value}")]
+        [HttpGet("bypagination/{value}")]
         public BaseViewPagination GetPagination(int value = 1)
         {
             int pageSize = 10;
@@ -48,6 +50,17 @@ namespace InvestmentManager.Server.Controllers
             {
                 DateUpdate = result.DateUpdate,
                 Price = result.Price
+            };
+        }
+        [HttpGet("bycompanyid/{id}/summary/")]
+        public async Task<SummaryBuyRecommendation> GetSummaryByCompanyId(long id)
+        {
+            var recommendation = (await unitOfWork.Company.FindByIdAsync(id).ConfigureAwait(false))?.BuyRecommendation;
+            return recommendation is null ? new SummaryBuyRecommendation() : new SummaryBuyRecommendation
+            {
+                IsHave = true,
+                DateUpdate = recommendation.DateUpdate,
+                BuyPrice = recommendation.Price
             };
         }
     }

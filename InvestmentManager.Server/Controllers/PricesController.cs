@@ -1,4 +1,5 @@
-﻿using InvestmentManager.Models;
+﻿using InvestmentManager.Models.EntityModels;
+using InvestmentManager.Models.SummaryModels;
 using InvestmentManager.Repository;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -16,27 +17,34 @@ namespace InvestmentManager.Server.Controllers
         [HttpGet("bycompanyid/{id}")]
         public async Task<List<PriceModel>> GetByCompanyId(long id)
         {
-            var prices = await unitOfWork.Price.GetCustomPricesAsync(id,12,OrderType.OrderByDesc).ConfigureAwait(false);
-            return prices is null ? null : prices.Select(x => new PriceModel
-            {
-                DateUpdate = x.DateUpdate,
-                BidDate = x.BidDate,
-                Value = x.Value,
-                CurrencyId = x.CurrencyId,
-                TickerId = x.TickerId
-            }).ToList();
+            var prices = await unitOfWork.Price.GetCustomPricesAsync(id, 12, OrderType.OrderByDesc).ConfigureAwait(false);
+            return prices is null
+                ? new List<PriceModel>()
+                : prices.Select(x => new PriceModel
+                {
+                    DateUpdate = x.DateUpdate,
+                    BidDate = x.BidDate,
+                    Value = x.Value,
+                    CurrencyId = x.CurrencyId,
+                    TickerId = x.TickerId
+                }).ToList();
         }
-        [HttpGet("bycompanyid/{id}/last/")]
-        public async Task<PriceModel> GetLastByCompanyId(long id)
+        [HttpGet("bycompanyid/{id}/summary/")]
+        public async Task<SummaryPrice> GetSummaryByCompanyId(long id)
         {
-            var price = (await unitOfWork.Price.GetCustomPricesAsync(id, 1, OrderType.OrderByDesc).ConfigureAwait(false)).FirstOrDefault();
-            return price is null ? null : new PriceModel
+            var prices = await unitOfWork.Price.GetCustomPricesAsync(id, 1, OrderType.OrderBy).ConfigureAwait(false);
+
+            if (prices is null || !prices.Any())
+                return new SummaryPrice();
+            
+            var lastPrice = prices.Last();
+
+            return new SummaryPrice
             {
-                DateUpdate = price.DateUpdate,
-                BidDate = price.BidDate,
-                Value = price.Value,
-                CurrencyId = price.CurrencyId,
-                TickerId = price.TickerId
+                IsHave = true,
+                DateUpdate = lastPrice.DateUpdate,
+                DatePrice = lastPrice.BidDate,
+                Cost = lastPrice.Value
             };
         }
     }

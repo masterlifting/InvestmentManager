@@ -1,6 +1,6 @@
 ﻿using InvestmentManager.Models.Interfaces;
 
-namespace InvestmentManager.Models
+namespace InvestmentManager.Models.EntityModels
 {
     public class ReportSourceModel : IEditebleModel
     {

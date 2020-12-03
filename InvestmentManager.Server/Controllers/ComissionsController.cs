@@ -1,12 +1,13 @@
 ﻿using InvestmentManager.Entities.Broker;
-using InvestmentManager.Models;
+using InvestmentManager.Models.EntityModels;
 using InvestmentManager.Server.RestServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
 namespace InvestmentManager.Server.Controllers
 {
-    [ApiController, Route("[controller]")]
+    [ApiController, Route("[controller]"), Authorize]
     public class ComissionsController : ControllerBase
     {
         private readonly IBaseRestMethod restMethod;

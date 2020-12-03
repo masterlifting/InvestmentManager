@@ -9,6 +9,9 @@ using Microsoft.AspNetCore.Authorization;
 using InvestmentManager.Entities.Market;
 using System;
 using InvestmentManager.Server.RestServices;
+using InvestmentManager.Models.EntityModels;
+using InvestmentManager.Models.SummaryModels;
+using InvestmentManager.Services.Interfaces;
 
 namespace InvestmentManager.Server.Controllers
 {
@@ -17,12 +20,18 @@ namespace InvestmentManager.Server.Controllers
     {
         private readonly IUnitOfWorkFactory unitOfWork;
         private readonly IBaseRestMethod restMethod;
+        private readonly ICatalogService catalogService;
 
-        public CompaniesController(IUnitOfWorkFactory unitOfWork, IBaseRestMethod restMethod)
+        public CompaniesController(
+            IUnitOfWorkFactory unitOfWork
+            , IBaseRestMethod restMethod
+            , ICatalogService catalogService)
         {
             this.unitOfWork = unitOfWork;
             this.restMethod = restMethod;
+            this.catalogService = catalogService;
         }
+
         [HttpGet]
         public async Task<List<BaseView>> Get() =>
             await unitOfWork.Company.GetAll().OrderBy(x => x.Name).Select(x => new BaseView { Id = x.Id, Name = x.Name }).ToListAsync().ConfigureAwait(false);
@@ -39,8 +48,21 @@ namespace InvestmentManager.Server.Controllers
                 SectorId = company.SectorId
             };
         }
+        [HttpGet("{id}/summary/")]
+        public async Task<SummaryAdditional> GetSummary(long id)
+        {
+            var company = await unitOfWork.Company.FindByIdAsync(id).ConfigureAwait(false);
 
-        [HttpGet("pagination/{value}")]
+            return company is null ? new SummaryAdditional() : new SummaryAdditional
+            {
+                IsHave = true,
+                IndustryName = company.Industry.Name,
+                SectorName = company.Sector.Name,
+                CurrencyType = catalogService.GetCurrencyName(company.Tickers.FirstOrDefault().Prices.FirstOrDefault().CurrencyId)
+            };
+        }
+
+        [HttpGet("bypagination/{value}")]
         public async Task<BaseViewPagination> GetPagination(int value = 1)
         {
             int pageSize = 10;

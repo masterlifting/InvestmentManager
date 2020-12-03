@@ -9,9 +9,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using InvestmentManager.Services.Interfaces;
-using InvestmentManager.Models;
 using InvestmentManager.Models.Additional;
 using System.Net.Http.Json;
+using InvestmentManager.Models.EntityModels;
 
 namespace InvestmentManager.Server.Controllers
 {
@@ -42,13 +42,15 @@ namespace InvestmentManager.Server.Controllers
         {
             var userId = userManager.GetUserId(User);
             var accounts = unitOfWork.Account.GetAll().Where(x => x.UserId.Equals(userId));
-            return await accounts.Select(x => new AccountModel { Id = x.Id, Name = x.Name }).ToListAsync().ConfigureAwait(false);
+            return accounts is  null 
+                ? new List<AccountModel>() 
+                : await accounts.Select(x => new AccountModel { Id = x.Id, Name = x.Name }).ToListAsync().ConfigureAwait(false);
         }
         [HttpGet("{id}")]
         public async Task<AccountModel> Get(long id)
         {
             Account account = await unitOfWork.Account.FindByIdAsync(id).ConfigureAwait(false);
-            return account is not null ? new AccountModel { Id = account.Id, Name = account.Name } : null;
+            return account is null ? null : new AccountModel { Id = account.Id, Name = account.Name };
         }
         [HttpGet("{id}/summary/")]
         public async Task<decimal> GetSum(long id)

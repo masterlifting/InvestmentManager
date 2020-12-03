@@ -1,59 +1,81 @@
 ﻿@inject CustomHttpClient http
 @inject ILocalStorageService localStorage
 @inject CustomNotification notice
-@using System.Text.Json
 
-<InfoTemplate InfoName="@InfoName" VisibleAction="(async (bool isVisible) => await UpdateVisible.InvokeAsync(isVisible))">
+<InfoTemplate InfoName="@InfoName" VisibleAction="((bool isVisible) => UpdateVisible.InvokeAsync(isVisible))">
     <ChildContent>
-        @if (model != null)
+        @if (model is not null && model.IsHave)
         {
-            if (model.IsHave)
-            {
-                <KeyValueCols Key="Last dividend" Value="@model.DateOperation.ToShortDateString()" />
-                <KeyValueCols Key="Ammount" Value="@model.Amount.ToString("f3")" />
-                <KeyValueCols Key="Sum" Value="@sum" />
+            <KeyValueCols Key="Last dividend" Value="@model.DateLastDividend.ToShortDateString()" />
+            <KeyValueCols Key="Ammount" Value="@model.LastAmount.ToString("f2")" />
+            <KeyValueCols Key="Sum" Value="@model.TotalSum.ToString("f2")" />
 
-                <div class="col">
-                    <DividendF CompanyId="CompanyId" />
-                </div>
-            }
-            else
-            {
-                <span>There are no dividends for this company.</span>
-            }
+            <div class="col">
+                <DividendF CompanyId="CompanyId" />
+            </div>
         }
         else
         {
-            <span>@DefaultString.loading</span>
+            <span>@info</span>
         }
     </ChildContent>
 </InfoTemplate>
 
-@code{
+@code
+{
+    [CascadingParameter] Task<AuthenticationState> AuthenticationStateTask { get; set; }
+
     [Parameter] public EventCallback<bool> UpdateVisible { get; set; }
     [Parameter] public string InfoName { get; set; }
     [Parameter] public long CompanyId { get; set; }
-    [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; }
 
-    DividendModel model;
-    string sum = "calculating...";
+    string info = DefaultString.loading;
+    SummaryDividend model;
 
     protected override async Task OnInitializedAsync()
     {
-        var user = (await AuthenticationState).User;
+        var user = (await AuthenticationStateTask).User;
 
-        if (await localStorage.ContainKeyAsync($"{user.Identity.Name}_{DefaultString.Id.accountId}"))
+        if (user.Identity.IsAuthenticated)
         {
-            string accountIds = JsonSerializer.Serialize(await localStorage.GetItemAsync<long[]>($"{user.Identity.Name}_{DefaultString.Id.accountId}"));
-            model = await http.GetAsync<DividendModel>(new UrlBuilder(UrlController.Dividends, UrlPath.ByAccountIds, accountIds, UrlPath.ByCompanyId, CompanyId, UrlOption.Last).Result);
-            if(model is not null && model.IsHave)
+            if (await localStorage.ContainKeyAsync($"{user.Identity.Name}_{DefaultString.Id.accountId}"))
             {
-                var dividends = await http.GetAsync<List<DividendModel>>(new UrlBuilder(UrlController.Dividends, UrlPath.ByAccountIds, accountIds, UrlPath.ByCompanyId, CompanyId).Result);
-                decimal _sum = dividends.Sum(x => x.Amount);
-                sum = _sum.ToString("f3");
+                var accountIds = await localStorage.GetItemAsync<long[]>($"{user.Identity.Name}_{DefaultString.Id.accountId}");
+
+                if (accountIds.Any())
+                {
+                    var models = new List<SummaryDividend>();
+
+                    foreach (var accountId in accountIds)
+                    {
+                        var summary = await http.GetAsync<SummaryDividend>(new UrlBuilder(UrlController.Dividends, UrlPath.ByAccountId, accountId, UrlPath.ByCompanyId, CompanyId, UrlOption.Summary).Result);
+
+                        if (summary.IsHave)
+                            models.Add(summary);
+                    }
+
+                    if (models.Any())
+                    {
+                        var targetData = models.OrderBy(x => x.DateLastDividend).Last();
+
+                        model = new SummaryDividend
+                        {
+                            IsHave = true,
+                            DateLastDividend = targetData.DateLastDividend,
+                            LastAmount = targetData.LastAmount,
+                            TotalSum = models.Sum(x => x.TotalSum)
+                        };
+                    }
+                    else
+                        info = DefaultString.notFound;
+                }
+                else
+                    info = DefaultString.accountDisabled;
             }
+            else
+                info = DefaultString.accountNotFound;
         }
         else
-            await notice.AlertInfoAsync("Accounts not found!");
+            info = DefaultString.noticeAccess;
     }
 }

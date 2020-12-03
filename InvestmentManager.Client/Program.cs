@@ -2,6 +2,8 @@ using Blazored.LocalStorage;
 using InvestmentManager.Client.Services.AuthenticationConfiguration;
 using InvestmentManager.Client.Services.HttpService;
 using InvestmentManager.Client.Services.NotificationService;
+using InvestmentManager.Services.Implimentations;
+using InvestmentManager.Services.Interfaces;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -23,6 +25,7 @@ namespace InvestmentManager.Client
             builder.Services.AddAuthorizationCore();
             builder.Services.AddCustomAuthenticationStateProvider();
             builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+            builder.Services.AddSingleton<ICatalogService, CatalogService>();
             builder.Services.AddScoped<CustomHttpClient>();
 
             await builder.Build().RunAsync();

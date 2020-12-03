@@ -2,34 +2,41 @@
 
 <DetailTemplate Name="Price list" DetailTemplateAction="ShowInfo">
     <ChildContent>
-        @if (prices != null)
+        @if (items is not null && items.Any())
         {
-            <TableVertical TItem="PriceModel" DataItems="prices" Columns="columns" />
+            <TableVertical TItem="PriceModel" DataItems="items" Columns="columns" />
         }
         else
         {
-            <span>@DefaultString.loading</span>
+            <span>@info</span>
         }
     </ChildContent>
 </DetailTemplate>
 
 @code {
     [Parameter] public long CompanyId { get; set; }
+    string info = DefaultString.loading;
 
-    List<PriceModel> prices;
+    List<PriceModel> items;
     List<ColumnConfig> columns;
 
     async Task ShowInfo(bool isDetails)
     {
         if (isDetails == true)
         {
-            columns = new List<ColumnConfig>();
-            prices = await http.GetAsync<List<PriceModel>>(new UrlBuilder(UrlController.Prices, UrlPath.ByCompanyId, CompanyId).Result);
-            columns.AddRange(new ColumnConfig[]
+            items = await http.GetAsync<List<PriceModel>>(new UrlBuilder(UrlController.Prices, UrlPath.ByCompanyId, CompanyId).Result);
+
+            if (items.Any())
             {
-                new ColumnConfig{DataField = nameof(PriceModel.BidDate), Caption = "Date", DataType = HtmlDataType.Date, Format = "d", AlignType = AlignType.Center},
-                new ColumnConfig{DataField = nameof(PriceModel.Value), Caption = "Price", DataType = HtmlDataType.Number, Format = "f2", AlignType = AlignType.Center}
-            });
+                columns = new List<ColumnConfig>();
+                columns.AddRange(new ColumnConfig[]
+                {
+                    new ColumnConfig{DataField = nameof(PriceModel.BidDate), Caption = "Date", DataType = HtmlDataType.Date, Format = "d", AlignType = AlignType.Center},
+                    new ColumnConfig{DataField = nameof(PriceModel.Value), Caption = "Price", DataType = HtmlDataType.Number, Format = "f2", AlignType = AlignType.Center}
+                });
+            }
+            else
+                info = $"{DefaultString.outresult} prices.";
         }
     }
 }

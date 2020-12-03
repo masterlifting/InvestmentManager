@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace InvestmentManager.Models
+namespace InvestmentManager.Models.EntityModels
 {
     public class PriceModel
     {

@@ -1,5 +1,5 @@
 ﻿using InvestmentManager.Entities.Market;
-using InvestmentManager.Models;
+using InvestmentManager.Models.EntityModels;
 using InvestmentManager.Repository;
 using InvestmentManager.Server.RestServices;
 using Microsoft.AspNetCore.Authorization;
@@ -36,7 +36,9 @@ namespace InvestmentManager.Server.Controllers
         public async Task<List<IsinModel>> GetByCompanyId(long id)
         {
             var isins = (await unitOfWork.Company.FindByIdAsync(id).ConfigureAwait(false))?.Isins;
-            return isins is null ? null : isins.Select(x => new IsinModel { Id = x.Id, CompanyId = x.CompanyId, Name = x.Name, IsEditeble = true }).ToList();
+            return isins is null 
+                ? new List<IsinModel>() 
+                : isins.Select(x => new IsinModel { Id = x.Id, CompanyId = x.CompanyId, Name = x.Name, IsEditeble = true }).ToList();
         }
         [HttpPost, Authorize(Roles = "pestunov")]
         public async Task<IActionResult> Post(IsinModel model)

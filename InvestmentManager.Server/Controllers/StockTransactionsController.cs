@@ -1,13 +1,14 @@
 ﻿using InvestmentManager.Entities.Broker;
-using InvestmentManager.Models;
+using InvestmentManager.Models.EntityModels;
+using InvestmentManager.Models.SummaryModels;
 using InvestmentManager.Repository;
 using InvestmentManager.Server.RestServices;
+using InvestmentManager.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace InvestmentManager.Server.Controllers
@@ -17,52 +18,53 @@ namespace InvestmentManager.Server.Controllers
     {
         private readonly IUnitOfWorkFactory unitOfWork;
         private readonly IBaseRestMethod restMethod;
-        public StockTransactionsController(IUnitOfWorkFactory unitOfWork, IBaseRestMethod restMethod)
+        private readonly ICatalogService catalogService;
+
+        public StockTransactionsController(
+            IUnitOfWorkFactory unitOfWork
+            , IBaseRestMethod restMethod
+            , ICatalogService catalogService)
         {
             this.unitOfWork = unitOfWork;
             this.restMethod = restMethod;
+            this.catalogService = catalogService;
         }
 
-        [HttpGet("byaccountids/{values}/bycompanyid/{id}/last/")]
-        public async Task<StockTransactionModel> GetLastByAccountIds(string values, long id)
+        [HttpGet("byaccountid/{accountId}/bycompanyid/{companyId}")]
+        public async Task<List<StockTransactionModel>> GetByAccountIds(long accountId, long companyId)
         {
-            long[] accountIds = JsonSerializer.Deserialize<long[]>(values);
-            var lastTransaction = await unitOfWork.StockTransaction.GetAll()
-                .Where(x => accountIds.Contains(x.AccountId) && x.Ticker.CompanyId == id)
-                .OrderBy(x => x.DateOperation)
-                .LastOrDefaultAsync();
-
-            return lastTransaction is not null
-                ? new StockTransactionModel
-                {
-                    IsHave = true,
-                    DateOperation = lastTransaction.DateOperation,
-                    StatusId = lastTransaction.TransactionStatusId,
-                    StatusName = lastTransaction.TransactionStatusId == 3 ? "Buy" : "Sell",
-                    Quantity = lastTransaction.Quantity,
-                    Cost = lastTransaction.Cost
-                }
-                : new StockTransactionModel { IsHave = false };
-        }
-        [HttpGet("byaccountids/{values}/bycompanyid/{id}")]
-        public async Task<List<StockTransactionModel>> GetByAccountIds(string values, long id)
-        {
-            long[] accountIds = JsonSerializer.Deserialize<long[]>(values);
             var transactions = await unitOfWork.StockTransaction.GetAll()
-                .Where(x => accountIds.Contains(x.AccountId) && x.Ticker.CompanyId == id)
+                .Where(x => x.AccountId == accountId && x.Ticker.CompanyId == companyId)
                 .OrderByDescending(x => x.DateOperation)
                 .ToListAsync().ConfigureAwait(false);
 
-            return transactions is null ? null
+            return transactions is null || !transactions.Any()
+                ? new List<StockTransactionModel>()
                 : transactions.Select(x => new StockTransactionModel
                 {
-                    IsHave = true,
                     DateOperation = x.DateOperation,
                     StatusId = x.TransactionStatusId,
-                    StatusName = x.TransactionStatusId == 3 ? "Buy" : "Sell",
+                    StatusName = catalogService.GetStatusName(x.TransactionStatusId),
                     Quantity = x.Quantity,
                     Cost = x.Cost
                 }).ToList();
+        }
+        [HttpGet("byaccountid/{accountId}/bycompanyid/{companyId}/summary/")]
+        public async Task<SummaryStockTransaction> GetSummaryByAccountIds(long accountId, long companyId)
+        {
+            var lastTransaction = await unitOfWork.StockTransaction.GetAll()
+                .Where(x => x.AccountId == accountId && x.Ticker.CompanyId == companyId)
+                .OrderBy(x => x.DateOperation)
+                .LastOrDefaultAsync();
+
+            return lastTransaction is null ? new SummaryStockTransaction() : new SummaryStockTransaction
+            {
+                IsHave = true,
+                DateTransaction = lastTransaction.DateOperation,
+                StatusName = catalogService.GetStatusName(lastTransaction.TransactionStatusId),
+                Quantity = lastTransaction.Quantity,
+                Cost = lastTransaction.Cost
+            };
         }
 
         [HttpPost]

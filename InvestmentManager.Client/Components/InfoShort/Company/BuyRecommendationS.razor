@@ -2,8 +2,15 @@
 
 <InfoTemplate InfoName="@InfoName" VisibleAction="@((bool isVisible) => UpdateVisible.InvokeAsync(isVisible))">
     <ChildContent>
-        <KeyValueCols KeySize="6" Key="Date Update" Value="@dateUpdate" />
-        <KeyValueCols KeySize="6" Key="Buy if the price is less" Value="@buyPrice" />
+        @if (model is not null && model.IsHave)
+        {
+            <KeyValueCols KeySize="6" Key="Date Update" Value="@model.DateUpdate.ToShortDateString()" />
+            <KeyValueCols KeySize="6" Key="Buy if the price is less" Value="@model.BuyPrice.ToString("f4")" />
+        }
+        else
+        {
+            <span>@info</span>
+        }
     </ChildContent>
 </InfoTemplate>
 
@@ -12,16 +19,16 @@
     [Parameter] public string InfoName { get; set; }
     [Parameter] public long CompanyId { get; set; }
 
-    string dateUpdate = DefaultString.loading;
-    string buyPrice = DefaultString.loading;
+    string info = DefaultString.loading;
+    SummaryBuyRecommendation model;
 
     protected async override Task OnInitializedAsync()
     {
-        var result = await http.GetAsync<BuyRecommendationModel>(new UrlBuilder(UrlController.BuyRecommendations, UrlPath.ByCompanyId, CompanyId).Result);
-        if (result != null)
-        {
-            dateUpdate = result.DateUpdate.ToShortDateString();
-            buyPrice = result.Price.ToString("f2");
-        }
+        var resultmary = await http.GetAsync<SummaryBuyRecommendation>(new UrlBuilder(UrlController.BuyRecommendations, UrlPath.ByCompanyId, CompanyId, UrlOption.Summary).Result);
+        
+        if (resultmary.IsHave)
+            model = resultmary;
+        else
+            info = DefaultString.notFound;
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace InvestmentManager.Models
+﻿namespace InvestmentManager.Models.EntityModels
 {
     public class ComissionModel : BaseBrokerReport
     {

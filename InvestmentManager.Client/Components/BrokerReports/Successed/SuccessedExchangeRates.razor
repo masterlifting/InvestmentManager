@@ -1,6 +1,6 @@
 ﻿@inject CustomHttpClient http
 @inject CustomNotification notice
-@using static InvestmentManager.Client.Configurations.InvestHelper
+@inject ICatalogService catalogService
 
 <RowTitleSub Text="Exchange rates" />
 
@@ -23,16 +23,13 @@
 
         @foreach (var rate in exchangeRates)
         {
-            ColorBootstrap color = ColorBootstrap.danger;
-            TransactionStatus status = GetTransactionStatus(rate.StatusId);
+            string color = catalogService.GetStatusBootstrapColor(rate.StatusId);
+            string status = catalogService.GetStatusName(rate.StatusId);
 
-            if (status == TransactionStatus.Sell)
-                color = ColorBootstrap.success;
-
-            <div class="row ilink text-@color.ToString()" @onclick="(() => SaveData(rate))">
+            <div class="row ilink text-@color" @onclick="(() => SaveData(rate))">
                 <div class="col-7">
                     <div class="row">
-                        <div class="col-8">@status.ToString()</div>
+                        <div class="col-8">@status</div>
                         <div class="col-4">@rate.Rate</div>
                     </div>
                 </div>

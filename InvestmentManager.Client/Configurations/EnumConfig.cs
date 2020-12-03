@@ -2,24 +2,7 @@
 {
     public static class EnumConfig
     {
-        public enum TransactionStatus
-        {
-            None,
-            Buy,
-            Sell,
-            Add,
-            Withdraw
-        }
-        public enum Exchange
-        {
-            MMVB,
-            SPB
-        }
-        public enum Currency
-        {
-            usd,
-            rub
-        }
+        #region Url config
         public enum UrlController
         {
             Accounts,
@@ -42,18 +25,14 @@
         }
         public enum UrlPath
         {
-            None,
             ByCompanyId,
-            ByAccountIds
+            ByAccountId,
+            ByPagination
         }
         public enum UrlOption
         {
-            None,
             New,
             Last,
-            Pagination,
-            OrderBy,
-            OrderDesc,
             Summary
         }
         public enum UrlCatalog
@@ -72,6 +51,8 @@
             ParsePrices,
             Rate
         }
+        #endregion
+
         public enum ColorCustom
         {
             isuccess,

@@ -20,15 +20,7 @@
         }
         @if (isTransactions)
         {
-            if (user.Identity.IsAuthenticated)
-            {
-                <StockTransactionS InfoName="@transactions" CompanyId="CompanyId" UpdateVisible="((bool isVisible) => isTransactions = isVisible)" />
-            }
-            else
-            {
-                isTransactions = false;
-                Task.FromResult(notice.AlertAccessAsync());
-            }
+            <StockTransactionS InfoName="@transactions" CompanyId="CompanyId" UpdateVisible="((bool isVisible) => isTransactions = isVisible)" />
         }
         @if (isRating)
         {
@@ -40,15 +32,7 @@
         }
         @if (isSellRecommendations)
         {
-            if (user.Identity.IsAuthenticated)
-            {
-                <SellRecommendationS InfoName="@sellRecommendations" CompanyId="CompanyId" UpdateVisible="((bool isVisible) => isSellRecommendations = isVisible)" />
-            }
-            else
-            {
-                isSellRecommendations = false;
-                Task.FromResult(notice.AlertAccessAsync());
-            }
+            <SellRecommendationS InfoName="@sellRecommendations" CompanyId="CompanyId" UpdateVisible="((bool isVisible) => isSellRecommendations = isVisible)" />
         }
         @if (isCoefficient)
         {
@@ -70,7 +54,7 @@
         {
             if (user.IsInRole("pestunov"))
             {
-            <FormCompanyComplex InfoName="@edit" CompanyId="CompanyId" UpdateVisible="((bool isVisible) => isEdit = isVisible)" />
+                <FormCompanyComplex InfoName="@edit" CompanyId="CompanyId" UpdateVisible="((bool isVisible) => isEdit = isVisible)" />
             }
             else
             {

@@ -2,13 +2,13 @@
 
 <DetailTemplate Name="Report details" DetailTemplateAction="ShowInfo">
     <ChildContent>
-        @if (reports != null)
+        @if (items is not null && items.Any())
         {
-            <TableHorizontal TItem="ReportModel" DataItems="reports" Columns="columns" BodyColWidth="6" />
+            <TableHorizontal TItem="ReportModel" DataItems="items" Columns="columns" BodyColWidth="6" />
         }
         else
         {
-            <span>@DefaultString.loading</span>
+            <span>@info</span>
         }
     </ChildContent>
 </DetailTemplate>
@@ -16,31 +16,38 @@
 
 @code {
     [Parameter] public long CompanyId { get; set; }
+    string info = DefaultString.loading;
 
-    List<ReportModel> reports;
+    List<ReportModel> items;
     List<ColumnConfig> columns;
 
     async Task ShowInfo(bool isDetails)
     {
         if (isDetails == true)
         {
-            columns = new List<ColumnConfig>();
-            reports = await http.GetAsync<List<ReportModel>>(new UrlBuilder(UrlController.Reports, UrlPath.ByCompanyId, CompanyId).Result);
-            columns.AddRange(new ColumnConfig[]
+            items = await http.GetAsync<List<ReportModel>>(new UrlBuilder(UrlController.Reports, UrlPath.ByCompanyId, CompanyId).Result);
+
+            if (items.Any())
             {
-                new ColumnConfig{DataField = nameof(ReportModel.DateReport), Caption = "Date Report", DataType = HtmlDataType.Date, Format = "d" },
-                new ColumnConfig{DataField = nameof(ReportModel.Quarter), Caption = "Quarter", DataType = HtmlDataType.Number, Format = "f0" },
-                new ColumnConfig{DataField = nameof(ReportModel.Revenue), Caption = "Revenue", DataType = HtmlDataType.Number, Format = "f0" },
-                new ColumnConfig{DataField = nameof(ReportModel.NetProfit), Caption = "Net Profit", DataType = HtmlDataType.Number, Format = "f0" },
-                new ColumnConfig{DataField = nameof(ReportModel.GrossProfit), Caption = "Gross Profit", DataType = HtmlDataType.Number, Format = "f0" },
-                new ColumnConfig{DataField = nameof(ReportModel.CashFlow), Caption = "Cash Flow", DataType = HtmlDataType.Number, Format = "f0" },
-                new ColumnConfig{DataField = nameof(ReportModel.Assets), Caption = "Assets", DataType = HtmlDataType.Number, Format = "f0" },
-                new ColumnConfig{DataField = nameof(ReportModel.Turnover), Caption = "Turnover", DataType = HtmlDataType.Number, Format = "f0" },
-                new ColumnConfig{DataField = nameof(ReportModel.ShareCapital), Caption = "Share Capital", DataType = HtmlDataType.Number, Format = "f0" },
-                new ColumnConfig{DataField = nameof(ReportModel.Dividend), Caption = "Dividend", DataType = HtmlDataType.Number, Format = "f2" },
-                new ColumnConfig{DataField = nameof(ReportModel.Obligation), Caption = "Obligation", DataType = HtmlDataType.Number, Format = "f0" },
-                new ColumnConfig{DataField = nameof(ReportModel.LongTermDebt), Caption = "Long Term Debt", DataType = HtmlDataType.Number, Format = "f0" },
-            });
+                columns = new List<ColumnConfig>();
+                columns.AddRange(new ColumnConfig[]
+                {
+                    new ColumnConfig{DataField = nameof(ReportModel.DateReport), Caption = "Date Report", DataType = HtmlDataType.Date, Format = "d" },
+                    new ColumnConfig{DataField = nameof(ReportModel.Quarter), Caption = "Quarter", DataType = HtmlDataType.Number, Format = "f0" },
+                    new ColumnConfig{DataField = nameof(ReportModel.Revenue), Caption = "Revenue", DataType = HtmlDataType.Number, Format = "f0" },
+                    new ColumnConfig{DataField = nameof(ReportModel.NetProfit), Caption = "Net Profit", DataType = HtmlDataType.Number, Format = "f0" },
+                    new ColumnConfig{DataField = nameof(ReportModel.GrossProfit), Caption = "Gross Profit", DataType = HtmlDataType.Number, Format = "f0" },
+                    new ColumnConfig{DataField = nameof(ReportModel.CashFlow), Caption = "Cash Flow", DataType = HtmlDataType.Number, Format = "f0" },
+                    new ColumnConfig{DataField = nameof(ReportModel.Assets), Caption = "Assets", DataType = HtmlDataType.Number, Format = "f0" },
+                    new ColumnConfig{DataField = nameof(ReportModel.Turnover), Caption = "Turnover", DataType = HtmlDataType.Number, Format = "f0" },
+                    new ColumnConfig{DataField = nameof(ReportModel.ShareCapital), Caption = "Share Capital", DataType = HtmlDataType.Number, Format = "f0" },
+                    new ColumnConfig{DataField = nameof(ReportModel.Dividend), Caption = "Dividend", DataType = HtmlDataType.Number, Format = "f2" },
+                    new ColumnConfig{DataField = nameof(ReportModel.Obligation), Caption = "Obligation", DataType = HtmlDataType.Number, Format = "f0" },
+                    new ColumnConfig{DataField = nameof(ReportModel.LongTermDebt), Caption = "Long Term Debt", DataType = HtmlDataType.Number, Format = "f0" },
+                });
+            }
+            else
+                info = $"{DefaultString.outresult} reports.";
         }
     }
 }

@@ -20,7 +20,7 @@
     <div class="col-8"><span class="oi oi-dollar text-dark" aria-hidden="true"></span> today:</div>
     @if (cbrf != null)
     {
-        <div class="col-4 text-right font-weight-bold text-dark">@cbrf.Valute.USD.Value.ToString("C")</div>
+        <div class="col-4 text-right font-weight-bold text-dark">@cbrf.Valute.USD.Value.ToString("C", new CultureInfo("ru-RU"))</div>
     }
     else
     {
@@ -66,7 +66,7 @@
     protected override async Task OnInitializedAsync()
     {
         user = (await AuthenticationState).User;
-        companies = await http.GetAsync<BaseViewPagination>(new UrlBuilder(paginationController, UrlOption.Pagination, 1).Result);
+        companies = await http.GetAsync<BaseViewPagination>(new UrlBuilder(paginationController, UrlPath.ByPagination, 1).Result);
         cbrf = await http.GetAsync<CBRF>(new UrlBuilder(UrlService.Rate).Result);
 
         _else = companies.Pagination.HasNextPage;
@@ -84,16 +84,15 @@
         {
             await SetDefaultFilterAsync();
             await notice.AlertAccessAsync();
-            return;
         }
 
-        companies = await http.GetAsync<BaseViewPagination>(new UrlBuilder(paginationController, UrlOption.Pagination, 1).Result);
+        companies = await http.GetAsync<BaseViewPagination>(new UrlBuilder(paginationController, UrlPath.ByPagination, 1).Result);
         _else = companies.Pagination.HasNextPage;
     }
     async Task GetElse()
     {
         int paginationValue = companies.Pagination.PageNumber + 1;
-        var next = await http.GetAsync<BaseViewPagination>(new UrlBuilder(paginationController, UrlOption.Pagination, paginationValue).Result);
+        var next = await http.GetAsync<BaseViewPagination>(new UrlBuilder(paginationController, UrlPath.ByPagination, paginationValue).Result);
 
         companies.Pagination = next.Pagination;
         _else = next.Pagination.HasNextPage;
