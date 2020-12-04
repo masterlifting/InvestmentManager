@@ -27,7 +27,7 @@ namespace InvestmentManager.Server.Controllers
         {
             var reportSource = (await unitOfWork.Company.FindByIdAsync(id).ConfigureAwait(false))?.ReportSource;
 
-            return reportSource is null ? null : new ReportSourceModel
+            return reportSource is null ? new ReportSourceModel() : new ReportSourceModel
             {
                 Id = reportSource.Id,
                 CompanyId = reportSource.CompanyId,

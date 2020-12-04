@@ -37,7 +37,7 @@ else
     {
         var respose = await http.GetAsync<ReportSourceModel>(new UrlBuilder(UrlController.ReportSources, UrlPath.ByCompanyId, CompanyId).Result);
         
-        reportSource =  respose is null ? new ReportSourceModel { CompanyId = CompanyId }: respose;
+        reportSource =  respose.IsEditeble ? respose : new ReportSourceModel { CompanyId = CompanyId };
 
         editContext = new EditContext(reportSource);
 

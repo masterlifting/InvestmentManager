@@ -54,9 +54,9 @@ else
     {
         var response = await http.GetAsync<List<IsinModel>>(new UrlBuilder(UrlController.Isins, UrlPath.ByCompanyId, CompanyId).Result);
 
-        var isins = response is null
-            ? new List<IsinModel> { new IsinModel { CompanyId = CompanyId } }
-            : response;
+        var isins = response.Any()
+            ? response
+            : new List<IsinModel> { new IsinModel { CompanyId = CompanyId } };
 
         editContexts = isins.Select(x => new EditContext(x)).ToList();
 

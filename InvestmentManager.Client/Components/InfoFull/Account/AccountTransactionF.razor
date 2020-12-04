@@ -5,7 +5,7 @@
     <ChildContent>
         @if (items is not null && items.Any())
         {
-            <TableVertical TItem="AccountTransactionModel" DataItems="items.OrderByDescending(x => x.DateOperation).ToList()" Columns="columns" />
+            <TableHorizontal TItem="AccountTransactionModel" DataItems="items.OrderByDescending(x => x.DateOperation).ToList()" Columns="columns" BodyColWidth="6" />
         }
         else
         {
@@ -45,9 +45,11 @@
                         columns = new List<ColumnConfig>();
                         columns.AddRange(new ColumnConfig[]
                         {
-                            new ColumnConfig{DataField = nameof(AccountTransactionModel.DateOperation), Caption = "Date", DataType = HtmlDataType.Date, Format = "d", AlignType = AlignType.Center},
-                            new ColumnConfig{DataField = nameof(AccountTransactionModel.StatusName), Caption = "Status", DataType = HtmlDataType.String, AlignType = AlignType.Center},
-                            new ColumnConfig{DataField = nameof(AccountTransactionModel.Amount), Caption = "Ammount", DataType = HtmlDataType.Number, Format = "f2", AlignType = AlignType.Center}
+                            new ColumnConfig{DataField = nameof(AccountTransactionModel.AccountName), Caption = "Account", DataType = HtmlDataType.String},
+                            new ColumnConfig{DataField = nameof(AccountTransactionModel.DateOperation), Caption = "Date", DataType = HtmlDataType.Date, Format = "d"},
+                            new ColumnConfig{DataField = nameof(AccountTransactionModel.StatusName), Caption = "Status", DataType = HtmlDataType.String},
+                            new ColumnConfig{DataField = nameof(AccountTransactionModel.Amount), Caption = "Amount", DataType = HtmlDataType.Number, Format = "f2"},
+                            new ColumnConfig{DataField = nameof(AccountTransactionModel.CurrencyName), Caption = "Currency", DataType = HtmlDataType.String}
                         });
                     }
                     else

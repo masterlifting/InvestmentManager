@@ -40,7 +40,9 @@ namespace InvestmentManager.Server.Controllers
                 {
                     DateOperation = x.DateOperation,
                     Amount = x.Amount,
-                    StatusName = catalogService.GetStatusName(x.TransactionStatusId)
+                    StatusName = catalogService.GetStatusName(x.TransactionStatusId),
+                    CurrencyName = catalogService.GetCurrencyName(x.CurrencyId),
+                    AccountName = x.Account.Name.Substring(0, 9) + "..."
                 }).ToList();
         }
         [HttpGet("byaccountid/{id}/summary/")]

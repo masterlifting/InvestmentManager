@@ -196,7 +196,7 @@ namespace InvestmentManager.Repository
         {
             var result = new Dictionary<long, decimal>();
 
-            var tickers = context.Companies.AsNoTracking().Include(x => x.Tickers).Select(x => x.Tickers.First());
+            var tickers = context.Companies.AsNoTracking().Include(x => x.Tickers).Where(x => x.Tickers.Any()).Select(x => x.Tickers.First());
             var prices = context.Prices.AsNoTracking().Where(x => x.BidDate >= DateTime.Now.AddDays(-lastDays)).OrderBy(x => x.BidDate);
             var agregatedData = prices.AsEnumerable().GroupBy(x => x.TickerId).Join(tickers, x => x.Key, y => y.Id, (x, y) => new { y.CompanyId, LastPrice = x.Last().Value });
 
@@ -220,9 +220,9 @@ namespace InvestmentManager.Repository
         }
         public async Task<IEnumerable<Price>> GetCustomPricesAsync(long companyId, int lastMonths, OrderType orderDate) => orderDate == OrderType.OrderByDesc
             ? (await context.Companies.AsNoTracking().Include(x => x.Tickers).ThenInclude(x => x.Prices).FirstOrDefaultAsync(x => x.Id == companyId).ConfigureAwait(false))
-            .Tickers.First().Prices.Where(x => x.BidDate >= DateTime.Now.AddMonths(-lastMonths)).OrderByDescending(x => x.BidDate)
+            .Tickers.FirstOrDefault()?.Prices.Where(x => x.BidDate >= DateTime.Now.AddMonths(-lastMonths)).OrderByDescending(x => x.BidDate)
             : (await context.Companies.AsNoTracking().Include(x => x.Tickers).ThenInclude(x => x.Prices).FirstOrDefaultAsync(x => x.Id == companyId).ConfigureAwait(false))
-            .Tickers.First().Prices.Where(x => x.BidDate >= DateTime.Now.AddMonths(-lastMonths)).OrderBy(x => x.BidDate);
+            .Tickers.FirstOrDefault()?.Prices.Where(x => x.BidDate >= DateTime.Now.AddMonths(-lastMonths)).OrderBy(x => x.BidDate);
         public async Task<IEnumerable<Price>> GetCustomPricesAsync(long companyId, int lastMonths, OrderType orderDate, DateTime? startDate = null)
         {
             DateTime baseStartDate = DateTime.Now.AddMonths(-lastMonths);

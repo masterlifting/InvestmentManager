@@ -21,7 +21,7 @@
     </AdditionalBlock>
     <InfoBlock>
         <MultiRow Name="Accounts information" IconName="info" />
-        <MultiRow Name="@transactions" IconName="yen" />
+        <MultiRow Name="@transactions" IconName="yen" Action="(() => isTransactions = !isTransactions)" />
         <MultiRow Name="Exchange rate" IconName="loop" />
         <MultiRow Name="Add a transaction manually" IconName="plus" />
         <MultiRow Name="Download files (xls) with transactions" IconName="data-transfer-download" Action="@(() => ClickInputFileButtonAsync("inputButton"))" Description="Available only for the Russian broker BCS" />

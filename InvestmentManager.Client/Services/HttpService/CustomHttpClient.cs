@@ -1,5 +1,7 @@
-﻿using InvestmentManager.Client.Services.AuthenticationConfiguration;
+﻿using InvestmentManager.Client.Configurations;
+using InvestmentManager.Client.Services.AuthenticationConfiguration;
 using InvestmentManager.Client.Services.NotificationService;
+using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -36,6 +38,7 @@ namespace InvestmentManager.Client.Services.HttpService
         public async Task<TResult> PutAsync<TResult, TModel>(string url, TModel model) => await BaseQueryAsync<TResult>(httpClient.PutAsJsonAsync(url, model)).ConfigureAwait(false);
         public async Task<TResult> DeleteAsync<TResult>(string url) => await BaseQueryAsync<TResult>(httpClient.DeleteAsync(url)).ConfigureAwait(false);
 
+       //*/
         async Task<TResult> BaseQueryAsync<TResult>(Task<HttpResponseMessage> responseTask)
         {
             notice.LoadStart();
@@ -47,6 +50,35 @@ namespace InvestmentManager.Client.Services.HttpService
             notice.LoadStop();
             return result;
         }
+        /*/
+        async Task<TResult> BaseQueryAsync<TResult>(Task<HttpResponseMessage> responseTask)
+        {
+            notice.LoadStart();
+            await SetAuthHeaderAsync().ConfigureAwait(false);
+            var response = await responseTask.ConfigureAwait(false);
+
+            TResult result;
+
+            if (response.IsSuccessStatusCode)
+            {
+                if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
+                {
+                    await notice.AlertInfoAsync(DefaultString.notFound);
+                    result = Activator.CreateInstance<TResult>();
+                }
+                else
+                    result = await response.Content.ReadFromJsonAsync<TResult>().ConfigureAwait(false);
+            }
+            else
+            {
+                await notice.AlertFailedAsync("Bad request");
+                result = Activator.CreateInstance<TResult>();
+            }
+
+            notice.LoadStop();
+            return result;
+        }
+        //*/
         public async Task SetAuthHeaderAsync()
         {
             string token = await customAuthenticationState.GetTokenAsync().ConfigureAwait(false);

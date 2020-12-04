@@ -52,13 +52,13 @@ namespace InvestmentManager.Server.Controllers
         public async Task<SummaryAdditional> GetSummary(long id)
         {
             var company = await unitOfWork.Company.FindByIdAsync(id).ConfigureAwait(false);
-
+            long? currencyId = company?.Tickers?.FirstOrDefault()?.Prices?.FirstOrDefault()?.CurrencyId;
             return company is null ? new SummaryAdditional() : new SummaryAdditional
             {
                 IsHave = true,
                 IndustryName = company.Industry.Name,
                 SectorName = company.Sector.Name,
-                CurrencyType = catalogService.GetCurrencyName(company.Tickers.FirstOrDefault().Prices.FirstOrDefault().CurrencyId)
+                CurrencyType = currencyId.HasValue ? catalogService.GetCurrencyName(currencyId.Value) : "No currency data."
             };
         }
 

@@ -7,8 +7,8 @@
         {
             <KeyValueCols Key="Last transaction" Value="@model.DateLastTransaction.ToShortDateString()" />
             <KeyValueCols Key="Status" Value="@model.StatusName" />
-            <KeyValueCols Key="Ammount" Value="@model.Amount.ToString("f3")" />
-            <KeyValueCols Key="Added sum" Value="@model.TotalAddedSum.ToString("f3")" />
+            <KeyValueCols Key="Ammount" Value="@model.Amount.ToString("f2")" />
+            <KeyValueCols Key="Added sum" Value="@model.TotalAddedSum.ToString("f2")" />
 
             <div class="col">
                 <AccountTransactionF />
