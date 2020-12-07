@@ -104,16 +104,16 @@
 
 @code {
     List<ReportModel> checkingreports;
-    List<BaseView> companies = new List<BaseView>();
+    List<ShortView> companies = new List<ShortView>();
     protected override async Task OnInitializedAsync()
     {
-        companies = await http.GetAsync<List<BaseView>>(new UrlBuilder(UrlController.Companies).Result);
+        companies = await http.GetAsync<List<ShortView>>(new UrlBuilder(UrlController.Companies).Result);
         checkingreports = await http.GetAsync<List<ReportModel>>(new UrlBuilder(UrlController.Reports, UrlOption.New).Result);
     }
 
     async Task DeleteReport(ReportModel report)
     {
-        var result = await http.DeleteAsync<BaseResult>(new UrlBuilder(UrlController.Reports, report.Id).Result);
+        var result = await http.DeleteAsync<BaseActionResult>(new UrlBuilder(UrlController.Reports, report.Id).Result);
 
         if (result.IsSuccess)
         {
@@ -126,7 +126,7 @@
     async Task SaveReport(ReportModel report)
     {
         report.IsChecked = true;
-        var result = await http.PutAsync<BaseResult, ReportModel>(new UrlBuilder(UrlController.Reports,report.Id).Result, report);
+        var result = await http.PutAsync<BaseActionResult, ReportModel>(new UrlBuilder(UrlController.Reports,report.Id).Result, report);
 
         if (result.IsSuccess)
         {

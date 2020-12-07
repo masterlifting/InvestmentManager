@@ -4,8 +4,6 @@ namespace InvestmentManager.Models.SummaryModels
 {
     public class SummarySellRecommendation
     {
-        public bool IsHave { get; set; } = false;
-
         public DateTime DateUpdate { get; set; }
 
         public int LotMin { get; set; }

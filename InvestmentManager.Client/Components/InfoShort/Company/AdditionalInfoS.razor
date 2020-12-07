@@ -1,8 +1,8 @@
-﻿@inject CustomHttpClient http
+﻿@inject QueryBaseService<SummaryAdditional> queryService
 
 <InfoTemplate InfoName="@InfoName" VisibleAction="@((bool isVisible) => UpdateVisible.InvokeAsync(isVisible))">
     <ChildContent>
-        @if (model is not null && model.IsHave)
+        @if (model is not null)
         {
             <KeyValueCols Key="Currency" Value="@model.CurrencyType" />
             <KeyValueCols Key="Sector" Value="@model.SectorName" />
@@ -25,12 +25,11 @@
 
     protected async override Task OnInitializedAsync()
     {
-        var summary = await http.GetAsync<SummaryAdditional>(new UrlBuilder(UrlController.Companies, CompanyId, UrlOption.Summary).Result);
+        string CustomUriBuilder() => new UrlBuilder(UrlController.Companies, CompanyId, UrlOption.Summary).Result;
+        var queryResult = await queryService.GetResultAsync(CustomUriBuilder);
 
-        if (summary.IsHave)
-            model = summary;
-        else
-            info = DefaultString.notFound;
+        model = queryResult.ResultContent;
+        info = queryResult.ResultInfo;
     }
 }
 

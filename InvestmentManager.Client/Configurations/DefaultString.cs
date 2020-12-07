@@ -13,7 +13,6 @@
         public const string noticeInfo = "Information.";
         public const string accountNotFound = "Account not found.";
         public const string accountDisabled = "Accounts disabled.";
-        public const string outresult = "There are no";
         public static class Id
         {
             public const string accountId = "accountId";

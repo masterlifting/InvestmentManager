@@ -1,6 +1,6 @@
 ﻿namespace InvestmentManager.Models
 {
-    public class BaseResult
+    public class BaseActionResult
     {
         public bool IsSuccess { get; set; } = false;
         public string Info { get; set; }

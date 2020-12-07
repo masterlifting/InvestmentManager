@@ -14,10 +14,10 @@ namespace InvestmentManager.Server.RestServices
         private readonly InvestmentContext context;
         public BaseRestMethod(InvestmentContext context) => this.context = context;
 
-        public async Task<BaseResult> BasePostAsync<TEntity, TModel>(ModelStateDictionary modelState, TEntity result, TModel model, Func<TModel, bool> func = null) where TEntity : class where TModel : class
+        public async Task<BaseActionResult> BasePostAsync<TEntity, TModel>(ModelStateDictionary modelState, TEntity result, TModel model, Func<TModel, bool> func = null) where TEntity : class where TModel : class
         {
             if (!modelState.IsValid)
-                return new BaseResult { IsSuccess = false, Info = modelInvalid };
+                return new BaseActionResult { IsSuccess = false, Info = modelInvalid };
 
             bool isContains = false;
 
@@ -29,12 +29,12 @@ namespace InvestmentManager.Server.RestServices
                 }
                 catch
                 {
-                    return new BaseResult { IsSuccess = false, Info = "Contains function error" };
+                    return new BaseActionResult { IsSuccess = false, Info = "Contains function error" };
                 }
             }
 
             if (isContains)
-                return new BaseResult { IsSuccess = true, Info = $"This {typeof(TEntity).Name} allready!" };
+                return new BaseActionResult { IsSuccess = true, Info = $"This {typeof(TEntity).Name} allready!" };
 
             await context.Set<TEntity>().AddAsync(result).ConfigureAwait(false);
 
@@ -51,25 +51,25 @@ namespace InvestmentManager.Server.RestServices
                     long nextId = (long)idlimit + 1;
                     context.Database.ExecuteSqlRaw($"ALTER SEQUENCE \"{tableName}_Id_seq\" RESTART WITH {nextId}");
 
-                     await context.SaveChangesAsync().ConfigureAwait(false);
+                    await context.SaveChangesAsync().ConfigureAwait(false);
                 }
                 catch
                 {
-                    return new BaseResult { IsSuccess = false, Info = savingError };
+                    return new BaseActionResult { IsSuccess = false, Info = savingError };
                 }
             }
 
-            return new BaseResult { IsSuccess = true, Info = $"{typeof(TEntity).Name} saved.", ResultId = (long)result.GetType().GetProperty("Id").GetValue(result) };
+            return new BaseActionResult { IsSuccess = true, Info = $"{typeof(TEntity).Name} saved.", ResultId = (long)result.GetType().GetProperty("Id").GetValue(result) };
         }
-        public async Task<BaseResult> BasePutAsync<TEntity>(ModelStateDictionary modelState, long id, Action<TEntity> update) where TEntity : class
+        public async Task<BaseActionResult> BasePutAsync<TEntity>(ModelStateDictionary modelState, long id, Action<TEntity> update) where TEntity : class
         {
             if (!modelState.IsValid)
-                return new BaseResult { IsSuccess = false, Info = modelInvalid };
+                return new BaseActionResult { IsSuccess = false, Info = modelInvalid };
 
             var entity = await context.Set<TEntity>().FindAsync(id).ConfigureAwait(false);
 
             if (entity is null)
-                return new BaseResult { IsSuccess = false, Info = modelIsNull };
+                return new BaseActionResult { IsSuccess = false, Info = modelIsNull };
 
             update.Invoke(entity);
 
@@ -79,17 +79,17 @@ namespace InvestmentManager.Server.RestServices
             }
             catch
             {
-                return new BaseResult { IsSuccess = false, Info = editingError };
+                return new BaseActionResult { IsSuccess = false, Info = editingError };
             }
 
-            return new BaseResult { IsSuccess = true, Info = $"{typeof(TEntity).Name} edited.", ResultId = id };
+            return new BaseActionResult { IsSuccess = true, Info = $"{typeof(TEntity).Name} edited.", ResultId = id };
         }
-        public async Task<BaseResult> BaseDeleteAsync<TEntity>(long id) where TEntity : class
+        public async Task<BaseActionResult> BaseDeleteAsync<TEntity>(long id) where TEntity : class
         {
             var entity = await context.Set<TEntity>().FindAsync(id).ConfigureAwait(false);
 
             if (entity is null)
-                return new BaseResult { IsSuccess = false, Info = modelIsNull };
+                return new BaseActionResult { IsSuccess = false, Info = modelIsNull };
 
             try
             {
@@ -98,10 +98,10 @@ namespace InvestmentManager.Server.RestServices
             }
             catch
             {
-                return new BaseResult { IsSuccess = false, Info = deletingError };
+                return new BaseActionResult { IsSuccess = false, Info = deletingError };
             }
 
-            return new BaseResult { IsSuccess = true, Info = $"{typeof(TEntity).Name} deleted.", ResultId = id };
+            return new BaseActionResult { IsSuccess = true, Info = $"{typeof(TEntity).Name} deleted.", ResultId = id };
         }
     }
 }

@@ -31,7 +31,7 @@ namespace InvestmentManager.Server.Controllers
         }
 
         [HttpGet("byaccountid/{accountId}/bycompanyid/{companyId}")]
-        public async Task<List<StockTransactionModel>> GetByAccountIds(long accountId, long companyId)
+        public async Task<IActionResult> GetByAccountIds(long accountId, long companyId)
         {
             var transactions = await unitOfWork.StockTransaction.GetAll()
                 .Where(x => x.AccountId == accountId && x.Ticker.CompanyId == companyId)
@@ -39,32 +39,31 @@ namespace InvestmentManager.Server.Controllers
                 .ToListAsync().ConfigureAwait(false);
 
             return transactions is null || !transactions.Any()
-                ? new List<StockTransactionModel>()
-                : transactions.Select(x => new StockTransactionModel
+                ? NoContent()
+                : Ok(transactions.Select(x => new StockTransactionModel
                 {
                     DateOperation = x.DateOperation,
                     StatusId = x.TransactionStatusId,
                     StatusName = catalogService.GetStatusName(x.TransactionStatusId),
                     Quantity = x.Quantity,
                     Cost = x.Cost
-                }).ToList();
+                }).ToList());
         }
         [HttpGet("byaccountid/{accountId}/bycompanyid/{companyId}/summary/")]
-        public async Task<SummaryStockTransaction> GetSummaryByAccountIds(long accountId, long companyId)
+        public async Task<IActionResult> GetSummaryByAccountIds(long accountId, long companyId)
         {
             var lastTransaction = await unitOfWork.StockTransaction.GetAll()
                 .Where(x => x.AccountId == accountId && x.Ticker.CompanyId == companyId)
                 .OrderBy(x => x.DateOperation)
                 .LastOrDefaultAsync();
 
-            return lastTransaction is null ? new SummaryStockTransaction() : new SummaryStockTransaction
+            return lastTransaction is null ? NoContent() : Ok(new SummaryStockTransaction
             {
-                IsHave = true,
                 DateTransaction = lastTransaction.DateOperation,
                 StatusName = catalogService.GetStatusName(lastTransaction.TransactionStatusId),
                 Quantity = lastTransaction.Quantity,
                 Cost = lastTransaction.Cost
-            };
+            });
         }
 
         [HttpPost]

@@ -1,8 +1,8 @@
-﻿@inject CustomHttpClient http
+﻿@inject QueryBaseService<SummaryBuyRecommendation> queryService
 
 <InfoTemplate InfoName="@InfoName" VisibleAction="@((bool isVisible) => UpdateVisible.InvokeAsync(isVisible))">
     <ChildContent>
-        @if (model is not null && model.IsHave)
+        @if (model is not null)
         {
             <KeyValueCols KeySize="6" Key="Date Update" Value="@model.DateUpdate.ToShortDateString()" />
             <KeyValueCols KeySize="6" Key="Buy if the price is less" Value="@model.BuyPrice.ToString("f4")" />
@@ -24,11 +24,10 @@
 
     protected async override Task OnInitializedAsync()
     {
-        var resultmary = await http.GetAsync<SummaryBuyRecommendation>(new UrlBuilder(UrlController.BuyRecommendations, UrlPath.ByCompanyId, CompanyId, UrlOption.Summary).Result);
-        
-        if (resultmary.IsHave)
-            model = resultmary;
-        else
-            info = DefaultString.notFound;
+        string CustomUriBuilder() => new UrlBuilder(UrlController.BuyRecommendations, UrlPath.ByCompanyId, CompanyId, UrlOption.Summary).Result;
+        var queryResult = await queryService.GetResultAsync(CustomUriBuilder);
+
+        model = queryResult.ResultContent;
+        info = queryResult.ResultInfo;
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace InvestmentManager.Models
 {
-    public class BaseView
+    public class ShortView
     {
         public long Id { get; set; }
         public virtual string Name { get; set; }

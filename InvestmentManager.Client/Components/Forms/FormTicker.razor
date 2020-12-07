@@ -2,7 +2,7 @@
 @inject CustomNotification notice
 
 <RowTitleSub Text="Tickers" />
-@if (editContexts != null)
+@if (editContexts is not null)
 {
     foreach (var context in editContexts)
     {
@@ -75,23 +75,26 @@ else
     [Parameter] public long CompanyId { get; set; }
     [Parameter] public EventCallback<int> Step { get; set; }
 
-    List<BaseView> exchanges = new List<BaseView>();
-    List<BaseView> lots = new List<BaseView>();
+    List<ShortView> exchanges;
+    List<ShortView> lots;
+
     List<EditContext> editContexts;
+    bool isEditeble = true;
 
     protected override async Task OnInitializedAsync()
     {
-        exchanges = await http.GetAsync<List<BaseView>>(new UrlBuilder(UrlCatalog.ExchangeTypes).Result);
-        lots = await http.GetAsync<List<BaseView>>(new UrlBuilder(UrlCatalog.LotTypes).Result);
+        exchanges = await http.GetAsync<List<ShortView>>(new UrlBuilder(UrlCatalog.ExchangeTypes).Result);
+        lots = await http.GetAsync<List<ShortView>>(new UrlBuilder(UrlCatalog.LotTypes).Result);
 
-        var response = await http.GetAsync<List<TickerModel>>(new UrlBuilder(UrlController.Tickers, UrlPath.ByCompanyId, CompanyId).Result);
+        List<TickerModel> tickers = await http.GetAsync<List<TickerModel>>(new UrlBuilder(UrlController.Tickers, UrlPath.ByCompanyId, CompanyId).Result);
 
-        var tickers = response.Any()
-            ? response
-            : new List<TickerModel> { new TickerModel { CompanyId = CompanyId, ExchangeId = exchanges.First().Id, LotId = lots.First().Id } };
+        if (tickers == default)
+        {
+            isEditeble = false;
+            tickers = new List<TickerModel> { new TickerModel { CompanyId = CompanyId, ExchangeId = exchanges.First().Id, LotId = lots.First().Id } };
+        }
 
         editContexts = tickers.Select(x => new EditContext(x)).ToList();
-
 
         await base.OnInitializedAsync();
     }
@@ -131,9 +134,9 @@ else
             return false;
         }
 
-        var result = model.IsEditeble
-            ? await http.PutAsync<BaseResult, TickerModel>(new UrlBuilder(UrlController.Tickers, model.Id).Result, model)
-            : await http.PostAsync<BaseResult, TickerModel>(new UrlBuilder(UrlController.Tickers).Result, model);
+        var result = isEditeble
+            ? await http.PutAsync<BaseActionResult, TickerModel>(new UrlBuilder(UrlController.Tickers, model.Id).Result, model)
+            : await http.PostAsync<BaseActionResult, TickerModel>(new UrlBuilder(UrlController.Tickers).Result, model);
 
         if (result.IsSuccess)
         {
@@ -154,16 +157,15 @@ else
     }
     void RemoveTicker(EditContext editContext)
     {
-        var model = editContext.Model as TickerModel;
-
-        if (model.IsEditeble)
+        if (isEditeble)
             notice.ConfirmAction(ColorCustom.idanger, "Delete ticker from data base?", (async () => await RemoveFromDbAsync()));
         else
             editContexts.Remove(editContext);
 
         async Task RemoveFromDbAsync()
         {
-            var result = await http.DeleteAsync<BaseResult>(new UrlBuilder(UrlController.Tickers, model.Id).Result);
+            var model = editContext.Model as TickerModel;
+            var result = await http.DeleteAsync<BaseActionResult>(new UrlBuilder(UrlController.Tickers, model.Id).Result);
 
             if (result.IsSuccess)
             {

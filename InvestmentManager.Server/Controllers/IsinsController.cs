@@ -25,20 +25,20 @@ namespace InvestmentManager.Server.Controllers
         }
 
         [HttpGet]
-        public async Task<List<IsinModel>> Get() =>
-            await unitOfWork.Isin.GetAll().Select(x => new IsinModel
+        public async Task<IActionResult> Get() =>
+            Ok(await unitOfWork.Isin.GetAll().Select(x => new IsinModel
             {
                 Id = x.Id,
                 Name = x.Name,
                 CompanyId = x.CompanyId
-            }).ToListAsync().ConfigureAwait(false);
+            }).ToListAsync().ConfigureAwait(false));
         [HttpGet("bycompanyid/{id}")]
-        public async Task<List<IsinModel>> GetByCompanyId(long id)
+        public async Task<IActionResult> GetByCompanyId(long id)
         {
             var isins = (await unitOfWork.Company.FindByIdAsync(id).ConfigureAwait(false))?.Isins;
-            return isins is null 
-                ? new List<IsinModel>() 
-                : isins.Select(x => new IsinModel { Id = x.Id, CompanyId = x.CompanyId, Name = x.Name, IsEditeble = true }).ToList();
+            return isins is null
+                ? NoContent()
+                : Ok(isins.Select(x => new IsinModel { Id = x.Id, CompanyId = x.CompanyId, Name = x.Name }).ToList());
         }
         [HttpPost, Authorize(Roles = "pestunov")]
         public async Task<IActionResult> Post(IsinModel model)

@@ -49,7 +49,7 @@
 
     List<ExchangeRateModel> exchangeRates { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
         exchangeRates = ExchangeRates;
         await base.OnInitializedAsync();
@@ -57,7 +57,7 @@
 
     async Task SaveData(ExchangeRateModel rate)
     {
-        var result = await http.PostAsync<BaseResult, ExchangeRateModel>(new UrlBuilder(UrlController.ExchangeRates).Result, rate);
+        var result = await http.PostAsync<BaseActionResult, ExchangeRateModel>(new UrlBuilder(UrlController.ExchangeRates).Result, rate);
 
         if (result.IsSuccess)
         {

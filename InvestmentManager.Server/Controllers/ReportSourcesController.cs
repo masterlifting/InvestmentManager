@@ -23,20 +23,19 @@ namespace InvestmentManager.Server.Controllers
         }
 
         [HttpGet("bycompanyid/{id}")]
-        public async Task<ReportSourceModel> GetByCompanyId(long id)
+        public async Task<IActionResult> GetByCompanyId(long id)
         {
             var reportSource = (await unitOfWork.Company.FindByIdAsync(id).ConfigureAwait(false))?.ReportSource;
 
-            return reportSource is null ? new ReportSourceModel() : new ReportSourceModel
+            return reportSource is null ? NoContent() : Ok(new ReportSourceModel
             {
                 Id = reportSource.Id,
                 CompanyId = reportSource.CompanyId,
                 Key = reportSource.Key,
-                Value = reportSource.Value,
-                IsEditeble = true
-            };
+                Value = reportSource.Value
+            });
         }
-        
+
         [HttpPost, Authorize(Roles = "pestunov")]
         public async Task<IActionResult> Post(ReportSourceModel model)
         {

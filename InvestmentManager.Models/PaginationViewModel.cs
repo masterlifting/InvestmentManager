@@ -3,10 +3,10 @@ using System.Collections.Generic;
 
 namespace InvestmentManager.Models
 {
-    public class BaseViewPagination
+    public class PaginationViewModel<T>  where T : class
     {
-        public List<BaseView> Items { get; set; }
-        public Pagination Pagination { get; set; }
+        public List<T> Items { get; set; } = new List<T>();
+        public Pagination Pagination { get; set; } = new Pagination();
     }
     public class Pagination
     {

@@ -2,7 +2,7 @@
 @inject CustomNotification notice
 
 <RowTitleSub Text="Isins" />
-@if (editContexts != null)
+@if (editContexts is not null)
 {
     foreach (var context in editContexts)
     {
@@ -48,15 +48,19 @@ else
 @code {
     [Parameter] public long CompanyId { get; set; }
     [Parameter] public EventCallback<int> Step { get; set; }
+
     List<EditContext> editContexts;
+    bool isEditeble = true;
 
     protected override async Task OnInitializedAsync()
     {
-        var response = await http.GetAsync<List<IsinModel>>(new UrlBuilder(UrlController.Isins, UrlPath.ByCompanyId, CompanyId).Result);
+        List<IsinModel> isins = await http.GetAsync<List<IsinModel>>(new UrlBuilder(UrlController.Isins, UrlPath.ByCompanyId, CompanyId).Result);
 
-        var isins = response.Any()
-            ? response
-            : new List<IsinModel> { new IsinModel { CompanyId = CompanyId } };
+        if (isins == default)
+        {
+            isEditeble = false;
+            isins = new List<IsinModel> { new IsinModel { CompanyId = CompanyId } };
+        }
 
         editContexts = isins.Select(x => new EditContext(x)).ToList();
 
@@ -99,9 +103,9 @@ else
             return false;
         }
 
-        var result = model.IsEditeble
-            ? await http.PutAsync<BaseResult, IsinModel>(new UrlBuilder(UrlController.Isins, model.Id).Result, model)
-            : await http.PostAsync<BaseResult, IsinModel>(new UrlBuilder(UrlController.Isins).Result, model);
+        var result = isEditeble
+            ? await http.PutAsync<BaseActionResult, IsinModel>(new UrlBuilder(UrlController.Isins, model.Id).Result, model)
+            : await http.PostAsync<BaseActionResult, IsinModel>(new UrlBuilder(UrlController.Isins).Result, model);
 
         if (result.IsSuccess)
         {
@@ -118,16 +122,15 @@ else
     void AddIsin() => editContexts.Add(new EditContext(new IsinModel { CompanyId = CompanyId }));
     void RemoveIsin(EditContext editContext)
     {
-        var model = editContext.Model as IsinModel;
-
-        if (model.IsEditeble)
+        if (isEditeble)
             notice.ConfirmAction(ColorCustom.idanger, "Delete isin from data base?", (async () => await RemoveFromDbAsync()));
         else
             editContexts.Remove(editContext);
 
         async Task RemoveFromDbAsync()
         {
-            var result = await http.DeleteAsync<BaseResult>(new UrlBuilder(UrlController.Isins, model.Id).Result);
+            var model = editContext.Model as IsinModel;
+            var result = await http.DeleteAsync<BaseActionResult>(new UrlBuilder(UrlController.Isins, model.Id).Result);
 
             if (result.IsSuccess)
             {

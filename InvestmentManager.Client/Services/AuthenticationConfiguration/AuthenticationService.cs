@@ -25,8 +25,8 @@ namespace InvestmentManager.Client.Services.AuthenticationConfiguration
 
             return result;
         }
-        public async Task<BaseResult> RegisterAsync(RegisterModel model) =>
-            await http.PostAsync<BaseResult, RegisterModel>("security/register/", model).ConfigureAwait(false);
+        public async Task<BaseActionResult> RegisterAsync(RegisterModel model) =>
+            await http.PostAsync<BaseActionResult, RegisterModel>("security/register/", model).ConfigureAwait(false);
         public async Task LogoutAsync() => await customAuthenticationState.SetTokenAsync(null).ConfigureAwait(false);
     }
 }

@@ -1,8 +1,8 @@
-﻿@inject CustomHttpClient http
+﻿@inject QueryBaseService<SummarySellRecommendation> queryService
 
 <InfoTemplate InfoName="@InfoName" VisibleAction="((bool isVisible) => UpdateVisible.InvokeAsync(isVisible))">
     <ChildContent>
-        @if (model is not null && model.IsHave)
+        @if (model is not null)
         {
             <KeyValueCols Key="Date Update" Value="@model.DateUpdate.ToShortDateString()" />
             <KeyValueCols Key="Profit of 20%" Value="@($"{model.LotMin} lot(s) by price > {model.PriceMin}")" />
@@ -30,16 +30,10 @@
     {
         var user = (await AuthenticationStateTask).User;
 
-        if (user.Identity.IsAuthenticated)
-        {
-            var summary = await http.GetAsync<SummarySellRecommendation>(new UrlBuilder(UrlController.SellRecommendations, UrlPath.ByCompanyId, CompanyId, UrlOption.Summary).Result);
+        string CustomUriBuilder() => new UrlBuilder(UrlController.SellRecommendations, UrlPath.ByCompanyId, CompanyId, UrlOption.Summary).Result;
+        var queryResult = await queryService.GetResultAsync(user, CustomUriBuilder);
 
-            if (summary.IsHave)
-                model = summary;
-            else
-                info = DefaultString.notFound;
-        }
-        else
-            info = DefaultString.noticeAccess;
+        model = queryResult.ResultContent;
+        info = queryResult.ResultInfo;
     }
 }

@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace InvestmentManager.Models.EntityModels
 {
-    public class CompanyModel : BaseView
+    public class CompanyModel : ShortView
     {
         [Required(ErrorMessage = "Name required!")]
         [StringLength(50, ErrorMessage = "Name lenght 2..50 symbols", MinimumLength = 2)]

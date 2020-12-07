@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -25,30 +24,29 @@ namespace InvestmentManager.Server.Controllers
         }
 
         [HttpGet]
-        public async Task<List<TickerModel>> Get() =>
-            await unitOfWork.Ticker.GetAll().Select(x => new TickerModel
+        public async Task<IActionResult> Get() =>
+            Ok(await unitOfWork.Ticker.GetAll().Select(x => new TickerModel
             {
                 Id = x.Id,
                 Name = x.Name,
                 CompanyId = x.CompanyId,
                 ExchangeId = x.ExchangeId,
                 LotId = x.LotId,
-            }).ToListAsync().ConfigureAwait(false);
+            }).ToListAsync().ConfigureAwait(false));
         [HttpGet("bycompanyid/{id}")]
-        public async Task<List<TickerModel>> GetByCompanyId(long id)
+        public async Task<IActionResult> GetByCompanyId(long id)
         {
             var tickers = (await unitOfWork.Company.FindByIdAsync(id).ConfigureAwait(false))?.Tickers;
             return tickers is null
-                ? new List<TickerModel>()
-                : tickers.Select(x => new TickerModel
+                ? NoContent()
+                : Ok(tickers.Select(x => new TickerModel
                 {
                     Id = x.Id,
                     Name = x.Name,
                     CompanyId = x.CompanyId,
                     ExchangeId = x.ExchangeId,
-                    LotId = x.LotId,
-                    IsEditeble = true
-                }).ToList();
+                    LotId = x.LotId
+                }).ToList());
         }
         [HttpPost, Authorize(Roles = "pestunov")]
         public async Task<IActionResult> Post(TickerModel model)

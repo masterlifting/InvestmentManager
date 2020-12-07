@@ -62,9 +62,9 @@ namespace InvestmentManager.Server.Controllers
             if (!result.Succeeded)
             {
                 var errors = result.Errors.Select(x => x.Description);
-                return BadRequest(new BaseResult { IsSuccess = false, Info = string.Join(";", errors) });
+                return BadRequest(new BaseActionResult { IsSuccess = false, Info = string.Join(";", errors) });
             }
-            return Ok(new BaseResult { IsSuccess = true });
+            return Ok(new BaseActionResult { IsSuccess = true });
         }
     }
 }

@@ -1,8 +1,8 @@
-﻿@inject CustomHttpClient http
+﻿@inject QueryBaseService<SummaryReport> queryService
 
 <InfoTemplate InfoName="@InfoName" VisibleAction="((bool isVisible) => UpdateVisible.InvokeAsync(isVisible))">
     <ChildContent>
-        @if (model is not null && model.IsHave)
+        @if (model is not null)
         {
             <KeyValueCols Key="Date update" Value="@model.DateUpdate.ToShortDateString()" />
             <KeyValueCols Key="Last report" Value="@model.DateLastReport.ToShortDateString()" />
@@ -32,11 +32,10 @@
 
     protected async override Task OnInitializedAsync()
     {
-        var summary = await http.GetAsync<SummaryReport>(new UrlBuilder(UrlController.Reports, UrlPath.ByCompanyId, CompanyId, UrlOption.Summary).Result);
-        
-        if (summary.IsHave)
-            model = summary;
-        else
-            info = DefaultString.notFound;
+        string CustomUriBuilder() => new UrlBuilder(UrlController.Reports, UrlPath.ByCompanyId, CompanyId, UrlOption.Summary).Result;
+        var queryResult = await queryService.GetResultAsync(CustomUriBuilder);
+
+        model = queryResult.ResultContent;
+        info = queryResult.ResultInfo;
     }
 }

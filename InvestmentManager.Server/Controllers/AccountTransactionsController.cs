@@ -30,39 +30,38 @@ namespace InvestmentManager.Server.Controllers
         }
 
         [HttpGet("byaccountid/{id}")]
-        public async Task<List<AccountTransactionModel>> GetByAccountId(long id)
+        public async Task<IActionResult> GetByAccountId(long id)
         {
             var transactions = (await unitOfWork.Account.FindByIdAsync(id).ConfigureAwait(false))?.AccountTransactions;
 
             return transactions is null
-                ? new List<AccountTransactionModel>()
-                : transactions.Select(x => new AccountTransactionModel
+                ? NoContent()
+                : Ok(transactions.Select(x => new AccountTransactionModel
                 {
                     DateOperation = x.DateOperation,
                     Amount = x.Amount,
                     StatusName = catalogService.GetStatusName(x.TransactionStatusId),
                     CurrencyName = catalogService.GetCurrencyName(x.CurrencyId),
                     AccountName = x.Account.Name.Substring(0, 9) + "..."
-                }).ToList();
+                }).ToList());
         }
         [HttpGet("byaccountid/{id}/summary/")]
-        public async Task<SummaryAccountTransaction> GetSummaryByAccountId(long id)
+        public async Task<IActionResult> GetSummaryByAccountId(long id)
         {
             var transactions = (await unitOfWork.Account.FindByIdAsync(id).ConfigureAwait(false))?.AccountTransactions;
 
             if (transactions is null || !transactions.Any())
-                return new SummaryAccountTransaction();
+                return NoContent();
 
             var lastTransaction = transactions.OrderBy(x => x.DateOperation).Last();
 
-            return new SummaryAccountTransaction
+            return Ok(new SummaryAccountTransaction
             {
-                IsHave = true,
                 DateLastTransaction = lastTransaction.DateOperation,
                 Amount = lastTransaction.Amount,
                 StatusName = catalogService.GetStatusName(lastTransaction.TransactionStatusId),
                 TotalAddedSum = transactions.Where(x => x.TransactionStatusId == 1).Sum(x => x.Amount)
-            };
+            });
         }
 
         [HttpPost]

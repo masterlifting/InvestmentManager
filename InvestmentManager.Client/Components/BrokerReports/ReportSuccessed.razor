@@ -1,41 +1,52 @@
 ﻿@inject CustomHttpClient http
 
-<RowTitleSub Color="ColorBootstrap.muted" Text="Tap row to save"/>
-
-@foreach (var item in Reports.Join(accounts, x => x.AccountId, y => y.Id, (x, y) => new { Report = x, AccountName = y.Name }))
+<RowTitleSub Color="ColorBootstrap.muted" Text="Tap row to save" />
+@if (reports is not null)
 {
-    <div class="row idark iframe">
-        <div class="col">
-            <RowTitle Color="ColorBootstrap.warning" Text="@item.AccountName" />
+    foreach (var item in reports.Join(accounts, x => x.AccountId, y => y.Id, (x, y) => new { Report = x, AccountName = y.Name }))
+    {
+        <div class="row idark iframe">
+            <div class="col">
+                <RowTitle Color="ColorBootstrap.warning" Text="@item.AccountName" />
 
-            @if (item.Report.AccountTransactions.Any())
-            {
-                <SuccessedAccountTransactions AccountTransactions="item.Report.AccountTransactions" />
-            }
-            @if (item.Report.StockTransactions.Any())
-            {
-                <SuccessedStockTransactions StockTransactions="item.Report.StockTransactions" />
-            }
-            @if (item.Report.Comissions.Any())
-            {
-                <SuccessedComissions Comissions="item.Report.Comissions" />
-            }
-            @if (item.Report.Dividends.Any())
-            {
-                <SuccessedDividends Dividends="item.Report.Dividends" />
-            }
-            @if (item.Report.ExchangeRates.Any())
-            {
-                <SuccessedExchangeRates ExchangeRates="item.Report.ExchangeRates" />
-            }
+                @if (item.Report.AccountTransactions.Any())
+                {
+                    <SuccessedAccountTransactions AccountTransactions="item.Report.AccountTransactions" />
+                }
+                @if (item.Report.StockTransactions.Any())
+                {
+                    <SuccessedStockTransactions StockTransactions="item.Report.StockTransactions" />
+                }
+                @if (item.Report.Comissions.Any())
+                {
+                    <SuccessedComissions Comissions="item.Report.Comissions" />
+                }
+                @if (item.Report.Dividends.Any())
+                {
+                    <SuccessedDividends Dividends="item.Report.Dividends" />
+                }
+                @if (item.Report.ExchangeRates.Any())
+                {
+                    <SuccessedExchangeRates ExchangeRates="item.Report.ExchangeRates" />
+                }
 
+            </div>
         </div>
-    </div>
+    }
 }
 
 @code {
     [Parameter] public List<BrokerReportSuccessedModel> Reports { get; set; }
-    List<AccountModel> accounts = new List<AccountModel>();
 
-    protected override async Task OnInitializedAsync() => accounts = await http.GetAsync<List<AccountModel>>(new UrlBuilder(UrlController.Accounts).Result);
+    List<BrokerReportSuccessedModel> reports;
+    List<AccountModel> accounts;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        accounts = await http.GetAsync<List<AccountModel>>(new UrlBuilder(UrlController.Accounts).Result);
+        if (accounts != default)
+            reports = Reports;
+
+        await base.OnParametersSetAsync();
+    }
 }

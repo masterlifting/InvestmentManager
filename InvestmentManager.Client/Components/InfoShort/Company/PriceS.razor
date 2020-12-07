@@ -1,17 +1,17 @@
-﻿@inject CustomHttpClient http
+﻿@inject QueryBaseService<SummaryPrice> queryService
 
 <InfoTemplate InfoName="@InfoName" VisibleAction="((bool isVisible) => UpdateVisible.InvokeAsync(isVisible))">
     <ChildContent>
 
-        @if(model is not null && model.IsHave)
+        @if (model is not null)
         {
-        <KeyValueCols Key="Date update" Value="@model.DateUpdate.ToShortDateString()" />
-        <KeyValueCols Key="Date price" Value="@model.DatePrice.ToShortDateString()" />
-        <KeyValueCols Key="Cost" Value="@model.Cost.ToString("f4")" />
+            <KeyValueCols Key="Date update" Value="@model.DateUpdate.ToShortDateString()" />
+            <KeyValueCols Key="Date price" Value="@model.DatePrice.ToShortDateString()" />
+            <KeyValueCols Key="Cost" Value="@model.Cost.ToString("f4")" />
 
-        <div class="col">
-            <PriceF CompanyId="CompanyId" />
-        </div>
+            <div class="col">
+                <PriceF CompanyId="CompanyId" />
+            </div>
         }
         else
         {
@@ -31,10 +31,10 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var summary = await http.GetAsync<SummaryPrice>(new UrlBuilder(UrlController.Prices, UrlPath.ByCompanyId, CompanyId, UrlOption.Summary).Result);
-        if (summary.IsHave)
-            model = summary;
-        else
-            info = DefaultString.notFound;
+        string CustomUriBuilder() => new UrlBuilder(UrlController.Prices, UrlPath.ByCompanyId, CompanyId, UrlOption.Summary).Result;
+        var queryResult = await queryService.GetResultAsync(CustomUriBuilder);
+
+        model = queryResult.ResultContent;
+        info = queryResult.ResultInfo;
     }
 }

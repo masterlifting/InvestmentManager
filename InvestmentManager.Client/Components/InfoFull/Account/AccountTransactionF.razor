@@ -1,5 +1,4 @@
-﻿@inject CustomHttpClient http
-@inject ILocalStorageService localStorage
+﻿@inject QueryBaseService<AccountTransactionModel> queryService
 
 <DetailTemplate Name="Transaction list" DetailTemplateAction="ShowInfo">
     <ChildContent>
@@ -27,39 +26,21 @@
         {
             var user = (await AuthenticationState).User;
 
-            if (await localStorage.ContainKeyAsync($"{user.Identity.Name}_{DefaultString.Id.accountId}"))
-            {
-                var accountIds = await localStorage.GetItemAsync<long[]>($"{user.Identity.Name}_{DefaultString.Id.accountId}");
-
-                if (accountIds.Any())
+            string CustomUriBuilder(long accountId) => new UrlBuilder(UrlController.AccountTransactions, UrlPath.ByAccountId, accountId).Result;
+            ColumnConfig[] CustomColumnBuilder() => new ColumnConfig[]
                 {
-                    var result = new List<AccountTransactionModel>();
+                    new ColumnConfig{DataField = nameof(AccountTransactionModel.AccountName), Caption = "Account", DataType = HtmlDataType.String},
+                    new ColumnConfig{DataField = nameof(AccountTransactionModel.DateOperation), Caption = "Date", DataType = HtmlDataType.Date, Format = "d"},
+                    new ColumnConfig{DataField = nameof(AccountTransactionModel.StatusName), Caption = "Status", DataType = HtmlDataType.String},
+                    new ColumnConfig{DataField = nameof(AccountTransactionModel.Amount), Caption = "Amount", DataType = HtmlDataType.Number, Format = "f2"},
+                    new ColumnConfig{DataField = nameof(AccountTransactionModel.CurrencyName), Caption = "Currency", DataType = HtmlDataType.String}                
+                };
 
-                    foreach (var accountId in accountIds)
-                        result.AddRange(await http.GetAsync<List<AccountTransactionModel>>(new UrlBuilder(UrlController.AccountTransactions, UrlPath.ByAccountId, accountId).Result));
+            var queryResult = await queryService.GetResultsAsync(user, CustomUriBuilder, CustomColumnBuilder);
 
-                    if (result.Any())
-                    {
-                        items = result;
-
-                        columns = new List<ColumnConfig>();
-                        columns.AddRange(new ColumnConfig[]
-                        {
-                            new ColumnConfig{DataField = nameof(AccountTransactionModel.AccountName), Caption = "Account", DataType = HtmlDataType.String},
-                            new ColumnConfig{DataField = nameof(AccountTransactionModel.DateOperation), Caption = "Date", DataType = HtmlDataType.Date, Format = "d"},
-                            new ColumnConfig{DataField = nameof(AccountTransactionModel.StatusName), Caption = "Status", DataType = HtmlDataType.String},
-                            new ColumnConfig{DataField = nameof(AccountTransactionModel.Amount), Caption = "Amount", DataType = HtmlDataType.Number, Format = "f2"},
-                            new ColumnConfig{DataField = nameof(AccountTransactionModel.CurrencyName), Caption = "Currency", DataType = HtmlDataType.String}
-                        });
-                    }
-                    else
-                        info = $"{DefaultString.outresult} transactions.";
-                }
-                else
-                    info = DefaultString.accountDisabled;
-            }
-            else
-                info = DefaultString.accountNotFound;
+            columns = queryResult.Columns;
+            items = queryResult.ViewResult.ResultContents;
+            info = queryResult.ViewResult.ResultInfo;
         }
     }
 }

@@ -2,7 +2,7 @@
 @inject CustomNotification notice
 
 <RowTitleSub Text="Company" />
-@if (editContext != null)
+@if (editContext is not null)
 {
     <EditForm EditContext="editContext">
         <DataAnnotationsValidator />
@@ -62,21 +62,26 @@ else
     [Parameter] public long? CompanyId { get; set; }
     [Parameter] public EventCallback<(int, long)> FirstStep { get; set; }
 
-    List<BaseView> industries = new List<BaseView>();
-    List<BaseView> sectors = new List<BaseView>();
+    List<ShortView> industries;
+    List<ShortView> sectors;
     CompanyModel company;
     EditContext editContext;
 
     protected override async Task OnInitializedAsync()
     {
-        industries = await http.GetAsync<List<BaseView>>(new UrlBuilder(UrlController.Industries).Result);
-        sectors = await http.GetAsync<List<BaseView>>(new UrlBuilder(UrlController.Sectors).Result);
+        industries = await http.GetAsync<List<ShortView>>(new UrlBuilder(UrlController.Industries).Result);
+        sectors = await http.GetAsync<List<ShortView>>(new UrlBuilder(UrlController.Sectors).Result);
 
-        company = CompanyId.HasValue
-            ? await http.GetAsync<CompanyModel>(new UrlBuilder(UrlController.Companies, CompanyId.Value).Result)
-            : new CompanyModel();
+        if (industries != default && sectors != default)
+        {
+            if(CompanyId.HasValue)
+                company = await http.GetAsync<CompanyModel>(new UrlBuilder(UrlController.Companies, CompanyId.Value).Result);
+            
+            if(company == default)
+                company =  new CompanyModel();
 
-        editContext = new EditContext(company);
+            editContext = new EditContext(company);
+        }
 
         await base.OnInitializedAsync();
     }
@@ -88,8 +93,8 @@ else
         if (editContext.Validate())
         {
             var result = CompanyId.HasValue
-                ? await http.PutAsync<BaseResult, CompanyModel>(new UrlBuilder(UrlController.Companies, CompanyId.Value).Result, company)
-                : await http.PostAsync<BaseResult, CompanyModel>(new UrlBuilder(UrlController.Companies).Result, company);
+                ? await http.PutAsync<BaseActionResult, CompanyModel>(new UrlBuilder(UrlController.Companies, CompanyId.Value).Result, company)
+                : await http.PostAsync<BaseActionResult, CompanyModel>(new UrlBuilder(UrlController.Companies).Result, company);
 
             if (result.IsSuccess)
             {

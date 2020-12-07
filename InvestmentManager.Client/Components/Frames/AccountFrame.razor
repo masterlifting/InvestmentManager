@@ -58,18 +58,20 @@
             try
             {
                 var accounts = await http.GetAsync<List<AccountModel>>(new UrlBuilder(UrlController.Accounts).Result);
-
-                foreach (var account in accounts)
+                if (accounts != default)
                 {
-                    decimal accountSum = await http.GetAsync<decimal>(new UrlBuilder(UrlController.Accounts, account.Id, UrlOption.Summary).Result);
-                    sumAccounts.Add(account.Id, accountSum);
-                    accountCollection.Add(account, true);
+                    foreach (var account in accounts)
+                    {
+                        decimal accountSum = await http.GetAsync<decimal>(new UrlBuilder(UrlController.Accounts, account.Id, UrlOption.Summary).Result);
+                        sumAccounts.Add(account.Id, accountSum);
+                        accountCollection.Add(account, true);
+                    }
                 }
             }
             catch
             {
-                navigationManager.NavigateTo("login");
                 await authenticationService.LogoutAsync();
+                navigationManager.NavigateTo("login");
                 await notice.AlertInfoAsync("Relogin please", 2000);
             }
         }

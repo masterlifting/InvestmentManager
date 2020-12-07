@@ -29,12 +29,12 @@ namespace InvestmentManager.Server.Controllers
 
 
         [HttpGet("bycompanyid/{id}")]
-        public async Task<List<ReportModel>> GetByCompanyId(long id)
+        public async Task<IActionResult> GetByCompanyId(long id)
         {
             var reports = (await unitOfWork.Company.FindByIdAsync(id).ConfigureAwait(false))?.Reports;
             return reports is null
-                ? new List<ReportModel>()
-                : reports.Select(x => new ReportModel
+                ? NoContent()
+                : Ok(reports.Select(x => new ReportModel
                 {
                     DateReport = x.DateReport,
                     Quarter = converterService.ConvertToQuarter(x.DateReport.Month),
@@ -49,28 +49,27 @@ namespace InvestmentManager.Server.Controllers
                     ShareCapital = x.ShareCapital,
                     Turnover = x.Turnover
 
-                }).ToList();
+                }).ToList());
         }
         [HttpGet("bycompanyid/{id}/summary/")]
-        public async Task<SummaryReport> GetSummaryByCompanyId(long id)
+        public async Task<IActionResult> GetSummaryByCompanyId(long id)
         {
             var reports = (await unitOfWork.Company.FindByIdAsync(id).ConfigureAwait(false))?.Reports.OrderBy(x => x.DateReport);
-            
-            return reports is null || !reports.Any() ? new SummaryReport() : new SummaryReport
+
+            return reports is null || !reports.Any() ? NoContent() : Ok(new SummaryReport
             {
-                IsHave = true,
                 DateLastReport = reports.Last().DateReport,
                 DateUpdate = reports.Last().DateUpdate,
                 ReportsCount = reports.Count(),
                 LastReportYear = reports.Last().DateReport.Year,
                 LastReportQuarter = converterService.ConvertToQuarter(reports.Last().DateReport.Month)
-            };
+            });
         }
 
         [HttpGet("new/"), Authorize(Roles = "pestunov")]
-        public async Task<List<ReportModel>> GetNew()
+        public async Task<IActionResult> GetNew()
         {
-            return await unitOfWork.Report.GetAll().Where(x => x.IsChecked == false).Select(x => new ReportModel
+            return Ok(await unitOfWork.Report.GetAll().Where(x => x.IsChecked == false).Select(x => new ReportModel
             {
                 Id = x.Id,
                 CompanyId = x.CompanyId,
@@ -87,7 +86,7 @@ namespace InvestmentManager.Server.Controllers
                 ShareCapital = x.ShareCapital,
                 StockVolume = x.StockVolume,
                 Turnover = x.Turnover
-            }).ToListAsync().ConfigureAwait(false);
+            }).ToListAsync().ConfigureAwait(false));
         }
 
         [HttpPut("{id}"), Authorize(Roles = "pestunov")]

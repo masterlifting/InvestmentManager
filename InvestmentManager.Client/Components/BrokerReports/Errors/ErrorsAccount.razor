@@ -24,7 +24,7 @@
     protected override void OnParametersSet() => model.Name = ErrorValue.Split('\'')[1];
     async Task SendData()
     {
-        var result = await http.PostAsync<BaseResult, AccountModel>(new UrlBuilder(UrlController.Accounts).Result, model);
+        var result = await http.PostAsync<BaseActionResult, AccountModel>(new UrlBuilder(UrlController.Accounts).Result, model);
         if (result.IsSuccess)
         {
             isDone = true;

@@ -4,7 +4,6 @@ using InvestmentManager.Entities.Market;
 using InvestmentManager.Mapper.Interfaces;
 using InvestmentManager.Models;
 using InvestmentManager.Models.Additional;
-using InvestmentManager.Models.Services;
 using InvestmentManager.PriceFinder.Interfaces;
 using InvestmentManager.ReportFinder.Interfaces;
 using InvestmentManager.Repository;
@@ -54,30 +53,30 @@ namespace InvestmentManager.Server.Controllers
         }
 
         [HttpGet("rate/")]
-        public async Task<CBRF> GetRate()
+        public async Task<IActionResult> GetRate()
         {
             var response = await webService.GetCBRateAsync().ConfigureAwait(false);
-            return response.IsSuccessStatusCode ? await response.Content.ReadFromJsonAsync<CBRF>().ConfigureAwait(false) : null;
+            return response.IsSuccessStatusCode ? Ok(await response.Content.ReadFromJsonAsync<CBRF>().ConfigureAwait(false)) : NoContent();
         }
-        
+
         [HttpPost("parsebrokerreports/"), Authorize]
-        public async Task<BrokerReportModel> ParseBcsReports()
+        public async Task<IActionResult> ParseBcsReports()
         {
             var files = HttpContext.Request.Form.Files;
             string userId = userManager.GetUserId(User);
             try
             {
                 var parsedReports = await brokerService.GetNewReportsAsync(files, userId).ConfigureAwait(false);
-                return mapper.MapBcsReports(parsedReports);
+                return Ok(mapper.MapBcsReports(parsedReports));
             }
             catch
             {
-                return null;
+                return NoContent();
             }
         }
-        
+
         [HttpGet("recalculateall/"), Authorize(Roles = "pestunov")]
-        public async Task<BaseResult> RecalculateAll()
+        public async Task<IActionResult> RecalculateAll()
         {
             try
             {
@@ -109,11 +108,11 @@ namespace InvestmentManager.Server.Controllers
 
                 await unitOfWork.CompleteAsync().ConfigureAwait(false);
 
-                return new BaseResult { IsSuccess = true, Info = "Recalculated." };
+                return Ok(new BaseActionResult { IsSuccess = true, Info = "Recalculated." });
             }
             catch (Exception)
             {
-                return new BaseResult { IsSuccess = false, Info = "Recalculated failed!" };
+                return BadRequest(new BaseActionResult { IsSuccess = false, Info = "Recalculated failed!" });
             }
         }
         [HttpGet("parsereports/"), Authorize(Roles = "pestunov")]

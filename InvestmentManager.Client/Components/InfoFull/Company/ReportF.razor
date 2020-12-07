@@ -1,10 +1,10 @@
-﻿@inject CustomHttpClient http
+﻿@inject QueryBaseService<ReportModel> queryService
 
 <DetailTemplate Name="Report details" DetailTemplateAction="ShowInfo">
     <ChildContent>
         @if (items is not null && items.Any())
         {
-            <TableHorizontal TItem="ReportModel" DataItems="items" Columns="columns" BodyColWidth="6" />
+            <TableHorizontal TItem="ReportModel" DataItems="items.OrderByDescending(x => x.DateReport).ToList()" Columns="columns" BodyColWidth="6" />
         }
         else
         {
@@ -25,12 +25,8 @@
     {
         if (isDetails == true)
         {
-            items = await http.GetAsync<List<ReportModel>>(new UrlBuilder(UrlController.Reports, UrlPath.ByCompanyId, CompanyId).Result);
-
-            if (items.Any())
-            {
-                columns = new List<ColumnConfig>();
-                columns.AddRange(new ColumnConfig[]
+            string CustomUriBuilder() => new UrlBuilder(UrlController.Reports, UrlPath.ByCompanyId, CompanyId).Result;
+            ColumnConfig[] CustomColumnBuilder() => new ColumnConfig[]
                 {
                     new ColumnConfig{DataField = nameof(ReportModel.DateReport), Caption = "Date Report", DataType = HtmlDataType.Date, Format = "d" },
                     new ColumnConfig{DataField = nameof(ReportModel.Quarter), Caption = "Quarter", DataType = HtmlDataType.Number, Format = "f0" },
@@ -44,10 +40,12 @@
                     new ColumnConfig{DataField = nameof(ReportModel.Dividend), Caption = "Dividend", DataType = HtmlDataType.Number, Format = "f2" },
                     new ColumnConfig{DataField = nameof(ReportModel.Obligation), Caption = "Obligation", DataType = HtmlDataType.Number, Format = "f0" },
                     new ColumnConfig{DataField = nameof(ReportModel.LongTermDebt), Caption = "Long Term Debt", DataType = HtmlDataType.Number, Format = "f0" },
-                });
-            }
-            else
-                info = $"{DefaultString.outresult} reports.";
+                };
+            var queryResult = await queryService.GetResultsAsync(CustomUriBuilder, CustomColumnBuilder);
+
+            columns = queryResult.Columns;
+            items = queryResult.ViewResult.ResultContents;
+            info = queryResult.ViewResult.ResultInfo;
         }
     }
 }

@@ -28,7 +28,7 @@
     {
         if (await IsAdmin())
         {
-            var result = await http.GetAsync<BaseResult>(new UrlBuilder(UrlService.RecalculateAll).Result);
+            var result = await http.GetAsync<BaseActionResult>(new UrlBuilder(UrlService.RecalculateAll).Result);
 
             if (result.IsSuccess)
                 notice.ToastSuccess("Recalculating info", result.Info);

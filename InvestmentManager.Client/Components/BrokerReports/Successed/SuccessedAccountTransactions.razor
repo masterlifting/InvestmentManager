@@ -39,15 +39,15 @@
     [Parameter] public List<AccountTransactionModel> AccountTransactions { get; set; }
     List<AccountTransactionModel> accountTransactions { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnParametersSet()
     {
         accountTransactions = AccountTransactions;
-        await base.OnInitializedAsync();
+        base.OnParametersSet();
     }
 
     async Task SaveData(AccountTransactionModel transaction)
     {
-        var result = await http.PostAsync<BaseResult, AccountTransactionModel>(new UrlBuilder(UrlController.AccountTransactions).Result, transaction);
+        var result = await http.PostAsync<BaseActionResult, AccountTransactionModel>(new UrlBuilder(UrlController.AccountTransactions).Result, transaction);
 
         if (result.IsSuccess)
         {
@@ -55,6 +55,6 @@
             accountTransactions.Remove(transaction);
         }
         else
-            notice.ToastDanger("Account transaction error.", result.Info);
+            notice.ToastDanger("Account transaction error", result.Info);
     }
 }

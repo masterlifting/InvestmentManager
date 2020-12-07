@@ -2,7 +2,7 @@
 @inject CustomNotification notice
 
 <RowTitleSub Text="Roport source" />
-@if (reportSource != null)
+@if (editContext is not null)
 {
     <EditForm EditContext="editContext">
         <DataAnnotationsValidator />
@@ -32,12 +32,17 @@ else
 
     EditContext editContext;
     ReportSourceModel reportSource;
+    bool isEditeble = true;
 
     protected override async Task OnInitializedAsync()
     {
-        var respose = await http.GetAsync<ReportSourceModel>(new UrlBuilder(UrlController.ReportSources, UrlPath.ByCompanyId, CompanyId).Result);
-        
-        reportSource =  respose.IsEditeble ? respose : new ReportSourceModel { CompanyId = CompanyId };
+        reportSource = await http.GetAsync<ReportSourceModel>(new UrlBuilder(UrlController.ReportSources, UrlPath.ByCompanyId, CompanyId).Result);
+
+        if(reportSource == default)
+        {
+            isEditeble = false;
+            reportSource = new ReportSourceModel { CompanyId = CompanyId };
+        }
 
         editContext = new EditContext(reportSource);
 
@@ -48,9 +53,9 @@ else
     {
         if (editContext.Validate())
         {
-            var result = reportSource.IsEditeble
-                ? await http.PutAsync<BaseResult, ReportSourceModel>(new UrlBuilder(UrlController.ReportSources, reportSource.Id).Result, reportSource)
-                : await http.PostAsync<BaseResult, ReportSourceModel>(new UrlBuilder(UrlController.ReportSources).Result, reportSource);
+            var result = isEditeble
+                ? await http.PutAsync<BaseActionResult, ReportSourceModel>(new UrlBuilder(UrlController.ReportSources, reportSource.Id).Result, reportSource)
+                : await http.PostAsync<BaseActionResult, ReportSourceModel>(new UrlBuilder(UrlController.ReportSources).Result, reportSource);
 
             if (result.IsSuccess)
             {

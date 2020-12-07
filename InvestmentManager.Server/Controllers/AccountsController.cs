@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using InvestmentManager.Server.RestServices;
 using InvestmentManager.Repository;
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using InvestmentManager.Services.Interfaces;
@@ -38,27 +37,37 @@ namespace InvestmentManager.Server.Controllers
             this.webService = webService;
         }
         [HttpGet]
-        public async Task<List<AccountModel>> Get()
+        public async Task<IActionResult> Get()
         {
             var userId = userManager.GetUserId(User);
             var accounts = unitOfWork.Account.GetAll().Where(x => x.UserId.Equals(userId));
-            return accounts is  null 
-                ? new List<AccountModel>() 
-                : await accounts.Select(x => new AccountModel { Id = x.Id, Name = x.Name }).ToListAsync().ConfigureAwait(false);
+            return accounts is null
+                ? NoContent()
+                : Ok(await accounts.Select(x => new AccountModel { Id = x.Id, Name = x.Name }).ToListAsync().ConfigureAwait(false));
         }
         [HttpGet("{id}")]
-        public async Task<AccountModel> Get(long id)
+        public async Task<IActionResult> Get(long id)
         {
             Account account = await unitOfWork.Account.FindByIdAsync(id).ConfigureAwait(false);
-            return account is null ? null : new AccountModel { Id = account.Id, Name = account.Name };
+            return account is null
+                ? NoContent()
+                : Ok(new AccountModel { Id = account.Id, Name = account.Name });
         }
         [HttpGet("{id}/summary/")]
-        public async Task<decimal> GetSum(long id)
+        public async Task<IActionResult> GetSum(long id)
         {
             var response = await webService.GetCBRateAsync().ConfigureAwait(false);
             var rate = response.IsSuccessStatusCode ? await response.Content.ReadFromJsonAsync<CBRF>().ConfigureAwait(false) : null;
             decimal dollar = rate is not null ? rate.Valute.USD.Value : 0;
-            return await summaryService.GetAccountSumAsync(id, dollar).ConfigureAwait(false);
+            try
+            {
+                decimal result = await summaryService.GetAccountSumAsync(id, dollar).ConfigureAwait(false);
+                return Ok(result);
+            }
+            catch
+            {
+                return BadRequest(0);
+            }
         }
 
         [HttpPost]

@@ -1,9 +1,9 @@
-﻿@inject CustomHttpClient http
-@inject ILocalStorageService localStorage
+﻿@inject QueryBaseService<StockTransactionModel> queryService
+
 
 <DetailTemplate Name="Transaction list" DetailTemplateAction="ShowInfo">
     <ChildContent>
-        @if (items is not null && items.Any())
+        @if (items is not null)
         {
             <TableVertical TItem="StockTransactionModel" DataItems="items" Columns="columns" />
         }
@@ -28,39 +28,20 @@
         if (isDetails == true)
         {
             var user = (await AuthenticationState).User;
-
-            if (await localStorage.ContainKeyAsync($"{user.Identity.Name}_{DefaultString.Id.accountId}"))
-            {
-                var accountIds = await localStorage.GetItemAsync<long[]>($"{user.Identity.Name}_{DefaultString.Id.accountId}");
-
-                if (accountIds.Any())
+            string CustomUriBuilder(long accountId) => new UrlBuilder(UrlController.StockTransactions, UrlPath.ByAccountId, accountId, UrlPath.ByCompanyId, CompanyId).Result;
+            ColumnConfig[] CustomColumnBuilder() => new ColumnConfig[]
                 {
-                    var result = new List<StockTransactionModel>();
-
-                    foreach (var accountId in accountIds)
-                        result.AddRange(await http.GetAsync<List<StockTransactionModel>>(new UrlBuilder(UrlController.StockTransactions, UrlPath.ByAccountId, accountId, UrlPath.ByCompanyId, CompanyId).Result));
-
-                    if (result.Any())
-                    {
-                        items = result;
-
-                        columns = new List<ColumnConfig>();
-                        columns.AddRange(new ColumnConfig[]
-                        {
                             new ColumnConfig{DataField = nameof(StockTransactionModel.DateOperation), Caption = "Date", DataType = HtmlDataType.Date, Format = "d", AlignType=AlignType.Center},
                             new ColumnConfig{DataField = nameof(StockTransactionModel.StatusName), Caption = "Status", DataType = HtmlDataType.String, AlignType=AlignType.Center},
                             new ColumnConfig{DataField = nameof(StockTransactionModel.Quantity), Caption = "Volume", DataType = HtmlDataType.Number, Format = "f0", AlignType=AlignType.Center},
                             new ColumnConfig{DataField = nameof(StockTransactionModel.Cost), Caption = "Cost", DataType = HtmlDataType.Number, Format = "f3", AlignType=AlignType.Center},
-                        });
-                    }
-                    else
-                        info = $"{DefaultString.outresult} transactions.";
-                }
-                else
-                    info = DefaultString.accountDisabled;
-            }
-            else
-                info = DefaultString.accountNotFound;
+                };
+
+            var queryResult = await queryService.GetResultsAsync(user, CustomUriBuilder, CustomColumnBuilder);
+
+            columns = queryResult.Columns;
+            items = queryResult.ViewResult.ResultContents;
+            info = queryResult.ViewResult.ResultInfo;
         }
     }
 }

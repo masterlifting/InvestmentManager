@@ -1,9 +1,8 @@
-﻿@inject CustomHttpClient http
-@inject ILocalStorageService localStorage
+﻿@inject QueryBaseService<DividendModel> queryService 
 
 <DetailTemplate Name="Dividend list" DetailTemplateAction="ShowInfo">
     <ChildContent>
-        @if (items != null && items.Any())
+        @if (items is not null)
         {
             <TableVertical TItem="DividendModel" DataItems="items" Columns="columns" />
         }
@@ -29,36 +28,18 @@
         {
             var user = (await AuthenticationState).User;
 
-            if (await localStorage.ContainKeyAsync($"{user.Identity.Name}_{DefaultString.Id.accountId}"))
-            {
-                var accountIds = await localStorage.GetItemAsync<long[]>($"{user.Identity.Name}_{DefaultString.Id.accountId}");
-
-                if (accountIds.Any())
-                {
-                    var result = new List<DividendModel>();
-
-                    foreach (var accountId in accountIds)
-                        result.AddRange(await http.GetAsync<List<DividendModel>>(new UrlBuilder(UrlController.Dividends, UrlPath.ByAccountId, accountId, UrlPath.ByCompanyId, CompanyId).Result));
-
-                    if (result.Any())
+            string CustomUriBuilder(long accountId) => new UrlBuilder(UrlController.Dividends, UrlPath.ByAccountId, accountId, UrlPath.ByCompanyId, CompanyId).Result;
+                ColumnConfig[] CustomColumnBuilder() => new ColumnConfig[]
                     {
-                        items = result;
+                        new ColumnConfig{DataField = nameof(DividendModel.DateOperation), Caption = "Date", DataType = HtmlDataType.Date, Format = "d", AlignType = AlignType.Center},
+                        new ColumnConfig{DataField = nameof(DividendModel.Amount), Caption = "Ammount", DataType = HtmlDataType.Number, Format = "f3", AlignType = AlignType.Center},
+                    };
 
-                        columns = new List<ColumnConfig>();
-                        columns.AddRange(new ColumnConfig[]
-                        {
-                            new ColumnConfig{DataField = nameof(DividendModel.DateOperation), Caption = "Date", DataType = HtmlDataType.Date, Format = "d", AlignType = AlignType.Center},
-                            new ColumnConfig{DataField = nameof(DividendModel.Amount), Caption = "Ammount", DataType = HtmlDataType.Number, Format = "f3", AlignType = AlignType.Center},
-                        });
-                    }
-                    else
-                        info = $"{DefaultString.outresult} dividends.";
-                }
-                else
-                    info = DefaultString.accountDisabled;
-            }
-            else
-                info = DefaultString.accountNotFound;
+            var queryResult = await queryService.GetResultsAsync(user, CustomUriBuilder, CustomColumnBuilder);
+
+            columns = queryResult.Columns;
+            items = queryResult.ViewResult.ResultContents;
+            info = queryResult.ViewResult.ResultInfo;
         }
     }
 }

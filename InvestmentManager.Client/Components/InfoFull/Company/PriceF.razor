@@ -1,8 +1,8 @@
-﻿@inject CustomHttpClient http
+﻿@inject QueryBaseService<PriceModel> queryService
 
 <DetailTemplate Name="Price list" DetailTemplateAction="ShowInfo">
     <ChildContent>
-        @if (items is not null && items.Any())
+        @if (items is not null)
         {
             <TableVertical TItem="PriceModel" DataItems="items" Columns="columns" />
         }
@@ -24,19 +24,17 @@
     {
         if (isDetails == true)
         {
-            items = await http.GetAsync<List<PriceModel>>(new UrlBuilder(UrlController.Prices, UrlPath.ByCompanyId, CompanyId).Result);
-
-            if (items.Any())
-            {
-                columns = new List<ColumnConfig>();
-                columns.AddRange(new ColumnConfig[]
+            string CustomUriBuilder() => new UrlBuilder(UrlController.Prices, UrlPath.ByCompanyId, CompanyId).Result;
+            ColumnConfig[] CustomColumnBuilder() => new ColumnConfig[]
                 {
                     new ColumnConfig{DataField = nameof(PriceModel.BidDate), Caption = "Date", DataType = HtmlDataType.Date, Format = "d", AlignType = AlignType.Center},
                     new ColumnConfig{DataField = nameof(PriceModel.Value), Caption = "Price", DataType = HtmlDataType.Number, Format = "f2", AlignType = AlignType.Center}
-                });
-            }
-            else
-                info = $"{DefaultString.outresult} prices.";
+                };
+            var queryResult = await queryService.GetResultsAsync(CustomUriBuilder, CustomColumnBuilder);
+
+            columns = queryResult.Columns;
+            items = queryResult.ViewResult.ResultContents;
+            info = queryResult.ViewResult.ResultInfo;
         }
     }
 }

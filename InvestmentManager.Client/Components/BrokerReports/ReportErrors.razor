@@ -1,4 +1,4 @@
-﻿@foreach (var error in Errors.OrderBy(x => x.ErrorType))
+﻿@foreach (var error in errors.OrderBy(x => x.ErrorType))
 {
     switch (error.ErrorType)
     {
@@ -29,4 +29,11 @@
 
 @code {
     [Parameter] public List<BrokerReportErrorModel> Errors { get; set; }
+    List<BrokerReportErrorModel> errors;
+
+    protected override void OnParametersSet()
+    {
+        errors = Errors;
+        base.OnParametersSet();
+    }
 }

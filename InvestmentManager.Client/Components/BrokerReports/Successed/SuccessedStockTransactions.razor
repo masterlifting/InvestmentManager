@@ -21,36 +21,38 @@
                 </div>
             </div>
         </div>
-
-        @foreach (var item in stockTransactions
-              .Join(tickers, x => x.TickerId, y => y.Id, (x, y) => new { Transaction = x, CompanyId = y.CompanyId, Ticker = y.Name })
-              .Join(companies, x => x.CompanyId, y => y.Id, (x, y) => new
-              {
-                  x.Transaction,
-                  x.Ticker,
-                  Company = y.Name
-              }))
+        @if (stockTransactions is not null)
         {
-            string color = catalogService.GetStatusBootstrapColor(item.Transaction.StatusId);
-            string status = catalogService.GetStatusName(item.Transaction.StatusId);
-            string exchange = catalogService.GetExchangeName(item.Transaction.ExchangeId);
+            foreach (var item in stockTransactions
+                  .Join(tickers, x => x.TickerId, y => y.Id, (x, y) => new { Transaction = x, CompanyId = y.CompanyId, Ticker = y.Name })
+                  .Join(companies, x => x.CompanyId, y => y.Id, (x, y) => new
+                  {
+                      x.Transaction,
+                      x.Ticker,
+                      Company = y.Name
+                  }))
+            {
+                string color = catalogService.GetStatusBootstrapColor(item.Transaction.StatusId);
+                string status = catalogService.GetStatusName(item.Transaction.StatusId);
+                string exchange = catalogService.GetExchangeName(item.Transaction.ExchangeId);
 
-            <div class="row ilink" @onclick="(() => SaveData(item.Transaction))" >
-                <div class="col-12">@item.Ticker | @item.Company</div>
-                <div class="col-7">
-                    <div class="row text-@color">
-                        <div class="col-4">@status</div>
-                        <div class="col-4">@exchange</div>
-                        <div class="col-4">@item.Transaction.Quantity</div>
+                <div class="row ilink" @onclick="(() => SaveData(item.Transaction))">
+                    <div class="col-12">@item.Ticker | @item.Company</div>
+                    <div class="col-7">
+                        <div class="row text-@color">
+                            <div class="col-4">@status</div>
+                            <div class="col-4">@exchange</div>
+                            <div class="col-4">@item.Transaction.Quantity</div>
+                        </div>
+                    </div>
+                    <div class="col-5">
+                        <div class="row text-@color.ToString()">
+                            <div class="col-6 px-0">@item.Transaction.Cost</div>
+                            <div class="col-6 px-0 text-center">@item.Transaction.DateOperation.ToShortDateString()</div>
+                        </div>
                     </div>
                 </div>
-                <div class="col-5">
-                    <div class="row text-@color.ToString()">
-                        <div class="col-6 px-0">@item.Transaction.Cost</div>
-                        <div class="col-6 px-0 text-center">@item.Transaction.DateOperation.ToShortDateString()</div>
-                    </div>
-                </div>
-            </div>
+            }
         }
     </div>
 </div>
@@ -59,21 +61,23 @@
     [Parameter] public List<StockTransactionModel> StockTransactions { get; set; }
 
     List<StockTransactionModel> stockTransactions { get; set; }
-    List<TickerModel> tickers = new List<TickerModel>();
-    List<BaseView> companies = new List<BaseView>();
+    List<TickerModel> tickers;
+    List<ShortView> companies;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
-        stockTransactions = StockTransactions;
         tickers = await http.GetAsync<List<TickerModel>>(new UrlBuilder(UrlController.Tickers).Result);
-        companies = await http.GetAsync<List<BaseView>>(new UrlBuilder(UrlController.Companies).Result);
+        companies = await http.GetAsync<List<ShortView>>(new UrlBuilder(UrlController.Companies).Result);
+
+        if (tickers != default && companies != default)
+            stockTransactions = StockTransactions;
 
         await base.OnInitializedAsync();
     }
 
     async Task SaveData(StockTransactionModel transaction)
     {
-        var result = await http.PostAsync<BaseResult, StockTransactionModel>(new UrlBuilder(UrlController.StockTransactions).Result, transaction);
+        var result = await http.PostAsync<BaseActionResult, StockTransactionModel>(new UrlBuilder(UrlController.StockTransactions).Result, transaction);
 
         if (result.IsSuccess)
         {

@@ -33,51 +33,50 @@ namespace InvestmentManager.Server.Controllers
         }
 
         [HttpGet]
-        public async Task<List<BaseView>> Get() =>
-            await unitOfWork.Company.GetAll().OrderBy(x => x.Name).Select(x => new BaseView { Id = x.Id, Name = x.Name }).ToListAsync().ConfigureAwait(false);
+        public async Task<IActionResult> Get() =>
+            Ok(await unitOfWork.Company.GetAll().OrderBy(x => x.Name).Select(x => new ShortView { Id = x.Id, Name = x.Name }).ToListAsync().ConfigureAwait(false));
         [HttpGet("{id}")]
-        public async Task<CompanyModel> Get(long id)
+        public async Task<IActionResult> Get(long id)
         {
             var company = await unitOfWork.Company.FindByIdAsync(id).ConfigureAwait(false);
-            return company is null ? null : new CompanyModel
+            return company is null ? NoContent() : Ok(new CompanyModel
             {
                 Id = company.Id,
                 Name = company.Name,
                 DateSplit = company.DateSplit,
                 IndustryId = company.IndustryId,
                 SectorId = company.SectorId
-            };
+            });
         }
         [HttpGet("{id}/summary/")]
-        public async Task<SummaryAdditional> GetSummary(long id)
+        public async Task<IActionResult> GetSummary(long id)
         {
             var company = await unitOfWork.Company.FindByIdAsync(id).ConfigureAwait(false);
             long? currencyId = company?.Tickers?.FirstOrDefault()?.Prices?.FirstOrDefault()?.CurrencyId;
-            return company is null ? new SummaryAdditional() : new SummaryAdditional
+            return company is null ? NoContent() : Ok(new SummaryAdditional
             {
-                IsHave = true,
                 IndustryName = company.Industry.Name,
                 SectorName = company.Sector.Name,
                 CurrencyType = currencyId.HasValue ? catalogService.GetCurrencyName(currencyId.Value) : "No currency data."
-            };
+            });
         }
 
         [HttpGet("bypagination/{value}")]
-        public async Task<BaseViewPagination> GetPagination(int value = 1)
+        public async Task<IActionResult> GetPagination(int value = 1)
         {
             int pageSize = 10;
             var companies = unitOfWork.Company.GetAll().OrderBy(x => x.Name);
             var items = await companies
                 .Skip((value - 1) * pageSize)
                 .Take(pageSize)
-                .Select(x => new BaseView { Id = x.Id, Name = x.Name })
+                .Select(x => new ShortView { Id = x.Id, Name = x.Name })
                 .ToListAsync().ConfigureAwait(false);
 
-            var pagination = new Pagination();
-            var count = await companies.CountAsync().ConfigureAwait(false);
-            pagination.SetPagination(count, value, pageSize);
+            var paginationResult = new PaginationViewModel<ShortView>();
+            paginationResult.Pagination.SetPagination(await companies.CountAsync().ConfigureAwait(false), value, pageSize);
+            paginationResult.Items = items;
 
-            return new BaseViewPagination { Items = items, Pagination = pagination };
+            return Ok(paginationResult);
         }
 
         [HttpPost, Authorize(Roles = "pestunov")]

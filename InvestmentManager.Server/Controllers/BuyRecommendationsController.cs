@@ -17,12 +17,12 @@ namespace InvestmentManager.Server.Controllers
         public BuyRecommendationsController(IUnitOfWorkFactory unitOfWork) => this.unitOfWork = unitOfWork;
 
         [HttpGet("bypagination/{value}")]
-        public BaseViewPagination GetPagination(int value = 1)
+        public IActionResult GetPagination(int value = 1)
         {
             int pageSize = 10;
             var companies = unitOfWork.Company.GetAll();
             var lastPricies = unitOfWork.Price.GetLastPrices(30);
-            var recommendations = lastPricies
+            var recommendations = lastPricies?
                 .Join(unitOfWork.BuyRecommendation.GetAll(), x => x.Key, y => y.CompanyId, (x, y) => new
                 {
                     y.CompanyId,
@@ -31,37 +31,40 @@ namespace InvestmentManager.Server.Controllers
                 })
                 .OrderByDescending(x => x.RecommendationPrice / x.LastPrice);
 
-            var items = recommendations
+            var items = recommendations?
                 .Skip((value - 1) * pageSize)
                 .Take(pageSize)
-                .Join(companies, x => x.CompanyId, y => y.Id, (x, y) => new BaseView { Id = y.Id, Name = y.Name })
+                .Join(companies, x => x.CompanyId, y => y.Id, (x, y) => new ShortView { Id = y.Id, Name = y.Name })
                 .ToList();
 
-            var pagination = new Pagination();
-            pagination.SetPagination(recommendations.Count(), value, pageSize);
+            if (items is null)
+                return NoContent();
 
-            return new BaseViewPagination { Items = items, Pagination = pagination };
+            var paginationResult = new PaginationViewModel<ShortView>();
+            paginationResult.Pagination.SetPagination(recommendations.Count(), value, pageSize);
+            paginationResult.Items = items;
+
+            return Ok(paginationResult);
         }
         [HttpGet("bycompanyid/{id}")]
-        public async Task<BuyRecommendationModel> GetByCompanyId(long id)
+        public async Task<IActionResult> GetByCompanyId(long id)
         {
             var result = await unitOfWork.BuyRecommendation.GetAll().FirstOrDefaultAsync(x => x.CompanyId == id).ConfigureAwait(false);
-            return result is null ? null : new BuyRecommendationModel
+            return result is null ? NoContent() : Ok(new BuyRecommendationModel
             {
                 DateUpdate = result.DateUpdate,
                 Price = result.Price
-            };
+            });
         }
         [HttpGet("bycompanyid/{id}/summary/")]
-        public async Task<SummaryBuyRecommendation> GetSummaryByCompanyId(long id)
+        public async Task<IActionResult> GetSummaryByCompanyId(long id)
         {
             var recommendation = (await unitOfWork.Company.FindByIdAsync(id).ConfigureAwait(false))?.BuyRecommendation;
-            return recommendation is null ? new SummaryBuyRecommendation() : new SummaryBuyRecommendation
+            return recommendation is null ? NoContent() : Ok(new SummaryBuyRecommendation
             {
-                IsHave = true,
                 DateUpdate = recommendation.DateUpdate,
                 BuyPrice = recommendation.Price
-            };
+            });
         }
     }
 }

@@ -15,37 +15,36 @@ namespace InvestmentManager.Server.Controllers
         public PricesController(IUnitOfWorkFactory unitOfWork) => this.unitOfWork = unitOfWork;
 
         [HttpGet("bycompanyid/{id}")]
-        public async Task<List<PriceModel>> GetByCompanyId(long id)
+        public async Task<IActionResult> GetByCompanyId(long id)
         {
             var prices = await unitOfWork.Price.GetCustomPricesAsync(id, 12, OrderType.OrderByDesc).ConfigureAwait(false);
             return prices is null
-                ? new List<PriceModel>()
-                : prices.Select(x => new PriceModel
+                ? NoContent()
+                : Ok(prices.Select(x => new PriceModel
                 {
                     DateUpdate = x.DateUpdate,
                     BidDate = x.BidDate,
                     Value = x.Value,
                     CurrencyId = x.CurrencyId,
                     TickerId = x.TickerId
-                }).ToList();
+                }).ToList());
         }
         [HttpGet("bycompanyid/{id}/summary/")]
-        public async Task<SummaryPrice> GetSummaryByCompanyId(long id)
+        public async Task<IActionResult> GetSummaryByCompanyId(long id)
         {
             var prices = await unitOfWork.Price.GetCustomPricesAsync(id, 1, OrderType.OrderBy).ConfigureAwait(false);
 
             if (prices is null || !prices.Any())
-                return new SummaryPrice();
-            
+                return NoContent();
+
             var lastPrice = prices.Last();
 
-            return new SummaryPrice
+            return Ok(new SummaryPrice
             {
-                IsHave = true,
                 DateUpdate = lastPrice.DateUpdate,
                 DatePrice = lastPrice.BidDate,
                 Cost = lastPrice.Value
-            };
+            });
         }
     }
 }

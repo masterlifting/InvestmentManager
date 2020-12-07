@@ -1,10 +1,8 @@
-﻿@inject CustomHttpClient http
-@inject ILocalStorageService localStorage
-@inject CustomNotification notice
+﻿@inject QueryBaseService<SummaryStockTransaction> queryService
 
 <InfoTemplate InfoName="@InfoName" VisibleAction="((bool isVisible) => UpdateVisible.InvokeAsync(isVisible))">
     <ChildContent>
-        @if (model is not null && model.IsHave)
+        @if (model is not null)
         {
             <KeyValueCols Key="Last operation" Value="@model.DateTransaction.ToShortDateString()" />
             <KeyValueCols Key="Status" Value="@model.StatusName" />
@@ -35,48 +33,23 @@
     protected override async Task OnInitializedAsync()
     {
         var user = (await AuthenticationStateTask).User;
-
-        if (user.Identity.IsAuthenticated)
+        string CustomUrlBuilder(long accountId) => new UrlBuilder(UrlController.StockTransactions, UrlPath.ByAccountId, accountId, UrlPath.ByCompanyId, CompanyId, UrlOption.Summary).Result;
+        SummaryStockTransaction CustomResultBuilder(List<SummaryStockTransaction> models)
         {
-            if (await localStorage.ContainKeyAsync($"{user.Identity.Name}_{DefaultString.Id.accountId}"))
+            var targetData = models.OrderBy(x => x.DateTransaction).Last();
+
+            return new SummaryStockTransaction
             {
-                var accountIds = await localStorage.GetItemAsync<long[]>($"{user.Identity.Name}_{DefaultString.Id.accountId}");
-
-                if (accountIds.Any())
-                {
-                    var models = new List<SummaryStockTransaction>();
-
-                    foreach (var accountId in accountIds)
-                    {
-                        var summary = await http.GetAsync<SummaryStockTransaction>(new UrlBuilder(UrlController.StockTransactions, UrlPath.ByAccountId, accountId, UrlPath.ByCompanyId, CompanyId, UrlOption.Summary).Result);
-
-                        if (summary.IsHave)
-                            models.Add(summary);
-                    }
-
-                    if (models.Any())
-                    {
-                        var targetData = models.OrderBy(x => x.DateTransaction).Last();
-
-                        model = new SummaryStockTransaction
-                        {
-                            IsHave = true,
-                            DateTransaction = targetData.DateTransaction,
-                            StatusName = targetData.StatusName,
-                            Cost = targetData.Cost,
-                            Quantity = targetData.Quantity
-                        };
-                    }
-                    else
-                        info = DefaultString.notFound;
-                }
-                else
-                    info = DefaultString.accountDisabled;
-            }
-            else
-                info = DefaultString.accountNotFound;
+                DateTransaction = targetData.DateTransaction,
+                StatusName = targetData.StatusName,
+                Cost = targetData.Cost,
+                Quantity = targetData.Quantity
+            };
         }
-        else
-            info = DefaultString.noticeAccess;
+
+        var queryResult = await queryService.GetResultAsync(user, CustomUrlBuilder, CustomResultBuilder);
+
+        model = queryResult.ResultContent;
+        info = queryResult.ResultInfo;
     }
 }

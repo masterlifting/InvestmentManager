@@ -1,10 +1,8 @@
-﻿@inject CustomHttpClient http
-@inject ILocalStorageService localStorage
-@inject CustomNotification notice
+﻿@inject QueryBaseService<SummaryDividend> queryService
 
 <InfoTemplate InfoName="@InfoName" VisibleAction="((bool isVisible) => UpdateVisible.InvokeAsync(isVisible))">
     <ChildContent>
-        @if (model is not null && model.IsHave)
+        @if (model is not null)
         {
             <KeyValueCols Key="Last dividend" Value="@model.DateLastDividend.ToShortDateString()" />
             <KeyValueCols Key="Ammount" Value="@model.LastAmount.ToString("f2")" />
@@ -36,46 +34,21 @@
     {
         var user = (await AuthenticationStateTask).User;
 
-        if (user.Identity.IsAuthenticated)
+        string CustomUrlBuilder(long accountId) => new UrlBuilder(UrlController.Dividends, UrlPath.ByAccountId, accountId, UrlPath.ByCompanyId, CompanyId, UrlOption.Summary).Result;
+        SummaryDividend CustomResultBuilder(List<SummaryDividend> models)
         {
-            if (await localStorage.ContainKeyAsync($"{user.Identity.Name}_{DefaultString.Id.accountId}"))
+            var targetData = models.OrderBy(x => x.DateLastDividend).Last();
+            return new SummaryDividend
             {
-                var accountIds = await localStorage.GetItemAsync<long[]>($"{user.Identity.Name}_{DefaultString.Id.accountId}");
-
-                if (accountIds.Any())
-                {
-                    var models = new List<SummaryDividend>();
-
-                    foreach (var accountId in accountIds)
-                    {
-                        var summary = await http.GetAsync<SummaryDividend>(new UrlBuilder(UrlController.Dividends, UrlPath.ByAccountId, accountId, UrlPath.ByCompanyId, CompanyId, UrlOption.Summary).Result);
-
-                        if (summary.IsHave)
-                            models.Add(summary);
-                    }
-
-                    if (models.Any())
-                    {
-                        var targetData = models.OrderBy(x => x.DateLastDividend).Last();
-
-                        model = new SummaryDividend
-                        {
-                            IsHave = true,
-                            DateLastDividend = targetData.DateLastDividend,
-                            LastAmount = targetData.LastAmount,
-                            TotalSum = models.Sum(x => x.TotalSum)
-                        };
-                    }
-                    else
-                        info = DefaultString.notFound;
-                }
-                else
-                    info = DefaultString.accountDisabled;
-            }
-            else
-                info = DefaultString.accountNotFound;
+                DateLastDividend = targetData.DateLastDividend,
+                LastAmount = targetData.LastAmount,
+                TotalSum = models.Sum(x => x.TotalSum)
+            };
         }
-        else
-            info = DefaultString.noticeAccess;
+
+        var queryResult = await queryService.GetResultAsync(user, CustomUrlBuilder, CustomResultBuilder);
+
+        model = queryResult.ResultContent;
+        info = queryResult.ResultInfo;
     }
 }

@@ -27,15 +27,14 @@ namespace InvestmentManager.Server.Controllers
         }
 
         [HttpGet("bypagination/{value}")]
-        public BaseViewPagination GetPagination(int value = 1)
+        public IActionResult GetPagination(int value = 1)
         {
             string userId = userManager.GetUserId(User);
             int pageSize = 10;
-            var pagination = new Pagination();
 
             var companies = unitOfWork.Company.GetAll();
             var lastPricies = unitOfWork.Price.GetLastPrices(30);
-            var recommendations = lastPricies
+            var recommendations = lastPricies?
                 .Join(unitOfWork.SellRecommendation.GetAll().Where(x => x.UserId.Equals(userId)), x => x.Key, y => y.CompanyId, (x, y) => new
                 {
                     y.CompanyId,
@@ -56,26 +55,28 @@ namespace InvestmentManager.Server.Controllers
                 .ThenBy(x => x.PriceMax / x.LastPrice);
 
             if (recommendations is null)
-                return new BaseViewPagination { Items = new List<BaseView>(), Pagination = pagination };
+                return NoContent();
 
             var items = recommendations
                 .Skip((value - 1) * pageSize)
                 .Take(pageSize)
-                .Join(companies, x => x.CompanyId, y => y.Id, (x, y) => new BaseView { Id = y.Id, Name = y.Name })
+                .Join(companies, x => x.CompanyId, y => y.Id, (x, y) => new ShortView { Id = y.Id, Name = y.Name })
                 .ToList();
 
-            pagination.SetPagination(recommendations.Count(), value, pageSize);
+            var paginationResult = new PaginationViewModel<ShortView>();
+            paginationResult.Pagination.SetPagination(recommendations.Count(), value, pageSize);
+            paginationResult.Items = items;
 
-            return new BaseViewPagination { Items = items, Pagination = pagination };
+            return Ok(paginationResult);
         }
 
         [HttpGet("bycompanyid/{id}")]
-        public async Task<SellRecommendationModel> GetByCompanyId(long id)
+        public async Task<IActionResult> GetByCompanyId(long id)
         {
             string userId = userManager.GetUserId(User);
             var recommentation = await unitOfWork.SellRecommendation.GetAll().FirstOrDefaultAsync(x => x.UserId.Equals(userId) && x.CompanyId == id).ConfigureAwait(false);
 
-            return recommentation is null ? new SellRecommendationModel() : new SellRecommendationModel
+            return recommentation is null ? NoContent() : Ok(new SellRecommendationModel
             {
                 DateUpdate = recommentation.DateUpdate,
                 LotMin = recommentation.LotMin,
@@ -84,17 +85,16 @@ namespace InvestmentManager.Server.Controllers
                 PriceMin = recommentation.PriceMin,
                 PriceMid = recommentation.PriceMid,
                 PriceMax = recommentation.PriceMax
-            };
+            });
         }
         [HttpGet("bycompanyid/{id}/summary/")]
-        public async Task<SummarySellRecommendation> GetSummaryByCompanyId(long id)
+        public async Task<IActionResult> GetSummaryByCompanyId(long id)
         {
             string userId = userManager.GetUserId(User);
             var recommentation = await unitOfWork.SellRecommendation.GetAll().FirstOrDefaultAsync(x => x.UserId.Equals(userId) && x.CompanyId == id).ConfigureAwait(false);
 
-            return recommentation is null ? new SummarySellRecommendation() : new SummarySellRecommendation
+            return recommentation is null ? NoContent() : Ok(new SummarySellRecommendation
             {
-                IsHave = true,
                 DateUpdate = recommentation.DateUpdate,
                 LotMin = recommentation.LotMin,
                 LotMid = recommentation.LotMid,
@@ -102,8 +102,7 @@ namespace InvestmentManager.Server.Controllers
                 PriceMin = recommentation.PriceMin,
                 PriceMid = recommentation.PriceMid,
                 PriceMax = recommentation.PriceMax
-            };
+            });
         }
-
     }
 }

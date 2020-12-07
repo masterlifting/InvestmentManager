@@ -18,22 +18,24 @@
                 </div>
             </div>
         </div>
-
-        @foreach (var item in comissions.Join(comissionTypes, x => x.TypeId, y => y.Id, (x, y) => new { Comission = x, Type = y.Name }))
+        @if (comissions is not null)
         {
-            <div class="row text-danger ilink" @onclick="(() => SaveData(item.Comission))">
-                <div class="col-7">
-                    <div class="row">
-                        <div class="col">@item.Type</div>
+            foreach (var item in comissions.Join(comissionTypes, x => x.TypeId, y => y.Id, (x, y) => new { Comission = x, Type = y.Name }))
+            {
+                <div class="row text-danger ilink" @onclick="(() => SaveData(item.Comission))">
+                    <div class="col-7">
+                        <div class="row">
+                            <div class="col">@item.Type</div>
+                        </div>
+                    </div>
+                    <div class="col-5">
+                        <div class="row">
+                            <div class="col-6 px-0">@item.Comission.Amount</div>
+                            <div class="col-6 px-0 text-center">@item.Comission.DateOperation.ToShortDateString()</div>
+                        </div>
                     </div>
                 </div>
-                <div class="col-5">
-                    <div class="row">
-                        <div class="col-6 px-0">@item.Comission.Amount</div>
-                        <div class="col-6 px-0 text-center">@item.Comission.DateOperation.ToShortDateString()</div>
-                    </div>
-                </div>
-            </div>
+            }
         }
     </div>
 </div>
@@ -42,19 +44,20 @@
     [Parameter] public List<ComissionModel> Comissions { get; set; }
 
     List<ComissionModel> comissions { get; set; }
-    List<BaseView> comissionTypes = new List<BaseView>();
+    List<ShortView> comissionTypes;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
-        comissions = Comissions;
-        comissionTypes = await http.GetAsync<List<BaseView>>(new UrlBuilder(UrlCatalog.ComissionTypes).Result);
+        comissionTypes = await http.GetAsync<List<ShortView>>(new UrlBuilder(UrlCatalog.ComissionTypes).Result);
+        if(comissionTypes != default)
+            comissions = Comissions;
 
-        await base.OnInitializedAsync();
+        await base.OnParametersSetAsync();
     }
 
     async Task SaveData(ComissionModel comission)
     {
-        var result = await http.PostAsync<BaseResult, ComissionModel>(new UrlBuilder(UrlController.Comissions).Result, comission);
+        var result = await http.PostAsync<BaseActionResult, ComissionModel>(new UrlBuilder(UrlController.Comissions).Result, comission);
 
         if (result.IsSuccess)
         {

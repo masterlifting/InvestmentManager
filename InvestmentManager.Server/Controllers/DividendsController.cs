@@ -24,42 +24,41 @@ namespace InvestmentManager.Server.Controllers
         }
 
         [HttpGet("byaccountid/{accountId}/bycompanyid/{companyId}")]
-        public async Task<List<DividendModel>> GetByAccountIds(long accountId, long companyId)
+        public async Task<IActionResult> GetByAccountIds(long accountId, long companyId)
         {
             var transactions = await unitOfWork.Dividend.GetAll()
                 .Where(x => x.AccountId == accountId && x.Isin.CompanyId == companyId)
                 .OrderByDescending(x => x.DateOperation)
                 .ToListAsync().ConfigureAwait(false);
 
-            return transactions is null 
-                ? new List<DividendModel>() 
-                : transactions.Select(x => new DividendModel
-            {
-                DateOperation = x.DateOperation,
-                Amount = x.Amount,
-                Tax = x.Tax
-            }).ToList();
+            return transactions is null
+                ? NoContent()
+                : Ok(transactions.Select(x => new DividendModel
+                {
+                    DateOperation = x.DateOperation,
+                    Amount = x.Amount,
+                    Tax = x.Tax
+                }).ToList());
         }
         [HttpGet("byaccountid/{accountId}/bycompanyid/{companyId}/summary/")]
-        public async Task<SummaryDividend> GetSummaryByAccountIds(long accountId, long companyId)
+        public async Task<IActionResult> GetSummaryByAccountIds(long accountId, long companyId)
         {
             var dividends = await unitOfWork.Dividend.GetAll()
                 .Where(x => x.AccountId == accountId && x.Isin.CompanyId == companyId)
                 .OrderBy(x => x.DateOperation)
                 .ToListAsync();
-            
+
             if (dividends is null || !dividends.Any())
-                return new SummaryDividend();
+                return NoContent();
 
             var lastDividend = dividends.Last();
 
-            return new SummaryDividend
+            return Ok(new SummaryDividend
             {
-                IsHave = true,
                 DateLastDividend = lastDividend.DateOperation,
                 LastAmount = lastDividend.Amount,
                 TotalSum = dividends.Sum(x => x.Amount)
-            };
+            });
         }
         [HttpPost]
         public async Task<IActionResult> Post(DividendModel model)

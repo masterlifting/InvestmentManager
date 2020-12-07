@@ -58,15 +58,15 @@
     CBRF cbrf;
     bool _else;
 
-    BaseViewPagination companies;
-    List<BaseView> allCompanies;
+    PaginationViewModel<ShortView> companies;
+    List<ShortView> allCompanies;
 
     UrlController paginationController = UrlController.Companies;
 
     protected override async Task OnInitializedAsync()
     {
         user = (await AuthenticationState).User;
-        companies = await http.GetAsync<BaseViewPagination>(new UrlBuilder(paginationController, UrlPath.ByPagination, 1).Result);
+        companies = await http.GetAsync<PaginationViewModel<ShortView>>(new UrlBuilder(paginationController, UrlPath.ByPagination, 1).Result);
         cbrf = await http.GetAsync<CBRF>(new UrlBuilder(UrlService.Rate).Result);
 
         _else = companies.Pagination.HasNextPage;
@@ -74,7 +74,7 @@
     async Task GetAllCompanies()
     {
         await SetDefaultFilterAsync();
-        allCompanies = await http.GetAsync<List<BaseView>>(new UrlBuilder(UrlController.Companies).Result);
+        allCompanies = await http.GetAsync<List<ShortView>>(new UrlBuilder(UrlController.Companies).Result);
     }
     async Task GetOrderBy(ChangeEventArgs e)
     {
@@ -86,13 +86,13 @@
             await notice.AlertAccessAsync();
         }
 
-        companies = await http.GetAsync<BaseViewPagination>(new UrlBuilder(paginationController, UrlPath.ByPagination, 1).Result);
+        companies = await http.GetAsync<PaginationViewModel<ShortView>>(new UrlBuilder(paginationController, UrlPath.ByPagination, 1).Result);
         _else = companies.Pagination.HasNextPage;
     }
     async Task GetElse()
     {
         int paginationValue = companies.Pagination.PageNumber + 1;
-        var next = await http.GetAsync<BaseViewPagination>(new UrlBuilder(paginationController, UrlPath.ByPagination, paginationValue).Result);
+        var next = await http.GetAsync<PaginationViewModel<ShortView>>(new UrlBuilder(paginationController, UrlPath.ByPagination, paginationValue).Result);
 
         companies.Pagination = next.Pagination;
         _else = next.Pagination.HasNextPage;
@@ -101,7 +101,7 @@
     void FindCompany(ChangeEventArgs e)
     {
         var result = allCompanies.Where(x => x.Name.Contains(e.Value.ToString(), StringComparison.OrdinalIgnoreCase)).ToList();
-        companies.Items = result != null && result.Any() ? result : new List<BaseView>();
+        companies.Items = result != null && result.Any() ? result : new List<ShortView>();
         _else = false;
     }
     async Task SetDefaultFilterAsync()
