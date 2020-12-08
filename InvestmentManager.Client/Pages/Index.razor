@@ -9,9 +9,10 @@
     </div>
     <div class="col-6 pr-0 pl-1">
         <select @onchange="GetOrderBy" id="filterIndex">
-            <option selected value="@(UrlController.Companies)">Order by (default)</option>
+            <option selected value="@(UrlController.Companies)">Order by... name</option>
             <option value="@(UrlController.BuyRecommendations)">recommendations for buy</option>
             <option value="@(UrlController.SellRecommendations)">recommendations for sale</option>
+            <option value="@(UrlController.Ratings)">rating</option>
         </select>
     </div>
 </div>
@@ -106,7 +107,9 @@
     }
     async Task SetDefaultFilterAsync()
     {
-        paginationController = UrlController.Companies;
         await jsRuntime.InvokeVoidAsync("setDefaultFilter", "filterIndex");
+        paginationController = UrlController.Companies;
+        companies = await http.GetAsync<PaginationViewModel<ShortView>>(new UrlBuilder(paginationController, UrlPath.ByPagination, 1).Result);
+        _else = companies.Pagination.HasNextPage;
     }
 }

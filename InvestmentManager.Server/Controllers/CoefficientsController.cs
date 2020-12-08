@@ -1,0 +1,63 @@
+﻿using InvestmentManager.Entities.Calculate;
+using InvestmentManager.Models;
+using InvestmentManager.Models.EntityModels;
+using InvestmentManager.Models.SummaryModels;
+using InvestmentManager.Repository;
+using InvestmentManager.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace InvestmentManager.Server.Controllers
+{
+    [ApiController, Route("[controller]")]
+    public class CoefficientsController : Controller
+    {
+        private readonly IUnitOfWorkFactory unitOfWork;
+        private readonly IConverterService converterService;
+
+        public CoefficientsController(IUnitOfWorkFactory unitOfWork, IConverterService converterService)
+        {
+            this.unitOfWork = unitOfWork;
+            this.converterService = converterService;
+        }
+
+        [HttpGet("bycompanyid/{id}")]
+        public async Task<IActionResult> GetByCompanyId(long id)
+        {
+            var result = (await unitOfWork.Company.FindByIdAsync(id).ConfigureAwait(false))?.Reports?.Select(x => x.Coefficient).OrderByDescending(x => x.Report.DateReport);
+            return result is null ? NoContent() : Ok(result.Select(x => new CoefficientModel
+            {
+                PE = x.PE,
+                PB = x.PB,
+                EPS = x.EPS,
+                Profitability = x.Profitability,
+                ROA = x.ROA,
+                ROE = x.ROE,
+                DebtLoad = x.DebtLoad,
+                Year = x.Report.DateReport.Year,
+                Quarter = converterService.ConvertToQuarter(x.Report.DateReport.Month)
+            }).ToList());
+        }
+        [HttpGet("bycompanyid/{id}/summary/")]
+        public async Task<IActionResult> GetSummaryByCompanyId(long id)
+        {
+            var results = (await unitOfWork.Company.FindByIdAsync(id).ConfigureAwait(false))
+                ?.Reports?.Select(x => x.Coefficient).OrderBy(x => x.DateUpdate);
+            return results is null ? NoContent() : Ok(new SummaryCoefficient
+            {
+                DateUpdate = results.Last().DateUpdate,
+                Count = results.Count(),
+                Multiplcators = string.Join("; ", results.First().GetType().GetProperties()
+                .Where(x => !x.Name.Equals("LazyLoader")
+                                && !x.Name.Equals(nameof(Coefficient.DateUpdate))
+                                && !x.Name.Equals(nameof(Coefficient.Id))
+                                && !x.Name.Equals(nameof(Coefficient.Report))
+                                && !x.Name.Equals(nameof(Coefficient.ReportId)))
+                .Select(x => x.Name))
+            });
+        }
+    }
+}

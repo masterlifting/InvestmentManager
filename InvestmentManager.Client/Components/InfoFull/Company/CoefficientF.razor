@@ -1,5 +1,47 @@
-﻿<h3>CompanyCoefficient</h3>
+﻿@inject QueryBaseService<CoefficientModel> queryService
+
+<DetailTemplate Name="Coefficient detail" DetailTemplateAction="ShowInfo">
+    <ChildContent>
+        @if (items is not null)
+        {
+            <TableHorizontal BodyColWidth="4" TItem="CoefficientModel" DataItems="items" Columns="columns" />
+        }
+        else
+        {
+            <span>@info</span>
+        }
+    </ChildContent>
+</DetailTemplate>
 
 @code {
+    [Parameter] public long CompanyId { get; set; }
+    string info = DefaultString.loading;
 
+    List<CoefficientModel> items;
+    List<ColumnConfig> columns;
+
+    async Task ShowInfo(bool isDetails)
+    {
+        if (isDetails == true)
+        {
+            string CustomUriBuilder() => new UrlBuilder(UrlController.Coefficients, UrlPath.ByCompanyId, CompanyId).Result;
+            ColumnConfig[] CustomColumnBuilder() => new ColumnConfig[]
+                {
+                    new ColumnConfig{DataField = nameof(CoefficientModel.Year), Caption = "Year", DataType = HtmlDataType.Number, Format = "f0", AlignType = AlignType.Center},
+                    new ColumnConfig{DataField = nameof(CoefficientModel.Quarter), Caption = "Quarter", DataType = HtmlDataType.Number, Format = "f0", AlignType = AlignType.Center},
+                    new ColumnConfig{DataField = nameof(CoefficientModel.PE), Caption = "PE", DataType = HtmlDataType.Number, Format = "f2", AlignType = AlignType.Center},
+                    new ColumnConfig{DataField = nameof(CoefficientModel.PB), Caption = "PB", DataType = HtmlDataType.Number, Format = "f2", AlignType = AlignType.Center},
+                    new ColumnConfig{DataField = nameof(CoefficientModel.Profitability), Caption = "Profitability", DataType = HtmlDataType.Number, Format = "f2", AlignType = AlignType.Center},
+                    new ColumnConfig{DataField = nameof(CoefficientModel.EPS), Caption = "EPS", DataType = HtmlDataType.Number, Format = "f2", AlignType = AlignType.Center},
+                    new ColumnConfig{DataField = nameof(CoefficientModel.ROA), Caption = "ROA", DataType = HtmlDataType.Number, Format = "f2", AlignType = AlignType.Center},
+                    new ColumnConfig{DataField = nameof(CoefficientModel.ROE), Caption = "ROE", DataType = HtmlDataType.Number, Format = "f2", AlignType = AlignType.Center},
+                    new ColumnConfig{DataField = nameof(CoefficientModel.DebtLoad), Caption = "Debt load", DataType = HtmlDataType.Number, Format = "f2", AlignType = AlignType.Center}
+                };
+            var queryResult = await queryService.GetResultsAsync(CustomUriBuilder, CustomColumnBuilder);
+
+            columns = queryResult.Columns;
+            items = queryResult.ViewResult.ResultContents;
+            info = queryResult.ViewResult.ResultInfo;
+        }
+    }
 }

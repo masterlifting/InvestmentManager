@@ -1,5 +1,39 @@
-﻿<h3>CompanyRating</h3>
+﻿@inject QueryBaseService<RatingModel> queryService
+<DetailTemplate Name="Rating detail" DetailTemplateAction="ShowInfo">
+    <ChildContent>
+        @if (model is not null)
+        {
+            <div class="row">
+                <KeyValueCols KeySize="9" Key="Price comparision" Value="@model.PriceComparisonValue.ToString("f2")" />
+                <KeyValueCols KeySize="9" Key="Report comparision" Value="@model.ReportComparisonValue.ToString("f2")" />
+                <KeyValueCols KeySize="9" Key="Coefficient comparision" Value="@model.CoefficientComparisonValue.ToString("f2")" />
+                <KeyValueCols KeySize="9" Key="Coefficient avg comparision" Value="@model.CoefficientAverageValue.ToString("f2")" />
+                <KeyValueCols KeySize="9" Key="Cash flow comparision" Value="@model.CashFlowPositiveBalanceValue.ToString("f2")" />
+            </div>
+        }
+        else
+        {
+            <span>@info</span>
+        }
+    </ChildContent>
+</DetailTemplate>
 
 @code {
+    [Parameter] public long CompanyId { get; set; }
+    string info = DefaultString.loading;
 
+    RatingModel model;
+    List<ColumnConfig> columns;
+
+    async Task ShowInfo(bool isDetails)
+    {
+        if (isDetails == true)
+        {
+            string CustomUriBuilder() => new UrlBuilder(UrlController.Ratings, UrlPath.ByCompanyId, CompanyId).Result;
+            var queryResult = await queryService.GetResultAsync(CustomUriBuilder);
+
+            model = queryResult.ResultContent;
+            info = queryResult.ResultInfo;
+        }
+    }
 }
