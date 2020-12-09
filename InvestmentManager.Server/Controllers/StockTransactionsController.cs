@@ -1,12 +1,15 @@
 ﻿using InvestmentManager.Entities.Broker;
+using InvestmentManager.Models;
 using InvestmentManager.Models.EntityModels;
 using InvestmentManager.Models.SummaryModels;
 using InvestmentManager.Repository;
 using InvestmentManager.Server.RestServices;
 using InvestmentManager.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,15 +22,55 @@ namespace InvestmentManager.Server.Controllers
         private readonly IUnitOfWorkFactory unitOfWork;
         private readonly IBaseRestMethod restMethod;
         private readonly ICatalogService catalogService;
+        private readonly IConfiguration configuration;
+        private readonly UserManager<IdentityUser> userManager;
 
         public StockTransactionsController(
             IUnitOfWorkFactory unitOfWork
             , IBaseRestMethod restMethod
-            , ICatalogService catalogService)
+            , ICatalogService catalogService
+            , IConfiguration configuration
+            , UserManager<IdentityUser> userManager)
         {
             this.unitOfWork = unitOfWork;
             this.restMethod = restMethod;
             this.catalogService = catalogService;
+            this.configuration = configuration;
+            this.userManager = userManager;
+        }
+
+        [HttpGet("bypagination/{value}")]
+        public async Task<IActionResult> GetPagination(int value = 1)
+        {
+            string userId = userManager.GetUserId(User);
+            int pageSize = int.Parse(configuration["PaginationPageSize"]);
+
+            var companies = unitOfWork.Company.GetAll();
+            var accountIds = unitOfWork.Account.GetAll().Where(x => x.UserId.Equals(userId)).Select(x => x.Id);
+            var transactions = (await unitOfWork.StockTransaction.GetAll()
+                .Where(x => accountIds.Contains(x.AccountId))
+                .OrderByDescending(x => x.DateOperation)
+                .ToListAsync())
+                .GroupBy(x => x.TickerId);
+            var tickers = unitOfWork.Ticker.GetAll();
+            if (transactions is null)
+                return NoContent();
+
+            var items = transactions.Skip((value - 1) * pageSize).Take(pageSize)
+                .Join(tickers, x => x.Key, y => y.Id, (x, y) => new { y.CompanyId, x.First().DateOperation, x.First().TransactionStatusId })
+                .Join(companies, x => x.CompanyId, y => y.Id, (x, y) => new ShortView
+                {
+                    Id = y.Id,
+                    Name = y.Name,
+                    Description = x.DateOperation.ToShortDateString() + $"|{catalogService.GetStatusName(x.TransactionStatusId)}"
+                })
+                .ToList();
+
+            var paginationResult = new PaginationViewModel<ShortView>();
+            paginationResult.Pagination.SetPagination(transactions.Count(), value, pageSize);
+            paginationResult.Items = items;
+
+            return Ok(paginationResult);
         }
 
         [HttpGet("byaccountid/{accountId}/bycompanyid/{companyId}")]

@@ -11,6 +11,7 @@ using InvestmentManager.Server.RestServices;
 using InvestmentManager.Models.EntityModels;
 using InvestmentManager.Models.SummaryModels;
 using InvestmentManager.Services.Interfaces;
+using Microsoft.Extensions.Configuration;
 
 namespace InvestmentManager.Server.Controllers
 {
@@ -20,15 +21,18 @@ namespace InvestmentManager.Server.Controllers
         private readonly IUnitOfWorkFactory unitOfWork;
         private readonly IBaseRestMethod restMethod;
         private readonly ICatalogService catalogService;
+        private readonly IConfiguration configuration;
 
         public CompaniesController(
             IUnitOfWorkFactory unitOfWork
             , IBaseRestMethod restMethod
-            , ICatalogService catalogService)
+            , ICatalogService catalogService
+            , IConfiguration configuration)
         {
             this.unitOfWork = unitOfWork;
             this.restMethod = restMethod;
             this.catalogService = catalogService;
+            this.configuration = configuration;
         }
 
         [HttpGet]
@@ -63,12 +67,13 @@ namespace InvestmentManager.Server.Controllers
         [HttpGet("bypagination/{value}")]
         public async Task<IActionResult> GetPagination(int value = 1)
         {
-            int pageSize = 10;
+            int pageSize = int.Parse(configuration["PaginationPageSize"]);
+            
             var companies = unitOfWork.Company.GetAll().OrderBy(x => x.Name);
             var items = await companies
                 .Skip((value - 1) * pageSize)
                 .Take(pageSize)
-                .Select(x => new ShortView { Id = x.Id, Name = x.Name })
+                .Select(x => new ShortView { Id = x.Id, Name = x.Name, Description = x.Tickers.FirstOrDefault().Name })
                 .ToListAsync().ConfigureAwait(false);
 
             var paginationResult = new PaginationViewModel<ShortView>();

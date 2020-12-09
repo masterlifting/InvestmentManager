@@ -1,6 +1,6 @@
 ﻿@inject CustomNotification notice
 
-<FrameTemplate Name="@Name" TitleColor="ColorBootstrap.warning">
+<FrameTemplate Name="@Name" Description="@Description" TitleColor="ColorBootstrap.warning">
     <InfoBlock>
         <MultiRow Name="@additionalInfo" IconName="info" Action="(() => isAdditionalInfo = !isAdditionalInfo)" Description="Test description" />
         <MultiRow Name="@transactions" IconName="yen" Action="(() => isTransactions = !isTransactions)" />
@@ -68,6 +68,7 @@
 @code {
     [Parameter] public long CompanyId { get; set; }
     [Parameter] public string Name { get; set; }
+    [Parameter] public string Description { get; set; }
 
     [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; }
     ClaimsPrincipal user;

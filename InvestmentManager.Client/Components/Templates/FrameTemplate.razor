@@ -1,6 +1,12 @@
 ﻿<div class="row @Theme iframe">
-    <div class="col-10 text-@TitleColor.ToString() font-weight-bold">@Name</div>
-    <div class="col-2 text-right"><DetailToggleComponent ToggleAction="ToggleDetail" /></div>
+    <div class="col-11">
+        <span class="text-@TitleColor.ToString() font-weight-bold">@Name</span>
+        @if (!string.IsNullOrWhiteSpace(Description))
+        {
+            <span class="small text-muted ml-1">(@Description)</span>
+        }
+    </div>
+    <div class="col-1 text-right"><DetailToggleComponent ToggleAction="ToggleDetail" /></div>
     @if (isDetail)
     {
         <div class="col-12">@AdditionalBlock</div>
@@ -12,6 +18,7 @@
 
 @code {
     [Parameter] public string Name { get; set; }
+    [Parameter] public string Description { get; set; }
     [Parameter] public ColorBootstrap TitleColor { get; set; }
     [Parameter] public ColorCustom Theme { get; set; } = ColorCustom.idark;
     [Parameter] public RenderFragment AdditionalBlock { get; set; }

@@ -1,11 +1,14 @@
 ﻿using InvestmentManager.Entities.Broker;
+using InvestmentManager.Models;
 using InvestmentManager.Models.EntityModels;
 using InvestmentManager.Models.SummaryModels;
 using InvestmentManager.Repository;
 using InvestmentManager.Server.RestServices;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,10 +20,53 @@ namespace InvestmentManager.Server.Controllers
     {
         private readonly IUnitOfWorkFactory unitOfWork;
         private readonly IBaseRestMethod restMethod;
-        public DividendsController(IUnitOfWorkFactory unitOfWork, IBaseRestMethod restMethod)
+        private readonly IConfiguration configuration;
+        private readonly UserManager<IdentityUser> userManager;
+
+        public DividendsController(
+            IUnitOfWorkFactory unitOfWork
+            , IBaseRestMethod restMethod
+            , IConfiguration configuration
+            , UserManager<IdentityUser> userManager)
         {
             this.unitOfWork = unitOfWork;
             this.restMethod = restMethod;
+            this.configuration = configuration;
+            this.userManager = userManager;
+        }
+
+        [HttpGet("bypagination/{value}")]
+        public async Task<IActionResult> GetPagination(int value = 1)
+        {
+            string userId = userManager.GetUserId(User);
+            int pageSize = int.Parse(configuration["PaginationPageSize"]);
+
+            var companies = unitOfWork.Company.GetAll();
+            var accountIds = unitOfWork.Account.GetAll().Where(x => x.UserId.Equals(userId)).Select(x => x.Id);
+            var dividends = (await unitOfWork.Dividend.GetAll()
+                .Where(x => accountIds.Contains(x.AccountId))
+                .OrderByDescending(x => x.DateOperation)
+                .ToListAsync())
+                .GroupBy(x => x.IsinId);
+            var isins = unitOfWork.Isin.GetAll();
+            if (dividends is null)
+                return NoContent();
+
+            var items = dividends.Skip((value - 1) * pageSize).Take(pageSize)
+                .Join(isins, x => x.Key, y => y.Id, (x, y) => new { y.CompanyId, x.First().DateOperation, x.First().Amount })
+                .Join(companies, x => x.CompanyId, y => y.Id, (x, y) => new ShortView
+                {
+                    Id = y.Id,
+                    Name = y.Name,
+                    Description = x.DateOperation.ToShortDateString() + "|" + x.Amount.ToString("f2")
+                })
+                .ToList();
+
+            var paginationResult = new PaginationViewModel<ShortView>();
+            paginationResult.Pagination.SetPagination(dividends.Count(), value, pageSize);
+            paginationResult.Items = items;
+
+            return Ok(paginationResult);
         }
 
         [HttpGet("byaccountid/{accountId}/bycompanyid/{companyId}")]

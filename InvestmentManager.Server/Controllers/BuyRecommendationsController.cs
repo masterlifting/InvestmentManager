@@ -4,6 +4,7 @@ using InvestmentManager.Models.SummaryModels;
 using InvestmentManager.Repository;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,12 +15,18 @@ namespace InvestmentManager.Server.Controllers
     public class BuyRecommendationsController : ControllerBase
     {
         private readonly IUnitOfWorkFactory unitOfWork;
-        public BuyRecommendationsController(IUnitOfWorkFactory unitOfWork) => this.unitOfWork = unitOfWork;
+        private readonly IConfiguration configuration;
+
+        public BuyRecommendationsController(IUnitOfWorkFactory unitOfWork, IConfiguration configuration)
+        {
+            this.unitOfWork = unitOfWork;
+            this.configuration = configuration;
+        }
 
         [HttpGet("bypagination/{value}")]
         public IActionResult GetPagination(int value = 1)
         {
-            int pageSize = 10;
+            int pageSize = int.Parse(configuration["PaginationPageSize"]);
             var companies = unitOfWork.Company.GetAll();
             var lastPricies = unitOfWork.Price.GetLastPrices(30);
             var recommendations = lastPricies?
@@ -34,7 +41,7 @@ namespace InvestmentManager.Server.Controllers
             var items = recommendations?
                 .Skip((value - 1) * pageSize)
                 .Take(pageSize)
-                .Join(companies, x => x.CompanyId, y => y.Id, (x, y) => new ShortView { Id = y.Id, Name = y.Name })
+                .Join(companies, x => x.CompanyId, y => y.Id, (x, y) => new ShortView { Id = y.Id, Name = y.Name, Description = x.RecommendationPrice.ToString("f2") })
                 .ToList();
 
             if (items is null)

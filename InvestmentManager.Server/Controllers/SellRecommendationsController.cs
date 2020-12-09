@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,20 +18,23 @@ namespace InvestmentManager.Server.Controllers
     {
         private readonly IUnitOfWorkFactory unitOfWork;
         private readonly UserManager<IdentityUser> userManager;
+        private readonly IConfiguration configuration;
 
         public SellRecommendationsController(
             IUnitOfWorkFactory unitOfWork
-            , UserManager<IdentityUser> userManager)
+            , UserManager<IdentityUser> userManager
+            , IConfiguration configuration)
         {
             this.unitOfWork = unitOfWork;
             this.userManager = userManager;
+            this.configuration = configuration;
         }
 
         [HttpGet("bypagination/{value}")]
         public IActionResult GetPagination(int value = 1)
         {
             string userId = userManager.GetUserId(User);
-            int pageSize = 10;
+            int pageSize = int.Parse(configuration["PaginationPageSize"]);
 
             var companies = unitOfWork.Company.GetAll();
             var lastPricies = unitOfWork.Price.GetLastPrices(30);
@@ -60,7 +64,12 @@ namespace InvestmentManager.Server.Controllers
             var items = recommendations
                 .Skip((value - 1) * pageSize)
                 .Take(pageSize)
-                .Join(companies, x => x.CompanyId, y => y.Id, (x, y) => new ShortView { Id = y.Id, Name = y.Name })
+                .Join(companies, x => x.CompanyId, y => y.Id, (x, y) => new ShortView 
+                { 
+                    Id = y.Id, 
+                    Name = y.Name, 
+                    Description = $"{x.LotMin}:{x.PriceMin}|{x.LotMid}:{x.PriceMid}|{x.LotMax}:{x.PriceMax}" 
+                })
                 .ToList();
 
             var paginationResult = new PaginationViewModel<ShortView>();
