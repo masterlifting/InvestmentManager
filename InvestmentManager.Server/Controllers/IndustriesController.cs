@@ -27,16 +27,22 @@ namespace InvestmentManager.Server.Controllers
             int pageSize = int.Parse(configuration["PaginationPageSize"]);
 
             var companies = unitOfWork.Company.GetAll();
-            var industries = unitOfWork.Industry.GetAll().OrderBy(x => x.Name);
+            var industries = unitOfWork.Industry.GetAll();
 
-            var result = industries?.Join(companies, x => x.Id, y => y.IndustryId, (x, y) => new ShortView { Id = y.Id, Name = y.Name, Description = x.Name });
-
-            if (result is null)
+            if (companies is null || industries is null)
                 return NoContent();
 
+            var result = await companies.Join(industries, x => x.IndustryId, y => y.Id, (x, y) => new ShortView 
+            { 
+                Id = x.Id, 
+                Name = x.Name, 
+                Description = y.Name 
+            }).OrderBy(x => x.Description)
+            .ToListAsync();
+
             var paginationResult = new PaginationViewModel<ShortView>();
-            paginationResult.Items = await result.Skip((value - 1) * pageSize).Take(pageSize).ToListAsync().ConfigureAwait(false);
-            paginationResult.Pagination.SetPagination(await result.CountAsync().ConfigureAwait(false), value, pageSize);
+            paginationResult.Items = result.Skip((value - 1) * pageSize).Take(pageSize).ToList();
+            paginationResult.Pagination.SetPagination(result.Count, value, pageSize);
 
             return Ok(paginationResult);
         }
