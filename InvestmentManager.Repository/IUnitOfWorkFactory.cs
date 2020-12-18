@@ -33,6 +33,11 @@ namespace InvestmentManager.Repository
         ICoefficientRepository Coefficient { get; }
         ISellRecommendationRepository SellRecommendation { get; }
         IBuyRecommendationRepository BuyRecommendation { get; }
+        ICompanySummaryRepository CompanySummary { get; }
+        IAccountSummaryRepository AccountSummary { get; }
+        IDividendSummaryRepository DividendSummary { get; }
+        IComissionSummaryRepository ComissionSummary { get; }
+        IExchangeRateSummaryRepository ExchangeRateSummary { get; }
         // Common
         ICurrencyRepository Currency { get; }
 

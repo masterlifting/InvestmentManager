@@ -4,6 +4,7 @@ using InvestmentManager.Models.EntityModels;
 using InvestmentManager.Models.SummaryModels;
 using InvestmentManager.Repository;
 using InvestmentManager.Server.RestServices;
+using InvestmentManager.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -21,17 +22,20 @@ namespace InvestmentManager.Server.Controllers
         private readonly IUnitOfWorkFactory unitOfWork;
         private readonly IBaseRestMethod restMethod;
         private readonly IConfiguration configuration;
+        private readonly ISummaryService summaryService;
         private readonly UserManager<IdentityUser> userManager;
 
         public DividendsController(
             IUnitOfWorkFactory unitOfWork
             , IBaseRestMethod restMethod
             , IConfiguration configuration
+            , ISummaryService summaryService
             , UserManager<IdentityUser> userManager)
         {
             this.unitOfWork = unitOfWork;
             this.restMethod = restMethod;
             this.configuration = configuration;
+            this.summaryService = summaryService;
             this.userManager = userManager;
         }
 
@@ -74,7 +78,6 @@ namespace InvestmentManager.Server.Controllers
         {
             var transactions = await unitOfWork.Dividend.GetAll()
                 .Where(x => x.AccountId == accountId && x.Isin.CompanyId == companyId)
-                .OrderByDescending(x => x.DateOperation)
                 .ToListAsync().ConfigureAwait(false);
 
             return transactions is null
@@ -120,7 +123,20 @@ namespace InvestmentManager.Server.Controllers
             };
 
             var result = await restMethod.BasePostAsync(ModelState, entity, model).ConfigureAwait(false);
-            return result.IsSuccess ? (IActionResult)Ok(result) : BadRequest(result);
+            if (result.IsSuccess)
+            {
+                await summaryService.SetDividendSummaryAsync(entity).ConfigureAwait(false);
+
+                await summaryService.SetAccountFreeSumAsync(entity.AccountId, entity.CurrencyId).ConfigureAwait(false);
+
+                bool isComplete = await unitOfWork.CompleteAsync().ConfigureAwait(false);
+                if (!isComplete)
+                    result.Info += "; SUMMARY ERROR!";
+
+                return Ok(result);
+            }
+            else
+                return BadRequest(result);
         }
     }
 }

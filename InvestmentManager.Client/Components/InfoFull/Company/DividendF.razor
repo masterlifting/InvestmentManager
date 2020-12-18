@@ -4,7 +4,7 @@
     <ChildContent>
         @if (items is not null)
         {
-            <TableVertical TItem="DividendModel" DataItems="items" Columns="columns" />
+            <TableVertical TItem="DividendModel" DataItems="items.OrderByDescending(x => x.DateOperation).ToList()" Columns="columns" />
         }
         else
         {

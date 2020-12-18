@@ -22,7 +22,8 @@
     <InfoBlock>
         <MultiRow Name="Accounts information" IconName="info" />
         <MultiRow Name="@transactions" IconName="yen" Action="(() => isTransactions = !isTransactions)" />
-        <MultiRow Name="Exchange rate" IconName="loop" />
+        <MultiRow Name="@comissions" IconName="fire" Action="(() => isComissions = !isComissions)" />
+        <MultiRow Name="@exchangeRates" IconName="loop" Action="(() => isExchangeRates = !isExchangeRates)" />
         <MultiRow Name="Add a transaction manually" IconName="plus" />
         <MultiRow Name="Download files (xls) with transactions" IconName="data-transfer-download" Action="@(() => ClickInputFileButtonAsync("inputButton"))" Description="Available only for the Russian broker BCS" />
         <MultiRow Name="Analytics" IconName="pie-chart" />
@@ -32,6 +33,14 @@
         {
             <AccountTransactionS InfoName="@transactions" UpdateVisible="((bool isVisible) => isTransactions =isVisible)" />
         }
+        @if (isComissions)
+        {
+            <ComissionS InfoName="@comissions" UpdateVisible="((bool isVisible) => isComissions =isVisible)" />
+        }
+        @if (isExchangeRates)
+        {
+            <ExchangeRateS InfoName="@exchangeRates" UpdateVisible="((bool isVisible) => isExchangeRates =isVisible)" />
+        }
     </ActionBlock>
 </FrameTemplate>
 
@@ -40,6 +49,11 @@
 @code {
     bool isTransactions;
     string transactions = "Transactions";
+    bool isComissions;
+    string comissions = "Comissions";
+    bool isExchangeRates;
+    string exchangeRates = "Exchange Rates";
+
 
     [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; }
 

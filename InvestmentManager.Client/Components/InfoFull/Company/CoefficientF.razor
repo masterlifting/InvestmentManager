@@ -4,7 +4,7 @@
     <ChildContent>
         @if (items is not null)
         {
-            <TableHorizontal BodyColWidth="4" TItem="CoefficientModel" DataItems="items" Columns="columns" />
+            <TableHorizontal BodyColWidth="4" TItem="CoefficientModel" DataItems="items.OrderByDescending(x => x.Year).ThenByDescending(x => x.Quarter).ToList()" Columns="columns" />
         }
         else
         {

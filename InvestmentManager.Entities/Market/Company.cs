@@ -40,5 +40,8 @@ namespace InvestmentManager.Entities.Market
         public virtual Rating Rating { get; set; }
         public virtual BuyRecommendation BuyRecommendation { get; set; }
         public virtual SellRecommendation SellRecommendation { get; set; }
+
+        public virtual CompanySummary CompanySummary { get; set; }
+        public virtual DividendSummary DividendSummary { get; set; }
     }
 }

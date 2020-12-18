@@ -1,4 +1,5 @@
 ﻿using InvestmentManager.Entities.Basic;
+using InvestmentManager.Entities.Calculate;
 using InvestmentManager.Entities.Relationship.InterfaceNavigationProperty;
 
 using System.Collections.Generic;
@@ -21,5 +22,11 @@ namespace InvestmentManager.Entities.Broker
         public virtual IEnumerable<StockTransaction> StockTransactions { get; set; }
         public virtual IEnumerable<Comission> Comissions { get; set; }
         public virtual IEnumerable<ExchangeRate> ExchangeRates { get; set; }
+
+        public virtual ExchangeRateSummary ExchangeRateSummary { get; set; }
+        public virtual ComissionSummary ComissionSummary { get; set; }
+        public virtual IEnumerable<AccountSummary> AccountSummaries { get; set; }
+        public virtual IEnumerable<CompanySummary> CompanySummaries { get; set; }
+        public virtual IEnumerable<DividendSummary> DividendSummaries { get; set; }
     }
 }

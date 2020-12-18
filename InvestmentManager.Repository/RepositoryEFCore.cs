@@ -74,11 +74,15 @@ namespace InvestmentManager.Repository
     #region Repository Classes
     // Broker
     public class AccountRepository : RepositoryEFCore<Account>, IAccountRepository { public AccountRepository(InvestmentContext context) : base(context) { } }
+    public class AccountSummaryRepository : RepositoryEFCore<AccountSummary>, IAccountSummaryRepository { public AccountSummaryRepository(InvestmentContext context) : base(context) { } }
     public class AccountTransactionRepository : RepositoryEFCore<AccountTransaction>, IAccountTransactionRepository { public AccountTransactionRepository(InvestmentContext context) : base(context) { } }
     public class ComissionRepository : RepositoryEFCore<Comission>, IComissionRepository { public ComissionRepository(InvestmentContext context) : base(context) { } }
+    public class ComissionSummaryRepository : RepositoryEFCore<ComissionSummary>, IComissionSummaryRepository { public ComissionSummaryRepository(InvestmentContext context) : base(context) { } }
     public class ComissionTypeRepository : RepositoryEFCore<ComissionType>, IComissionTypeRepository { public ComissionTypeRepository(InvestmentContext context) : base(context) { } }
     public class DividendRepository : RepositoryEFCore<Dividend>, IDividendRepository { public DividendRepository(InvestmentContext context) : base(context) { } }
+    public class DividendSummaryRepository : RepositoryEFCore<DividendSummary>, IDividendSummaryRepository { public DividendSummaryRepository(InvestmentContext context) : base(context) { } }
     public class ExchangeRateRepository : RepositoryEFCore<ExchangeRate>, IExchangeRateRepository { public ExchangeRateRepository(InvestmentContext context) : base(context) { } }
+    public class ExchangeRateSummaryRepository : RepositoryEFCore<ExchangeRateSummary>, IExchangeRateSummaryRepository { public ExchangeRateSummaryRepository(InvestmentContext context) : base(context) { } }
     public class StockTransactionRepository : RepositoryEFCore<StockTransaction>, IStockTransactionRepository { public StockTransactionRepository(InvestmentContext context) : base(context) { } }
     public class TransactionStatusRepository : RepositoryEFCore<TransactionStatus>, ITransactionStatusRepository { public TransactionStatusRepository(InvestmentContext context) : base(context) { } }
     // Market
@@ -104,6 +108,7 @@ namespace InvestmentManager.Repository
     }
     public class LotRepository : RepositoryEFCore<Lot>, ILotRepository { public LotRepository(InvestmentContext context) : base(context) { } }
     public class CompanyRepository : RepositoryEFCore<Company>, ICompanyRepository { public CompanyRepository(InvestmentContext context) : base(context) { } }
+    public class CompanySummaryRepository : RepositoryEFCore<CompanySummary>, ICompanySummaryRepository { public CompanySummaryRepository(InvestmentContext context) : base(context) { } }
     public class IndustryRepository : RepositoryEFCore<Industry>, IIndustryRepository { public IndustryRepository(InvestmentContext context) : base(context) { } }
     public class SectorRepository : RepositoryEFCore<Sector>, ISectorRepository { public SectorRepository(InvestmentContext context) : base(context) { } }
     public class ReportSourceRepository : RepositoryEFCore<ReportSource>, IReportSourceRepository { public ReportSourceRepository(InvestmentContext context) : base(context) { } }

@@ -41,7 +41,7 @@ namespace InvestmentManager.Server
             services.AddDbContext<InvestmentContext>(provider =>
             {
                 provider.UseLazyLoadingProxies();
-                /*/
+                //*/
                 provider.UseNpgsql(Configuration["ConnectionStrings:LocalPostgresConnection"]);
                 /*/
                 provider.UseNpgsql(Configuration["ConnectionStrings:PostgresConnection"]);
@@ -78,12 +78,16 @@ namespace InvestmentManager.Server
             services.AddScoped<IBaseRestMethod, BaseRestMethod>();
             #region Unit of work factory
             services.AddScoped<IAccountRepository, AccountRepository>();
+            services.AddScoped<IAccountSummaryRepository, AccountSummaryRepository>();
             services.AddScoped<IAccountTransactionRepository, AccountTransactionRepository>();
             services.AddScoped<IComissionRepository, ComissionRepository>();
+            services.AddScoped<IComissionSummaryRepository, ComissionSummaryRepository>();
             services.AddScoped<IComissionTypeRepository, ComissionTypeRepository>();
             services.AddScoped<IDividendRepository, DividendRepository>();
+            services.AddScoped<IDividendSummaryRepository, DividendSummaryRepository>();
             services.AddScoped<IIsinRepository, IsinRepository>();
             services.AddScoped<IExchangeRateRepository, ExchangeRateRepository>();
+            services.AddScoped<IExchangeRateSummaryRepository, ExchangeRateSummaryRepository>();
             services.AddScoped<IStockTransactionRepository, StockTransactionRepository>();
             services.AddScoped<ITransactionStatusRepository, TransactionStatusRepository>();
             services.AddScoped<IPriceRepository, PriceRepository>();
@@ -92,6 +96,7 @@ namespace InvestmentManager.Server
             services.AddScoped<ISectorRepository, SectorRepository>();
             services.AddScoped<IReportRepository, ReportRepository>();
             services.AddScoped<ICompanyRepository, CompanyRepository>();
+            services.AddScoped<ICompanySummaryRepository, CompanySummaryRepository>();
             services.AddScoped<IExchangeRepository, ExchangeRepository>();
             services.AddScoped<IIndustryRepository, IndustryRepository>();
             services.AddScoped<IReportSourceRepository, ReportSourceRepository>();

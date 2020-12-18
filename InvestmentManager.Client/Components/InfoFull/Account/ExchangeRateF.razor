@@ -1,5 +1,45 @@
-﻿<h3>AccountExchangeRate</h3>
+﻿@inject QueryBaseService<ExchangeRateModel> queryService
+
+<DetailTemplate Name="Rate list" DetailTemplateAction="ShowInfo">
+    <ChildContent>
+        @if (items is not null && items.Any())
+        {
+            <TableVertical TItem="ExchangeRateModel" DataItems="items.OrderByDescending(x => x.DateOperation).ToList()" Columns="columns" />
+        }
+        else
+        {
+            <span>@info</span>
+        }
+    </ChildContent>
+</DetailTemplate>
 
 @code {
+    [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; }
 
+    List<ExchangeRateModel> items;
+    List<ColumnConfig> columns;
+    public string info = DefaultString.loading;
+
+    async Task ShowInfo(bool isDetails)
+    {
+        if (isDetails == true)
+        {
+            var user = (await AuthenticationState).User;
+
+            string CustomUriBuilder(long accountId) => new UrlBuilder(UrlController.ExchangeRates, UrlPath.ByAccountId, accountId).Result;
+            ColumnConfig[] CustomColumnBuilder() => new ColumnConfig[]
+                {
+                    new ColumnConfig{DataField = nameof(ExchangeRateModel.DateOperation), Caption = "Date", DataType = HtmlDataType.Date, Format = "d"},
+                    new ColumnConfig{DataField = nameof(ExchangeRateModel.StatusName), Caption = "Status", DataType = HtmlDataType.String, AlignType=AlignType.Center},
+                    new ColumnConfig{DataField = nameof(ExchangeRateModel.Quantity), Caption = "Quantity", DataType = HtmlDataType.Number, Format = "f0"},
+                    new ColumnConfig{DataField = nameof(ExchangeRateModel.Rate), Caption = "Rate", DataType = HtmlDataType.Number, Format = "f2",AlignType=AlignType.Center}
+                };
+
+            var queryResult = await queryService.GetResultsAsync(user, CustomUriBuilder, CustomColumnBuilder);
+
+            columns = queryResult.Columns;
+            items = queryResult.ViewResult.ResultContents;
+            info = queryResult.ViewResult.ResultInfo;
+        }
+    }
 }

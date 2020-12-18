@@ -56,17 +56,40 @@ namespace InvestmentManager.Server.Controllers
         [HttpGet("{id}/summary/")]
         public async Task<IActionResult> GetSum(long id)
         {
-            var response = await webService.GetCBRateAsync().ConfigureAwait(false);
-            var rate = response.IsSuccessStatusCode ? await response.Content.ReadFromJsonAsync<CBRF>().ConfigureAwait(false) : null;
-            decimal dollar = rate is not null ? rate.Valute.USD.Value : 0;
+            decimal result = 0;
+
             try
             {
-                decimal result = await summaryService.GetAccountSumAsync(id, dollar).ConfigureAwait(false);
+                long[] currencyIds = await unitOfWork.Currency.GetAll().Select(x => x.Id).ToArrayAsync().ConfigureAwait(false);
+
+                foreach (var currencyId in currencyIds)
+                {
+                    decimal intermediateResult = await summaryService.GetAccountTotalSumAsync(id, currencyId).ConfigureAwait(false);
+                    decimal rateValue = 1;
+
+                    if (currencyId != 2)
+                    {
+                        var response = await webService.GetCBRateAsync().ConfigureAwait(false);
+                        var rate = response.IsSuccessStatusCode ? await response.Content.ReadFromJsonAsync<CBRF>().ConfigureAwait(false) : null;
+
+                        rateValue = rate is not null
+                            ? currencyId switch
+                            {
+                                1 => rate.Valute.USD.Value,
+                                3 => rate.Valute.EUR.Value,
+                                _ => 0
+                            }
+                            : 0;
+                    }
+
+                    result += intermediateResult * rateValue;
+                }
+
                 return Ok(result);
             }
             catch
             {
-                return BadRequest(0);
+                return BadRequest(result);
             }
         }
 

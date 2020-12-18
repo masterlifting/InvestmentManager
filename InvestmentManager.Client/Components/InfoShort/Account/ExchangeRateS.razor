@@ -1,5 +1,53 @@
-﻿<h3>AccountExchangeRate</h3>
+﻿@inject QueryBaseService<SummaryExchangeRate> queryService
 
-@code {
+<InfoTemplate InfoName="@InfoName" VisibleAction="((bool isVisible) => UpdateVisible.InvokeAsync(isVisible))">
+    <ChildContent>
+        @if (model is not null)
+        {
+            <KeyValueCols KeySize="6" Key="Last transaction" Value="@model.DateLastOperation.ToShortDateString()" />
+            <KeyValueCols KeySize="6" Key="Status" Value="@model.StatusName" />
+            <KeyValueCols KeySize="6" Key="Rate" Value="@model.Rate.ToString("f2")" />
 
+            <div class="col">
+                <ExchangeRateF />
+            </div>
+        }
+        else
+        {
+            <span>@info</span>
+        }
+    </ChildContent>
+</InfoTemplate>
+
+@code{
+    [CascadingParameter] Task<AuthenticationState> AuthenticationStateTask { get; set; }
+
+    [Parameter] public EventCallback<bool> UpdateVisible { get; set; }
+    [Parameter] public string InfoName { get; set; }
+    [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; }
+
+    SummaryExchangeRate model;
+    string info = DefaultString.loading;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await AuthenticationStateTask).User;
+        string CustomUrlBuilder(long accountId) => new UrlBuilder(UrlController.ExchangeRates, UrlPath.ByAccountId, accountId, UrlOption.Summary).Result;
+        SummaryExchangeRate CustomResultBuilder(List<SummaryExchangeRate> models)
+        {
+            var targetModel = models.OrderBy(x => x.DateLastOperation).Last();
+
+            return new SummaryExchangeRate
+            {
+                DateLastOperation = targetModel.DateLastOperation,
+                StatusName = targetModel.StatusName,
+                Rate = targetModel.Rate
+            };
+        }
+
+        var queryResult = await queryService.GetResultAsync(user, CustomUrlBuilder, CustomResultBuilder);
+
+        model = queryResult.ResultContent;
+        info = queryResult.ResultInfo;
+    }
 }

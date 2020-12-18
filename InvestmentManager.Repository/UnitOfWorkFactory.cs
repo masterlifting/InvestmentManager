@@ -11,12 +11,16 @@ namespace InvestmentManager.Repository
         public UnitOfWorkFactory(
         InvestmentContext context
         , IAccountRepository account
+        , IAccountSummaryRepository accountSummary
         , IAccountTransactionRepository accountTransaction
         , IComissionRepository comission
+        , IComissionSummaryRepository comissionSummary
         , IComissionTypeRepository comissionType
         , IDividendRepository dividend
+        , IDividendSummaryRepository dividendSummary
         , IIsinRepository isin
         , IExchangeRateRepository exchangeRate
+        , IExchangeRateSummaryRepository exchangeRateSummary
         , IStockTransactionRepository stockTransaction
         , ITransactionStatusRepository transactionStatus
         , IPriceRepository price
@@ -25,6 +29,7 @@ namespace InvestmentManager.Repository
         , ISectorRepository sector
         , IReportRepository report
         , ICompanyRepository company
+        , ICompanySummaryRepository companySummary
         , IExchangeRepository exchange
         , IIndustryRepository industry
         , IReportSourceRepository reportSource
@@ -36,12 +41,16 @@ namespace InvestmentManager.Repository
         {
             this.context = context;
             Account = account;
+            AccountSummary = accountSummary;
             AccountTransaction = accountTransaction;
             Comission = comission;
+            ComissionSummary = comissionSummary;
             ComissionType = comissionType;
             Dividend = dividend;
+            DividendSummary = dividendSummary;
             Isin = isin;
             ExchangeRate = exchangeRate;
+            ExchangeRateSummary = exchangeRateSummary;
             StockTransaction = stockTransaction;
             TransactionStatus = transactionStatus;
             Price = price;
@@ -50,6 +59,7 @@ namespace InvestmentManager.Repository
             Sector = sector;
             Report = report;
             Company = company;
+            CompanySummary = companySummary;
             Exchange = exchange;
             Industry = industry;
             ReportSource = reportSource;
@@ -61,12 +71,16 @@ namespace InvestmentManager.Repository
         }
 
         public IAccountRepository Account { get; }
+        public IAccountSummaryRepository AccountSummary { get; }
         public IAccountTransactionRepository AccountTransaction { get; }
         public IComissionRepository Comission { get; }
+        public IComissionSummaryRepository ComissionSummary { get; }
         public IComissionTypeRepository ComissionType { get; }
         public IDividendRepository Dividend { get; }
+        public IDividendSummaryRepository DividendSummary { get; }
         public IIsinRepository Isin { get; }
         public IExchangeRateRepository ExchangeRate { get; }
+        public IExchangeRateSummaryRepository ExchangeRateSummary { get; }
         public IStockTransactionRepository StockTransaction { get; }
         public ITransactionStatusRepository TransactionStatus { get; }
         public IPriceRepository Price { get; }
@@ -75,6 +89,7 @@ namespace InvestmentManager.Repository
         public ISectorRepository Sector { get; }
         public IReportRepository Report { get; }
         public ICompanyRepository Company { get; }
+        public ICompanySummaryRepository CompanySummary { get; }
         public IExchangeRepository Exchange { get; }
         public IIndustryRepository Industry { get; }
         public IReportSourceRepository ReportSource { get; }

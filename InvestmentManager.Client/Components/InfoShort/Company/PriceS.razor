@@ -5,8 +5,8 @@
 
         @if (model is not null)
         {
-            <KeyValueCols Key="Date update" Value="@model.DateUpdate.ToShortDateString()" />
-            <KeyValueCols Key="Date price" Value="@model.DatePrice.ToShortDateString()" />
+            <KeyValueCols Key="Date update" Value="@model.DateUpdate.ToString()" />
+            <KeyValueCols Key="Date price" Value="@model.DatePrice.ToString()" />
             <KeyValueCols Key="Cost" Value="@model.Cost.ToString("f4")" />
 
             <div class="col">

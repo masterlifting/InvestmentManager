@@ -15,29 +15,29 @@ namespace InvestmentManager.Repository.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
-                .HasAnnotation("ProductVersion", "3.1.9")
-                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+                .UseIdentityByDefaultColumns()
+                .HasAnnotation("Relational:MaxIdentifierLength", 63)
+                .HasAnnotation("ProductVersion", "3.1.9");
 
             modelBuilder.Entity("InvestmentManager.Entities.Broker.Account", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .UseIdentityByDefaultColumn();
 
                     b.Property<DateTime>("DateUpdate")
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("character varying(100)")
-                        .HasMaxLength(100);
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("character varying(100)")
-                        .HasMaxLength(100);
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -49,7 +49,7 @@ namespace InvestmentManager.Repository.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .UseIdentityByDefaultColumn();
 
                     b.Property<long>("AccountId")
                         .HasColumnType("bigint");
@@ -85,7 +85,7 @@ namespace InvestmentManager.Repository.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .UseIdentityByDefaultColumn();
 
                     b.Property<long>("AccountId")
                         .HasColumnType("bigint");
@@ -121,15 +121,15 @@ namespace InvestmentManager.Repository.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .UseIdentityByDefaultColumn();
 
                     b.Property<DateTime>("DateUpdate")
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("character varying(500)")
-                        .HasMaxLength(500);
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.HasKey("Id");
 
@@ -141,7 +141,7 @@ namespace InvestmentManager.Repository.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .UseIdentityByDefaultColumn();
 
                     b.Property<long>("AccountId")
                         .HasColumnType("bigint");
@@ -180,7 +180,7 @@ namespace InvestmentManager.Repository.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .UseIdentityByDefaultColumn();
 
                     b.Property<long>("AccountId")
                         .HasColumnType("bigint");
@@ -222,7 +222,7 @@ namespace InvestmentManager.Repository.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .UseIdentityByDefaultColumn();
 
                     b.Property<long>("AccountId")
                         .HasColumnType("bigint");
@@ -274,15 +274,15 @@ namespace InvestmentManager.Repository.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .UseIdentityByDefaultColumn();
 
                     b.Property<DateTime>("DateUpdate")
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("character varying(100)")
-                        .HasMaxLength(100);
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -294,7 +294,7 @@ namespace InvestmentManager.Repository.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .UseIdentityByDefaultColumn();
 
                     b.Property<long>("CompanyId")
                         .HasColumnType("bigint");
@@ -318,7 +318,7 @@ namespace InvestmentManager.Repository.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .UseIdentityByDefaultColumn();
 
                     b.Property<DateTime>("DateUpdate")
                         .HasColumnType("timestamp without time zone");
@@ -360,7 +360,7 @@ namespace InvestmentManager.Repository.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .UseIdentityByDefaultColumn();
 
                     b.Property<decimal>("CashFlowPositiveBalanceValue")
                         .HasColumnType("Decimal(18,5)");
@@ -402,7 +402,7 @@ namespace InvestmentManager.Repository.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .UseIdentityByDefaultColumn();
 
                     b.Property<long>("CompanyId")
                         .HasColumnType("bigint");
@@ -430,8 +430,8 @@ namespace InvestmentManager.Repository.Migrations
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("character varying(100)")
-                        .HasMaxLength(100);
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -446,7 +446,7 @@ namespace InvestmentManager.Repository.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .UseIdentityByDefaultColumn();
 
                     b.Property<DateTime?>("DateSplit")
                         .HasColumnType("timestamp without time zone");
@@ -459,8 +459,8 @@ namespace InvestmentManager.Repository.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("character varying(500)")
-                        .HasMaxLength(500);
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.Property<long>("SectorId")
                         .HasColumnType("bigint");
@@ -479,15 +479,15 @@ namespace InvestmentManager.Repository.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .UseIdentityByDefaultColumn();
 
                     b.Property<DateTime>("DateUpdate")
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("character varying(10)")
-                        .HasMaxLength(10);
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
 
                     b.HasKey("Id");
 
@@ -499,25 +499,25 @@ namespace InvestmentManager.Repository.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .UseIdentityByDefaultColumn();
 
                     b.Property<DateTime>("DateUpdate")
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("character varying(100)")
-                        .HasMaxLength(100);
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("ProviderName")
                         .IsRequired()
-                        .HasColumnType("character varying(100)")
-                        .HasMaxLength(100);
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("ProviderUri")
                         .IsRequired()
-                        .HasColumnType("character varying(100)")
-                        .HasMaxLength(100);
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -529,15 +529,15 @@ namespace InvestmentManager.Repository.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .UseIdentityByDefaultColumn();
 
                     b.Property<DateTime>("DateUpdate")
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("character varying(300)")
-                        .HasMaxLength(300);
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
 
                     b.HasKey("Id");
 
@@ -549,7 +549,7 @@ namespace InvestmentManager.Repository.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .UseIdentityByDefaultColumn();
 
                     b.Property<long>("CompanyId")
                         .HasColumnType("bigint");
@@ -559,8 +559,8 @@ namespace InvestmentManager.Repository.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("character varying(50)")
-                        .HasMaxLength(50);
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.HasKey("Id");
 
@@ -574,7 +574,7 @@ namespace InvestmentManager.Repository.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .UseIdentityByDefaultColumn();
 
                     b.Property<DateTime>("DateUpdate")
                         .HasColumnType("timestamp without time zone");
@@ -592,7 +592,7 @@ namespace InvestmentManager.Repository.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .UseIdentityByDefaultColumn();
 
                     b.Property<DateTime>("BidDate")
                         .HasColumnType("timestamp without time zone");
@@ -623,23 +623,23 @@ namespace InvestmentManager.Repository.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .UseIdentityByDefaultColumn();
 
                     b.Property<DateTime>("DateUpdate")
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Host")
                         .IsRequired()
-                        .HasColumnType("character varying(50)")
-                        .HasMaxLength(50);
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<int>("Port")
                         .HasColumnType("integer");
 
                     b.Property<string>("Scheme")
                         .IsRequired()
-                        .HasColumnType("character varying(10)")
-                        .HasMaxLength(10);
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
 
                     b.HasKey("Id");
 
@@ -651,7 +651,7 @@ namespace InvestmentManager.Repository.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .UseIdentityByDefaultColumn();
 
                     b.Property<decimal>("Assets")
                         .HasColumnType("Decimal(18,4)");
@@ -710,7 +710,7 @@ namespace InvestmentManager.Repository.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .UseIdentityByDefaultColumn();
 
                     b.Property<long>("CompanyId")
                         .HasColumnType("bigint");
@@ -720,13 +720,13 @@ namespace InvestmentManager.Repository.Migrations
 
                     b.Property<string>("Key")
                         .IsRequired()
-                        .HasColumnType("character varying(100)")
-                        .HasMaxLength(100);
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("Value")
                         .IsRequired()
-                        .HasColumnType("character varying(500)")
-                        .HasMaxLength(500);
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.HasKey("Id");
 
@@ -741,15 +741,15 @@ namespace InvestmentManager.Repository.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .UseIdentityByDefaultColumn();
 
                     b.Property<DateTime>("DateUpdate")
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("character varying(300)")
-                        .HasMaxLength(300);
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
 
                     b.HasKey("Id");
 
@@ -761,7 +761,7 @@ namespace InvestmentManager.Repository.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .UseIdentityByDefaultColumn();
 
                     b.Property<long>("CompanyId")
                         .HasColumnType("bigint");
@@ -777,8 +777,8 @@ namespace InvestmentManager.Repository.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("character varying(10)")
-                        .HasMaxLength(10);
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
 
                     b.HasKey("Id");
 
@@ -801,18 +801,18 @@ namespace InvestmentManager.Repository.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Name")
-                        .HasColumnType("character varying(256)")
-                        .HasMaxLength(256);
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
 
                     b.Property<string>("NormalizedName")
-                        .HasColumnType("character varying(256)")
-                        .HasMaxLength(256);
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedName")
                         .IsUnique()
-                        .HasName("RoleNameIndex");
+                        .HasDatabaseName("RoleNameIndex");
 
                     b.ToTable("AspNetRoles");
                 });
@@ -822,7 +822,7 @@ namespace InvestmentManager.Repository.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .UseIdentityByDefaultColumn();
 
                     b.Property<string>("ClaimType")
                         .HasColumnType("text");
@@ -854,8 +854,8 @@ namespace InvestmentManager.Repository.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Email")
-                        .HasColumnType("character varying(256)")
-                        .HasMaxLength(256);
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("boolean");
@@ -867,12 +867,12 @@ namespace InvestmentManager.Repository.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("NormalizedEmail")
-                        .HasColumnType("character varying(256)")
-                        .HasMaxLength(256);
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
 
                     b.Property<string>("NormalizedUserName")
-                        .HasColumnType("character varying(256)")
-                        .HasMaxLength(256);
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
 
                     b.Property<string>("PasswordHash")
                         .HasColumnType("text");
@@ -890,17 +890,17 @@ namespace InvestmentManager.Repository.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("UserName")
-                        .HasColumnType("character varying(256)")
-                        .HasMaxLength(256);
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
-                        .HasName("EmailIndex");
+                        .HasDatabaseName("EmailIndex");
 
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
-                        .HasName("UserNameIndex");
+                        .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("AspNetUsers");
                 });
@@ -910,7 +910,7 @@ namespace InvestmentManager.Repository.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .UseIdentityByDefaultColumn();
 
                     b.Property<string>("ClaimType")
                         .HasColumnType("text");
@@ -1004,6 +1004,12 @@ namespace InvestmentManager.Repository.Migrations
                         .HasForeignKey("TransactionStatusId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Account");
+
+                    b.Navigation("Currency");
+
+                    b.Navigation("TransactionStatus");
                 });
 
             modelBuilder.Entity("InvestmentManager.Entities.Broker.Comission", b =>
@@ -1025,6 +1031,12 @@ namespace InvestmentManager.Repository.Migrations
                         .HasForeignKey("CurrencyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Account");
+
+                    b.Navigation("ComissionType");
+
+                    b.Navigation("Currency");
                 });
 
             modelBuilder.Entity("InvestmentManager.Entities.Broker.Dividend", b =>
@@ -1046,6 +1058,12 @@ namespace InvestmentManager.Repository.Migrations
                         .HasForeignKey("IsinId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Account");
+
+                    b.Navigation("Currency");
+
+                    b.Navigation("Isin");
                 });
 
             modelBuilder.Entity("InvestmentManager.Entities.Broker.ExchangeRate", b =>
@@ -1067,6 +1085,12 @@ namespace InvestmentManager.Repository.Migrations
                         .HasForeignKey("TransactionStatusId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Account");
+
+                    b.Navigation("Currency");
+
+                    b.Navigation("TransactionStatus");
                 });
 
             modelBuilder.Entity("InvestmentManager.Entities.Broker.StockTransaction", b =>
@@ -1100,6 +1124,16 @@ namespace InvestmentManager.Repository.Migrations
                         .HasForeignKey("TransactionStatusId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Account");
+
+                    b.Navigation("Currency");
+
+                    b.Navigation("Exchange");
+
+                    b.Navigation("Ticker");
+
+                    b.Navigation("TransactionStatus");
                 });
 
             modelBuilder.Entity("InvestmentManager.Entities.Calculate.BuyRecommendation", b =>
@@ -1109,6 +1143,8 @@ namespace InvestmentManager.Repository.Migrations
                         .HasForeignKey("InvestmentManager.Entities.Calculate.BuyRecommendation", "CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Company");
                 });
 
             modelBuilder.Entity("InvestmentManager.Entities.Calculate.Coefficient", b =>
@@ -1118,6 +1154,8 @@ namespace InvestmentManager.Repository.Migrations
                         .HasForeignKey("InvestmentManager.Entities.Calculate.Coefficient", "ReportId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Report");
                 });
 
             modelBuilder.Entity("InvestmentManager.Entities.Calculate.Rating", b =>
@@ -1127,6 +1165,8 @@ namespace InvestmentManager.Repository.Migrations
                         .HasForeignKey("InvestmentManager.Entities.Calculate.Rating", "CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Company");
                 });
 
             modelBuilder.Entity("InvestmentManager.Entities.Calculate.SellRecommendation", b =>
@@ -1136,6 +1176,8 @@ namespace InvestmentManager.Repository.Migrations
                         .HasForeignKey("InvestmentManager.Entities.Calculate.SellRecommendation", "CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Company");
                 });
 
             modelBuilder.Entity("InvestmentManager.Entities.Market.Company", b =>
@@ -1151,6 +1193,10 @@ namespace InvestmentManager.Repository.Migrations
                         .HasForeignKey("SectorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Industry");
+
+                    b.Navigation("Sector");
                 });
 
             modelBuilder.Entity("InvestmentManager.Entities.Market.Isin", b =>
@@ -1160,6 +1206,8 @@ namespace InvestmentManager.Repository.Migrations
                         .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Company");
                 });
 
             modelBuilder.Entity("InvestmentManager.Entities.Market.Price", b =>
@@ -1175,6 +1223,10 @@ namespace InvestmentManager.Repository.Migrations
                         .HasForeignKey("TickerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Currency");
+
+                    b.Navigation("Ticker");
                 });
 
             modelBuilder.Entity("InvestmentManager.Entities.Market.Report", b =>
@@ -1184,6 +1236,8 @@ namespace InvestmentManager.Repository.Migrations
                         .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Company");
                 });
 
             modelBuilder.Entity("InvestmentManager.Entities.Market.ReportSource", b =>
@@ -1193,6 +1247,8 @@ namespace InvestmentManager.Repository.Migrations
                         .HasForeignKey("InvestmentManager.Entities.Market.ReportSource", "CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Company");
                 });
 
             modelBuilder.Entity("InvestmentManager.Entities.Market.Ticker", b =>
@@ -1214,6 +1270,12 @@ namespace InvestmentManager.Repository.Migrations
                         .HasForeignKey("LotId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Company");
+
+                    b.Navigation("Exchange");
+
+                    b.Navigation("Lot");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1265,6 +1327,104 @@ namespace InvestmentManager.Repository.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("InvestmentManager.Entities.Broker.Account", b =>
+                {
+                    b.Navigation("AccountTransactions");
+
+                    b.Navigation("Comissions");
+
+                    b.Navigation("Dividends");
+
+                    b.Navigation("ExchangeRates");
+
+                    b.Navigation("StockTransactions");
+                });
+
+            modelBuilder.Entity("InvestmentManager.Entities.Broker.ComissionType", b =>
+                {
+                    b.Navigation("Comissions");
+                });
+
+            modelBuilder.Entity("InvestmentManager.Entities.Broker.TransactionStatus", b =>
+                {
+                    b.Navigation("AccountTransactions");
+
+                    b.Navigation("ExchangeRates");
+
+                    b.Navigation("StockTransactions");
+                });
+
+            modelBuilder.Entity("InvestmentManager.Entities.Market.Company", b =>
+                {
+                    b.Navigation("BuyRecommendation");
+
+                    b.Navigation("Isins");
+
+                    b.Navigation("Rating");
+
+                    b.Navigation("Reports");
+
+                    b.Navigation("ReportSource");
+
+                    b.Navigation("SellRecommendation");
+
+                    b.Navigation("Tickers");
+                });
+
+            modelBuilder.Entity("InvestmentManager.Entities.Market.Currency", b =>
+                {
+                    b.Navigation("AccountTransactions");
+
+                    b.Navigation("Comissions");
+
+                    b.Navigation("Dividends");
+
+                    b.Navigation("ExchangeRates");
+
+                    b.Navigation("Prices");
+
+                    b.Navigation("StockTransactions");
+                });
+
+            modelBuilder.Entity("InvestmentManager.Entities.Market.Exchange", b =>
+                {
+                    b.Navigation("StockTransactions");
+
+                    b.Navigation("Tickers");
+                });
+
+            modelBuilder.Entity("InvestmentManager.Entities.Market.Industry", b =>
+                {
+                    b.Navigation("Companies");
+                });
+
+            modelBuilder.Entity("InvestmentManager.Entities.Market.Isin", b =>
+                {
+                    b.Navigation("Dividends");
+                });
+
+            modelBuilder.Entity("InvestmentManager.Entities.Market.Lot", b =>
+                {
+                    b.Navigation("Tickers");
+                });
+
+            modelBuilder.Entity("InvestmentManager.Entities.Market.Report", b =>
+                {
+                    b.Navigation("Coefficient");
+                });
+
+            modelBuilder.Entity("InvestmentManager.Entities.Market.Sector", b =>
+                {
+                    b.Navigation("Companies");
+                });
+
+            modelBuilder.Entity("InvestmentManager.Entities.Market.Ticker", b =>
+                {
+                    b.Navigation("Prices");
+
+                    b.Navigation("StockTransactions");
                 });
 #pragma warning restore 612, 618
         }

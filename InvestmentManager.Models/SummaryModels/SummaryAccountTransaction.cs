@@ -8,5 +8,6 @@ namespace InvestmentManager.Models.SummaryModels
         public string StatusName { get; set; }
         public decimal Amount { get; set; }
         public decimal TotalAddedSum { get; set; }
+        public decimal InvestingSum { get; set; }
     }
 }

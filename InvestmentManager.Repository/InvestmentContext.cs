@@ -36,12 +36,15 @@ namespace InvestmentManager.Repository
         public DbSet<Sector> Sectors { get; set; }
         public DbSet<Ticker> Tickers { get; set; }
         #endregion
+        #region Summary set
+        public DbSet<CompanySummary> CompanySummaries { get; set; }
+        public DbSet<AccountSummary> AccountSummaries { get; set; }
+        public DbSet<DividendSummary> DividendSummaries { get; set; }
+        public DbSet<ComissionSummary> ComissionSummaries { get; set; }
+        public DbSet<ExchangeRateSummary> ExchangeRateSummaries { get; set; }
+        #endregion
 
-        public InvestmentContext(DbContextOptions<InvestmentContext> options) : base(options)
-        {
-            //Database.EnsureDeleted();
-            //Database.EnsureCreated();
-        }
+        public InvestmentContext(DbContextOptions<InvestmentContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

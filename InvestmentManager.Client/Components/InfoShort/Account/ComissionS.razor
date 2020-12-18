@@ -1,5 +1,51 @@
-﻿<h3>AccountComission</h3>
+﻿@inject QueryBaseService<SummaryComission> queryService
 
-@code {
+<InfoTemplate InfoName="@InfoName" VisibleAction="((bool isVisible) => UpdateVisible.InvokeAsync(isVisible))">
+    <ChildContent>
+        @if (model is not null)
+        {
+            <KeyValueCols KeySize="6" Key="Date first comission" Value="@model.DateFirstComission.ToShortDateString()" />
+            <KeyValueCols KeySize="6" Key="Date last comission" Value="@model.DateLastComission.ToShortDateString()" />
+            <KeyValueCols KeySize="6" Key="Sum all time" Value="@model.Amount.ToString("C")" />
 
+            <div class="col">
+                <ComissionF />
+            </div>
+        }
+        else
+        {
+            <span>@info</span>
+        }
+    </ChildContent>
+</InfoTemplate>
+
+@code{
+    [CascadingParameter] Task<AuthenticationState> AuthenticationStateTask { get; set; }
+
+    [Parameter] public EventCallback<bool> UpdateVisible { get; set; }
+    [Parameter] public string InfoName { get; set; }
+    [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; }
+
+    SummaryComission model;
+    string info = DefaultString.loading;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await AuthenticationStateTask).User;
+        string CustomUrlBuilder(long accountId) => new UrlBuilder(UrlController.Comissions, UrlPath.ByAccountId, accountId, UrlOption.Summary).Result;
+        SummaryComission CustomResultBuilder(List<SummaryComission> models)
+        {
+            return new SummaryComission
+            {
+                DateFirstComission = models.OrderBy(x => x.DateFirstComission).First().DateFirstComission,
+                DateLastComission = models.OrderBy(x => x.DateLastComission).Last().DateLastComission,
+                Amount = models.Sum(x => x.Amount)
+            };
+        }
+
+        var queryResult = await queryService.GetResultAsync(user, CustomUrlBuilder, CustomResultBuilder);
+
+        model = queryResult.ResultContent;
+        info = queryResult.ResultInfo;
+    }
 }

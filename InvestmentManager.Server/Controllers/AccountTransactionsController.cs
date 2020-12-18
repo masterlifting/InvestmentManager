@@ -6,7 +6,6 @@ using InvestmentManager.Server.RestServices;
 using InvestmentManager.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -17,16 +16,16 @@ namespace InvestmentManager.Server.Controllers
     {
         private readonly IUnitOfWorkFactory unitOfWork;
         private readonly IBaseRestMethod restMethod;
-        private readonly ICatalogService catalogService;
+        private readonly ISummaryService summaryService;
 
         public AccountTransactionsController(
             IUnitOfWorkFactory unitOfWork
             , IBaseRestMethod restMethod
-            , ICatalogService catalogService)
+            , ISummaryService summaryService)
         {
             this.unitOfWork = unitOfWork;
             this.restMethod = restMethod;
-            this.catalogService = catalogService;
+            this.summaryService = summaryService;
         }
 
         [HttpGet("byaccountid/{id}")]
@@ -40,8 +39,8 @@ namespace InvestmentManager.Server.Controllers
                 {
                     DateOperation = x.DateOperation,
                     Amount = x.Amount,
-                    StatusName = catalogService.GetStatusName(x.TransactionStatusId),
-                    CurrencyName = catalogService.GetCurrencyName(x.CurrencyId),
+                    StatusName = x.TransactionStatus.Name,
+                    CurrencyName = x.Currency.Name,
                     AccountName = x.Account.Name.Substring(0, 9) + "..."
                 }).ToList());
         }
@@ -59,11 +58,10 @@ namespace InvestmentManager.Server.Controllers
             {
                 DateLastTransaction = lastTransaction.DateOperation,
                 Amount = lastTransaction.Amount,
-                StatusName = catalogService.GetStatusName(lastTransaction.TransactionStatusId),
+                StatusName = lastTransaction.TransactionStatus.Name,
                 TotalAddedSum = transactions.Where(x => x.TransactionStatusId == 1).Sum(x => x.Amount)
             });
         }
-
         [HttpPost]
         public async Task<IActionResult> Post(AccountTransactionModel model)
         {
@@ -76,8 +74,23 @@ namespace InvestmentManager.Server.Controllers
                 TransactionStatusId = model.StatusId,
             };
 
+
             var result = await restMethod.BasePostAsync(ModelState, entity, model).ConfigureAwait(false);
-            return result.IsSuccess ? (IActionResult)Ok(result) : BadRequest(result);
+            
+            if (result.IsSuccess)
+            {
+                await summaryService.SetAccountSummaryAsync(entity).ConfigureAwait(false);
+
+                await summaryService.SetAccountFreeSumAsync(entity.AccountId, entity.CurrencyId).ConfigureAwait(false);
+
+                bool isComplete = await unitOfWork.CompleteAsync().ConfigureAwait(false);
+                if (!isComplete)
+                    result.Info += "; SUMMARY ERROR!";
+
+                return Ok(result);
+            }
+            else
+                return BadRequest(result);
         }
     }
 }

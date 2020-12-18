@@ -4,10 +4,10 @@
     <ChildContent>
         @if (model is not null)
         {
-            <KeyValueCols Key="Last transaction" Value="@model.DateLastTransaction.ToShortDateString()" />
-            <KeyValueCols Key="Status" Value="@model.StatusName" />
-            <KeyValueCols Key="Ammount" Value="@model.Amount.ToString("f2")" />
-            <KeyValueCols Key="Added sum" Value="@model.TotalAddedSum.ToString("f2")" />
+            <KeyValueCols KeySize="6" Key="Last transaction" Value="@model.DateLastTransaction.ToShortDateString()" />
+            <KeyValueCols KeySize="6" Key="Status" Value="@model.StatusName" />
+            <KeyValueCols KeySize="6" Key="Ammount" Value="@model.Amount.ToString("f2")" />
+            <KeyValueCols KeySize="6" Key="Added sum" Value="@model.TotalAddedSum.ToString("f2")" />
 
             <div class="col">
                 <AccountTransactionF />

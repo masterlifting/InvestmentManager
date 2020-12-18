@@ -4,7 +4,7 @@
     <ChildContent>
         @if (model is not null)
         {
-            <KeyValueCols Key="Date update" Value="@model.DateUpdate.ToShortDateString()" />
+            <KeyValueCols Key="Date update" Value="@model.DateUpdate.ToString()" />
             <KeyValueCols Key="Last report" Value="@model.DateLastReport.ToShortDateString()" />
             <KeyValueCols Key="Report count" Value="@model.ReportsCount.ToString()" />
             <KeyValueCols Key="Last year" Value="@model.LastReportYear.ToString()" />

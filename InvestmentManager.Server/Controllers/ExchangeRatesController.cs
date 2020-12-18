@@ -1,8 +1,12 @@
 ﻿using InvestmentManager.Entities.Broker;
 using InvestmentManager.Models.EntityModels;
+using InvestmentManager.Models.SummaryModels;
+using InvestmentManager.Repository;
 using InvestmentManager.Server.RestServices;
+using InvestmentManager.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace InvestmentManager.Server.Controllers
@@ -11,23 +15,78 @@ namespace InvestmentManager.Server.Controllers
     public class ExchangeRatesController : ControllerBase
     {
         private readonly IBaseRestMethod restMethod;
-        public ExchangeRatesController(IBaseRestMethod restMethod) => this.restMethod = restMethod;
+        private readonly IUnitOfWorkFactory unitOfWork;
+        private readonly ISummaryService summaryService;
+
+        public ExchangeRatesController(IBaseRestMethod restMethod, IUnitOfWorkFactory unitOfWork, ISummaryService summaryService)
+        {
+            this.restMethod = restMethod;
+            this.unitOfWork = unitOfWork;
+            this.summaryService = summaryService;
+        }
+
+        [HttpGet("byaccountid/{id}")]
+        public async Task<IActionResult> GetByAccountId(long id)
+        {
+            var rates = (await unitOfWork.Account.FindByIdAsync(id).ConfigureAwait(false))?.ExchangeRates;
+
+            return rates is null
+                ? NoContent()
+                : Ok(rates.Select(x => new ExchangeRateModel
+                {
+                    DateOperation = x.DateOperation,
+                    StatusName = x.TransactionStatus.Name,
+                    Rate = x.Rate,
+                    Quantity = x.Quantity
+                }).ToList());
+        }
+        [HttpGet("byaccountid/{id}/summary/")]
+        public async Task<IActionResult> GetSummaryByAccountId(long id)
+        {
+            var rates = (await unitOfWork.Account.FindByIdAsync(id).ConfigureAwait(false))?.ExchangeRates;
+
+            if (rates is null || !rates.Any())
+                return NoContent();
+
+            var lastRate = rates.OrderBy(x => x.DateOperation).Last();
+
+            return Ok(new SummaryExchangeRate
+            {
+                DateLastOperation = lastRate.DateOperation,
+                Rate = lastRate.Rate,
+                StatusName = lastRate.TransactionStatus.Name
+            });
+        }
+
         [HttpPost]
         public async Task<IActionResult> Post(ExchangeRateModel model)
         {
             var entity = new ExchangeRate
             {
                 AccountId = model.AccountId,
+                CurrencyId = model.CurrencyId,
                 TransactionStatusId = model.StatusId,
                 DateOperation = model.DateOperation,
-                CurrencyId = model.CurrencyId,
                 Identifier = model.Identifier,
                 Quantity = model.Quantity,
                 Rate = model.Rate
             };
 
             var result = await restMethod.BasePostAsync(ModelState, entity, model).ConfigureAwait(false);
-            return result.IsSuccess ? (IActionResult)Ok(result) : BadRequest(result);
+
+            if (result.IsSuccess)
+            {
+                await summaryService.SetExchangeRateSummaryAsync(entity).ConfigureAwait(false);
+                await summaryService.SetAccountSummaryAsync(entity).ConfigureAwait(false);
+
+                bool isComplete = await unitOfWork.CompleteAsync().ConfigureAwait(false);
+                if (!isComplete)
+                    result.Info += "; SUMMARY ERROR!";
+
+                return Ok(result);
+            }
+            else
+                return BadRequest(result);
         }
     }
 }

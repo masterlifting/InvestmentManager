@@ -56,7 +56,7 @@ else
     {
         List<IsinModel> isins = await http.GetAsync<List<IsinModel>>(new UrlBuilder(UrlController.Isins, UrlPath.ByCompanyId, CompanyId).Result);
 
-        if (isins == default)
+        if (isins == default || !isins.Any())
         {
             isEditeble = false;
             isins = new List<IsinModel> { new IsinModel { CompanyId = CompanyId } };

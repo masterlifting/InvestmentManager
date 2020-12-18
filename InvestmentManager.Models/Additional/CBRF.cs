@@ -13,9 +13,15 @@ namespace InvestmentManager.Models.Additional
     {
         public Valute() => USD = new USD();
         public USD USD { get; set; }
+        public EUR EUR { get; set; }
+
     }
 
     public class USD
+    {
+        public decimal Value { get; set; }
+    }
+    public class EUR
     {
         public decimal Value { get; set; }
     }

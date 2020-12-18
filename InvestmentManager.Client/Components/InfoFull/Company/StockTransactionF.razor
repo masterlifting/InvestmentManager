@@ -5,7 +5,7 @@
     <ChildContent>
         @if (items is not null)
         {
-            <TableVertical TItem="StockTransactionModel" DataItems="items" Columns="columns" />
+            <TableVertical TItem="StockTransactionModel" DataItems="items.OrderByDescending(x => x.DateOperation).ToList()" Columns="columns" />
         }
         else
         {

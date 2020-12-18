@@ -1,5 +1,44 @@
-﻿<h3>AccountComission</h3>
+﻿@inject QueryBaseService<ComissionModel> queryService
+
+<DetailTemplate Name="Comission list" DetailTemplateAction="ShowInfo">
+    <ChildContent>
+        @if (items is not null && items.Any())
+        {
+            <TableVertical TItem="ComissionModel" DataItems="items.OrderByDescending(x => x.DateOperation).ToList()" Columns="columns"/>
+        }
+        else
+        {
+            <span>@info</span>
+        }
+    </ChildContent>
+</DetailTemplate>
 
 @code {
+    [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; }
 
+    List<ComissionModel> items;
+    List<ColumnConfig> columns;
+    public string info = DefaultString.loading;
+
+    async Task ShowInfo(bool isDetails)
+    {
+        if (isDetails == true)
+        {
+            var user = (await AuthenticationState).User;
+
+            string CustomUriBuilder(long accountId) => new UrlBuilder(UrlController.Comissions, UrlPath.ByAccountId, accountId).Result;
+            ColumnConfig[] CustomColumnBuilder() => new ColumnConfig[]
+                {
+                    new ColumnConfig{DataField = nameof(ComissionModel.DateOperation), Caption = "Date", DataType = HtmlDataType.Date, Format = "d", AlignType = AlignType.Center},
+                    new ColumnConfig{DataField = nameof(ComissionModel.TypeName), Caption = "Status", DataType = HtmlDataType.String},
+                    new ColumnConfig{DataField = nameof(ComissionModel.Amount), Caption = "Amount", DataType = HtmlDataType.Number, Format = "f2", AlignType = AlignType.Center},
+                };
+
+            var queryResult = await queryService.GetResultsAsync(user, CustomUriBuilder, CustomColumnBuilder);
+
+            columns = queryResult.Columns;
+            items = queryResult.ViewResult.ResultContents;
+            info = queryResult.ViewResult.ResultInfo;
+        }
+    }
 }

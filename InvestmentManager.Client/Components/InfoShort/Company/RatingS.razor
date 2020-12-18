@@ -5,7 +5,7 @@
 
         @if (model is not null)
         {
-            <KeyValueCols Key="Date update" Value="@model.DateUpdate.ToShortDateString()" />
+            <KeyValueCols Key="Date update" Value="@model.DateUpdate.ToString()" />
             <KeyValueCols Key="Place" Value="@($"{model.PlaceCurrent} of {model.PlaceTotal}")" />
             <KeyValueCols Key="Value" Value="@model.ValueTotal.ToString("f2")" />
 

@@ -88,7 +88,7 @@ else
 
         List<TickerModel> tickers = await http.GetAsync<List<TickerModel>>(new UrlBuilder(UrlController.Tickers, UrlPath.ByCompanyId, CompanyId).Result);
 
-        if (tickers == default)
+        if (tickers == default || !tickers.Any())
         {
             isEditeble = false;
             tickers = new List<TickerModel> { new TickerModel { CompanyId = CompanyId, ExchangeId = exchanges.First().Id, LotId = lots.First().Id } };

@@ -23,6 +23,7 @@ namespace InvestmentManager.Server.Controllers
         private readonly IBaseRestMethod restMethod;
         private readonly ICatalogService catalogService;
         private readonly IConfiguration configuration;
+        private readonly ISummaryService summaryService;
         private readonly UserManager<IdentityUser> userManager;
 
         public StockTransactionsController(
@@ -30,12 +31,14 @@ namespace InvestmentManager.Server.Controllers
             , IBaseRestMethod restMethod
             , ICatalogService catalogService
             , IConfiguration configuration
+            , ISummaryService summaryService
             , UserManager<IdentityUser> userManager)
         {
             this.unitOfWork = unitOfWork;
             this.restMethod = restMethod;
             this.catalogService = catalogService;
             this.configuration = configuration;
+            this.summaryService = summaryService;
             this.userManager = userManager;
         }
 
@@ -78,7 +81,6 @@ namespace InvestmentManager.Server.Controllers
         {
             var transactions = await unitOfWork.StockTransaction.GetAll()
                 .Where(x => x.AccountId == accountId && x.Ticker.CompanyId == companyId)
-                .OrderByDescending(x => x.DateOperation)
                 .ToListAsync().ConfigureAwait(false);
 
             return transactions is null || !transactions.Any()
@@ -126,7 +128,21 @@ namespace InvestmentManager.Server.Controllers
             };
 
             var result = await restMethod.BasePostAsync(ModelState, entity, model).ConfigureAwait(false);
-            return result.IsSuccess ? (IActionResult)Ok(result) : BadRequest(result);
+
+            if (result.IsSuccess)
+            {
+                await summaryService.SetCompanySummaryAsync(entity).ConfigureAwait(false);
+                
+                await summaryService.SetAccountFreeSumAsync(entity.AccountId, entity.CurrencyId).ConfigureAwait(false);
+
+                bool isComplete = await unitOfWork.CompleteAsync().ConfigureAwait(false);
+                if (!isComplete)
+                    result.Info += "; SUMMARY ERROR!";
+
+                return Ok(result);
+            }
+            else
+                return BadRequest(result);
         }
     }
 }
