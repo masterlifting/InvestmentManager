@@ -19,5 +19,7 @@ namespace InvestmentManager.Services.Interfaces
         Task SetCompanySummaryAsync(StockTransaction transaction);
         Task SetDividendSummaryAsync(Dividend dividend);
         Task SetExchangeRateSummaryAsync(ExchangeRate exchangeRate);
+
+        Task ResetAllSummaryDataAsync(string userId);
     }
 }

@@ -8,17 +8,13 @@ namespace InvestmentManager.Calculator.Implimentations
 {
     internal class PriceCalculate : BaseCalculate, IPriceCalculate
     {
-        private readonly IEnumerable<Price> prices;
-        public PriceCalculate(IEnumerable<Price> orderedPrices) => prices = orderedPrices;
+        private readonly List<decimal> prices;
+        public PriceCalculate(List<Price> orderedPrices) => prices = orderedPrices.Where(x => x.Value != 0).Select(x => x.Value).ToList();
 
-        public decimal GetPricieComporision()
+        public decimal? GetPricieComporision()
         {
-            var thisPriceList = prices.Where(x => x.Value != 0).Select(x => x.Value);
-            var collection = thisPriceList.Any() ? thisPriceList : new List<decimal>();
-
             Weight = WeightConfig.PriceComparision > 0 ? WeightConfig.PriceComparision : 1;
-            PositiveCollections = new List<IEnumerable<decimal>> { collection };
-
+            PositiveCollections = new List<List<decimal>> { prices };
             return CollectionComparison();
         }
     }

@@ -30,15 +30,11 @@ namespace InvestmentManager.Repository
     #region Repository Interfaces
     // Broker
     public interface IAccountRepository : IRepository<Account> { }
-    public interface IAccountSummaryRepository : IRepository<AccountSummary> { }
     public interface IAccountTransactionRepository : IRepository<AccountTransaction> { }
     public interface IComissionRepository : IRepository<Comission> { }
-    public interface IComissionSummaryRepository : IRepository<ComissionSummary> { }
     public interface IComissionTypeRepository : IRepository<ComissionType> { }
     public interface IDividendRepository : IRepository<Dividend> { }
-    public interface IDividendSummaryRepository : IRepository<DividendSummary> { }
     public interface IExchangeRateRepository : IRepository<ExchangeRate> { }
-    public interface IExchangeRateSummaryRepository : IRepository<ExchangeRateSummary> { }
     public interface IStockTransactionRepository : IRepository<StockTransaction>  { }
     public interface ITransactionStatusRepository : IRepository<TransactionStatus> { }
     // Market
@@ -53,7 +49,6 @@ namespace InvestmentManager.Repository
     }
     public interface ILotRepository : IRepository<Lot> { }
     public interface ICompanyRepository : IRepository<Company> { }
-    public interface ICompanySummaryRepository : IRepository<CompanySummary> { }
     public interface IIndustryRepository : IRepository<Industry> { }
     public interface ISectorRepository : IRepository<Sector> { }
     public interface IReportSourceRepository : IRepository<ReportSource> { }
@@ -89,11 +84,16 @@ namespace InvestmentManager.Repository
     public interface ICoefficientRepository : IRepository<Coefficient>
     {
         Task<List<Coefficient>> GetSortedCoefficientsAsync(long companyId);
-        Task<List<(decimal price, Report report)>> GetSortedCoefficientCalculatingDataAsync(long companyId);
+        Task<List<(decimal price, Report report)>> GetSortedCoefficientCalculatingDataAsync(long companyId); // to delete
         IDictionary<string, List<(DateTime dateReport, Coefficient coefficient)>> GetViewData();
     }
     public interface ISellRecommendationRepository : IRepository<SellRecommendation> { }
     public interface IBuyRecommendationRepository : IRepository<BuyRecommendation> { }
+    public interface IAccountSummaryRepository : IRepository<AccountSummary> { }
+    public interface ICompanySummaryRepository : IRepository<CompanySummary> { }
+    public interface IDividendSummaryRepository : IRepository<DividendSummary> { }
+    public interface IComissionSummaryRepository : IRepository<ComissionSummary> { }
+    public interface IExchangeRateSummaryRepository : IRepository<ExchangeRateSummary> { }
     // Common
     public interface ICurrencyRepository : IRepository<Currency> { }
     #endregion

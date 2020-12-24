@@ -4,11 +4,11 @@
         @if (model is not null)
         {
             <div class="row">
-                <KeyValueCols KeySize="9" Key="Price comparision" Value="@model.PriceComparisonValue.ToString("f2")" />
-                <KeyValueCols KeySize="9" Key="Report comparision" Value="@model.ReportComparisonValue.ToString("f2")" />
-                <KeyValueCols KeySize="9" Key="Coefficient comparision" Value="@model.CoefficientComparisonValue.ToString("f2")" />
-                <KeyValueCols KeySize="9" Key="Coefficient avg comparision" Value="@model.CoefficientAverageValue.ToString("f2")" />
-                <KeyValueCols KeySize="9" Key="Cash flow comparision" Value="@model.CashFlowPositiveBalanceValue.ToString("f2")" />
+                <KeyValueCols KeySize="9" Key="Price comparision" Value="@(model.PriceComparisonValue.HasValue ? model.PriceComparisonValue.Value.ToString("f2") : " - ")" />
+                <KeyValueCols KeySize="9" Key="Report comparision" Value="@(model.ReportComparisonValue.HasValue ? model.ReportComparisonValue.Value.ToString("f2") : " - ")" />
+                <KeyValueCols KeySize="9" Key="Coefficient comparision" Value="@(model.CoefficientComparisonValue.HasValue ? model.CoefficientComparisonValue.Value.ToString("f2") : " - ")" />
+                <KeyValueCols KeySize="9" Key="Coefficient avg comparision" Value="@(model.CoefficientAverageValue.HasValue ? model.CoefficientAverageValue.Value.ToString("f2") : " - ")" />
+                <KeyValueCols KeySize="9" Key="Cash flow comparision" Value="@(model.CashFlowPositiveBalanceValue.HasValue ? model.CashFlowPositiveBalanceValue.Value.ToString("f2") : " - ")" />
             </div>
         }
         else

@@ -2,7 +2,7 @@
 {
     public interface ICoefficientCalculate
     {
-        decimal GetCoefficientComparison();
-        decimal GetCoefficientAverage();
+        decimal? GetCoefficientComparison();
+        decimal? GetCoefficientAverage();
     }
 }

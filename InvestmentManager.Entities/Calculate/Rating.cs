@@ -15,15 +15,15 @@ namespace InvestmentManager.Entities.Calculate
 
 
         [Column(TypeName = "Decimal(18,5)")]
-        public decimal PriceComparisonValue { get; set; }
+        public decimal? PriceComparisonValue { get; set; }
         [Column(TypeName = "Decimal(18,5)")]
-        public decimal ReportComparisonValue { get; set; }
+        public decimal? ReportComparisonValue { get; set; }
         [Column(TypeName = "Decimal(18,5)")]
-        public decimal CashFlowPositiveBalanceValue { get; set; }
+        public decimal? CashFlowPositiveBalanceValue { get; set; }
         [Column(TypeName = "Decimal(18,5)")]
-        public decimal CoefficientComparisonValue { get; set; }
+        public decimal? CoefficientComparisonValue { get; set; }
         [Column(TypeName = "Decimal(18,5)")]
-        public decimal CoefficientAverageValue { get; set; }
+        public decimal? CoefficientAverageValue { get; set; }
 
         public long CompanyId { get; set; }
         public virtual Company Company { get; set; }

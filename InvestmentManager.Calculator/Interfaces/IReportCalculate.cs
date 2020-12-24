@@ -2,7 +2,7 @@
 {
     public interface IReportCalculate
     {
-        decimal GetReportComporision();
-        decimal GetCashFlowBalance(decimal maxPercent);
+        decimal? GetReportComporision();
+        decimal? GetCashFlowBalance(decimal maxPercent);
     }
 }

@@ -14,27 +14,20 @@ namespace InvestmentManager.Calculator
         public IEnumerable<IEnumerable<decimal>> PositiveCollections { get; private protected set; } = null;
         public IEnumerable<IEnumerable<decimal>> NegativeCollections { get; private protected set; } = null;
 
-        private protected decimal CollectionComparison()
+        private protected decimal? CollectionComparison()
         {
             var result = new List<decimal>();
 
-            if (PositiveCollections != null && PositiveCollections.Any())
-            {
+            if (PositiveCollections is not null && PositiveCollections.Any())
                 foreach (var pc in PositiveCollections.Where(x => x.Any()))
-                {
                     result.Add(CalculateNextToPreviousPercentChange(pc, 100));
-                }
-            }
 
-            if (NegativeCollections != null && NegativeCollections.Any())
-            {
+            if (NegativeCollections is not null && NegativeCollections.Any())
                 foreach (var nc in NegativeCollections.Where(x => x.Any()))
-                {
                     result.Add(CalculateNextToPreviousPercentChange(nc, -100));
-                }
-            }
+
             var _result = result.Where(x => x != 0);
-            return _result.Any() ? _result.Average() * Weight : 0;
+            return _result.Any() ? _result.Average() * Weight : null;
         }
 
         // Сравнение изменения усреднений даух значений в процентном отношении следующего элемента к предыдущему

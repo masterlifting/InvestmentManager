@@ -2,6 +2,6 @@
 {
     public interface IPriceCalculate
     {
-        decimal GetPricieComporision();
+        decimal? GetPricieComporision();
     }
 }

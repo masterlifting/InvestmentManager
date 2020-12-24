@@ -1,4 +1,5 @@
 ﻿using InvestmentManager.Entities.Basic;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -112,32 +113,27 @@ namespace InvestmentManager.Repository
             }
         }
 
-        public async Task CustomAllUpdateAsync<T>(IEnumerable<T> entities, WithDelete withDelete = WithDelete.False) where T : class, IBaseEntity
+        public async Task CustomUpdateRangeAsync<T>(IEnumerable<T> entities) where T : class, IBaseEntity
         {
             if (entities is null || !entities.Any())
                 return;
 
-            var entitiesToAdd = entities.Where(x => x.Id == default);
-            await context.AddRangeAsync(entitiesToAdd).ConfigureAwait(false);
+            var newEntities = entities.Where(x => x.Id == default);
+            await context.AddRangeAsync(newEntities).ConfigureAwait(false);
 
-            var entitiesToUpdate = entities.Where(x => x.Id != default);
-            context.UpdateRange(entitiesToUpdate);
+            var currentEntities = entities.Where(x => x.Id != default);
+            context.UpdateRange(currentEntities);
 
-            if (withDelete == WithDelete.True)
+            var oldEntityIds = context.Set<T>().Select(x => x.Id);
+            var currentEntityIds = entities.Where(x => x.Id != default).Select(x => x.Id);
+
+            var idsToDelete = oldEntityIds.Except(currentEntityIds);
+
+            if (idsToDelete.Any())
             {
-                var dbIds = context.Set<T>().Select(x => x.Id);
-                var currentIds = entities.Where(x => x.Id != default).Select(x => x.Id);
-
-                var entitiesToDelete = dbIds.Except(currentIds);
-
-                if (entitiesToDelete.Any())
-                    context.RemoveRange(entitiesToDelete);
+                var entitiesToDelete = await context.Set<T>().Where(x => idsToDelete.Contains(x.Id)).ToArrayAsync().ConfigureAwait(false);
+                context.RemoveRange(entitiesToDelete);
             }
         }
-    }
-    public enum WithDelete
-    {
-        True,
-        False
     }
 }

@@ -29,6 +29,7 @@ namespace InvestmentManager.Server.Controllers
         private readonly IReportService reportService;
         private readonly IPriceService priceService;
         private readonly IInvestMapper mapper;
+        private readonly ISummaryService summaryService;
         private readonly UserManager<IdentityUser> userManager;
         private readonly IWebService webService;
 
@@ -39,6 +40,7 @@ namespace InvestmentManager.Server.Controllers
             , IReportService reportService
             , IPriceService priceService
             , IInvestMapper mapper
+            , ISummaryService summaryService
             , UserManager<IdentityUser> userManager
             , IWebService webService)
         {
@@ -48,6 +50,7 @@ namespace InvestmentManager.Server.Controllers
             this.reportService = reportService;
             this.priceService = priceService;
             this.mapper = mapper;
+            this.summaryService = summaryService;
             this.userManager = userManager;
             this.webService = webService;
         }
@@ -78,6 +81,12 @@ namespace InvestmentManager.Server.Controllers
         [HttpGet("recalculateall/"), Authorize(Roles = "pestunov")]
         public async Task<IActionResult> RecalculateAll()
         {
+            if (await calculator.SetCoeffitientsAsync(DataBaseType.Postgres).ConfigureAwait(false))
+                if (await unitOfWork.CompleteAsync().ConfigureAwait(false))
+                    if (await calculator.SetRatingAsync(DataBaseType.Postgres).ConfigureAwait(false))
+                        if (await unitOfWork.CompleteAsync().ConfigureAwait(false))
+                            return Ok();
+
             try
             {
                 //pre delete all sql
@@ -96,15 +105,15 @@ namespace InvestmentManager.Server.Controllers
                 await unitOfWork.CompleteAsync().ConfigureAwait(false);
 
                 // add new
-                await unitOfWork.Coefficient.CreateEntitiesAsync(await calculator.GetComplitedCoeffitientsAsync().ConfigureAwait(false)).ConfigureAwait(false);
+                //await unitOfWork.Coefficient.CreateEntitiesAsync(await calculator.GetComplitedCoeffitientsAsync().ConfigureAwait(false)).ConfigureAwait(false);
                 await unitOfWork.CompleteAsync().ConfigureAwait(false);
 
-                var ratings = await calculator.GetCompleatedRatingsAsync().ConfigureAwait(false);
-                await unitOfWork.Rating.CreateEntitiesAsync(ratings).ConfigureAwait(false);
+                //var ratings = await calculator.GetCompleatedRatingsAsync().ConfigureAwait(false);
+                //await unitOfWork.Rating.CreateEntitiesAsync(ratings).ConfigureAwait(false);
                 var userIds = userManager.Users.Select(x => x.Id).AsEnumerable();
-                var sellRecommendations = calculator.GetCompleatedSellRecommendations(userIds, ratings);
-                await unitOfWork.SellRecommendation.CreateEntitiesAsync(sellRecommendations).ConfigureAwait(false);
-                await unitOfWork.BuyRecommendation.CreateEntitiesAsync(calculator.GetCompleatedBuyRecommendations(ratings)).ConfigureAwait(false);
+                //var sellRecommendations = calculator.GetCompleatedSellRecommendations(userIds, ratings);
+                //await unitOfWork.SellRecommendation.CreateEntitiesAsync(sellRecommendations).ConfigureAwait(false);
+                //await unitOfWork.BuyRecommendation.CreateEntitiesAsync(calculator.GetCompleatedBuyRecommendations(ratings)).ConfigureAwait(false);
 
                 await unitOfWork.CompleteAsync().ConfigureAwait(false);
 
@@ -172,6 +181,50 @@ namespace InvestmentManager.Server.Controllers
                 await unitOfWork.Price.CreateEntitiesAsync(newPricies).ConfigureAwait(false);
                 await unitOfWork.Price.CompletePostgresAsync().ConfigureAwait(false);
             }
+        }
+
+        public async Task<IActionResult> ResetSummary()
+        {
+            var userIds = await userManager.Users.Select(x => x.Id).ToArrayAsync().ConfigureAwait(false);
+            List<string> errors = new List<string>();
+
+            try
+            {
+                unitOfWork.ComissionSummary.DeleteAndReseedPostgres();
+                unitOfWork.DividendSummary.DeleteAndReseedPostgres();
+                unitOfWork.ExchangeRateSummary.DeleteAndReseedPostgres();
+                unitOfWork.CompanySummary.DeleteAndReseedPostgres();
+                unitOfWork.AccountSummary.DeleteAndReseedPostgres();
+            }
+            catch
+            {
+                return BadRequest(new BaseActionResult { IsSuccess = false, Info = "Delete all error." });
+            }
+
+            foreach (var userId in userIds)
+            {
+                try
+                {
+                    await summaryService.ResetAllSummaryDataAsync(userId).ConfigureAwait(false);
+
+                    if (await unitOfWork.CompleteAsync().ConfigureAwait(false))
+                        continue;
+                    else
+                    {
+                        errors.Add($"Save summary error: '{(await userManager.FindByIdAsync(userId).ConfigureAwait(false)).Email}'.");
+                        continue;
+                    }
+                }
+                catch
+                {
+                    errors.Add($"Reset summary error: '{(await userManager.FindByIdAsync(userId).ConfigureAwait(false)).Email}'.");
+                    continue;
+                }
+            }
+
+            return errors.Any()
+                ? BadRequest(new BaseActionResult { IsSuccess = false, Info = string.Join("; ", errors) })
+                : Ok(new BaseActionResult { IsSuccess = true });
         }
     }
 }

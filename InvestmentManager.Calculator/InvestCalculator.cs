@@ -5,6 +5,7 @@ using InvestmentManager.Entities.Broker;
 using InvestmentManager.Entities.Calculate;
 using InvestmentManager.Entities.Market;
 using InvestmentManager.Repository;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,83 +18,93 @@ namespace InvestmentManager.Calculator
         private readonly IUnitOfWorkFactory unitOfWork;
         public InvestCalculator(IUnitOfWorkFactory unitOfWork) => this.unitOfWork = unitOfWork;
 
-        async Task<Rating> CalculateRatingAsync(CalculatedArgs calculatedArgs, long companyId)
+        #region Coefficient
+        public async Task<bool> SetCoeffitientsAsync(DataBaseType dbType)
         {
-            if (calculatedArgs is null || companyId == 0)
-                throw new NullReferenceException("Недостаточно данных для расчета рейтинга");
+            var coefficients = new List<Coefficient>();
 
-            var currentRating = calculatedArgs.CurrentRating;
-            var newRating = new Rating();
-
-            if (calculatedArgs.Prices != null && calculatedArgs.Prices.Any())
-                newRating.PriceComparisonValue = await Task.Run(() => new PriceCalculate(calculatedArgs.Prices).GetPricieComporision()).ConfigureAwait(false);
-
-            if (calculatedArgs.Reports != null && calculatedArgs.Reports.Any())
+            #region Set data
+            var reports = unitOfWork.Report.GetAll().Where(x => x.IsChecked).OrderBy(x => x.DateReport);
+            var dateFirstReport = reports.First().DateReport;
+            var dateLastReport = reports.Last().DateReport;
+            var tikerData = unitOfWork.Price.GetAll()
+                .Where(x => x.BidDate >= dateFirstReport && x.BidDate <= dateLastReport)
+                .OrderByDescending(x => x.BidDate)
+                .GroupBy(x => x.TickerId);
+            var priceData = tikerData.Join(unitOfWork.Ticker.GetAll(), x => x.Key, y => y.Id, (x, y) => new { y.CompanyId, Prices = x });
+            var coefficientData = await reports.Join(priceData, x => x.CompanyId, y => y.CompanyId, (x, y) =>
+            new
             {
-                var reportCalculate = new ReportCalculate(calculatedArgs.Reports);
-                newRating.ReportComparisonValue = await Task.Run(() => reportCalculate.GetReportComporision()).ConfigureAwait(false);
-                newRating.CashFlowPositiveBalanceValue = await Task.Run(() => reportCalculate.GetCashFlowBalance()).ConfigureAwait(false);
-            }
+                Report = x,
+                Price = y.Prices.Where(z => z.BidDate <= x.DateReport).First().Value
+            }).ToArrayAsync().ConfigureAwait(false);
+            #endregion
 
-            if (calculatedArgs.Coefficients != null && calculatedArgs.Coefficients.Any())
+            try
             {
-                var coefficientCalculate = new CoefficientCalculate(calculatedArgs.Coefficients);
-                newRating.CoefficientComparisonValue = await Task.Run(() => coefficientCalculate.GetCoefficientComparison()).ConfigureAwait(false);
-                newRating.CoefficientAverageValue = await Task.Run(() => coefficientCalculate.GetCoefficientAverage()).ConfigureAwait(false);
-            }
-
-            return RecalculateRating(newRating, currentRating, companyId);
-
-            static Rating RecalculateRating(Rating newRating, Rating currentRating, long companyId)
-            {
-                var ratingResult = new Rating();
-
-                if (newRating != null)
+                for (int i = 0; i < coefficientData.Length; i++)
                 {
-                    if (currentRating != null)
-                        ratingResult = currentRating;
-                    else
-                        ratingResult.CompanyId = companyId;
-
-                    // Перепись значений
-                    if (newRating.CoefficientComparisonValue != default)
-                        ratingResult.CoefficientComparisonValue = newRating.CoefficientComparisonValue;
-
-                    if (newRating.CoefficientAverageValue != default)
-                        ratingResult.CoefficientAverageValue = newRating.CoefficientAverageValue;
-
-                    if (newRating.PriceComparisonValue != default)
-                        ratingResult.PriceComparisonValue = newRating.PriceComparisonValue;
-
-                    if (newRating.ReportComparisonValue != default)
-                        ratingResult.ReportComparisonValue = newRating.ReportComparisonValue;
-
-                    if (newRating.CashFlowPositiveBalanceValue != default)
-                        ratingResult.CashFlowPositiveBalanceValue = newRating.CashFlowPositiveBalanceValue;
-
-                    var newResultList = new List<decimal>
-                {
-                    ratingResult.CoefficientComparisonValue
-                    , ratingResult.CoefficientAverageValue
-                    , ratingResult.PriceComparisonValue
-                    , ratingResult.ReportComparisonValue
-                    , ratingResult.CashFlowPositiveBalanceValue
-                };
-                    // Вычисление результата
-                    var tempValue = newResultList.Where(x => x != default);
-                    ratingResult.Result = tempValue.Any() ? tempValue.Average() : 0;
-
-                    ratingResult.DateUpdate = DateTime.Now;
-                    ratingResult.Place = default;
+                    var coefficient = CalculateReportCoefficient(coefficientData[i].Report, coefficientData[i].Price);
+                    coefficients.Add(coefficient);
                 }
 
-                return ratingResult;
+                switch (dbType)
+                {
+                    case DataBaseType.Postgres:
+                        unitOfWork.Coefficient.DeleteAndReseedPostgres();
+                        break;
+                    case DataBaseType.SQL:
+                        unitOfWork.Coefficient.TruncateAndReseedSQL();
+                        break;
+                }
+                await unitOfWork.Coefficient.CreateEntitiesAsync(coefficients).ConfigureAwait(false);
+
+                return true;
+            }
+            catch
+            {
+                return false;
             }
         }
-        Coefficient CalculateReportCoefficient(Report report, decimal price, long coefficientId = 0)
+        public async Task<bool> SetCoeffitientAsync(Report report)
         {
-            return report != null
-                 ? new Coefficient() { Id = coefficientId, ReportId = report.Id, PE = Pe(), PB = PB(), DebtLoad = DebtLoad(), Profitability = Profitability(), ROA = Roa(), ROE = Roe(), EPS = Eps() }
+            if (report is null || !report.IsChecked || report.Id == default)
+                return false;
+
+            int pricePeriod = ((DateTime.Now - report.DateReport).Days / 30) + 1;
+
+            var prices = await unitOfWork.Price.GetCustomPricesAsync(report.CompanyId, pricePeriod, OrderType.OrderByDesc).ConfigureAwait(false);
+
+            if (!prices.Any())
+                return false;
+
+            var price = prices.Where(x => x.BidDate <= report.DateReport).First().Value;
+            var newCoefficient = CalculateReportCoefficient(report, price);
+
+            var dbCoefficient = (await unitOfWork.Report.FindByIdAsync(report.Id).ConfigureAwait(false))?.Coefficient;
+
+            if (dbCoefficient is null)
+                await unitOfWork.Coefficient.CreateEntityAsync(newCoefficient).ConfigureAwait(false);
+            else
+            {
+                dbCoefficient.DateUpdate = DateTime.Now;
+                dbCoefficient.DebtLoad = newCoefficient.DebtLoad;
+                dbCoefficient.EPS = newCoefficient.EPS;
+                dbCoefficient.PB = newCoefficient.PB;
+                dbCoefficient.PE = newCoefficient.PE;
+                dbCoefficient.Profitability = newCoefficient.Profitability;
+                dbCoefficient.ROA = newCoefficient.ROA;
+                dbCoefficient.ROE = newCoefficient.ROE;
+            }
+
+            return true;
+        }
+
+        #region Helpers
+        static Coefficient CalculateReportCoefficient(Report report, decimal lastPrice)
+        {
+            return report is not null && report.Id != default
+                 ? new Coefficient() { ReportId = report.Id, PE = Pe(), PB = PB(), DebtLoad = DebtLoad(), Profitability = Profitability(), ROA = Roa(), ROE = Roe(), EPS = Eps() }
                  : throw new NullReferenceException("Нет отчета для расчета бизнес коэффициентов.");
 
             decimal Eps() => report.StockVolume != 0 ? ((report.NetProfit * 1_000_000) / report.StockVolume) : 0;
@@ -101,9 +112,423 @@ namespace InvestmentManager.Calculator
             decimal Roa() => report.Assets != 0 ? (report.NetProfit / report.Assets) * 100 : 0;
             decimal Roe() => report.ShareCapital != 0 ? (report.NetProfit / report.ShareCapital) * 100 : 0;
             decimal DebtLoad() => report.Assets != 0 ? report.Obligations / report.Assets : 0;
-            decimal Pe() => Eps() != 0 && price > 0 ? price / Eps() : 0;
-            decimal PB() => (report.Assets - report.Obligations) != 0 && price > 0 && report.StockVolume > 0 ? (price * report.StockVolume) / ((report.Assets - report.Obligations) * 1_000_000) : 0;
+            decimal Pe() => Eps() != 0 && lastPrice > 0 ? lastPrice / Eps() : 0;
+            decimal PB() => (report.Assets - report.Obligations) != 0 && lastPrice > 0 && report.StockVolume > 0 ? (lastPrice * report.StockVolume) / ((report.Assets - report.Obligations) * 1_000_000) : 0;
         }
+        #endregion
+
+        #endregion
+        #region Rating
+        public async Task<bool> SetRatingAsync(DataBaseType dbType)
+        {
+            var ratings = new List<Rating>();
+
+            try
+            {
+                foreach (var company in unitOfWork.Company.GetAll())
+                {
+                    var rating = await CalculateRatingAsync(company).ConfigureAwait(false);
+
+                    if (rating is not null)
+                        ratings.Add(rating);
+                    else return false;
+                }
+
+                SetRatingPlaces(ratings);
+
+                switch (dbType)
+                {
+                    case DataBaseType.Postgres:
+                        unitOfWork.Coefficient.DeleteAndReseedPostgres();
+                        break;
+                    case DataBaseType.SQL:
+                        unitOfWork.Coefficient.TruncateAndReseedSQL();
+                        break;
+                }
+                await unitOfWork.Rating.CreateEntitiesAsync(ratings).ConfigureAwait(false);
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        public async Task<bool> SetRatingByPricesAsync()
+        {
+            var prices = unitOfWork.Price.GetGroupedPrices(12, OrderType.OrderBy);
+
+            if (prices is null || !prices.Any())
+                return false;
+
+            var ratings = new List<Rating>();
+            try
+            {
+                foreach (var data in unitOfWork.Company.GetAll().Join(prices, x => x.Id, y => y.Key, (x, y) => new { Company = x, Prices = y.Value }))
+                {
+                    Rating rating = data.Company.Rating is null ? new Rating { CompanyId = data.Company.Id } : data.Company.Rating;
+
+                    if (!await SetRatingValueByPricesAsync(data.Prices, rating).ConfigureAwait(false))
+                        continue;
+
+                    SetRatingResult(rating);
+
+                    ratings.Add(rating);
+                }
+
+                var currentRatings = await unitOfWork.Rating.GetAll().ToListAsync().ConfigureAwait(false);
+                var notСalculatedRatings = currentRatings.Except(ratings).ToArray();
+                for (int i = 0; i < notСalculatedRatings.Length; i++)
+                {
+                    notСalculatedRatings[i].PriceComparisonValue = null;
+                    SetRatingResult(notСalculatedRatings[i]);
+                }
+
+                ratings.AddRange(notСalculatedRatings);
+
+                SetRatingPlaces(ratings);
+
+                await unitOfWork.CustomUpdateRangeAsync(ratings).ConfigureAwait(false);
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        public async Task<bool> SetRatingByPricesAsync(long companyId)
+        {
+            var company = await unitOfWork.Company.FindByIdAsync(companyId).ConfigureAwait(false);
+
+            if (company is null)
+                return false;
+
+            var prices = await unitOfWork.Price.GetCustomPricesAsync(company.Id, 12, OrderType.OrderBy, company.DateSplit).ConfigureAwait(false);
+
+            if (prices is null || !prices.Any())
+                return false;
+
+            Rating rating = company.Rating is null ? new Rating { CompanyId = company.Id } : company.Rating;
+
+            try
+            {
+                if (!await SetRatingValueByPricesAsync(prices.ToList(), rating).ConfigureAwait(false))
+                    return false;
+
+                SetRatingResult(rating);
+
+                var ratings = await unitOfWork.Rating.GetAll().ToListAsync().ConfigureAwait(false);
+
+                if (rating.Id != default)
+                {
+                    var removable = ratings.First(x => x.Id == rating.Id);
+                    ratings.Remove(removable);
+                    ratings.Add(rating);
+                }
+                else
+                    ratings.Add(rating);
+
+                SetRatingPlaces(ratings);
+
+                await unitOfWork.CustomUpdateRangeAsync(ratings).ConfigureAwait(false);
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        public async Task<bool> SetRatingByReportsAsync()
+        {
+            var reports = unitOfWork.Report.GetAll().Where(x => x.IsChecked).OrderBy(x => x.DateReport);
+
+            if (reports is null || !reports.Any())
+                return false;
+
+            var ratings = new List<Rating>();
+            var groupedReports = reports.GroupBy(x => x.CompanyId);
+            try
+            {
+                foreach (var data in unitOfWork.Company.GetAll().Join(groupedReports, x => x.Id, y => y.Key, (x, y) => new { Company = x, Reports = y }))
+                {
+                    Rating rating = data.Company.Rating is null ? new Rating { CompanyId = data.Company.Id } : data.Company.Rating;
+
+                    if (!await SetRatingValueByReportsAsync(data.Reports.ToList(), rating).ConfigureAwait(false))
+                        continue;
+
+                    SetRatingResult(rating);
+
+                    ratings.Add(rating);
+                }
+
+                var currentRatings = await unitOfWork.Rating.GetAll().ToListAsync().ConfigureAwait(false);
+                var notСalculatedRatings = currentRatings.Except(ratings).ToArray();
+                for (int i = 0; i < notСalculatedRatings.Length; i++)
+                {
+                    notСalculatedRatings[i].ReportComparisonValue = null;
+                    notСalculatedRatings[i].CashFlowPositiveBalanceValue = null;
+                    SetRatingResult(notСalculatedRatings[i]);
+                }
+
+                ratings.AddRange(notСalculatedRatings);
+
+                SetRatingPlaces(ratings);
+
+                await unitOfWork.CustomUpdateRangeAsync(ratings).ConfigureAwait(false);
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        public async Task<bool> SetRatingByReportsAsync(long companyId)
+        {
+            var company = await unitOfWork.Company.FindByIdAsync(companyId).ConfigureAwait(false);
+
+            if (company is null)
+                return false;
+
+            var reports = company.Reports.Where(x => x.IsChecked).OrderBy(x => x.DateReport).ToList();
+
+            if (reports is null || !reports.Any())
+                return false;
+
+            Rating rating = company.Rating is null ? new Rating { CompanyId = company.Id } : company.Rating;
+
+            try
+            {
+                if (!await SetRatingValueByReportsAsync(reports, rating).ConfigureAwait(false))
+                    return false;
+
+                SetRatingResult(rating);
+
+                var ratings = await unitOfWork.Rating.GetAll().ToListAsync().ConfigureAwait(false);
+
+                if (rating.Id != default)
+                {
+                    var removable = ratings.First(x => x.Id == rating.Id);
+                    ratings.Remove(removable);
+                    ratings.Add(rating);
+                }
+                else
+                    ratings.Add(rating);
+
+                SetRatingPlaces(ratings);
+
+                await unitOfWork.CustomUpdateRangeAsync(ratings).ConfigureAwait(false);
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        public async Task<bool> SetRatingByCoefficientsAsync()
+        {
+            var coefficients = unitOfWork.Report.GetAll()
+                .Where(x => x.IsChecked)
+                .OrderBy(x => x.DateReport)
+                .GroupBy(x => x.CompanyId)
+                .Select(x => new { CompanyId = x.Key, Coefficients = x.Select(y => y.Coefficient) });
+
+            if (coefficients is null || !coefficients.Any())
+                return false;
+
+            var ratings = new List<Rating>();
+            try
+            {
+                foreach (var data in unitOfWork.Company.GetAll().Join(coefficients, x => x.Id, y => y.CompanyId, (x, y) => new { Company = x, y.Coefficients }))
+                {
+                    Rating rating = data.Company.Rating is null ? new Rating { CompanyId = data.Company.Id } : data.Company.Rating;
+
+                    if (!await SetRatingValueByCoefficientsAsync(data.Coefficients.ToList(), rating).ConfigureAwait(false))
+                        continue;
+
+                    SetRatingResult(rating);
+
+                    ratings.Add(rating);
+                }
+
+                var currentRatings = await unitOfWork.Rating.GetAll().ToListAsync().ConfigureAwait(false);
+                var notСalculatedRatings = currentRatings.Except(ratings).ToArray();
+                for (int i = 0; i < notСalculatedRatings.Length; i++)
+                {
+                    notСalculatedRatings[i].CoefficientAverageValue = null;
+                    notСalculatedRatings[i].CoefficientComparisonValue = null;
+                    SetRatingResult(notСalculatedRatings[i]);
+                }
+
+                ratings.AddRange(notСalculatedRatings);
+
+                SetRatingPlaces(ratings);
+
+                await unitOfWork.CustomUpdateRangeAsync(ratings).ConfigureAwait(false);
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+
+        }
+        public async Task<bool> SetRatingByCoefficientsAsync(long companyId)
+        {
+            var company = await unitOfWork.Company.FindByIdAsync(companyId).ConfigureAwait(false);
+
+            if (company is null)
+                return false;
+
+            var coefficients = company.Reports.Where(x => x.IsChecked).OrderBy(x => x.DateReport).Select(x => x.Coefficient).ToList();
+
+            if (coefficients is null || !coefficients.Any())
+                return false;
+
+            Rating rating = company.Rating is null ? new Rating { CompanyId = company.Id } : company.Rating;
+            try
+            {
+                if (!await SetRatingValueByCoefficientsAsync(coefficients, rating).ConfigureAwait(false))
+                    return false;
+
+                SetRatingResult(rating);
+
+                var ratings = await unitOfWork.Rating.GetAll().ToListAsync().ConfigureAwait(false);
+
+                if (rating.Id != default)
+                {
+                    var removable = ratings.First(x => x.Id == rating.Id);
+                    ratings.Remove(removable);
+                    ratings.Add(rating);
+                }
+                else
+                    ratings.Add(rating);
+
+                SetRatingPlaces(ratings);
+
+                await unitOfWork.CustomUpdateRangeAsync(ratings).ConfigureAwait(false);
+
+                return true;
+
+            }
+            catch
+            {
+                return false;
+            }
+
+        }
+
+        #region Helpers
+        static async Task<bool> SetRatingValueByPricesAsync(List<Price> prices, Rating rating)
+        {
+            if (rating is not null && prices is not null && prices.Any())
+            {
+                try
+                {
+                    rating.PriceComparisonValue = await Task.Run(() => new PriceCalculate(prices).GetPricieComporision()).ConfigureAwait(false);
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+            else return false;
+        }
+        static async Task<bool> SetRatingValueByCoefficientsAsync(List<Coefficient> coefficients, Rating rating)
+        {
+            if (rating is not null && coefficients is not null && coefficients.Any())
+            {
+                try
+                {
+                    var coefficientCalculate = new CoefficientCalculate(coefficients);
+                    rating.CoefficientComparisonValue = await Task.Run(() => coefficientCalculate.GetCoefficientComparison()).ConfigureAwait(false);
+                    rating.CoefficientAverageValue = await Task.Run(() => coefficientCalculate.GetCoefficientAverage()).ConfigureAwait(false);
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+            else return false;
+        }
+        static async Task<bool> SetRatingValueByReportsAsync(List<Report> reports, Rating rating)
+        {
+            if (rating is not null && reports is not null && reports.Any())
+            {
+                try
+                {
+                    var reportCalculate = new ReportCalculate(reports);
+                    rating.ReportComparisonValue = await Task.Run(() => reportCalculate.GetReportComporision()).ConfigureAwait(false);
+                    rating.CashFlowPositiveBalanceValue = await Task.Run(() => reportCalculate.GetCashFlowBalance()).ConfigureAwait(false);
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+            else return false;
+        }
+        async Task<Rating> CalculateRatingAsync(Company company)
+        {
+            if (company is null)
+                return null;
+
+            #region Set data
+            var prices = await unitOfWork.Price.GetCustomPricesAsync(company.Id, 12, OrderType.OrderBy, company.DateSplit).ConfigureAwait(false);
+            var reports = company.Reports.Where(x => x.IsChecked).OrderBy(x => x.DateReport);
+            var coefficients = reports.Select(x => x.Coefficient);
+            #endregion
+
+            var rating = new Rating { CompanyId = company.Id };
+
+            if (!await SetRatingValueByPricesAsync(prices.ToList(), rating).ConfigureAwait(false)
+                || !await SetRatingValueByCoefficientsAsync(coefficients.ToList(), rating).ConfigureAwait(false)
+                || !await SetRatingValueByReportsAsync(reports.ToList(), rating).ConfigureAwait(false))
+                return null;
+
+            SetRatingResult(rating);
+
+            return rating;
+        }
+        static void SetRatingResult(Rating rating)
+        {
+            // Вычисление результата
+            var valuesByResult = new List<decimal>();
+
+            if (rating.CashFlowPositiveBalanceValue.HasValue)
+                valuesByResult.Add(rating.CashFlowPositiveBalanceValue.Value);
+            if (rating.CoefficientAverageValue.HasValue)
+                valuesByResult.Add(rating.CoefficientAverageValue.Value);
+            if (rating.CoefficientComparisonValue.HasValue)
+                valuesByResult.Add(rating.CoefficientComparisonValue.Value);
+            if (rating.PriceComparisonValue.HasValue)
+                valuesByResult.Add(rating.PriceComparisonValue.Value);
+            if (rating.ReportComparisonValue.HasValue)
+                valuesByResult.Add(rating.ReportComparisonValue.Value);
+
+            rating.Result = valuesByResult.Any() ? valuesByResult.Average() : 0;
+        }
+        static void SetRatingPlaces(List<Rating> ratings)
+        {
+            ratings.Sort(new RatingCompare());
+
+            for (int i = 1; i <= ratings.Count; i++)
+            {
+                ratings[i].Place = i;
+                ratings[i].DateUpdate = DateTime.Now;
+            }
+        }
+        #endregion
+
+        #endregion
+
         BuyRecommendation CalculateBuyRecommendation(BuyRecommendationArgs args)
         {
             decimal deviationPercentage = BuyRecommendationConfig.DeviationPercentage;
@@ -289,48 +714,6 @@ namespace InvestmentManager.Calculator
 
         }
 
-        public async Task<List<Coefficient>> GetComplitedCoeffitientsAsync()
-        {
-            var result = new List<Coefficient>();
-            var companyIds = unitOfWork.Company.GetAll().Select(x => x.Id).ToList();
-            foreach (long companyId in companyIds)
-            {
-                var data = await unitOfWork.Coefficient.GetSortedCoefficientCalculatingDataAsync(companyId).ConfigureAwait(false);
-
-                foreach (var (price, report) in data)
-                {
-                    result.Add(CalculateReportCoefficient(report, price));
-                }
-            }
-            return result;
-        }
-        public async Task<List<Rating>> GetCompleatedRatingsAsync()
-        {
-            var result = new List<Rating>();
-            var companyData = unitOfWork.Company.GetAll().Select(x => new { x.Id, x.DateSplit }).ToList();
-            foreach (var company in companyData)
-            {
-                var calculatorArgs = new CalculatedArgs
-                {
-                    CurrentRating = unitOfWork.Rating.GetAll().FirstOrDefault(x => x.CompanyId == company.Id),
-                    Coefficients = await unitOfWork.Coefficient.GetSortedCoefficientsAsync(company.Id).ConfigureAwait(false),
-                    Prices = await unitOfWork.Price.GetCustomPricesAsync(company.Id, 12, OrderType.OrderBy, company.DateSplit).ConfigureAwait(false),
-                    Reports = unitOfWork.Report.GetAll().Where(x => x.CompanyId == company.Id && x.IsChecked == true).OrderBy(x => x.DateReport.Date)
-                };
-
-                result.Add(await CalculateRatingAsync(calculatorArgs, company.Id).ConfigureAwait(false));
-            }
-
-            var comparer = new CustomCompare<Rating>();
-            result.Sort(comparer);
-
-            for (int i = 0; i < result.Count; i++)
-            {
-                result[i].Place = i + 1;
-            }
-
-            return result;
-        }
         public List<SellRecommendation> GetCompleatedSellRecommendations(IEnumerable<string> userIds, IEnumerable<Rating> ratings)
         {
             var result = new List<SellRecommendation>();
@@ -381,7 +764,7 @@ namespace InvestmentManager.Calculator
             int ratingCount = ratings.Count();
             int companyCountWithPrices = unitOfWork.Price.GetCompanyCountWithPrices();
             var prices = unitOfWork.Price.GetGroupedPricesByDateSplit(12, OrderType.OrderBy);
-            
+
             foreach (var i in unitOfWork.Company.GetAll().AsEnumerable()
                 .Join(prices, x => x.Id, y => y.Key, (x, y) => new { CompanyId = x.Id, Prices = y.Value })
                 .Join(ratings, x => x.CompanyId, y => y.CompanyId, (x, y) => new { x.CompanyId, x.Prices, y.Place }))
@@ -398,9 +781,29 @@ namespace InvestmentManager.Calculator
             }
             return result;
         }
+
+        public async Task SetBuyRecommendationsAsync()
+        {
+            throw new NotImplementedException();
+        }
+        public async Task SetSellRecommendationsAsync(string userId)
+        {
+            throw new NotImplementedException();
+        }
+        public async Task ResetCalculatingDataAsync(string userId)
+        {
+            var accountIds = await unitOfWork.Account.GetAll().Where(x => x.UserId.Equals(userId)).Select(x => x.Id).ToArrayAsync().ConfigureAwait(false);
+
+        }
+
     }
-    class CustomCompare<T> : IComparer<T> where T : Rating
+    class RatingCompare : IComparer<Rating>
     {
-        public int Compare(T x, T y) => x.Result < y.Result ? 1 : x.Result > y.Result ? -1 : 0;
+        public int Compare(Rating x, Rating y) => x.Result < y.Result ? 1 : x.Result > y.Result ? -1 : 0;
+    }
+    public enum DataBaseType
+    {
+        Postgres,
+        SQL
     }
 }

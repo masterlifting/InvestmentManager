@@ -43,6 +43,12 @@ namespace InvestmentManager.Repository
 
 
         Task<bool> CompleteAsync();
-        Task CustomAllUpdateAsync<T>(IEnumerable<T> entities, WithDelete withDelete = WithDelete.False) where T : class, IBaseEntity;
+        /// <summary>
+        /// Add new, Update current, Delete old
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="entities"></param>
+        /// <returns>Task</returns>
+        Task CustomUpdateRangeAsync<T>(IEnumerable<T> entities) where T : class, IBaseEntity;
     }
 }
