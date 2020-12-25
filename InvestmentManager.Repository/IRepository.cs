@@ -35,7 +35,7 @@ namespace InvestmentManager.Repository
     public interface IComissionTypeRepository : IRepository<ComissionType> { }
     public interface IDividendRepository : IRepository<Dividend> { }
     public interface IExchangeRateRepository : IRepository<ExchangeRate> { }
-    public interface IStockTransactionRepository : IRepository<StockTransaction>  { }
+    public interface IStockTransactionRepository : IRepository<StockTransaction> { }
     public interface ITransactionStatusRepository : IRepository<TransactionStatus> { }
     // Market
     public interface IExchangeRepository : IRepository<Exchange> { }
@@ -43,9 +43,6 @@ namespace InvestmentManager.Repository
     public interface ITickerRepository : IRepository<Ticker>
     {
         IEnumerable<Ticker> GetPriceTikers();
-        IQueryable<Ticker> GetTickerIncludedLot();
-        IQueryable<Ticker> GetTikersIncludeTransactions(IEnumerable<long> accountIds);
-        IQueryable<Ticker> GetTikersIncludeTransactions(long accountId);
     }
     public interface ILotRepository : IRepository<Lot> { }
     public interface ICompanyRepository : IRepository<Company> { }

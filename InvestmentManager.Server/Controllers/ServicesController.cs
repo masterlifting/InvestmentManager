@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
+using static InvestmentManager.Models.Enums;
 
 namespace InvestmentManager.Server.Controllers
 {
@@ -81,48 +82,11 @@ namespace InvestmentManager.Server.Controllers
         [HttpGet("recalculateall/"), Authorize(Roles = "pestunov")]
         public async Task<IActionResult> RecalculateAll()
         {
-            if (await calculator.SetCoeffitientsAsync(DataBaseType.Postgres).ConfigureAwait(false))
-                if (await unitOfWork.CompleteAsync().ConfigureAwait(false))
-                    if (await calculator.SetRatingAsync(DataBaseType.Postgres).ConfigureAwait(false))
-                        if (await unitOfWork.CompleteAsync().ConfigureAwait(false))
-                            return Ok();
+            var userIds = await userManager.Users.Select(x => x.Id).ToArrayAsync().ConfigureAwait(false);
 
-            try
-            {
-                //pre delete all sql
-                /*/
-                unitOfWork.Rating.TruncateAndReseedSQL();
-                unitOfWork.Coefficient.TruncateAndReseedSQL();
-                unitOfWork.BuyRecommendation.TruncateAndReseedSQL();
-                unitOfWork.SellRecommendation.TruncateAndReseedSQL();
-                /*/
-                //pre delete all Postgres
-                unitOfWork.Rating.DeleteAndReseedPostgres();
-                unitOfWork.Coefficient.DeleteAndReseedPostgres();
-                unitOfWork.BuyRecommendation.DeleteAndReseedPostgres();
-                unitOfWork.SellRecommendation.DeleteAndReseedPostgres();
-                //*/
-                await unitOfWork.CompleteAsync().ConfigureAwait(false);
-
-                // add new
-                //await unitOfWork.Coefficient.CreateEntitiesAsync(await calculator.GetComplitedCoeffitientsAsync().ConfigureAwait(false)).ConfigureAwait(false);
-                await unitOfWork.CompleteAsync().ConfigureAwait(false);
-
-                //var ratings = await calculator.GetCompleatedRatingsAsync().ConfigureAwait(false);
-                //await unitOfWork.Rating.CreateEntitiesAsync(ratings).ConfigureAwait(false);
-                var userIds = userManager.Users.Select(x => x.Id).AsEnumerable();
-                //var sellRecommendations = calculator.GetCompleatedSellRecommendations(userIds, ratings);
-                //await unitOfWork.SellRecommendation.CreateEntitiesAsync(sellRecommendations).ConfigureAwait(false);
-                //await unitOfWork.BuyRecommendation.CreateEntitiesAsync(calculator.GetCompleatedBuyRecommendations(ratings)).ConfigureAwait(false);
-
-                await unitOfWork.CompleteAsync().ConfigureAwait(false);
-
-                return Ok(new BaseActionResult { IsSuccess = true, Info = "Recalculated." });
-            }
-            catch (Exception)
-            {
-                return BadRequest(new BaseActionResult { IsSuccess = false, Info = "Recalculated failed!" });
-            }
+            return await calculator.ResetCalculatingDataAsync(DataBaseType.Postgres, userIds).ConfigureAwait(false)
+                ? Ok(new BaseActionResult { IsSuccess = true, Info = "Recalculated success." })
+                : BadRequest(new BaseActionResult { IsSuccess = false, Info = "Recalculated failed!" });
         }
         [HttpGet("parsereports/"), Authorize(Roles = "pestunov")]
         public async Task ParseReports()

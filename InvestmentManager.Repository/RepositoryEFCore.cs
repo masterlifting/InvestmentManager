@@ -89,18 +89,7 @@ namespace InvestmentManager.Repository
         private readonly InvestmentContext context;
         public TickerRepository(InvestmentContext context) : base(context) => this.context = context;
 
-        public IQueryable<Ticker> GetTickerIncludedLot() => context.Tickers.AsNoTracking().Include(x => x.Lot);
         public IEnumerable<Ticker> GetPriceTikers() => context.Tickers.AsNoTracking().AsEnumerable().GroupBy(x => x.CompanyId).Select(x => x.First());
-        public IQueryable<Ticker> GetTikersIncludeTransactions(IEnumerable<long> accountIds)
-        {
-            var tickerIds = context.StockTransactions.AsNoTracking().Where(y => accountIds.Contains(y.AccountId)).Select(x => x.TickerId);
-            return context.Tickers.AsNoTracking().Include(x => x.StockTransactions).Where(x => tickerIds.Contains(x.Id));
-        }
-        public IQueryable<Ticker> GetTikersIncludeTransactions(long accountId)
-        {
-            var tickerIds = context.StockTransactions.AsNoTracking().Where(y => y.AccountId == accountId).Select(x => x.TickerId);
-            return context.Tickers.AsNoTracking().Include(x => x.StockTransactions).Where(x => tickerIds.Contains(x.Id));
-        }
     }
     public class LotRepository : RepositoryEFCore<Lot>, ILotRepository { public LotRepository(InvestmentContext context) : base(context) { } }
     public class CompanyRepository : RepositoryEFCore<Company>, ICompanyRepository { public CompanyRepository(InvestmentContext context) : base(context) { } }
