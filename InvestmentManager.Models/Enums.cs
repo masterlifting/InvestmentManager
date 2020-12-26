@@ -19,6 +19,11 @@
             Buy = 3,
             Sell = 4
         }
+        public enum CurrencyTypes
+        {
+            USD = 1,
+            RUB = 2
+        }
         public enum DataBaseType
         {
             Postgres,

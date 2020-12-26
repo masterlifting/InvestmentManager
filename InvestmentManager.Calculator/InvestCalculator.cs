@@ -792,7 +792,7 @@ namespace InvestmentManager.Calculator
 
         #endregion
 
-        public async Task<bool> ResetCalculatingDataAsync(DataBaseType dbType, string userId) =>
+        public async Task<bool> ResetCalculatorDataAsync(DataBaseType dbType, string userId) =>
                 await SetCoeffitientsAsync(dbType).ConfigureAwait(false)
                 && await unitOfWork.CompleteAsync().ConfigureAwait(false)
                 && await SetRatingAsync(dbType).ConfigureAwait(false)
@@ -801,7 +801,7 @@ namespace InvestmentManager.Calculator
                 && await unitOfWork.CompleteAsync().ConfigureAwait(false)
                 && await SetSellRecommendationsAsync(userId)
                 && await unitOfWork.CompleteAsync().ConfigureAwait(false);
-        public async Task<bool> ResetCalculatingDataAsync(DataBaseType dbType, string[] userIds) =>
+        public async Task<bool> ResetCalculatorDataAsync(DataBaseType dbType, string[] userIds) =>
                 await SetCoeffitientsAsync(dbType).ConfigureAwait(false)
                 && await unitOfWork.CompleteAsync().ConfigureAwait(false)
                 && await SetRatingAsync(dbType).ConfigureAwait(false)

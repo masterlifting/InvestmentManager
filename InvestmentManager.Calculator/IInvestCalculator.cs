@@ -19,7 +19,7 @@ namespace InvestmentManager.Calculator
         Task<bool> SetSellRecommendationsAsync(DataBaseType dbType, string[] userIds);
         Task<bool> SetSellRecommendationsAsync(string userId);
 
-        Task<bool> ResetCalculatingDataAsync(DataBaseType dbType, string userId);
-        Task<bool> ResetCalculatingDataAsync(DataBaseType dbType, string[] userIds);
+        Task<bool> ResetCalculatorDataAsync(DataBaseType dbType, string userId);
+        Task<bool> ResetCalculatorDataAsync(DataBaseType dbType, string[] userIds);
     }
 }

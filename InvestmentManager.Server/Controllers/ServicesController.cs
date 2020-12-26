@@ -79,15 +79,6 @@ namespace InvestmentManager.Server.Controllers
             }
         }
 
-        [HttpGet("recalculateall/"), Authorize(Roles = "pestunov")]
-        public async Task<IActionResult> RecalculateAll()
-        {
-            var userIds = await userManager.Users.Select(x => x.Id).ToArrayAsync().ConfigureAwait(false);
-
-            return await calculator.ResetCalculatingDataAsync(DataBaseType.Postgres, userIds).ConfigureAwait(false)
-                ? Ok(new BaseActionResult { IsSuccess = true, Info = "Recalculated success." })
-                : BadRequest(new BaseActionResult { IsSuccess = false, Info = "Recalculated failed!" });
-        }
         [HttpGet("parsereports/"), Authorize(Roles = "pestunov")]
         public async Task ParseReports()
         {
@@ -147,48 +138,46 @@ namespace InvestmentManager.Server.Controllers
             }
         }
 
-        public async Task<IActionResult> ResetSummary()
+        [HttpGet("resetcalculatordata/"), Authorize(Roles = "pestunov")]
+        public async Task<IActionResult> ResetCalculatorData()
         {
             var userIds = await userManager.Users.Select(x => x.Id).ToArrayAsync().ConfigureAwait(false);
-            List<string> errors = new List<string>();
 
-            try
-            {
-                unitOfWork.ComissionSummary.DeleteAndReseedPostgres();
-                unitOfWork.DividendSummary.DeleteAndReseedPostgres();
-                unitOfWork.ExchangeRateSummary.DeleteAndReseedPostgres();
-                unitOfWork.CompanySummary.DeleteAndReseedPostgres();
-                unitOfWork.AccountSummary.DeleteAndReseedPostgres();
-            }
-            catch
-            {
-                return BadRequest(new BaseActionResult { IsSuccess = false, Info = "Delete all error." });
-            }
+            return await calculator.ResetCalculatorDataAsync(DataBaseType.Postgres, userIds).ConfigureAwait(false)
+                ? Ok(new BaseActionResult { IsSuccess = true, Info = "Reset all calculator success." })
+                : BadRequest(new BaseActionResult { IsSuccess = false, Info = "Reset all calculator failed!" });
+        }
+        [HttpGet("resetcalculatordata/{name}"), Authorize(Roles = "pestunov")]
+        public async Task<IActionResult> ResetCalculatorData(string name)
+        {
+            var user = await userManager.FindByNameAsync(name).ConfigureAwait(false);
+            if(user is null)
+                return BadRequest(new BaseActionResult { IsSuccess = false, Info = "User not found" });
 
-            foreach (var userId in userIds)
-            {
-                try
-                {
-                    await summaryService.ResetAllSummaryDataAsync(userId).ConfigureAwait(false);
+            return await calculator.ResetCalculatorDataAsync(DataBaseType.Postgres, user.Id).ConfigureAwait(false)
+                ? Ok(new BaseActionResult { IsSuccess = true, Info = "Reset this calculator success." })
+                : BadRequest(new BaseActionResult { IsSuccess = false, Info = "Reset this calculator failed!" });
+        }
 
-                    if (await unitOfWork.CompleteAsync().ConfigureAwait(false))
-                        continue;
-                    else
-                    {
-                        errors.Add($"Save summary error: '{(await userManager.FindByIdAsync(userId).ConfigureAwait(false)).Email}'.");
-                        continue;
-                    }
-                }
-                catch
-                {
-                    errors.Add($"Reset summary error: '{(await userManager.FindByIdAsync(userId).ConfigureAwait(false)).Email}'.");
-                    continue;
-                }
-            }
+        [HttpGet("resetsummarydata/"), Authorize(Roles = "pestunov")]
+        public async Task<IActionResult> ResetSummaryData()
+        {
+            var userIds = await userManager.Users.Select(x => x.Id).ToArrayAsync().ConfigureAwait(false);
 
-            return errors.Any()
-                ? BadRequest(new BaseActionResult { IsSuccess = false, Info = string.Join("; ", errors) })
-                : Ok(new BaseActionResult { IsSuccess = true });
+            return await summaryService.ResetSummaryDataAsync(DataBaseType.Postgres, userIds).ConfigureAwait(false)
+                ? Ok(new BaseActionResult { IsSuccess = true, Info = "Reset all summary success." })
+                : BadRequest(new BaseActionResult { IsSuccess = false, Info = "Reset all summary failed!" });
+        }
+        [HttpGet("resetsummarydata/{name}"), Authorize(Roles = "pestunov")]
+        public async Task<IActionResult> ResetSummaryData(string name)
+        {
+            var user = await userManager.FindByNameAsync(name).ConfigureAwait(false);
+            if (user is null)
+                return BadRequest(new BaseActionResult { IsSuccess = false, Info = "User not found" });
+
+            return await summaryService.ResetSummaryDataAsync(user.Id).ConfigureAwait(false)
+                ? Ok(new BaseActionResult { IsSuccess = true, Info = "Reset this summary success." })
+                : BadRequest(new BaseActionResult { IsSuccess = false, Info = "Reset this summary failed!" });
         }
     }
 }

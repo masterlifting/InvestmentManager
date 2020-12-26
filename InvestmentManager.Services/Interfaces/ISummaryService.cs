@@ -1,5 +1,6 @@
 ﻿using InvestmentManager.Entities.Broker;
 using System.Threading.Tasks;
+using static InvestmentManager.Models.Enums;
 
 namespace InvestmentManager.Services.Interfaces
 {
@@ -12,14 +13,15 @@ namespace InvestmentManager.Services.Interfaces
         Task<decimal> GetCompaniesOriginalInvestedSumAsync(long accountId, long currencyId);
         Task<decimal> GetCompanyActualInvestedSumAsync(long companyId);
 
-        Task SetAccountFreeSumAsync(long accountId, long currencyId);
-        Task SetAccountSummaryAsync(AccountTransaction transaction);
-        Task SetAccountSummaryAsync(ExchangeRate exchangeRate);
-        Task SetComissionSummaryAsync(Comission comission);
-        Task SetCompanySummaryAsync(StockTransaction transaction);
-        Task SetDividendSummaryAsync(Dividend dividend);
-        Task SetExchangeRateSummaryAsync(ExchangeRate exchangeRate);
+        Task<bool> SetAccountFreeSumAsync(long accountId, long currencyId);
+        Task<bool> SetAccountSummaryAsync(AccountTransaction transaction);
+        Task<bool> SetAccountSummaryAsync(ExchangeRate exchangeRate);
+        Task<bool> SetComissionSummaryAsync(Comission comission);
+        Task<bool> SetCompanySummaryAsync(StockTransaction transaction);
+        Task<bool> SetDividendSummaryAsync(Dividend dividend);
+        Task<bool> SetExchangeRateSummaryAsync(ExchangeRate exchangeRate);
 
-        Task ResetAllSummaryDataAsync(string userId);
+        Task<bool> ResetSummaryDataAsync(string userId);
+        Task<bool> ResetSummaryDataAsync(DataBaseType dbType, string[] userIds);
     }
 }
