@@ -47,7 +47,8 @@
         }
         public enum UrlService
         {
-            RecalculateAll,
+            ResetCalculator,
+            ResetSummary,
             ParseBrokerReports,
             ParseReports,
             ParsePrices,

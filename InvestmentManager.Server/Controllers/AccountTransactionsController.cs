@@ -16,16 +16,16 @@ namespace InvestmentManager.Server.Controllers
     {
         private readonly IUnitOfWorkFactory unitOfWork;
         private readonly IBaseRestMethod restMethod;
-        private readonly ISummaryService summaryService;
+        private readonly IReckonerService reckonerService;
 
         public AccountTransactionsController(
             IUnitOfWorkFactory unitOfWork
             , IBaseRestMethod restMethod
-            , ISummaryService summaryService)
+            , IReckonerService reckonerService)
         {
             this.unitOfWork = unitOfWork;
             this.restMethod = restMethod;
-            this.summaryService = summaryService;
+            this.reckonerService = reckonerService;
         }
 
         [HttpGet("byaccountid/{id}")]
@@ -79,14 +79,7 @@ namespace InvestmentManager.Server.Controllers
             
             if (result.IsSuccess)
             {
-                await summaryService.SetAccountSummaryAsync(entity).ConfigureAwait(false);
-
-                await summaryService.SetAccountFreeSumAsync(entity.AccountId, entity.CurrencyId).ConfigureAwait(false);
-
-                bool isComplete = await unitOfWork.CompleteAsync().ConfigureAwait(false);
-                if (!isComplete)
-                    result.Info += "; SUMMARY ERROR!";
-
+                await reckonerService.UpgradeByAccountTransactionChangeAsync(entity).ConfigureAwait(false);
                 return Ok(result);
             }
             else

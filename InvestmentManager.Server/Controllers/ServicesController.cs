@@ -27,33 +27,36 @@ namespace InvestmentManager.Server.Controllers
         private readonly IUnitOfWorkFactory unitOfWork;
         private readonly IInvestCalculator calculator;
         private readonly IInvestBrokerService brokerService;
-        private readonly IReportService reportService;
-        private readonly IPriceService priceService;
         private readonly IInvestMapper mapper;
         private readonly ISummaryService summaryService;
         private readonly UserManager<IdentityUser> userManager;
         private readonly IWebService webService;
+        private readonly IPriceService priceService;
+        private readonly IReportService reportService;
+        private readonly IReckonerService reckonerService;
 
         public ServicesController(
             IUnitOfWorkFactory unitOfWork
             , IInvestCalculator calculator
             , IInvestBrokerService brokerService
-            , IReportService reportService
-            , IPriceService priceService
             , IInvestMapper mapper
             , ISummaryService summaryService
             , UserManager<IdentityUser> userManager
-            , IWebService webService)
+            , IWebService webService
+            , IPriceService priceService
+            , IReportService reportService
+            , IReckonerService reckonerService)
         {
             this.unitOfWork = unitOfWork;
             this.calculator = calculator;
             this.brokerService = brokerService;
-            this.reportService = reportService;
-            this.priceService = priceService;
             this.mapper = mapper;
             this.summaryService = summaryService;
             this.userManager = userManager;
             this.webService = webService;
+            this.priceService = priceService;
+            this.reportService = reportService;
+            this.reckonerService = reckonerService;
         }
 
         [HttpGet("rate/")]
@@ -78,7 +81,36 @@ namespace InvestmentManager.Server.Controllers
                 return NoContent();
             }
         }
+        [HttpGet("parseprices/"), Authorize(Roles = "pestunov")]
+        public async Task ParsePrices()
+        {
+            var newPricies = new List<Price>();
+            var exchanges = unitOfWork.Exchange.GetAll();
+            var tickers = unitOfWork.Ticker.GetPriceTikers();
+            var priceConfigure = tickers.Join(exchanges, x => x.ExchangeId, y => y.Id, (x, y) => new { TickerId = x.Id, Ticker = x.Name, y.ProviderName, y.ProviderUri });
 
+            foreach (var i in priceConfigure)
+            {
+                try
+                {
+                    var newPrice = await priceService.GetPriceListAsync(i.ProviderName, i.TickerId, i.Ticker, i.ProviderUri).ConfigureAwait(false);
+                    newPricies.AddRange(newPrice);
+                }
+                catch
+                {
+                    continue;
+                }
+            }
+            if (newPricies.Any())
+            {
+                await unitOfWork.Price.CreateEntitiesAsync(newPricies).ConfigureAwait(false);
+                if (await unitOfWork.Price.CompletePostgresAsync().ConfigureAwait(false))
+                {
+                    var userIds = await userManager.Users.Select(x => x.Id).ToArrayAsync().ConfigureAwait(false);
+                    await reckonerService.UpgradeByPriceChangeAsync(DataBaseType.Postgres, userIds).ConfigureAwait(false);
+                }
+            }
+        }
         [HttpGet("parsereports/"), Authorize(Roles = "pestunov")]
         public async Task ParseReports()
         {
@@ -109,34 +141,8 @@ namespace InvestmentManager.Server.Controllers
 
             await unitOfWork.Report.CreateEntitiesAsync(reportsToSave);
             await unitOfWork.Report.CompletePostgresAsync().ConfigureAwait(false);
-
         }
-        [HttpGet("parseprices/"), Authorize(Roles = "pestunov")]
-        public async Task ParsePrices()
-        {
-            var newPricies = new List<Price>();
-            var exchanges = unitOfWork.Exchange.GetAll();
-            var tickers = unitOfWork.Ticker.GetPriceTikers();
-            var priceConfigure = tickers.Join(exchanges, x => x.ExchangeId, y => y.Id, (x, y) => new { TickerId = x.Id, Ticker = x.Name, y.ProviderName, y.ProviderUri });
 
-            foreach (var i in priceConfigure)
-            {
-                try
-                {
-                    var newPrice = await priceService.GetPriceListAsync(i.ProviderName, i.TickerId, i.Ticker, i.ProviderUri).ConfigureAwait(false);
-                    newPricies.AddRange(newPrice);
-                }
-                catch
-                {
-                    continue;
-                }
-            }
-            if (newPricies.Any())
-            {
-                await unitOfWork.Price.CreateEntitiesAsync(newPricies).ConfigureAwait(false);
-                await unitOfWork.Price.CompletePostgresAsync().ConfigureAwait(false);
-            }
-        }
 
         [HttpGet("resetcalculatordata/"), Authorize(Roles = "pestunov")]
         public async Task<IActionResult> ResetCalculatorData()
@@ -147,18 +153,6 @@ namespace InvestmentManager.Server.Controllers
                 ? Ok(new BaseActionResult { IsSuccess = true, Info = "Reset all calculator success." })
                 : BadRequest(new BaseActionResult { IsSuccess = false, Info = "Reset all calculator failed!" });
         }
-        [HttpGet("resetcalculatordata/{name}"), Authorize(Roles = "pestunov")]
-        public async Task<IActionResult> ResetCalculatorData(string name)
-        {
-            var user = await userManager.FindByNameAsync(name).ConfigureAwait(false);
-            if(user is null)
-                return BadRequest(new BaseActionResult { IsSuccess = false, Info = "User not found" });
-
-            return await calculator.ResetCalculatorDataAsync(DataBaseType.Postgres, user.Id).ConfigureAwait(false)
-                ? Ok(new BaseActionResult { IsSuccess = true, Info = "Reset this calculator success." })
-                : BadRequest(new BaseActionResult { IsSuccess = false, Info = "Reset this calculator failed!" });
-        }
-
         [HttpGet("resetsummarydata/"), Authorize(Roles = "pestunov")]
         public async Task<IActionResult> ResetSummaryData()
         {
@@ -167,17 +161,6 @@ namespace InvestmentManager.Server.Controllers
             return await summaryService.ResetSummaryDataAsync(DataBaseType.Postgres, userIds).ConfigureAwait(false)
                 ? Ok(new BaseActionResult { IsSuccess = true, Info = "Reset all summary success." })
                 : BadRequest(new BaseActionResult { IsSuccess = false, Info = "Reset all summary failed!" });
-        }
-        [HttpGet("resetsummarydata/{name}"), Authorize(Roles = "pestunov")]
-        public async Task<IActionResult> ResetSummaryData(string name)
-        {
-            var user = await userManager.FindByNameAsync(name).ConfigureAwait(false);
-            if (user is null)
-                return BadRequest(new BaseActionResult { IsSuccess = false, Info = "User not found" });
-
-            return await summaryService.ResetSummaryDataAsync(user.Id).ConfigureAwait(false)
-                ? Ok(new BaseActionResult { IsSuccess = true, Info = "Reset this summary success." })
-                : BadRequest(new BaseActionResult { IsSuccess = false, Info = "Reset this summary failed!" });
         }
     }
 }

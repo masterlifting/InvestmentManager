@@ -41,7 +41,7 @@ namespace InvestmentManager.Entities.Market
         public virtual BuyRecommendation BuyRecommendation { get; set; }
         public virtual SellRecommendation SellRecommendation { get; set; }
 
-        public virtual CompanySummary CompanySummary { get; set; }
-        public virtual DividendSummary DividendSummary { get; set; }
+        public virtual IEnumerable<CompanySummary> CompanySummaries { get; set; }
+        public virtual IEnumerable<DividendSummary> DividendSummaries { get; set; }
     }
 }

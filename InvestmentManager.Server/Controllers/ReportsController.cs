@@ -5,12 +5,13 @@ using InvestmentManager.Repository;
 using InvestmentManager.Server.RestServices;
 using InvestmentManager.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static InvestmentManager.Models.Enums;
 
 namespace InvestmentManager.Server.Controllers
 {
@@ -20,11 +21,21 @@ namespace InvestmentManager.Server.Controllers
         private readonly IUnitOfWorkFactory unitOfWork;
         private readonly IBaseRestMethod restMethod;
         private readonly IConverterService converterService;
-        public ReportsController(IUnitOfWorkFactory unitOfWork, IBaseRestMethod restMethod, IConverterService converterService)
+        private readonly IReckonerService reckonerService;
+        private readonly UserManager<IdentityUser> userManager;
+
+        public ReportsController(
+            IUnitOfWorkFactory unitOfWork
+            , IBaseRestMethod restMethod
+            , IConverterService converterService
+            , IReckonerService reckonerService
+            , UserManager<IdentityUser> userManager)
         {
             this.unitOfWork = unitOfWork;
             this.restMethod = restMethod;
             this.converterService = converterService;
+            this.reckonerService = reckonerService;
+            this.userManager = userManager;
         }
 
 
@@ -110,7 +121,16 @@ namespace InvestmentManager.Server.Controllers
                 report.LongTermDebt = model.LongTermDebt;
             }
             var result = await restMethod.BasePutAsync<Report>(ModelState, id, UpdateReport);
-            return result.IsSuccess ? (IActionResult)Ok(result) : BadRequest(result);
+
+            if (result.IsSuccess)
+            {
+                long companyId = (await unitOfWork.Report.FindByIdAsync(id).ConfigureAwait(false)).CompanyId;
+                var userIds = await userManager.Users.Select(x => x.Id).ToArrayAsync().ConfigureAwait(false);
+                await reckonerService.UpgradeByReportChangeAsync(DataBaseType.Postgres, companyId, userIds).ConfigureAwait(false);
+                return Ok(result);
+            }
+            else
+                return BadRequest(result);
         }
 
         [HttpDelete("{id}"), Authorize(Roles = "pestunov")]

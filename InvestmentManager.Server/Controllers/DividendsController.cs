@@ -22,21 +22,21 @@ namespace InvestmentManager.Server.Controllers
         private readonly IUnitOfWorkFactory unitOfWork;
         private readonly IBaseRestMethod restMethod;
         private readonly IConfiguration configuration;
-        private readonly ISummaryService summaryService;
         private readonly UserManager<IdentityUser> userManager;
+        private readonly IReckonerService reckonerService;
 
         public DividendsController(
             IUnitOfWorkFactory unitOfWork
             , IBaseRestMethod restMethod
             , IConfiguration configuration
-            , ISummaryService summaryService
-            , UserManager<IdentityUser> userManager)
+            , UserManager<IdentityUser> userManager
+            , IReckonerService reckonerService)
         {
             this.unitOfWork = unitOfWork;
             this.restMethod = restMethod;
             this.configuration = configuration;
-            this.summaryService = summaryService;
             this.userManager = userManager;
+            this.reckonerService = reckonerService;
         }
 
         [HttpGet("bypagination/{value}")]
@@ -125,14 +125,7 @@ namespace InvestmentManager.Server.Controllers
             var result = await restMethod.BasePostAsync(ModelState, entity, model).ConfigureAwait(false);
             if (result.IsSuccess)
             {
-                await summaryService.SetDividendSummaryAsync(entity).ConfigureAwait(false);
-
-                await summaryService.SetAccountFreeSumAsync(entity.AccountId, entity.CurrencyId).ConfigureAwait(false);
-
-                bool isComplete = await unitOfWork.CompleteAsync().ConfigureAwait(false);
-                if (!isComplete)
-                    result.Info += "; SUMMARY ERROR!";
-
+                await reckonerService.UpgradeByDividendChangeAsync(entity).ConfigureAwait(false);
                 return Ok(result);
             }
             else

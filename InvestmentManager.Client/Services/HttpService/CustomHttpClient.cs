@@ -1,6 +1,7 @@
 ﻿using InvestmentManager.Client.Configurations;
 using InvestmentManager.Client.Services.AuthenticationConfiguration;
 using InvestmentManager.Client.Services.NotificationService;
+using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -53,8 +54,9 @@ namespace InvestmentManager.Client.Services.HttpService
             }
             else
             {
-                await notice.AlertFailedAsync(DefaultString.noticeFailed);
-                result = await response.Content.ReadFromJsonAsync<TResult>().ConfigureAwait(false);
+                result = response.Content is not null
+                    ? await response.Content.ReadFromJsonAsync<TResult>().ConfigureAwait(false)
+                    : Activator.CreateInstance<TResult>();
             }
 
             notice.LoadStop();

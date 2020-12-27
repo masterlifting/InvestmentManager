@@ -2,7 +2,6 @@
 using InvestmentManager.Models.SummaryModels;
 using InvestmentManager.Repository;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -12,6 +11,7 @@ namespace InvestmentManager.Server.Controllers
     public class PricesController : ControllerBase
     {
         private readonly IUnitOfWorkFactory unitOfWork;
+
         public PricesController(IUnitOfWorkFactory unitOfWork) => this.unitOfWork = unitOfWork;
 
         [HttpGet("bycompanyid/{id}")]

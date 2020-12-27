@@ -105,7 +105,7 @@ namespace InvestmentManager.Repository
         {
             try
             {
-                return await context.SaveChangesAsync().ConfigureAwait(false) > 0;
+                return await context.SaveChangesAsync().ConfigureAwait(false) >= 0;
             }
             catch
             {

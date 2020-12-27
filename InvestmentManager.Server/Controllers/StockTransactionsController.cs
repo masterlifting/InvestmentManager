@@ -23,23 +23,23 @@ namespace InvestmentManager.Server.Controllers
         private readonly IBaseRestMethod restMethod;
         private readonly ICatalogService catalogService;
         private readonly IConfiguration configuration;
-        private readonly ISummaryService summaryService;
         private readonly UserManager<IdentityUser> userManager;
+        private readonly IReckonerService reckonerService;
 
         public StockTransactionsController(
             IUnitOfWorkFactory unitOfWork
             , IBaseRestMethod restMethod
             , ICatalogService catalogService
             , IConfiguration configuration
-            , ISummaryService summaryService
-            , UserManager<IdentityUser> userManager)
+            , UserManager<IdentityUser> userManager
+            , IReckonerService reckonerService)
         {
             this.unitOfWork = unitOfWork;
             this.restMethod = restMethod;
             this.catalogService = catalogService;
             this.configuration = configuration;
-            this.summaryService = summaryService;
             this.userManager = userManager;
+            this.reckonerService = reckonerService;
         }
 
         [HttpGet("bypagination/{value}")]
@@ -131,14 +131,7 @@ namespace InvestmentManager.Server.Controllers
 
             if (result.IsSuccess)
             {
-                await summaryService.SetCompanySummaryAsync(entity).ConfigureAwait(false);
-                
-                await summaryService.SetAccountFreeSumAsync(entity.AccountId, entity.CurrencyId).ConfigureAwait(false);
-
-                bool isComplete = await unitOfWork.CompleteAsync().ConfigureAwait(false);
-                if (!isComplete)
-                    result.Info += "; SUMMARY ERROR!";
-
+                await reckonerService.UpgradeByStockTransactionChangeAsync(entity, userManager.GetUserId(User)).ConfigureAwait(false);
                 return Ok(result);
             }
             else

@@ -74,6 +74,12 @@ namespace InvestmentManager.Server
             services.AddResponseCompression(options => options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/octet-stream" }));
             services.AddControllers();
             services.AddRazorPages();
+            services.AddHttpClient<IWebService, WebService>(x =>
+            {
+                x.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:80.0) Gecko/20100101 Firefox/80.0");
+                x.DefaultRequestHeaders.Add("Accept", "application/json, text/html, */*; q=0.01");
+                x.DefaultRequestHeaders.Add("Connection", "keep-alive");
+            });
 
             services.AddScoped<IBaseRestMethod, BaseRestMethod>();
             #region Unit of work factory
@@ -109,6 +115,8 @@ namespace InvestmentManager.Server
             #endregion
             #region Service
             services.AddSingleton<ICatalogService, CatalogService>();
+
+            services.AddScoped<IReckonerService, ReckonerService>();
             services.AddScoped<IInvestBrokerService, InvestBrokerService>();
             services.AddScoped<IPriceService, PriceService>();
             services.AddScoped<IReportService, ReportService>();
@@ -116,14 +124,6 @@ namespace InvestmentManager.Server
             services.AddScoped<IIOService, IOService>();
             services.AddScoped<IConverterService, ConverterService>();
             services.AddScoped<ISummaryService, SummaryService>();
-            services.AddHttpClient<IWebService, WebService>(x =>
-            {
-                x.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:80.0) Gecko/20100101 Firefox/80.0");
-                x.DefaultRequestHeaders.Add("Accept", "application/json, text/html, */*; q=0.01");
-                x.DefaultRequestHeaders.Add("Connection", "keep-alive");
-            });
-            #endregion
-            #region Mapper
             services.AddScoped<IInvestMapper, InvestMapper>();
             #endregion
         }

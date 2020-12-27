@@ -3,15 +3,17 @@ using System;
 using InvestmentManager.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace InvestmentManager.Repository.Migrations
 {
     [DbContext(typeof(InvestmentContext))]
-    partial class InvestmentContextModelSnapshot : ModelSnapshot
+    [Migration("20201227045708_ChangeCompanyAndAccountSummaryType")]
+    partial class ChangeCompanyAndAccountSummaryType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -16,13 +16,16 @@ namespace InvestmentManager.Server.Controllers
     {
         private readonly IBaseRestMethod restMethod;
         private readonly IUnitOfWorkFactory unitOfWork;
-        private readonly ISummaryService summaryService;
+        private readonly IReckonerService reckonerService;
 
-        public ExchangeRatesController(IBaseRestMethod restMethod, IUnitOfWorkFactory unitOfWork, ISummaryService summaryService)
+        public ExchangeRatesController(
+            IBaseRestMethod restMethod
+            , IUnitOfWorkFactory unitOfWork
+            , IReckonerService reckonerService)
         {
             this.restMethod = restMethod;
             this.unitOfWork = unitOfWork;
-            this.summaryService = summaryService;
+            this.reckonerService = reckonerService;
         }
 
         [HttpGet("byaccountid/{id}")]
@@ -76,13 +79,7 @@ namespace InvestmentManager.Server.Controllers
 
             if (result.IsSuccess)
             {
-                await summaryService.SetExchangeRateSummaryAsync(entity).ConfigureAwait(false);
-                await summaryService.SetAccountSummaryAsync(entity).ConfigureAwait(false);
-
-                bool isComplete = await unitOfWork.CompleteAsync().ConfigureAwait(false);
-                if (!isComplete)
-                    result.Info += "; SUMMARY ERROR!";
-
+                await reckonerService.UpgradeByExchangeRateChangeAsync(entity).ConfigureAwait(false);
                 return Ok(result);
             }
             else

@@ -100,7 +100,8 @@ namespace InvestmentManager.Client.Services.HttpService
         };
         static string SetService(UrlService service) => service switch
         {
-            UrlService.RecalculateAll => ServiceName.RecalculateAll,
+            UrlService.ResetCalculator => ServiceName.ResetCalculator,
+            UrlService.ResetSummary => ServiceName.ResetSummary,
             UrlService.ParseBrokerReports => ServiceName.ParseBrokerReports,
             UrlService.ParseReports => ServiceName.ParseReports,
             UrlService.ParsePrices => ServiceName.ParsePrices,
@@ -152,7 +153,8 @@ namespace InvestmentManager.Client.Services.HttpService
     }
     static class ServiceName
     {
-        public const string RecalculateAll = "recalculateall";
+        public const string ResetCalculator = "resetcalculatordata";
+        public const string ResetSummary = "resetsummarydata";
         public const string ParseBrokerReports = "parsebrokerreports";
         public const string ParseReports = "parsereports";
         public const string ParsePrices = "parseprices";

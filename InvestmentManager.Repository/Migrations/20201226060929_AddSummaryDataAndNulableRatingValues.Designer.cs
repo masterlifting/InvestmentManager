@@ -3,15 +3,17 @@ using System;
 using InvestmentManager.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace InvestmentManager.Repository.Migrations
 {
     [DbContext(typeof(InvestmentContext))]
-    partial class InvestmentContextModelSnapshot : ModelSnapshot
+    [Migration("20201226060929_AddSummaryDataAndNulableRatingValues")]
+    partial class AddSummaryDataAndNulableRatingValues
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -407,7 +409,8 @@ namespace InvestmentManager.Repository.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AccountId");
+                    b.HasIndex("AccountId")
+                        .IsUnique();
 
                     b.HasIndex("CurrencyId");
 
@@ -443,7 +446,8 @@ namespace InvestmentManager.Repository.Migrations
 
                     b.HasIndex("AccountId");
 
-                    b.HasIndex("CompanyId");
+                    b.HasIndex("CompanyId")
+                        .IsUnique();
 
                     b.HasIndex("CurrencyId");
 
@@ -479,7 +483,8 @@ namespace InvestmentManager.Repository.Migrations
 
                     b.HasIndex("AccountId");
 
-                    b.HasIndex("CompanyId");
+                    b.HasIndex("CompanyId")
+                        .IsUnique();
 
                     b.HasIndex("CurrencyId");
 
@@ -522,7 +527,8 @@ namespace InvestmentManager.Repository.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AccountId");
+                    b.HasIndex("AccountId")
+                        .IsUnique();
 
                     b.HasIndex("CurrencyId");
 
@@ -1354,8 +1360,8 @@ namespace InvestmentManager.Repository.Migrations
             modelBuilder.Entity("InvestmentManager.Entities.Calculate.ComissionSummary", b =>
                 {
                     b.HasOne("InvestmentManager.Entities.Broker.Account", "Account")
-                        .WithMany("ComissionSummaries")
-                        .HasForeignKey("AccountId")
+                        .WithOne("ComissionSummary")
+                        .HasForeignKey("InvestmentManager.Entities.Calculate.ComissionSummary", "AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1379,8 +1385,8 @@ namespace InvestmentManager.Repository.Migrations
                         .IsRequired();
 
                     b.HasOne("InvestmentManager.Entities.Market.Company", "Company")
-                        .WithMany("CompanySummaries")
-                        .HasForeignKey("CompanyId")
+                        .WithOne("CompanySummary")
+                        .HasForeignKey("InvestmentManager.Entities.Calculate.CompanySummary", "CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1406,8 +1412,8 @@ namespace InvestmentManager.Repository.Migrations
                         .IsRequired();
 
                     b.HasOne("InvestmentManager.Entities.Market.Company", "Company")
-                        .WithMany("DividendSummaries")
-                        .HasForeignKey("CompanyId")
+                        .WithOne("DividendSummary")
+                        .HasForeignKey("InvestmentManager.Entities.Calculate.DividendSummary", "CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1427,8 +1433,8 @@ namespace InvestmentManager.Repository.Migrations
             modelBuilder.Entity("InvestmentManager.Entities.Calculate.ExchangeRateSummary", b =>
                 {
                     b.HasOne("InvestmentManager.Entities.Broker.Account", "Account")
-                        .WithMany("ExchangeRateSummaries")
-                        .HasForeignKey("AccountId")
+                        .WithOne("ExchangeRateSummary")
+                        .HasForeignKey("InvestmentManager.Entities.Calculate.ExchangeRateSummary", "AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1622,7 +1628,7 @@ namespace InvestmentManager.Repository.Migrations
 
                     b.Navigation("Comissions");
 
-                    b.Navigation("ComissionSummaries");
+                    b.Navigation("ComissionSummary");
 
                     b.Navigation("CompanySummaries");
 
@@ -1632,7 +1638,7 @@ namespace InvestmentManager.Repository.Migrations
 
                     b.Navigation("ExchangeRates");
 
-                    b.Navigation("ExchangeRateSummaries");
+                    b.Navigation("ExchangeRateSummary");
 
                     b.Navigation("StockTransactions");
                 });
@@ -1655,9 +1661,9 @@ namespace InvestmentManager.Repository.Migrations
                 {
                     b.Navigation("BuyRecommendation");
 
-                    b.Navigation("CompanySummaries");
+                    b.Navigation("CompanySummary");
 
-                    b.Navigation("DividendSummaries");
+                    b.Navigation("DividendSummary");
 
                     b.Navigation("Isins");
 

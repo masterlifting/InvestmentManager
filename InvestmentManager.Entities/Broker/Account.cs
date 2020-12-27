@@ -23,8 +23,8 @@ namespace InvestmentManager.Entities.Broker
         public virtual IEnumerable<Comission> Comissions { get; set; }
         public virtual IEnumerable<ExchangeRate> ExchangeRates { get; set; }
 
-        public virtual ExchangeRateSummary ExchangeRateSummary { get; set; }
-        public virtual ComissionSummary ComissionSummary { get; set; }
+        public virtual IEnumerable<ExchangeRateSummary> ExchangeRateSummaries { get; set; }
+        public virtual IEnumerable<ComissionSummary> ComissionSummaries { get; set; }
         public virtual IEnumerable<AccountSummary> AccountSummaries { get; set; }
         public virtual IEnumerable<CompanySummary> CompanySummaries { get; set; }
         public virtual IEnumerable<DividendSummary> DividendSummaries { get; set; }

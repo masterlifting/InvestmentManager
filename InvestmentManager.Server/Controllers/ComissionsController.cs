@@ -16,13 +16,16 @@ namespace InvestmentManager.Server.Controllers
     {
         private readonly IBaseRestMethod restMethod;
         private readonly IUnitOfWorkFactory unitOfWork;
-        private readonly ISummaryService summaryService;
+        private readonly IReckonerService reckonerService;
 
-        public ComissionsController(IBaseRestMethod restMethod, IUnitOfWorkFactory unitOfWork, ISummaryService summaryService)
+        public ComissionsController(
+            IBaseRestMethod restMethod
+            , IUnitOfWorkFactory unitOfWork
+            , IReckonerService reckonerService)
         {
             this.restMethod = restMethod;
             this.unitOfWork = unitOfWork;
-            this.summaryService = summaryService;
+            this.reckonerService = reckonerService;
         }
 
         [HttpGet("byaccountid/{id}")]
@@ -70,16 +73,10 @@ namespace InvestmentManager.Server.Controllers
             };
 
             var result = await restMethod.BasePostAsync(ModelState, entity, model).ConfigureAwait(false);
+
             if (result.IsSuccess)
             {
-                await summaryService.SetComissionSummaryAsync(entity).ConfigureAwait(false);
-
-                await summaryService.SetAccountFreeSumAsync(entity.AccountId, entity.CurrencyId).ConfigureAwait(false);
-
-                bool isComplete = await unitOfWork.CompleteAsync().ConfigureAwait(false);
-                if (!isComplete)
-                    result.Info += "; SUMMARY ERROR!";
-
+                await reckonerService.UpgradeByComissionChangeAsync(entity).ConfigureAwait(false);
                 return Ok(result);
             }
             else
