@@ -28,26 +28,29 @@ namespace InvestmentManager.Calculator
             var reports = unitOfWork.Report.GetAll().Where(x => x.IsChecked).OrderBy(x => x.DateReport);
             var dateFirstReport = reports.First().DateReport;
             var dateLastReport = reports.Last().DateReport;
-            var tikerData = unitOfWork.Price.GetAll()
-                .Where(x => x.BidDate >= dateFirstReport && x.BidDate <= dateLastReport)
-                .OrderByDescending(x => x.BidDate)
-                .GroupBy(x => x.TickerId);
-            var priceData = tikerData.Join(unitOfWork.Ticker.GetAll(), x => x.Key, y => y.Id, (x, y) => new { y.CompanyId, Prices = x });
-            var coefficientData = await reports.Join(priceData, x => x.CompanyId, y => y.CompanyId, (x, y) =>
-            new
-            {
-                Report = x,
-                Price = y.Prices.Where(z => z.BidDate <= x.DateReport).First().Value
-            }).ToArrayAsync().ConfigureAwait(false);
+            var prices = await unitOfWork.Price.GetAll().Where(x => x.BidDate >= dateFirstReport && x.BidDate <= dateLastReport).OrderByDescending(x => x.BidDate).ToArrayAsync().ConfigureAwait(false);
+            var companyData = await unitOfWork.Company.GetAll().Select(x => new { CompanyId = x.Id, TickerId = x.Tickers.First().Id }).ToArrayAsync().ConfigureAwait(false);
+
+            var groupedReports = (await reports.ToArrayAsync().ConfigureAwait(false)).GroupBy(x => x.CompanyId);
+            var groupedPrices = prices.Join(companyData, x => x.TickerId, y => y.TickerId, (x, y) => new { y.CompanyId, Price = x }).GroupBy(x => x.CompanyId);
+
+            var coefficientData = groupedReports.Join(groupedPrices, x => x.Key, y => y.Key, (x, y) => new { Reports = x.ToArray(), Prices = y.Select(z => z.Price) }).ToArray();
             #endregion
 
             try
             {
                 for (int i = 0; i < coefficientData.Length; i++)
-                {
-                    var coefficient = CalculateReportCoefficient(coefficientData[i].Report, coefficientData[i].Price);
-                    coefficients.Add(coefficient);
-                }
+                    for (int j = 0; j < coefficientData[i].Reports.Length; j++)
+                    {
+                        var report = coefficientData[i].Reports[j];
+                        var price = coefficientData[i].Prices.FirstOrDefault(x => x.BidDate <= report.DateReport)?.Value;
+
+                        if (!price.HasValue)
+                            price = coefficientData[i].Prices.Last().Value;
+
+                        var coefficient = CalculateReportCoefficient(report, price.Value);
+                        coefficients.Add(coefficient);
+                    }
 
                 switch (dbType)
                 {
@@ -104,9 +107,9 @@ namespace InvestmentManager.Calculator
         #region Helpers
         static Coefficient CalculateReportCoefficient(Report report, decimal lastPrice)
         {
-            return report is not null && report.Id != default
+            return report is not null && report.Id != default && lastPrice != default
                  ? new Coefficient() { ReportId = report.Id, PE = Pe(), PB = PB(), DebtLoad = DebtLoad(), Profitability = Profitability(), ROA = Roa(), ROE = Roe(), EPS = Eps() }
-                 : throw new NullReferenceException("Нет отчета для расчета бизнес коэффициентов.");
+                 : throw new NullReferenceException("Not found all data for calculating");
 
             decimal Eps() => report.StockVolume != 0 ? ((report.NetProfit * 1_000_000) / report.StockVolume) : 0;
             decimal Profitability() => report.Revenue == 0 || report.Assets == 0 ? 0 : ((report.NetProfit / report.Revenue) + (report.Revenue / report.Assets)) / 2;
@@ -120,6 +123,8 @@ namespace InvestmentManager.Calculator
 
         #endregion
 
+
+
         #region Rating
         public async Task<bool> SetRatingAsync(DataBaseType dbType)
         {
@@ -127,9 +132,9 @@ namespace InvestmentManager.Calculator
 
             try
             {
-                foreach (var company in unitOfWork.Company.GetAll())
+                foreach (var companyId in await unitOfWork.Company.GetAll().Select(x => x.Id).ToArrayAsync().ConfigureAwait(false))
                 {
-                    var rating = await CalculateRatingAsync(company).ConfigureAwait(false);
+                    var rating = await CalculateRatingAsync(companyId).ConfigureAwait(false);
 
                     if (rating is not null)
                         ratings.Add(rating);
@@ -141,10 +146,10 @@ namespace InvestmentManager.Calculator
                 switch (dbType)
                 {
                     case DataBaseType.Postgres:
-                        unitOfWork.Coefficient.DeleteAndReseedPostgres();
+                        unitOfWork.Rating.DeleteAndReseedPostgres();
                         break;
                     case DataBaseType.SQL:
-                        unitOfWork.Coefficient.TruncateAndReseedSQL();
+                        unitOfWork.Rating.TruncateAndReseedSQL();
                         break;
                 }
                 await unitOfWork.Rating.CreateEntitiesAsync(ratings).ConfigureAwait(false);
@@ -346,7 +351,7 @@ namespace InvestmentManager.Calculator
                     return false;
                 }
             }
-            else return false;
+            else return true;
         }
         static async Task<bool> SetRatingValueByCoefficientsAsync(List<Coefficient> coefficients, Rating rating)
         {
@@ -364,7 +369,7 @@ namespace InvestmentManager.Calculator
                     return false;
                 }
             }
-            else return false;
+            else return true;
         }
         static async Task<bool> SetRatingValueByReportsAsync(List<Report> reports, Rating rating)
         {
@@ -382,15 +387,17 @@ namespace InvestmentManager.Calculator
                     return false;
                 }
             }
-            else return false;
+            else return true;
         }
-        async Task<Rating> CalculateRatingAsync(Company company)
+        async Task<Rating> CalculateRatingAsync(long companyId)
         {
+            var company = await unitOfWork.Company.FindByIdAsync(companyId).ConfigureAwait(false);
+
             if (company is null)
                 return null;
 
             #region Set data
-            var prices = await unitOfWork.Price.GetCustomPricesAsync(company.Id, 12, OrderType.OrderBy, company.DateSplit).ConfigureAwait(false);
+            var prices = await unitOfWork.Price.GetCustomPricesAsync(companyId, 12, OrderType.OrderBy, company.DateSplit).ConfigureAwait(false);
             var reports = company.Reports.Where(x => x.IsChecked).OrderBy(x => x.DateReport);
             var coefficients = reports.Select(x => x.Coefficient);
             #endregion
@@ -428,9 +435,9 @@ namespace InvestmentManager.Calculator
         {
             ratings.Sort(new RatingComparator());
 
-            for (int i = 1; i <= ratings.Count; i++)
+            for (int i = 0; i < ratings.Count; i++)
             {
-                ratings[i].Place = i;
+                ratings[i].Place = i + 1;
                 ratings[i].DateUpdate = DateTime.Now;
             }
         }
@@ -474,10 +481,10 @@ namespace InvestmentManager.Calculator
                 switch (dbType)
                 {
                     case DataBaseType.Postgres:
-                        unitOfWork.Coefficient.DeleteAndReseedPostgres();
+                        unitOfWork.BuyRecommendation.DeleteAndReseedPostgres();
                         break;
                     case DataBaseType.SQL:
-                        unitOfWork.Coefficient.TruncateAndReseedSQL();
+                        unitOfWork.BuyRecommendation.TruncateAndReseedSQL();
                         break;
                 }
                 await unitOfWork.BuyRecommendation.CreateEntitiesAsync(recommendations).ConfigureAwait(false);
@@ -550,10 +557,10 @@ namespace InvestmentManager.Calculator
                 switch (dbType)
                 {
                     case DataBaseType.Postgres:
-                        unitOfWork.Coefficient.DeleteAndReseedPostgres();
+                        unitOfWork.SellRecommendation.DeleteAndReseedPostgres();
                         break;
                     case DataBaseType.SQL:
-                        unitOfWork.Coefficient.TruncateAndReseedSQL();
+                        unitOfWork.SellRecommendation.TruncateAndReseedSQL();
                         break;
                 }
                 await unitOfWork.SellRecommendation.CreateEntitiesAsync(recommendations).ConfigureAwait(false);

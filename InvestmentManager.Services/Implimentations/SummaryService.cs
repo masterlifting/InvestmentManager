@@ -81,6 +81,8 @@ namespace InvestmentManager.Services.Implimentations
                     _ => throw new NotImplementedException()
                 };
                 summary.DateUpdate = DateTime.Now;
+
+                return true;
             }
             else
             {
@@ -90,9 +92,9 @@ namespace InvestmentManager.Services.Implimentations
                     CurrencyId = transaction.CurrencyId,
                     InvestedSum = transaction.Amount
                 }).ConfigureAwait(false);
-            }
 
-            return true;
+                return await unitOfWork.CompleteAsync().ConfigureAwait(false);
+            }
         }
         public async Task<bool> SetAccountSummaryAsync(IEnumerable<AccountTransaction> transactions)
         {
@@ -147,6 +149,9 @@ namespace InvestmentManager.Services.Implimentations
                     CurrencyId = exchangeRate.CurrencyId,
                     InvestedSum = exchangeRate.Quantity
                 }).ConfigureAwait(false);
+
+                if (!await unitOfWork.CompleteAsync().ConfigureAwait(false))
+                    return false;
             }
 
             var summaryOut = await unitOfWork.AccountSummary.GetAll()
@@ -160,6 +165,8 @@ namespace InvestmentManager.Services.Implimentations
                     (long)TransactionStatusTypes.Sell => summaryOut.InvestedSum + exchangeRate.Quantity * exchangeRate.Rate,
                     _ => throw new NotImplementedException()
                 };
+
+                return true;
             }
             else
             {
@@ -169,9 +176,10 @@ namespace InvestmentManager.Services.Implimentations
                     CurrencyId = (long)CurrencyTypes.RUB,
                     InvestedSum = exchangeRate.Quantity * exchangeRate.Rate
                 }).ConfigureAwait(false);
+
+                return await unitOfWork.CompleteAsync().ConfigureAwait(false);
             }
 
-            return true;
         }
         public async Task<bool> SetAccountSummaryAsync(IEnumerable<ExchangeRate> exchangeRates)
         {
@@ -184,7 +192,7 @@ namespace InvestmentManager.Services.Implimentations
                     foreach (var dataByCurrency in dataByAccount.GroupBy(x => x.CurrencyId))
                     {
                         var summaryIn = await unitOfWork.AccountSummary.GetAll().FirstOrDefaultAsync(x => x.AccountId == dataByAccount.Key && x.CurrencyId == dataByCurrency.Key).ConfigureAwait(false);
-                        
+
                         decimal summaryInInvestedSumByBuy = dataByCurrency.Where(x => x.TransactionStatusId == (long)TransactionStatusTypes.Buy).Sum(x => x.Quantity);
                         decimal summaryInInvestedSumBySell = dataByCurrency.Where(x => x.TransactionStatusId == (long)TransactionStatusTypes.Sell).Sum(x => x.Quantity);
 
@@ -204,7 +212,7 @@ namespace InvestmentManager.Services.Implimentations
                         }
 
                         var summaryOut = await unitOfWork.AccountSummary.GetAll().FirstOrDefaultAsync(x => x.AccountId == dataByAccount.Key && x.CurrencyId == (long)CurrencyTypes.RUB).ConfigureAwait(false);
-                        
+
                         decimal summaryOutInvestedSumByBuy = dataByCurrency.Where(x => x.TransactionStatusId == (long)TransactionStatusTypes.Buy).Sum(x => x.Quantity * x.Rate);
                         decimal summaryOutInvestedSumBySell = dataByCurrency.Where(x => x.TransactionStatusId == (long)TransactionStatusTypes.Sell).Sum(x => x.Quantity * x.Rate);
 
@@ -257,6 +265,8 @@ namespace InvestmentManager.Services.Implimentations
                         break;
                 }
                 summary.DateUpdate = DateTime.Now;
+            
+                return true;
             }
             else
                 await unitOfWork.CompanySummary.CreateEntityAsync(new CompanySummary
@@ -268,7 +278,7 @@ namespace InvestmentManager.Services.Implimentations
                     CurrentProfit = transaction.Quantity * transaction.Cost * -1
                 }).ConfigureAwait(false);
 
-            return true;
+            return await unitOfWork.CompleteAsync().ConfigureAwait(false);
         }
         public async Task<bool> SetCompanySummaryAsync(IEnumerable<StockTransaction> transactions)
         {
@@ -320,6 +330,8 @@ namespace InvestmentManager.Services.Implimentations
                 summary.TotalSum += dividend.Amount;
                 summary.TotalTax += dividend.Tax;
                 summary.DateUpdate = DateTime.Now;
+            
+                return true;
             }
             else
             {
@@ -331,9 +343,10 @@ namespace InvestmentManager.Services.Implimentations
                     TotalSum = dividend.Amount,
                     TotalTax = dividend.Tax
                 }).ConfigureAwait(false);
+
+                return await unitOfWork.CompleteAsync().ConfigureAwait(false);
             }
 
-            return true;
         }
         public async Task<bool> SetDividendSummaryAsync(IEnumerable<Dividend> dividends)
         {
@@ -375,6 +388,8 @@ namespace InvestmentManager.Services.Implimentations
             {
                 summary.TotalSum += comission.Amount;
                 summary.DateUpdate = DateTime.Now;
+            
+                return true;
             }
             else
             {
@@ -384,9 +399,10 @@ namespace InvestmentManager.Services.Implimentations
                     CurrencyId = comission.CurrencyId,
                     TotalSum = comission.Amount
                 }).ConfigureAwait(false);
+
+                return await unitOfWork.CompleteAsync().ConfigureAwait(false);
             }
 
-            return true;
         }
         public async Task<bool> SetComissionSummaryAsync(IEnumerable<Comission> comissions)
         {
@@ -454,6 +470,8 @@ namespace InvestmentManager.Services.Implimentations
                         break;
                 }
                 summary.DateUpdate = DateTime.Now;
+            
+                return true;
             }
             else
             {
@@ -467,9 +485,10 @@ namespace InvestmentManager.Services.Implimentations
                         break;
                 }
                 await unitOfWork.ExchangeRateSummary.CreateEntityAsync(exchangeRateSummary).ConfigureAwait(false);
+
+                return await unitOfWork.CompleteAsync().ConfigureAwait(false);
             }
 
-            return true;
         }
         public async Task<bool> SetExchangeRateSummaryAsync(IEnumerable<ExchangeRate> exchangeRates)
         {

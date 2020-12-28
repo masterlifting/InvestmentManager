@@ -234,47 +234,7 @@ namespace InvestmentManager.Repository
     }
     // Calculate
     public class RatingRepository : RepositoryEFCore<Rating>, IRatingRepository { public RatingRepository(InvestmentContext context) : base(context) { } }
-    public class CoefficientRepository : RepositoryEFCore<Coefficient>, ICoefficientRepository
-    {
-        private readonly InvestmentContext context;
-        public CoefficientRepository(InvestmentContext context) : base(context) => this.context = context;
-
-        public async Task<List<(decimal, Report)>> GetSortedCoefficientCalculatingDataAsync(long companyId)
-        {
-            var result = new List<(decimal, Report)>();
-
-            foreach (var i in (await context.Companies.AsNoTracking().Include(x => x.Reports).FirstOrDefaultAsync(x => x.Id == companyId).ConfigureAwait(false)).Reports.Where(x => x.IsChecked == true).OrderBy(x => x.DateReport))
-            {
-                var prices = (await context.Companies.AsNoTracking().Include(x => x.Tickers).ThenInclude(x => x.Prices).FirstOrDefaultAsync(x => x.Id == i.CompanyId).ConfigureAwait(false))
-                    .Tickers.FirstOrDefault().Prices.Where(x => x.BidDate <= i.DateReport);
-
-                result.Add((prices.Any() ? prices.OrderByDescending(x => x.BidDate).FirstOrDefault().Value : 0, i));
-            }
-
-            return result;
-        }
-        public IDictionary<string, List<(DateTime, Coefficient)>> GetViewData()
-        {
-            var result = new Dictionary<string, List<(DateTime, Coefficient)>>();
-
-            foreach (var i in context.Companies.AsNoTracking().Include(x => x.Reports).ThenInclude(x => x.Coefficient))
-            {
-                var temp = new List<(DateTime, Coefficient)>();
-
-                foreach (var j in i.Reports.Where(x => x.IsChecked == true).OrderBy(x => x.DateReport))
-                {
-                    temp.Add((j.DateReport, j.Coefficient));
-                }
-
-                result.Add(i.Name, temp);
-            }
-
-            return result;
-        }
-        public async Task<List<Coefficient>> GetSortedCoefficientsAsync(long companyId) =>
-            (await context.Companies.AsNoTracking().Include(x => x.Reports).ThenInclude(x => x.Coefficient).FirstOrDefaultAsync(x => x.Id == companyId).ConfigureAwait(false))
-            .Reports.Where(x => x.IsChecked == true).OrderBy(x => x.DateReport).Select(x => x.Coefficient).ToList();
-    }
+    public class CoefficientRepository : RepositoryEFCore<Coefficient>, ICoefficientRepository { public CoefficientRepository(InvestmentContext context) : base(context) { } }
     public class SellRecommendationRepository : RepositoryEFCore<SellRecommendation>, ISellRecommendationRepository { public SellRecommendationRepository(InvestmentContext context) : base(context) { } }
     public class BuyRecommendationRepository : RepositoryEFCore<BuyRecommendation>, IBuyRecommendationRepository { public BuyRecommendationRepository(InvestmentContext context) : base(context) { } }
     public class AccountSummaryRepository : RepositoryEFCore<AccountSummary>, IAccountSummaryRepository { public AccountSummaryRepository(InvestmentContext context) : base(context) { } }

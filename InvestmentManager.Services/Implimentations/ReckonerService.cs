@@ -61,6 +61,7 @@ namespace InvestmentManager.Services.Implimentations
         public async Task UpgradeByPriceChangeAsync(DataBaseType dbType, string[] userIds)
         {
             if (await calculator.SetRatingByPricesAsync().ConfigureAwait(false)
+            && await unitOfWork.CompleteAsync().ConfigureAwait(false)
             && await calculator.SetBuyRecommendationsAsync(dbType).ConfigureAwait(false)
             && await calculator.SetSellRecommendationsAsync(dbType, userIds).ConfigureAwait(false))
                 await unitOfWork.CompleteAsync().ConfigureAwait(false);
@@ -68,6 +69,7 @@ namespace InvestmentManager.Services.Implimentations
         public async Task UpgradeByReportChangeAsync(DataBaseType dbType, long companyId, string[] userIds)
         {
             if (await calculator.SetRatingByReportsAsync(companyId).ConfigureAwait(false)
+            && await unitOfWork.CompleteAsync().ConfigureAwait(false)
             && await calculator.SetBuyRecommendationsAsync(dbType).ConfigureAwait(false)
             && await calculator.SetSellRecommendationsAsync(dbType, userIds).ConfigureAwait(false))
                 await unitOfWork.CompleteAsync().ConfigureAwait(false);

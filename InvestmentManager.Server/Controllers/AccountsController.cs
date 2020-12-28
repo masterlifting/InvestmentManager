@@ -11,6 +11,7 @@ using InvestmentManager.Services.Interfaces;
 using InvestmentManager.Models.Additional;
 using System.Net.Http.Json;
 using InvestmentManager.Models.EntityModels;
+using static InvestmentManager.Models.Enums;
 
 namespace InvestmentManager.Server.Controllers
 {
@@ -67,7 +68,7 @@ namespace InvestmentManager.Server.Controllers
                     decimal intermediateResult = await summaryService.GetAccountTotalSumAsync(id, currencyId).ConfigureAwait(false);
                     decimal rateValue = 1;
 
-                    if (currencyId != 2)
+                    if (currencyId != (long)CurrencyTypes.RUB)
                     {
                         var response = await webService.GetCBRateAsync().ConfigureAwait(false);
                         var rate = response.IsSuccessStatusCode ? await response.Content.ReadFromJsonAsync<CBRF>().ConfigureAwait(false) : null;
@@ -75,8 +76,8 @@ namespace InvestmentManager.Server.Controllers
                         rateValue = rate is not null
                             ? currencyId switch
                             {
-                                1 => rate.Valute.USD.Value,
-                                3 => rate.Valute.EUR.Value,
+                                (long)CurrencyTypes.USD => rate.Valute.USD.Value,
+                                //(long)CurrencyTypes.RUB => rate.Valute.EUR.Value,
                                 _ => 0
                             }
                             : 0;

@@ -39,8 +39,8 @@ namespace InvestmentManager.Calculator.Implimentations
             var pbMoreZero = pbCollection.Where(x => x > 0).ToList();
             var pbLessZero = pbCollection.Where(x => x < 0).ToList();
 
-            decimal peCollectionResult = peLessZero.Count * weightAverage + peMoreZero.Average();
-            decimal bpCollectionResult = pbLessZero.Count * weightAverage + pbMoreZero.Average();
+            decimal peCollectionResult = peLessZero.Count * weightAverage + (peMoreZero.Any() ? peMoreZero.Average() : 0);
+            decimal bpCollectionResult = pbLessZero.Count * weightAverage + (pbMoreZero.Any() ? pbMoreZero.Average() : 0);
 
             var negativeCollection = new List<decimal>() { peCollectionResult, bpCollectionResult, debtLoadCollection.Average() };
 

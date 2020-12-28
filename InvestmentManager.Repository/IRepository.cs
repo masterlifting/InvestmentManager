@@ -78,12 +78,7 @@ namespace InvestmentManager.Repository
     }
     // Calculate
     public interface IRatingRepository : IRepository<Rating> { }
-    public interface ICoefficientRepository : IRepository<Coefficient>
-    {
-        Task<List<Coefficient>> GetSortedCoefficientsAsync(long companyId);
-        Task<List<(decimal price, Report report)>> GetSortedCoefficientCalculatingDataAsync(long companyId); // to delete
-        IDictionary<string, List<(DateTime dateReport, Coefficient coefficient)>> GetViewData();
-    }
+    public interface ICoefficientRepository : IRepository<Coefficient> { }
     public interface ISellRecommendationRepository : IRepository<SellRecommendation> { }
     public interface IBuyRecommendationRepository : IRepository<BuyRecommendation> { }
     public interface IAccountSummaryRepository : IRepository<AccountSummary> { }
