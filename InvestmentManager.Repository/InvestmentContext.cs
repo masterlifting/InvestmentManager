@@ -26,7 +26,6 @@ namespace InvestmentManager.Repository
         public DbSet<SellRecommendation> SellRecommendations { get; set; }
         public DbSet<Currency> Currencies { get; set; }
         public DbSet<ReportSource> ReportSources { get; set; }
-        public DbSet<ProxyAddress> ProxyAddresses { get; set; }
         public DbSet<Company> Companies { get; set; }
         public DbSet<Exchange> Exchanges { get; set; }
         public DbSet<Industry> Industries { get; set; }

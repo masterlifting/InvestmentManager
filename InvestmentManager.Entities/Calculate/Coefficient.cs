@@ -1,12 +1,10 @@
 ﻿using InvestmentManager.Entities.Basic;
 using InvestmentManager.Entities.Market;
-using InvestmentManager.Entities.Relationship.InterfaceForeignKey;
-
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace InvestmentManager.Entities.Calculate
 {
-    public class Coefficient : BaseEntity, IReportFK
+    public class Coefficient : BaseEntity
     {
         [Column(TypeName = "Decimal(18,2)")]
         public decimal PE { get; set; }

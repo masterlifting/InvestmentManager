@@ -1,9 +1,42 @@
-﻿<BaseError Title="@Title" ErrorValue="@ErrorValue" IsDone="isDone">
-    <ChildContent></ChildContent>
+﻿@inject CustomHttpClient http
+@inject CustomNotification notice
+
+<BaseError Title="@Title" ErrorValue="@ErrorValue" IsDone="isDone">
+    <ChildContent>
+        <EditForm class="col-12" Model="model" OnValidSubmit="SendData">
+            <DataAnnotationsValidator />
+
+            <div class="row mb-1 pl-2">
+                <div class="col-12 text-info">Set new comission type:</div>
+            </div>
+
+            <ValidationMessage For="(() => model.Name)" />
+            <InputText class="mb-2" @bind-Value="model.Name" />
+
+            <ButtonSubmit Title="Fix" Color="ColorCustom.iwarning" />
+        </EditForm>
+    </ChildContent>
 </BaseError>
 @code {
     [Parameter] public string ErrorValue { get; set; }
     [Parameter] public string Title { get; set; }
 
     bool isDone = false;
+    ComissionTypeModel model;
+
+    protected override void OnParametersSet()
+    {
+        model = new ComissionTypeModel { Name = ErrorValue.Split("\'")[1] };
+    }
+    async Task SendData()
+    {
+        var result = await http.PostAsync<BaseActionResult, ComissionTypeModel>(new UrlBuilder(UrlController.ComissionTypes).Result, model);
+        if (result.IsSuccess)
+        {
+            isDone = true;
+            await notice.AlertSuccesAsync(result.Info);
+        }
+        else
+            notice.ToastDanger("Comission type error.", result.Info);
+    }
 }

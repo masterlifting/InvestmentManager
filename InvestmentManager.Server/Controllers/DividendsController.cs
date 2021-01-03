@@ -125,7 +125,7 @@ namespace InvestmentManager.Server.Controllers
             var result = await restMethod.BasePostAsync(ModelState, entity, model).ConfigureAwait(false);
             if (result.IsSuccess)
             {
-                await reckonerService.UpgradeByDividendChangeAsync(entity).ConfigureAwait(false);
+                result.Info += await reckonerService.UpgradeByDividendChangeAsync(entity).ConfigureAwait(false) ? " Recalculated" : " NOT Recalculated.";
                 return Ok(result);
             }
             else

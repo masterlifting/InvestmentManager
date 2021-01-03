@@ -68,7 +68,7 @@ namespace InvestmentManager.Server.Controllers
         public async Task<IActionResult> GetPagination(int value = 1)
         {
             int pageSize = int.Parse(configuration["PaginationPageSize"]);
-            
+
             var companies = unitOfWork.Company.GetAll().OrderBy(x => x.Name);
             var items = await companies
                 .Skip((value - 1) * pageSize)
@@ -93,13 +93,13 @@ namespace InvestmentManager.Server.Controllers
                 IndustryId = model.IndustryId,
                 SectorId = model.SectorId
             };
-            bool CompanyContains(CompanyModel model) => unitOfWork.Company.GetAll()
-                .Select(x => x.Name)
-                .ToList()
-                .Where(x => x.Equals(model.Name, StringComparison.OrdinalIgnoreCase))
-                .Any();
+            async Task<bool> CompanyValidatorAsync(CompanyModel model)
+            {
+                var names = await unitOfWork.Company.GetAll().Select(x => x.Name).ToListAsync().ConfigureAwait(false);
+                return !names.Where(x => x.Equals(model.Name, StringComparison.OrdinalIgnoreCase)).Any();
+            }
 
-            var result = await restMethod.BasePostAsync(ModelState, entity, model, CompanyContains).ConfigureAwait(false);
+            var result = await restMethod.BasePostAsync(ModelState, entity, model, CompanyValidatorAsync).ConfigureAwait(false);
             return result.IsSuccess ? (IActionResult)Ok(result) : BadRequest(result);
         }
 

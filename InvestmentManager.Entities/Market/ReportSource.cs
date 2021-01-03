@@ -1,10 +1,9 @@
 ﻿using InvestmentManager.Entities.Basic;
-using InvestmentManager.Entities.Relationship.InterfaceForeignKey;
 using System.ComponentModel.DataAnnotations;
 
 namespace InvestmentManager.Entities.Market
 {
-    public class ReportSource : BaseEntity, ICompanyFK
+    public class ReportSource : BaseEntity
     {
         [StringLength(100)]
         [Required]

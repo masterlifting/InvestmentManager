@@ -4,6 +4,7 @@ using InvestmentManager.Repository;
 using InvestmentManager.Server.RestServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -40,13 +41,13 @@ namespace InvestmentManager.Server.Controllers
         public async Task<IActionResult> Post(ReportSourceModel model)
         {
             var entity = new ReportSource { CompanyId = model.CompanyId, Key = model.Key, Value = model.Value };
-            bool ReportSourceContains(ReportSourceModel model)
+            async Task<bool> ReportSourceValidatorAsync(ReportSourceModel model)
             {
-                string value = unitOfWork.ReportSource.GetAll().FirstOrDefault(x => x.CompanyId == model.CompanyId)?.Value;
-                return value is not null && value.Equals(model.Value, StringComparison.OrdinalIgnoreCase);
+                string value = (await unitOfWork.ReportSource.GetAll().FirstOrDefaultAsync(x => x.CompanyId == model.CompanyId).ConfigureAwait(false))?.Value;
+                return value is not null && !value.Equals(model.Value, StringComparison.OrdinalIgnoreCase);
             }
 
-            var result = await restMethod.BasePostAsync(ModelState, entity, model, ReportSourceContains).ConfigureAwait(false);
+            var result = await restMethod.BasePostAsync(ModelState, entity, model, ReportSourceValidatorAsync).ConfigureAwait(false);
             return result.IsSuccess ? (IActionResult)Ok(result) : BadRequest(result);
         }
         [HttpPut("{id}"), Authorize(Roles = "pestunov")]

@@ -6,8 +6,10 @@ using InvestmentManager.Server.RestServices;
 using InvestmentManager.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
+using static InvestmentManager.Models.Enums;
 
 namespace InvestmentManager.Server.Controllers
 {
@@ -75,11 +77,37 @@ namespace InvestmentManager.Server.Controllers
                 Rate = model.Rate
             };
 
-            var result = await restMethod.BasePostAsync(ModelState, entity, model).ConfigureAwait(false);
+            async Task<bool> ExchangeRateValidatorAsync(ExchangeRateModel model)
+            {
+                if (model.StatusId == (long)TransactionStatusTypes.Sell)
+                {
+                    var summary = await unitOfWork.AccountSummary.GetAll()
+                        .FirstOrDefaultAsync(x =>
+                        x.AccountId == model.AccountId
+                        && x.CurrencyId == model.CurrencyId)
+                        .ConfigureAwait(false);
+
+                    return summary is not null && model.Quantity <= summary.FreeSum;
+                }
+                else if (model.StatusId == (long)TransactionStatusTypes.Buy)
+                {
+                    var summary = await unitOfWork.AccountSummary.GetAll()
+                        .FirstOrDefaultAsync(x =>
+                        x.AccountId == model.AccountId
+                        && x.CurrencyId == (long)CurrencyTypes.rub)
+                        .ConfigureAwait(false);
+
+                    return summary is not null && model.Quantity * model.Rate <= summary.FreeSum;
+                }
+                else
+                    return true;
+            }
+
+            var result = await restMethod.BasePostAsync(ModelState, entity, model, ExchangeRateValidatorAsync).ConfigureAwait(false);
 
             if (result.IsSuccess)
             {
-                await reckonerService.UpgradeByExchangeRateChangeAsync(entity).ConfigureAwait(false);
+                result.Info += await reckonerService.UpgradeByExchangeRateChangeAsync(entity).ConfigureAwait(false) ? " Recalculated" : " NOT Recalculated.";
                 return Ok(result);
             }
             else

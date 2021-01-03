@@ -1,12 +1,11 @@
 ﻿using InvestmentManager.Entities.Basic;
-using InvestmentManager.Entities.Relationship.InterfaceNavigationProperty;
 
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace InvestmentManager.Entities.Market
 {
-    public class Sector : BaseEntity, ICompanyNP
+    public class Sector : BaseEntity
     {
         [StringLength(300)]
         [Required]

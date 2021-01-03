@@ -1,13 +1,12 @@
 ﻿using InvestmentManager.Entities.Basic;
 using InvestmentManager.Entities.Calculate;
-using InvestmentManager.Entities.Relationship.InterfaceNavigationProperty;
 
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace InvestmentManager.Entities.Broker
 {
-    public class Account : BaseEntity, IDividendNP, IAccountTransactionNP, IStockTransactioNP, IComissionNP, IExchaneRateNP
+    public class Account : BaseEntity
     {
         [StringLength(100)]
         [Required]

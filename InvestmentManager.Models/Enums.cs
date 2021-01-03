@@ -21,8 +21,8 @@
         }
         public enum CurrencyTypes
         {
-            USD = 1,
-            RUB = 2
+            usd = 1,
+            rub = 2
         }
         public enum DataBaseType
         {

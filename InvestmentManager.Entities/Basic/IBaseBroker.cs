@@ -1,12 +1,17 @@
-﻿using InvestmentManager.Entities.Relationship.InterfaceForeignKey;
+﻿using InvestmentManager.Entities.Broker;
+using InvestmentManager.Entities.Market;
 using System;
 
 namespace InvestmentManager.Entities.Basic
 {
-    public interface IBaseBroker : IAccountFK, ICurrencyFK
+    public interface IBaseBroker : IBaseEntity
     {
-        long Id { get; set; }
-        DateTime DateUpdate { get; set; }
         DateTime DateOperation { get; set; }
+
+        long AccountId { get; set; }
+        Account Account { get; set; }
+
+        long CurrencyId { get; set; }
+        Currency Currency { get; set; }
     }
 }

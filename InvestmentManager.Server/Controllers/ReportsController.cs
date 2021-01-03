@@ -126,7 +126,7 @@ namespace InvestmentManager.Server.Controllers
             {
                 long companyId = (await unitOfWork.Report.FindByIdAsync(id).ConfigureAwait(false)).CompanyId;
                 var userIds = await userManager.Users.Select(x => x.Id).ToArrayAsync().ConfigureAwait(false);
-                await reckonerService.UpgradeByReportChangeAsync(DataBaseType.Postgres, companyId, userIds).ConfigureAwait(false);
+                result.Info += await reckonerService.UpgradeByReportChangeAsync(DataBaseType.Postgres, companyId, userIds).ConfigureAwait(false) ? " Recalculated" : " NOT Recalculated.";
                 return Ok(result);
             }
             else

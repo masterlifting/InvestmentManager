@@ -10,6 +10,7 @@
             BuyRecommendations,
             Coefficients,
             Comissions,
+            ComissionTypes,
             Companies,
             Dividends,
             ExchangeRates,

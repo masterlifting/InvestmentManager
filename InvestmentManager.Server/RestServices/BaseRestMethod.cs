@@ -14,27 +14,23 @@ namespace InvestmentManager.Server.RestServices
         private readonly InvestmentContext context;
         public BaseRestMethod(InvestmentContext context) => this.context = context;
 
-        public async Task<BaseActionResult> BasePostAsync<TEntity, TModel>(ModelStateDictionary modelState, TEntity result, TModel model, Func<TModel, bool> func = null) where TEntity : class where TModel : class
+        public async Task<BaseActionResult> BasePostAsync<TEntity, TModel>(ModelStateDictionary modelState, TEntity result, TModel model, Func<TModel, Task<bool>> customValidator = null) where TEntity : class where TModel : class
         {
             if (!modelState.IsValid)
                 return new BaseActionResult { IsSuccess = false, Info = modelInvalid };
 
-            bool isContains = false;
-
-            if (func != null)
+            if (customValidator is not null)
             {
                 try
                 {
-                    isContains = func.Invoke(model);
+                    if (!await customValidator.Invoke(model).ConfigureAwait(false))
+                        return new BaseActionResult { IsSuccess = false, Info = $"Impossible action." };
                 }
                 catch
                 {
-                    return new BaseActionResult { IsSuccess = false, Info = "Contains function error" };
+                    return new BaseActionResult { IsSuccess = false, Info = "Validation error." };
                 }
             }
-
-            if (isContains)
-                return new BaseActionResult { IsSuccess = true, Info = $"This {typeof(TEntity).Name} allready!" };
 
             await context.Set<TEntity>().AddAsync(result).ConfigureAwait(false);
 
@@ -71,7 +67,10 @@ namespace InvestmentManager.Server.RestServices
             if (entity is null)
                 return new BaseActionResult { IsSuccess = false, Info = modelIsNull };
 
-            update.Invoke(entity);
+            if (update is null)
+                return new BaseActionResult { IsSuccess = false, Info = "Update action out." };
+            else
+                update.Invoke(entity);
 
             try
             {

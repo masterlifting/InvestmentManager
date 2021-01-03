@@ -5,7 +5,6 @@ namespace InvestmentManager.Calculator.Models
 {
     public class SellRecommendationArgs
     {
-        public long CompanyId { get; set; }
         public int BuyValue { get; set; }
         public int SellValue { get; set; }
         public int Lot { get; set; }

@@ -49,6 +49,6 @@ namespace InvestmentManager.Repository
         /// <typeparam name="T"></typeparam>
         /// <param name="entities"></param>
         /// <returns>Task</returns>
-        Task CustomUpdateRangeAsync<T>(IEnumerable<T> entities) where T : class, IBaseEntity;
+        Task<bool> CustomUpdateRangeAsync<T>(IEnumerable<T> entities) where T : class, IBaseEntity;
     }
 }

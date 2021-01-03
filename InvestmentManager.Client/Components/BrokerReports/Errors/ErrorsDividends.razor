@@ -2,7 +2,7 @@
 @inject CustomNotification notice
 @using System.Text.RegularExpressions
 
-<BaseError Title="Title" IsDone="isDone" ErrorValue="ErrorValue">
+<BaseError Title="@Title" ErrorValue="@ErrorValue" IsDone="isDone">
     <ChildContent>
         @if (model is not null)
         {
@@ -17,14 +17,14 @@
                         }
                 </InputSelect>
 
-                <div class="row mb-1">
+                <div class="row mb-1 pl-2">
                     <div class="col text-info">Identifier for dividend:</div>
                 </div>
 
                 <ValidationMessage For="(() => model.Name)" />
                 <InputText class="mb-2" @bind-Value="model.Name" />
 
-                <ButtonSubmit Title="Исправить" Color="ColorCustom.iwarning" />
+                <ButtonSubmit Title="Fix" Color="ColorCustom.iwarning" />
             </EditForm>
         }
     </ChildContent>
@@ -34,9 +34,9 @@
     [Parameter] public string ErrorValue { get; set; }
     [Parameter] public string Title { get; set; }
 
+    bool isDone = false;
     IsinModel model;
     List<ShortView> companies;
-    bool isDone = false;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -45,7 +45,7 @@
         {
             model = new IsinModel
             {
-                Name = Regex.Match(ErrorValue.Split('\'')[1], @", (\w*), налог").Groups[1].Value,
+                Name = Regex.Match(ErrorValue.Split('\'')[1], @", (\w*)$").Groups[1].Value,
                 CompanyId = companies.FirstOrDefault().Id
             };
         }

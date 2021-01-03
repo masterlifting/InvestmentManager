@@ -18,14 +18,13 @@ namespace InvestmentManager.Calculator.Implimentations
 
         public CoefficientCalculate(List<Coefficient> sortedCoefficients)
         {
-            profitabilityCollection = sortedCoefficients.Where(x => x.Profitability != 0).Select(x => x.Profitability).ToList();
-            roaCollection = sortedCoefficients.Where(x => x.ROA != 0).Select(x => x.ROA).ToList();
-            roeCollection = sortedCoefficients.Where(x => x.ROE != 0).Select(x => x.ROE).ToList();
-            epsCollection = sortedCoefficients.Where(x => x.EPS != 0).Select(x => x.EPS).ToList();
-
-            peCollection = sortedCoefficients.Where(x => x.PE != 0).Select(x => x.PE).ToList();
-            pbCollection = sortedCoefficients.Where(x => x.PB != 0).Select(x => x.PB).ToList();
-            debtLoadCollection = sortedCoefficients.Where(x => x.DebtLoad != 0).Select(x => x.DebtLoad).ToList();
+            profitabilityCollection = sortedCoefficients.Select(x => x.Profitability).Where(x => x != default).ToList();
+            roaCollection = sortedCoefficients.Select(x => x.ROA).Where(x => x != default).ToList();
+            roeCollection = sortedCoefficients.Select(x => x.ROE).Where(x => x != default).ToList();
+            epsCollection = sortedCoefficients.Select(x => x.EPS).Where(x => x != default).ToList();
+            peCollection = sortedCoefficients.Select(x => x.PE).Where(x => x != default).ToList();
+            pbCollection = sortedCoefficients.Select(x => x.PB).Where(x => x != default).ToList();
+            debtLoadCollection = sortedCoefficients.Select(x => x.DebtLoad).Where(x => x != default).ToList();
         }
 
         public decimal? GetCoefficientAverage()

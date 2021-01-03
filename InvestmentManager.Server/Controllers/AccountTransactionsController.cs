@@ -6,8 +6,10 @@ using InvestmentManager.Server.RestServices;
 using InvestmentManager.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
+using static InvestmentManager.Models.Enums;
 
 namespace InvestmentManager.Server.Controllers
 {
@@ -74,12 +76,27 @@ namespace InvestmentManager.Server.Controllers
                 TransactionStatusId = model.StatusId,
             };
 
+            async Task<bool> TransactionValidatorAsync(AccountTransactionModel model)
+            {
+                if (model.StatusId == (long)TransactionStatusTypes.Withdraw)
+                {
+                    var summary = await unitOfWork.AccountSummary.GetAll()
+                        .FirstOrDefaultAsync(x =>
+                        x.AccountId == model.AccountId
+                        && x.CurrencyId == model.CurrencyId)
+                        .ConfigureAwait(false);
 
-            var result = await restMethod.BasePostAsync(ModelState, entity, model).ConfigureAwait(false);
-            
+                    return summary is not null && model.Amount <= summary.FreeSum;
+                }
+                else
+                    return true;
+            }
+            var result = await restMethod.BasePostAsync(ModelState, entity, model, TransactionValidatorAsync).ConfigureAwait(false);
+
             if (result.IsSuccess)
             {
-                await reckonerService.UpgradeByAccountTransactionChangeAsync(entity).ConfigureAwait(false);
+                result.Info += await reckonerService.UpgradeByAccountTransactionChangeAsync(entity).ConfigureAwait(false) ? " Recalculated" : " NOT Recalculated.";
+
                 return Ok(result);
             }
             else

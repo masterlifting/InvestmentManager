@@ -1,14 +1,12 @@
 ﻿using InvestmentManager.Entities.Basic;
 using InvestmentManager.Entities.Calculate;
-using InvestmentManager.Entities.Relationship.InterfaceForeignKey;
-using InvestmentManager.Entities.Relationship.InterfaceNavigationProperty;
 
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace InvestmentManager.Entities.Market
 {
-    public class Report : BaseEntity, ICompanyFK, ICoefficientNP
+    public class Report : BaseEntity
     {
         public Report() => IsChecked = false;
 

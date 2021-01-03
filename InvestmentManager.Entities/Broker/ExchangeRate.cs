@@ -1,10 +1,9 @@
 ﻿using InvestmentManager.Entities.Basic;
-using InvestmentManager.Entities.Relationship.InterfaceForeignKey;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace InvestmentManager.Entities.Broker
 {
-    public class ExchangeRate : BaseBroker, ITransactionStatusFK
+    public class ExchangeRate : BaseBroker
     {
         public long Identifier { get; set; }
         public int Quantity { get; set; }

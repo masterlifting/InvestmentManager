@@ -76,7 +76,7 @@ namespace InvestmentManager.Server.Controllers
 
             if (result.IsSuccess)
             {
-                await reckonerService.UpgradeByComissionChangeAsync(entity).ConfigureAwait(false);
+                result.Info += await reckonerService.UpgradeByComissionChangeAsync(entity).ConfigureAwait(false) ? " Recalculated" : " NOT Recalculated.";
                 return Ok(result);
             }
             else

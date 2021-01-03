@@ -1,6 +1,7 @@
 ﻿using InvestmentManager.BrokerService.Implimentations;
 using InvestmentManager.BrokerService.Interfaces;
 using InvestmentManager.BrokerService.Models;
+using InvestmentManager.Entities.Broker;
 using InvestmentManager.Repository;
 using InvestmentManager.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -40,7 +41,7 @@ namespace InvestmentManager.BrokerService
 
             var parsedReports = ParseFiles(files);
             var checkedReports = await CheckParsedReportsAsync(parsedReports, userId).ConfigureAwait(false);
-            var filteredNewReports = FilterOutNewReports(checkedReports);
+            var filteredNewReports = await FilterOutNewReportsAsync(checkedReports).ConfigureAwait(false);
 
             return filteredNewReports;
         }
@@ -109,7 +110,7 @@ namespace InvestmentManager.BrokerService
                     continue;
                 }
 
-                var entityReportModel = new EntityReportModel { AccountId = account.Id};
+                var entityReportModel = new EntityReportModel { AccountId = account.Id };
                 try
                 {
                     entityReportModel.AccountTransactions = await reportMapper.MapToAccountTransactionsAsync(model.AccountTransactions, account.Id, errors).ConfigureAwait(false);
@@ -133,24 +134,214 @@ namespace InvestmentManager.BrokerService
 
             return result;
         }
-        ResultBrokerReportModel FilterOutNewReports(ResultBrokerReportModel checkedReports)
+        async Task<ResultBrokerReportModel> FilterOutNewReportsAsync(ResultBrokerReportModel checkedReports)
         {
             var newReports = new List<EntityReportModel>();
 
             foreach (var i in checkedReports.Reports.GroupBy(x => x.AccountId))
             {
-                var reportModel = new EntityReportModel { AccountId = i.Key};
-                reportModel.AccountTransactions = reportFilter.GetNewTransactions(i.Select(x => x.AccountTransactions).Aggregate((x, y) => x.Union(y)), i.Key);
-                reportModel.StockTransactions = reportFilter.GetNewTransactions(i.Select(x => x.StockTransactions).Aggregate((x, y) => x.Union(y)), i.Key);
-                reportModel.Dividends = reportFilter.GetNewTransactions(i.Select(x => x.Dividends).Aggregate((x, y) => x.Union(y)), i.Key);
-                reportModel.Comissions = reportFilter.GetNewTransactions(i.Select(x => x.Comissions).Aggregate((x, y) => x.Union(y)), i.Key);
-                reportModel.ExchangeRates = reportFilter.GetNewTransactions(i.Select(x => x.ExchangeRates).Aggregate((x, y) => x.Union(y)), i.Key);
+                var reportModel = new EntityReportModel { AccountId = i.Key };
+                reportModel.AccountTransactions = await reportFilter.GetNewTransactionsAsync(i.Select(x => x.AccountTransactions).Aggregate((x, y) => x.Union(y)), i.Key, CheckAccountTransactions);
+                reportModel.StockTransactions = await reportFilter.GetNewTransactionsAsync(i.Select(x => x.StockTransactions).Aggregate((x, y) => x.Union(y)), i.Key, CheckStockTransactions).ConfigureAwait(false);
+                reportModel.Dividends = await reportFilter.GetNewTransactionsAsync(i.Select(x => x.Dividends).Aggregate((x, y) => x.Union(y)), i.Key, CheckDividends);
+                reportModel.Comissions = await reportFilter.GetNewTransactionsAsync(i.Select(x => x.Comissions).Aggregate((x, y) => x.Union(y)), i.Key, CheckComissions);
+                reportModel.ExchangeRates = await reportFilter.GetNewTransactionsAsync(i.Select(x => x.ExchangeRates).Aggregate((x, y) => x.Union(y)), i.Key, CheckExchangeRates);
 
                 newReports.Add(reportModel);
             }
 
             checkedReports.Reports = newReports;
             return checkedReports;
+
+            #region Filter helpers
+            static List<AccountTransaction> CheckAccountTransactions(List<AccountTransaction> incomeOperations, AccountTransaction[] dbOperations)
+            {
+                var result = new List<AccountTransaction>();
+
+                for (int i = 0; i < incomeOperations.Count; i++)
+                {
+                    int comparisionResult = 0;
+
+                    for (int j = 0; j < dbOperations.Length; j++)
+                    {
+                        if (incomeOperations[i].Amount == dbOperations[j].Amount
+                            && incomeOperations[i].TransactionStatusId == dbOperations[j].TransactionStatusId
+                            && incomeOperations[i].CurrencyId == dbOperations[j].CurrencyId)
+                        {
+                            int incomeOperationsCount = incomeOperations
+                                .Where(x => x.Amount == incomeOperations[i].Amount
+                                && x.TransactionStatusId == incomeOperations[i].TransactionStatusId
+                                && x.CurrencyId == incomeOperations[i].CurrencyId)
+                                .Count();
+
+                            int dbOperationsCount = dbOperations
+                                .Where(x => x.Amount == incomeOperations[i].Amount
+                                && x.TransactionStatusId == incomeOperations[i].TransactionStatusId
+                                && x.CurrencyId == incomeOperations[i].CurrencyId)
+                                .Count();
+
+                            int resultNewCount = incomeOperationsCount - dbOperationsCount;
+
+                            for (int k = 0; k < resultNewCount; k++)
+                            {
+                                result.Add(incomeOperations[i]);
+                                incomeOperations.RemoveAt(i);
+                                i--;
+                            }
+
+                            comparisionResult = -1;
+                            break;
+                        }
+                    }
+
+                    if (comparisionResult == 0)
+                        result.Add(incomeOperations[i]);
+                }
+
+                return result;
+            }
+            static List<StockTransaction> CheckStockTransactions(List<StockTransaction> incomeOperations, StockTransaction[] dbOperations)
+            {
+                var result = new List<StockTransaction>();
+
+                for (int i = 0; i < incomeOperations.Count; i++)
+                {
+                    int comparisionResult = 0;
+
+                    for (int j = 0; j < dbOperations.Length; j++)
+                    {
+                        if (incomeOperations[i].Identifier == dbOperations[j].Identifier)
+                        {
+                            comparisionResult = -1;
+                            break;
+                        }
+                    }
+
+                    if (comparisionResult == 0)
+                        result.Add(incomeOperations[i]);
+                }
+
+                return result;
+            }
+            static List<Dividend> CheckDividends(List<Dividend> incomeOperations, Dividend[] dbOperations)
+            {
+                var result = new List<Dividend>();
+
+                for (int i = 0; i < incomeOperations.Count; i++)
+                {
+                    int comparisionResult = 0;
+
+                    for (int j = 0; j < dbOperations.Length; j++)
+                    {
+                        if (incomeOperations[i].Amount == dbOperations[j].Amount
+                           && incomeOperations[i].Tax == dbOperations[j].Tax
+                           && incomeOperations[i].IsinId == dbOperations[j].IsinId
+                           && incomeOperations[i].CurrencyId == dbOperations[j].CurrencyId)
+                        {
+                            int incomeOperationsCount = incomeOperations
+                               .Where(x => x.Amount == incomeOperations[i].Amount
+                               && x.Tax == incomeOperations[i].Tax
+                               && incomeOperations[i].IsinId == dbOperations[j].IsinId
+                               && x.CurrencyId == incomeOperations[i].CurrencyId)
+                               .Count();
+
+                            int dbOperationsCount = dbOperations
+                                .Where(x => x.Amount == incomeOperations[i].Amount
+                                && x.Tax == incomeOperations[i].Tax
+                                && incomeOperations[i].IsinId == dbOperations[j].IsinId
+                                && x.CurrencyId == incomeOperations[i].CurrencyId)
+                                .Count();
+
+                            int resultNewCount = incomeOperationsCount - dbOperationsCount;
+
+                            for (int k = 0; k < resultNewCount; k++)
+                            {
+                                result.Add(incomeOperations[i]);
+                                incomeOperations.RemoveAt(i);
+                                i--;
+                            }
+
+                            comparisionResult = -1;
+                            break;
+                        }
+                    }
+
+                    if (comparisionResult == 0)
+                        result.Add(incomeOperations[i]);
+                }
+
+                return result;
+            }
+            static List<Comission> CheckComissions(List<Comission> incomeOperations, Comission[] dbOperations)
+            {
+                var result = new List<Comission>();
+
+                for (int i = 0; i < incomeOperations.Count; i++)
+                {
+                    int comparisionResult = 0;
+
+                    for (int j = 0; j < dbOperations.Length; j++)
+                    {
+                        if (incomeOperations[i].Amount == dbOperations[j].Amount
+                            && incomeOperations[i].ComissionTypeId == dbOperations[j].ComissionTypeId
+                            && incomeOperations[i].CurrencyId == dbOperations[j].CurrencyId)
+                        {
+                            int incomeOperationsCount = incomeOperations
+                               .Where(x => x.Amount == incomeOperations[i].Amount
+                               && x.ComissionTypeId == incomeOperations[i].ComissionTypeId
+                               && x.CurrencyId == incomeOperations[i].CurrencyId)
+                               .Count();
+
+                            int dbOperationsCount = dbOperations
+                                .Where(x => x.Amount == incomeOperations[i].Amount
+                                && x.ComissionTypeId == incomeOperations[i].ComissionTypeId
+                                && x.CurrencyId == incomeOperations[i].CurrencyId)
+                                .Count();
+
+                            int resultNewCount = incomeOperationsCount - dbOperationsCount;
+
+                            for (int k = 0; k < resultNewCount; k++)
+                            {
+                                result.Add(incomeOperations[i]);
+                                incomeOperations.RemoveAt(i);
+                                i--;
+                            }
+
+                            comparisionResult = -1;
+                            break;
+                        }
+                    }
+
+                    if (comparisionResult == 0)
+                        result.Add(incomeOperations[i]);
+                }
+
+                return result;
+            }
+            static List<ExchangeRate> CheckExchangeRates(List<ExchangeRate> incomeOperations, ExchangeRate[] dbOperations)
+            {
+                var result = new List<ExchangeRate>();
+
+                for (int i = 0; i < incomeOperations.Count; i++)
+                {
+                    int comparisionResult = 0;
+
+                    for (int j = 0; j < dbOperations.Length; j++)
+                    {
+                        if (incomeOperations[i].Identifier == dbOperations[j].Identifier)
+                        {
+                            comparisionResult = -1;
+                            break;
+                        }
+                    }
+
+                    if (comparisionResult == 0)
+                        result.Add(incomeOperations[i]);
+                }
+
+                return result;
+            }
+            #endregion
         }
         #endregion
     }

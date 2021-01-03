@@ -61,9 +61,9 @@ namespace InvestmentManager.Calculator
                         unitOfWork.Coefficient.TruncateAndReseedSQL();
                         break;
                 }
-                await unitOfWork.Coefficient.CreateEntitiesAsync(coefficients).ConfigureAwait(false);
 
-                return true;
+                await unitOfWork.Coefficient.CreateEntitiesAsync(coefficients).ConfigureAwait(false);
+                return await unitOfWork.CompleteAsync().ConfigureAwait(false);
             }
             catch
             {
@@ -101,7 +101,7 @@ namespace InvestmentManager.Calculator
                 dbCoefficient.ROE = newCoefficient.ROE;
             }
 
-            return true;
+            return await unitOfWork.CompleteAsync().ConfigureAwait(false);
         }
 
         #region Helpers
@@ -122,8 +122,6 @@ namespace InvestmentManager.Calculator
         #endregion
 
         #endregion
-
-
 
         #region Rating
         public async Task<bool> SetRatingAsync(DataBaseType dbType)
@@ -152,9 +150,9 @@ namespace InvestmentManager.Calculator
                         unitOfWork.Rating.TruncateAndReseedSQL();
                         break;
                 }
-                await unitOfWork.Rating.CreateEntitiesAsync(ratings).ConfigureAwait(false);
 
-                return true;
+                await unitOfWork.Rating.CreateEntitiesAsync(ratings).ConfigureAwait(false);
+                return await unitOfWork.CompleteAsync().ConfigureAwait(false);
             }
             catch
             {
@@ -172,11 +170,13 @@ namespace InvestmentManager.Calculator
             var ratings = new List<Rating>();
             try
             {
-                foreach (var data in unitOfWork.Company.GetAll().Join(prices, x => x.Id, y => y.Key, (x, y) => new { Company = x, Prices = y.Value }))
+                foreach (var data in prices)
                 {
-                    Rating rating = data.Company.Rating is null ? new Rating { CompanyId = data.Company.Id } : data.Company.Rating;
+                    var rating = unitOfWork.Rating.GetAll().FirstOrDefault(x => x.CompanyId == data.Key);
+                    if (rating is null)
+                        rating = new Rating { CompanyId = data.Key };
 
-                    if (!await SetRatingValueByPricesAsync(data.Prices, rating).ConfigureAwait(false))
+                    if (!await SetRatingValueByPricesAsync(data.Value, rating).ConfigureAwait(false))
                         continue;
 
                     SetRatingResult(rating);
@@ -196,9 +196,7 @@ namespace InvestmentManager.Calculator
 
                 SetRatingPlaces(ratings);
 
-                await unitOfWork.CustomUpdateRangeAsync(ratings).ConfigureAwait(false);
-
-                return true;
+                return await unitOfWork.CustomUpdateRangeAsync(ratings).ConfigureAwait(false);
             }
             catch
             {
@@ -234,9 +232,7 @@ namespace InvestmentManager.Calculator
                 ratings.Add(rating);
                 SetRatingPlaces(ratings);
 
-                await unitOfWork.CustomUpdateRangeAsync(ratings).ConfigureAwait(false);
-
-                return true;
+                return await unitOfWork.CustomUpdateRangeAsync(ratings).ConfigureAwait(false);
             }
             catch
             {
@@ -258,7 +254,7 @@ namespace InvestmentManager.Calculator
                 {
                     Rating rating = data.Company.Rating is null ? new Rating { CompanyId = data.Company.Id } : data.Company.Rating;
 
-                    var companyReports = data.Reports;
+                    var companyReports = data.Reports.Select(x => x);
                     var companyCoefficients = data.Reports.Select(x => x.Coefficient);
 
                     if (!await SetRatingValueByReportsAsync(companyReports.ToList(), rating).ConfigureAwait(false)
@@ -285,9 +281,7 @@ namespace InvestmentManager.Calculator
 
                 SetRatingPlaces(ratings);
 
-                await unitOfWork.CustomUpdateRangeAsync(ratings).ConfigureAwait(false);
-
-                return true;
+                return await unitOfWork.CustomUpdateRangeAsync(ratings).ConfigureAwait(false);
             }
             catch
             {
@@ -301,8 +295,8 @@ namespace InvestmentManager.Calculator
             if (company is null)
                 return false;
 
-            var reports = company.Reports.Where(x => x.IsChecked).OrderBy(x => x.DateReport);
-            var coefficients = reports.Select(x => x.Coefficient);
+            var reports = company.Reports.Where(x => x.IsChecked).OrderBy(x => x.DateReport).ToList();
+            var coefficients = await unitOfWork.Coefficient.GetAll().Where(x => reports.Select(y => y.Id).Contains(x.ReportId)).ToListAsync().ConfigureAwait(false);
 
             if (reports is null || !reports.Any())
                 return false;
@@ -311,8 +305,8 @@ namespace InvestmentManager.Calculator
 
             try
             {
-                if (!await SetRatingValueByReportsAsync(reports.ToList(), rating).ConfigureAwait(false)
-                    || !await SetRatingValueByCoefficientsAsync(coefficients.ToList(), rating).ConfigureAwait(false))
+                if (!await SetRatingValueByReportsAsync(reports, rating).ConfigureAwait(false)
+                    || !await SetRatingValueByCoefficientsAsync(coefficients, rating).ConfigureAwait(false))
                     return false;
 
                 SetRatingResult(rating);
@@ -326,9 +320,7 @@ namespace InvestmentManager.Calculator
 
                 SetRatingPlaces(ratings);
 
-                await unitOfWork.CustomUpdateRangeAsync(ratings).ConfigureAwait(false);
-
-                return true;
+                return await unitOfWork.CustomUpdateRangeAsync(ratings).ConfigureAwait(false);
             }
             catch
             {
@@ -487,9 +479,9 @@ namespace InvestmentManager.Calculator
                         unitOfWork.BuyRecommendation.TruncateAndReseedSQL();
                         break;
                 }
-                await unitOfWork.BuyRecommendation.CreateEntitiesAsync(recommendations).ConfigureAwait(false);
 
-                return true;
+                await unitOfWork.BuyRecommendation.CreateEntitiesAsync(recommendations).ConfigureAwait(false);
+                return await unitOfWork.CompleteAsync().ConfigureAwait(false);
             }
             catch
             {
@@ -542,14 +534,15 @@ namespace InvestmentManager.Calculator
             var ratings = await unitOfWork.Rating.GetAll().ToArrayAsync().ConfigureAwait(false);
             #endregion
 
-            var recommendations = new List<SellRecommendation>();
+            var result = new List<SellRecommendation>();
 
             foreach (string userId in userIds)
             {
                 var accountIds = await accounts.Where(x => x.UserId.Equals(userId)).Select(x => x.Id).ToArrayAsync().ConfigureAwait(false);
                 var userStockTransactions = await stockTransactions.Where(x => accountIds.Contains(x.AccountId)).ToArrayAsync().ConfigureAwait(false);
-                if (!SetRecommendations(userId, tickers, ratings, userStockTransactions, recommendations))
-                    return false;
+                var recommendations = GetRecommendations(userId, tickers, ratings, userStockTransactions);
+                if (recommendations.Any())
+                    result.AddRange(recommendations);
             }
 
             try
@@ -563,38 +556,52 @@ namespace InvestmentManager.Calculator
                         unitOfWork.SellRecommendation.TruncateAndReseedSQL();
                         break;
                 }
-                await unitOfWork.SellRecommendation.CreateEntitiesAsync(recommendations).ConfigureAwait(false);
 
-                return true;
+                await unitOfWork.SellRecommendation.CreateEntitiesAsync(result).ConfigureAwait(false);
+                return await unitOfWork.CompleteAsync().ConfigureAwait(false);
             }
             catch
             {
                 return false;
             }
         }
-        public async Task<bool> SetSellRecommendationsAsync(string userId)
+        public async Task<bool> SetSellRecommendationAsync(string userId, long tickerId)
         {
             #region set data
             var accounts = unitOfWork.Account.GetAll();
             var stockTransactions = unitOfWork.StockTransaction.GetAll();
-            var tickers = unitOfWork.Ticker.GetAll();
             var ratings = await unitOfWork.Rating.GetAll().ToArrayAsync().ConfigureAwait(false);
+            long companyId = (await unitOfWork.Ticker.FindByIdAsync(tickerId).ConfigureAwait(false)).CompanyId;
+            var companyTickerIds = (await unitOfWork.Company.FindByIdAsync(companyId).ConfigureAwait(false)).Tickers.Select(x => x.Id);
+            var lotValues = await unitOfWork.Ticker.GetAll().Where(x => companyTickerIds.Contains(x.Id)).Select(x => x.Lot.Value).ToArrayAsync().ConfigureAwait(false);
             #endregion
 
-            var recommendations = new List<SellRecommendation>();
+            for (int i = 1; i < lotValues.Length; i++)
+                if (lotValues[i - 1] != lotValues[i])
+                    return false;
+
+            var recommendation = await unitOfWork.SellRecommendation.GetAll().FirstOrDefaultAsync(x => x.UserId.Equals(userId) && x.CompanyId == companyId).ConfigureAwait(false);
+
             var accountIds = await accounts.Where(x => x.UserId.Equals(userId)).Select(x => x.Id).ToArrayAsync().ConfigureAwait(false);
-            var userStockTransactions = await stockTransactions.Where(x => accountIds.Contains(x.AccountId)).ToArrayAsync().ConfigureAwait(false);
+            var companyStockTransactions = await stockTransactions.Where(x => accountIds.Contains(x.AccountId) && companyTickerIds.Contains(x.TickerId)).ToArrayAsync().ConfigureAwait(false);
 
-            if (!SetRecommendations(userId, tickers, ratings, userStockTransactions, recommendations))
-                return false;
+            var updatedRecommendation = GetRecommendation(userId, companyId, lotValues.First(), ratings, companyStockTransactions);
 
-            await unitOfWork.CustomUpdateRangeAsync(recommendations);
+            if (updatedRecommendation is null)
+                unitOfWork.SellRecommendation.DeleteEntity(recommendation);
+            else if (recommendation is null)
+                await unitOfWork.SellRecommendation.CreateEntityAsync(updatedRecommendation).ConfigureAwait(false);
+            else
+            {
+                updatedRecommendation.DateUpdate = DateTime.Now;
+                unitOfWork.SellRecommendation.UpdateEntity(updatedRecommendation);
+            }
 
-            return true;
+            return await unitOfWork.CompleteAsync().ConfigureAwait(false);
         }
 
         #region helpers
-        static SellRecommendation CalculateSellRecommendation(SellRecommendationArgs args)
+        static bool CalculateSellRecommendation(SellRecommendationArgs args, SellRecommendation result)
         {
             decimal lotMaxPercent = SellRecommendationConfig.LotMaxPercent > 0 ? SellRecommendationConfig.LotMaxPercent : 50;
             decimal lotMidPercent = SellRecommendationConfig.LotMidPercent > 0 ? SellRecommendationConfig.LotMidPercent : 30;
@@ -604,9 +611,8 @@ namespace InvestmentManager.Calculator
             decimal profitMidPercent = SellRecommendationConfig.ProfitMidPercent > 0 ? SellRecommendationConfig.ProfitMidPercent * 0.01m + 1 : 1.5m;
             decimal profitMinPercent = SellRecommendationConfig.ProfitMinPercent > 0 ? SellRecommendationConfig.ProfitMinPercent * 0.01m + 1 : 1.2m;
 
-            SellRecommendation result = new SellRecommendation();
-
-            if (args is null) return result;
+            if (args is null)
+                return false;
 
             var operations = args.StockTransactions.OrderBy(x => x.DateOperation).Select(x => new { x.TransactionStatusId, x.Quantity, x.Cost });
 
@@ -622,7 +628,7 @@ namespace InvestmentManager.Calculator
             if (freeStockCount > 0)
             {
                 var buyCountPrice = operations
-                        .Where(x => x.TransactionStatusId == 3)
+                        .Where(x => x.TransactionStatusId == (long)TransactionStatusTypes.Buy)
                         .OrderBy(x => x.Cost)
                         .Select(x => new { Quantity = x.Quantity / args.Lot, x.Cost })
                         .ToArray();
@@ -649,6 +655,7 @@ namespace InvestmentManager.Calculator
                     sumBuyMaxPrice += buyCountPrice[index].Cost * stockMaxPriceCountTemp;
                     index--;
                 }
+
                 freeAvgPrice = sumBuyMaxPrice / freeStockCount;
 
                 var (percentMax, percentMid, percentMin) = GetPercents();
@@ -692,7 +699,6 @@ namespace InvestmentManager.Calculator
                 decimal priceMin = freeAvgPrice * profitMinPercent;
 
                 //Заполним модель
-                result.CompanyId = args.CompanyId;
                 result.LotMin = (int)lotMin;
                 result.LotMid = (int)lotMid;
                 result.LotMax = (int)lotMax;
@@ -701,7 +707,7 @@ namespace InvestmentManager.Calculator
                 result.PriceMax = priceMax;
 
                 //Вычтем с низа рекомендаций проданые лоты по порядку
-                foreach (var operation in operations.Where(x => x.TransactionStatusId == 4))
+                foreach (var operation in operations.Where(x => x.TransactionStatusId == (long)TransactionStatusTypes.Sell))
                 {
                     sellCount = operation.Quantity / args.Lot;
 
@@ -722,7 +728,8 @@ namespace InvestmentManager.Calculator
                     }
                 }
             }
-            return result;
+
+            return true;
 
             (decimal percentMax, decimal percentMid, decimal percentMin) GetPercents()
             {
@@ -743,12 +750,14 @@ namespace InvestmentManager.Calculator
                     midPercentForBest - MID * (args.RatingPlace - 1),
                     minPercentForBest + MIN * (args.RatingPlace - 1));
                 }
+
                 return result;
             }
-
         }
-        static bool SetRecommendations(string userId, IQueryable<Ticker> tickers, Rating[] ratings, StockTransaction[] stockTransactions, List<SellRecommendation> result)
+        static List<SellRecommendation> GetRecommendations(string userId, IQueryable<Ticker> tickers, Rating[] ratings, StockTransaction[] stockTransactions)
         {
+            var result = new List<SellRecommendation>();
+
             var transactionGroups = stockTransactions.Join(tickers, x => x.TickerId, y => y.Id, (x, y) =>
             new
             {
@@ -765,7 +774,7 @@ namespace InvestmentManager.Calculator
 
                     for (int i = 1; i < lotValues.Length; i++)
                         if (lotValues[i - 1] != lotValues[i])
-                            return false;
+                            continue;
 
                     var recommendationArgs = new SellRecommendationArgs();
                     var companyTransactions = item.Select(x => x.Transaction);
@@ -776,47 +785,61 @@ namespace InvestmentManager.Calculator
 
                     if (recommendationArgs.BuyValue > recommendationArgs.SellValue)
                     {
-                        recommendationArgs.CompanyId = item.Key;
                         recommendationArgs.StockTransactions = companyTransactions;
                         recommendationArgs.RatingPlace = ratings.FirstOrDefault(x => x.CompanyId == item.Key)?.Place ?? 0;
                         recommendationArgs.RatingCount = ratings.Length;
 
-                        var recommendation = CalculateSellRecommendation(recommendationArgs);
-                        recommendation.UserId = userId;
-
-                        result.Add(recommendation);
+                        var recommendation = new SellRecommendation { UserId = userId, CompanyId = item.Key };
+                        if (CalculateSellRecommendation(recommendationArgs, recommendation))
+                            result.Add(recommendation);
                     }
                 }
 
-                return true;
+                return result;
             }
             catch
             {
-                return false;
+                return result;
+            }
+        }
+        static SellRecommendation GetRecommendation(string userId, long companyId, int lot, Rating[] ratings, StockTransaction[] companyStockTransactions)
+        {
+            try
+            {
+                var recommendationArgs = new SellRecommendationArgs
+                {
+                    Lot = lot,
+                    BuyValue = companyStockTransactions.Where(x => x.TransactionStatusId == (long)TransactionStatusTypes.Buy).Sum(x => x.Quantity),
+                    SellValue = companyStockTransactions.Where(x => x.TransactionStatusId == (long)TransactionStatusTypes.Sell).Sum(x => x.Quantity)
+                };
+
+                if (recommendationArgs.BuyValue > recommendationArgs.SellValue)
+                {
+                    recommendationArgs.StockTransactions = companyStockTransactions;
+                    recommendationArgs.RatingPlace = ratings.FirstOrDefault(x => x.CompanyId == companyId)?.Place ?? 0;
+                    recommendationArgs.RatingCount = ratings.Length;
+
+                    var recommendation = new SellRecommendation { CompanyId = companyId, UserId = userId };
+
+                    return CalculateSellRecommendation(recommendationArgs, recommendation) ? recommendation : null;
+                }
+                else
+                    return null;
+            }
+            catch
+            {
+                return null;
             }
         }
         #endregion
 
         #endregion
 
-        public async Task<bool> ResetCalculatorDataAsync(DataBaseType dbType, string userId) =>
-                await SetCoeffitientsAsync(dbType).ConfigureAwait(false)
-                && await unitOfWork.CompleteAsync().ConfigureAwait(false)
-                && await SetRatingAsync(dbType).ConfigureAwait(false)
-                && await unitOfWork.CompleteAsync().ConfigureAwait(false)
-                && await SetBuyRecommendationsAsync(dbType)
-                && await unitOfWork.CompleteAsync().ConfigureAwait(false)
-                && await SetSellRecommendationsAsync(userId)
-                && await unitOfWork.CompleteAsync().ConfigureAwait(false);
         public async Task<bool> ResetCalculatorDataAsync(DataBaseType dbType, string[] userIds) =>
                 await SetCoeffitientsAsync(dbType).ConfigureAwait(false)
-                && await unitOfWork.CompleteAsync().ConfigureAwait(false)
                 && await SetRatingAsync(dbType).ConfigureAwait(false)
-                && await unitOfWork.CompleteAsync().ConfigureAwait(false)
                 && await SetBuyRecommendationsAsync(dbType)
-                && await unitOfWork.CompleteAsync().ConfigureAwait(false)
-                && await SetSellRecommendationsAsync(dbType, userIds)
-                && await unitOfWork.CompleteAsync().ConfigureAwait(false);
+                && await SetSellRecommendationsAsync(dbType, userIds);
     }
     class RatingComparator : IComparer<Rating>
     {

@@ -1,12 +1,11 @@
 ﻿using InvestmentManager.Entities.Basic;
-using InvestmentManager.Entities.Relationship.InterfaceForeignKey;
 
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace InvestmentManager.Entities.Market
 {
-    public class Price : BaseEntity, ICurrencyFK, ITickerFK
+    public class Price : BaseEntity
     {
         public DateTime BidDate { get; set; }
         [Column(TypeName = "Decimal(18,4)")]

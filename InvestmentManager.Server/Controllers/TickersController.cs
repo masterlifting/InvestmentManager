@@ -52,8 +52,8 @@ namespace InvestmentManager.Server.Controllers
         public async Task<IActionResult> Post(TickerModel model)
         {
             var entity = new Ticker { Name = model.Name, CompanyId = model.CompanyId, ExchangeId = model.ExchangeId, LotId = model.LotId };
-            bool TickerContains(TickerModel model) => unitOfWork.Ticker.GetAll().Where(x => x.Name.Equals(model.Name)).Any();
-            var result = await restMethod.BasePostAsync(ModelState, entity, model, TickerContains).ConfigureAwait(false);
+            async Task<bool> TickerValidatorAsync(TickerModel model) => !await unitOfWork.Ticker.GetAll().Where(x => x.Name.Equals(model.Name)).AnyAsync().ConfigureAwait(false);
+            var result = await restMethod.BasePostAsync(ModelState, entity, model, TickerValidatorAsync).ConfigureAwait(false);
             return result.IsSuccess ? (IActionResult)Ok(result) : BadRequest(result);
         }
         [HttpPut("{id}"), Authorize(Roles = "pestunov")]

@@ -149,9 +149,14 @@ namespace InvestmentManager.Server.Controllers
         {
             var userIds = await userManager.Users.Select(x => x.Id).ToArrayAsync().ConfigureAwait(false);
 
+           /*/
+            DropCalculations();
+            return Ok(new BaseActionResult { IsSuccess = true, Info = "Is Drop!" });
+            /*/
             return await calculator.ResetCalculatorDataAsync(DataBaseType.Postgres, userIds).ConfigureAwait(false)
                 ? Ok(new BaseActionResult { IsSuccess = true, Info = "Reset all calculator success." })
                 : BadRequest(new BaseActionResult { IsSuccess = false, Info = "Reset all calculator failed!" });
+            //*/
         }
         [HttpGet("resetsummarydata/"), Authorize(Roles = "pestunov")]
         public async Task<IActionResult> ResetSummaryData()
@@ -161,6 +166,23 @@ namespace InvestmentManager.Server.Controllers
             return await summaryService.ResetSummaryDataAsync(DataBaseType.Postgres, userIds).ConfigureAwait(false)
                 ? Ok(new BaseActionResult { IsSuccess = true, Info = "Reset all summary success." })
                 : BadRequest(new BaseActionResult { IsSuccess = false, Info = "Reset all summary failed!" });
+        }
+
+        void DropCalculations()
+        {
+            unitOfWork.AccountTransaction.DeleteAndReseedPostgres();
+            unitOfWork.StockTransaction.DeleteAndReseedPostgres();
+            unitOfWork.Dividend.DeleteAndReseedPostgres();
+            unitOfWork.Comission.DeleteAndReseedPostgres();
+            unitOfWork.ExchangeRate.DeleteAndReseedPostgres();
+
+            unitOfWork.AccountSummary.DeleteAndReseedPostgres();
+            unitOfWork.CompanySummary.DeleteAndReseedPostgres();
+            unitOfWork.DividendSummary.DeleteAndReseedPostgres();
+            unitOfWork.ComissionSummary.DeleteAndReseedPostgres();
+            unitOfWork.ExchangeRateSummary.DeleteAndReseedPostgres();
+
+            unitOfWork.SellRecommendation.DeleteAndReseedPostgres();
         }
     }
 }

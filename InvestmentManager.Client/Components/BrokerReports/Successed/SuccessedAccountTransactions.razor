@@ -7,8 +7,8 @@
 <div class="row icontent small">
     <div class="col">
         <div class="row text-info text-nowrap">
-            <div class="col-7"> Status </div>
-            <div class="col-5">
+            <div class="col-5"> Status </div>
+            <div class="col-7">
                 <div class="row">
                     <div class="col-6 px-0">Sum</div>
                     <div class="col-6 px-0 text-center">Date</div>
@@ -20,12 +20,18 @@
         {
             string color = catalogService.GetStatusBootstrapColor(transaction.StatusId);
             string ststusName = catalogService.GetStatusName(transaction.StatusId);
+            string currency = transaction.CurrencyId switch
+            {
+                (long)CurrencyTypes.rub => "rub",
+                (long)CurrencyTypes.usd => "usd",
+                _ => "?"
+            };
 
             <div class="row ilink text-@color" @onclick="(() => SaveData(transaction))">
-                <div class="col-7">@ststusName </div>
-                <div class="col-5">
+                <div class="col-5">@ststusName </div>
+                <div class="col-7">
                     <div class="row">
-                        <div class="col-6 px-0">@transaction.Amount</div>
+                        <div class="col-6 px-0">@(transaction.Amount + " " + currency)</div>
                         <div class="col-6 px-0 text-center">@transaction.DateOperation.ToShortDateString()</div>
                     </div>
                 </div>

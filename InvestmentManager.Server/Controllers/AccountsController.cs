@@ -68,7 +68,7 @@ namespace InvestmentManager.Server.Controllers
                     decimal intermediateResult = await summaryService.GetAccountTotalSumAsync(id, currencyId).ConfigureAwait(false);
                     decimal rateValue = 1;
 
-                    if (currencyId != (long)CurrencyTypes.RUB)
+                    if (currencyId != (long)CurrencyTypes.rub)
                     {
                         var response = await webService.GetCBRateAsync().ConfigureAwait(false);
                         var rate = response.IsSuccessStatusCode ? await response.Content.ReadFromJsonAsync<CBRF>().ConfigureAwait(false) : null;
@@ -76,7 +76,7 @@ namespace InvestmentManager.Server.Controllers
                         rateValue = rate is not null
                             ? currencyId switch
                             {
-                                (long)CurrencyTypes.USD => rate.Valute.USD.Value,
+                                (long)CurrencyTypes.usd => rate.Valute.USD.Value,
                                 //(long)CurrencyTypes.RUB => rate.Valute.EUR.Value,
                                 _ => 0
                             }
@@ -98,8 +98,9 @@ namespace InvestmentManager.Server.Controllers
         public async Task<IActionResult> Post(AccountModel model)
         {
             var entity = new Account { Name = model.Name, UserId = userManager.GetUserId(User) };
-            bool AccountContains(AccountModel model) => unitOfWork.Account.GetAll().Where(x => x.Name.Equals(model.Name)).Any();
-            var result = await restMethod.BasePostAsync(ModelState, entity, model, AccountContains).ConfigureAwait(false);
+            async Task<bool> AccountValidatorAsync(AccountModel model) =>
+                !await unitOfWork.Account.GetAll().Where(x => x.Name.Equals(model.Name)).AnyAsync().ConfigureAwait(false);
+            var result = await restMethod.BasePostAsync(ModelState, entity, model, AccountValidatorAsync).ConfigureAwait(false);
             return result.IsSuccess ? (IActionResult)Ok(result) : BadRequest(result);
         }
     }

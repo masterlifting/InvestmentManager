@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static InvestmentManager.Models.Enums;
 
 namespace InvestmentManager.Server.Controllers
 {
@@ -126,12 +127,33 @@ namespace InvestmentManager.Server.Controllers
                 TickerId = model.TickerId,
                 CurrencyId = model.CurrencyId,
             };
+            async Task<bool> TransactionValidatorAsync(StockTransactionModel model)
+            {
+                if (model.StatusId == (long)TransactionStatusTypes.Sell)
+                {
+                    var ticker = await unitOfWork.Ticker.FindByIdAsync(model.TickerId).ConfigureAwait(false);
 
-            var result = await restMethod.BasePostAsync(ModelState, entity, model).ConfigureAwait(false);
+                    if (ticker is null)
+                        return false;
+
+                    long companyId = ticker.CompanyId;
+
+                    var summary = await unitOfWork.CompanySummary.GetAll()
+                        .FirstOrDefaultAsync(x =>
+                        x.AccountId == model.AccountId
+                        && x.CompanyId == companyId
+                        && x.CurrencyId == model.CurrencyId).ConfigureAwait(false);
+
+                    return summary is not null && model.Quantity <= summary.ActualLot;
+                }
+                else
+                    return true;
+            }
+            var result = await restMethod.BasePostAsync(ModelState, entity, model, TransactionValidatorAsync).ConfigureAwait(false);
 
             if (result.IsSuccess)
             {
-                await reckonerService.UpgradeByStockTransactionChangeAsync(entity, userManager.GetUserId(User)).ConfigureAwait(false);
+                result.Info += await reckonerService.UpgradeByStockTransactionChangeAsync(entity, userManager.GetUserId(User)).ConfigureAwait(false) ? " Recalculated" : " NOT Recalculated.";
                 return Ok(result);
             }
             else

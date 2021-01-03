@@ -58,6 +58,7 @@ namespace InvestmentManager.Client.Services.HttpService
             UrlController.BuyRecommendations => ControllerName.BuyRecommendations,
             UrlController.Coefficients => ControllerName.Coefficients,
             UrlController.Comissions => ControllerName.Comissions,
+            UrlController.ComissionTypes => ControllerName.ComissionTypes,
             UrlController.Companies => ControllerName.Companies,
             UrlController.Dividends => ControllerName.Dividends,
             UrlController.ExchangeRates => ControllerName.ExchangeRates,
@@ -116,6 +117,7 @@ namespace InvestmentManager.Client.Services.HttpService
         public const string BuyRecommendations = "buyrecommendations";
         public const string Coefficients = "coefficients";
         public const string Comissions = "comissions";
+        public const string ComissionTypes = "comissiontypes";
         public const string Companies = "companies";
         public const string Dividends = "dividends";
         public const string ExchangeRates = "exchangerates";

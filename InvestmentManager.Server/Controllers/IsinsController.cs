@@ -44,10 +44,15 @@ namespace InvestmentManager.Server.Controllers
         public async Task<IActionResult> Post(IsinModel model)
         {
             var entity = new Isin { Name = model.Name, CompanyId = model.CompanyId };
-            bool IsinContains(IsinModel model) => unitOfWork.Isin.GetAll().Where(x => x.Name.Equals(model.Name)).Any();
-            var result = await restMethod.BasePostAsync(ModelState, entity, model, IsinContains).ConfigureAwait(false);
+
+            async Task<bool> IsinValidatorAsync(IsinModel model) =>
+                !await unitOfWork.Isin.GetAll().Where(x => x.Name.Equals(model.Name)).AnyAsync().ConfigureAwait(false);
+
+            var result = await restMethod.BasePostAsync(ModelState, entity, model, IsinValidatorAsync).ConfigureAwait(false);
+
             return result.IsSuccess ? (IActionResult)Ok(result) : BadRequest(result);
         }
+
         [HttpPut("{id}"), Authorize(Roles = "pestunov")]
         public async Task<IActionResult> Put(long id, IsinModel model)
         {
