@@ -1,12 +1,14 @@
 ﻿using Blazored.LocalStorage;
 using InvestmentManager.Client.Configurations;
 using InvestmentManager.Client.Services.HttpService;
+using InvestmentManager.Client.Services.NotificationService;
 using InvestmentManager.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using static InvestmentManager.Client.Configurations.EnumConfig;
 
 namespace InvestmentManager.Client.Services.QueryService
 {
@@ -14,12 +16,15 @@ namespace InvestmentManager.Client.Services.QueryService
     {
         private readonly ILocalStorageService localStorage;
         private readonly CustomHttpClient http;
-        private Func<ClaimsPrincipal, string> accountIdBuilder => (ClaimsPrincipal user) => $"{user.Identity.Name}_{DefaultString.Id.accountId}";
+        private readonly CustomNotification notice;
 
-        public QueryBaseService(ILocalStorageService localStorage, CustomHttpClient http)
+        private static Func<ClaimsPrincipal, string> AccountIdBuilder => (ClaimsPrincipal user) => $"{user.Identity.Name}_{DefaultString.Id.accountId}";
+
+        public QueryBaseService(ILocalStorageService localStorage, CustomHttpClient http, CustomNotification notice)
         {
             this.localStorage = localStorage;
             this.http = http;
+            this.notice = notice;
         }
         public async Task<(BaseListViewModel<T> ViewResult, List<ColumnConfig> Columns)> GetResultsAsync(ClaimsPrincipal user, Func<long, string> urlBuilder, Func<ColumnConfig[]> columnBuilder = null)
         {
@@ -29,9 +34,9 @@ namespace InvestmentManager.Client.Services.QueryService
 
             if (user.Identity.IsAuthenticated)
             {
-                if (await localStorage.ContainKeyAsync(accountIdBuilder.Invoke(user)))
+                if (await localStorage.ContainKeyAsync(AccountIdBuilder.Invoke(user)))
                 {
-                    var accountIds = await localStorage.GetItemAsync<long[]>(accountIdBuilder.Invoke(user));
+                    var accountIds = await localStorage.GetItemAsync<long[]>(AccountIdBuilder.Invoke(user));
 
                     if (accountIds.Any())
                     {
@@ -41,8 +46,8 @@ namespace InvestmentManager.Client.Services.QueryService
                         {
                             string uri = urlBuilder.Invoke(accountId);
                             var previewResult = await http.GetAsync<List<T>>(uri).ConfigureAwait(false);
-                            
-                            if(previewResult != default)
+
+                            if (previewResult != default)
                                 previewResults.AddRange(previewResult);
                         }
 
@@ -98,9 +103,9 @@ namespace InvestmentManager.Client.Services.QueryService
 
             if (user.Identity.IsAuthenticated)
             {
-                if (await localStorage.ContainKeyAsync(accountIdBuilder.Invoke(user)))
+                if (await localStorage.ContainKeyAsync(AccountIdBuilder.Invoke(user)))
                 {
-                    var accountIds = await localStorage.GetItemAsync<long[]>(accountIdBuilder.Invoke(user));
+                    var accountIds = await localStorage.GetItemAsync<long[]>(AccountIdBuilder.Invoke(user));
 
                     if (accountIds.Any())
                     {
@@ -110,7 +115,7 @@ namespace InvestmentManager.Client.Services.QueryService
                         {
                             string uri = urlBuilder.Invoke(accountId);
                             var previewResult = await http.GetAsync<T>(uri).ConfigureAwait(false);
-                            
+
                             if (previewResult != default)
                                 previewResults.Add(previewResult);
                         }
@@ -129,7 +134,7 @@ namespace InvestmentManager.Client.Services.QueryService
             else
                 resultInfo = DefaultString.noticeAccess;
 
-            return new BaseViewModel<T> { ResultContent = item, ResultInfo = resultInfo};
+            return new BaseViewModel<T> { ResultContent = item, ResultInfo = resultInfo };
         }
         public async Task<BaseViewModel<T>> GetResultAsync(Func<string> urlBuilder)
         {
@@ -165,6 +170,43 @@ namespace InvestmentManager.Client.Services.QueryService
                 resultInfo = DefaultString.noticeAccess;
 
             return new BaseViewModel<T> { ResultInfo = resultInfo, ResultContent = item };
+        }
+        public async Task PostDataAsync(T model, List<T> items, UrlController controllerName, string name = null)
+        {
+            var result = await http.PostAsync<BaseActionResult, T>(new UrlBuilder(controllerName).Result, model);
+
+            if (result.IsSuccess)
+            {
+                await notice.AlertSuccesAsync(result.Info);
+                items.Remove(model);
+            }
+            else
+                notice.ToastDanger($"{name} error.", result.Info);
+        }
+        public async Task PostDataCollectionAsync(List<T> items, UrlController controllerName, string name = null)
+        {
+            if (items is not null && items.Any())
+            {
+                int errorCount = 0;
+
+                for (int i = 0; i < items.Count; i++)
+                {
+                    var result = await http.PostAsync<BaseActionResult, T>(new UrlBuilder(controllerName).Result, items[i]);
+
+                    if (result.IsSuccess)
+                    {
+                        items.RemoveAt(i);
+                        i--;
+                    }
+                    else
+                        errorCount++;
+                }
+
+                if (errorCount == 0)
+                    await notice.AlertSuccesAsync($"All {name} saved");
+                else
+                    notice.ToastDanger($"Not saved {name} count:", errorCount.ToString());
+            }
         }
     }
 }

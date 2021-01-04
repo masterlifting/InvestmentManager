@@ -1,7 +1,14 @@
 ﻿@inject CustomHttpClient http
-@inject CustomNotification notice
+@inject QueryBaseService<ComissionModel> queryServise
 
-<RowTitleSub Text="Comissions" />
+<div class="row">
+    <div class="col-6">
+        <RowTitleSub Text="Comissions" />
+    </div>
+    <div class="col-6 text-right">
+        <span class="ilink" @onclick="SaveDataCollection">save all</span>
+    </div>
+</div>
 
 <div class="row icontent small">
     <div class="col">
@@ -42,29 +49,22 @@
 
 @code {
     [Parameter] public List<ComissionModel> Comissions { get; set; }
-
     List<ComissionModel> comissions { get; set; }
     List<ShortView> comissionTypes;
 
     protected override async Task OnParametersSetAsync()
     {
         comissionTypes = await http.GetAsync<List<ShortView>>(new UrlBuilder(UrlCatalog.ComissionTypes).Result);
-        if(comissionTypes != default)
+        if (comissionTypes != default)
             comissions = Comissions;
 
         await base.OnParametersSetAsync();
     }
-
-    async Task SaveData(ComissionModel comission)
+    async Task SaveData(ComissionModel comission) =>
+    await queryServise.PostDataAsync(comission, comissions, UrlController.Comissions, "Comission").ConfigureAwait(false);
+    async Task SaveDataCollection()
     {
-        var result = await http.PostAsync<BaseActionResult, ComissionModel>(new UrlBuilder(UrlController.Comissions).Result, comission);
-
-        if (result.IsSuccess)
-        {
-            await notice.AlertSuccesAsync(result.Info);
-            comissions.Remove(comission);
-        }
-        else
-            notice.ToastDanger("Comission error.", result.Info);
+        comissions = comissions.OrderBy(x => x.DateOperation).ToList();
+        await queryServise.PostDataCollectionAsync(comissions, UrlController.Comissions, "Comissions").ConfigureAwait(false);
     }
 }

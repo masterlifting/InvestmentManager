@@ -1,8 +1,14 @@
-﻿@inject CustomHttpClient http
-@inject CustomNotification notice
-@inject ICatalogService catalogService
+﻿@inject ICatalogService catalogService
+@inject QueryBaseService<ExchangeRateModel> queryServise
 
-<RowTitleSub Text="Exchange rates" />
+<div class="row">
+    <div class="col-6">
+        <RowTitleSub Text="Exchange rates" />
+    </div>
+    <div class="col-6 text-right">
+        <span class="ilink" @onclick="SaveDataCollection">save all</span>
+    </div>
+</div>
 
 <div class="row icontent small">
     <div class="col">
@@ -46,25 +52,18 @@
 
 @code {
     [Parameter] public List<ExchangeRateModel> ExchangeRates { get; set; }
-
     List<ExchangeRateModel> exchangeRates { get; set; }
 
-    protected override async Task OnParametersSetAsync()
+    protected override void OnParametersSet()
     {
         exchangeRates = ExchangeRates;
-        await base.OnInitializedAsync();
+        base.OnParametersSet();
     }
-
-    async Task SaveData(ExchangeRateModel rate)
+    async Task SaveData(ExchangeRateModel exchangeRate) =>
+        await queryServise.PostDataAsync(exchangeRate, exchangeRates, UrlController.ExchangeRates, "Exchange rate").ConfigureAwait(false);
+    async Task SaveDataCollection()
     {
-        var result = await http.PostAsync<BaseActionResult, ExchangeRateModel>(new UrlBuilder(UrlController.ExchangeRates).Result, rate);
-
-        if (result.IsSuccess)
-        {
-            await notice.AlertSuccesAsync(result.Info);
-            exchangeRates.Remove(rate);
-        }
-        else
-            notice.ToastDanger("Exchange rate error.", result.Info);
+        exchangeRates = exchangeRates.OrderBy(x => x.DateOperation).ToList();
+        await queryServise.PostDataCollectionAsync(exchangeRates, UrlController.ExchangeRates, "Exchange rates").ConfigureAwait(false);
     }
 }

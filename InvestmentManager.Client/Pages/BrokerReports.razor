@@ -16,11 +16,6 @@
     else
         Task.FromResult(notice.AlertInfoAsync("Out of new data"));
 }
-else
-{
-    <RowTitle Position="AlignType.Center" Color="ColorBootstrap.primary" Text="Out of data." />
-}
-
 
 @code
 {
@@ -33,6 +28,5 @@ else
         model = await localStorage.GetItemAsync<BrokerReportModel>($"{user.Identity.Name}_{DefaultString.Id.brokerReport}");
 
         notice.LoadStop();
-        notice.ToastSuccess("Parsing bcs reports", "Success");
     }
 }

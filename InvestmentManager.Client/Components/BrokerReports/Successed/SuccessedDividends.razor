@@ -1,7 +1,14 @@
 ﻿@inject CustomHttpClient http
-@inject CustomNotification notice
+@inject QueryBaseService<DividendModel> queryServise
 
-<RowTitleSub Text="Dividends" />
+<div class="row">
+    <div class="col-6">
+        <RowTitleSub Text="Dividends" />
+    </div>
+    <div class="col-6 text-right">
+        <span class="ilink" @onclick="SaveDataCollection">save all</span>
+    </div>
+</div>
 
 <div class="row icontent small">
     <div class="col">
@@ -57,19 +64,13 @@
         if (isins != default && companies != default)
             dividends = Dividends;
 
-        await base.OnInitializedAsync();
+        await base.OnParametersSetAsync();
     }
-
-    async Task SaveData(DividendModel dividend)
+    async Task SaveData(DividendModel dividend) =>
+        await queryServise.PostDataAsync(dividend, dividends, UrlController.Dividends, "Divivend").ConfigureAwait(false);
+    async Task SaveDataCollection()
     {
-        var result = await http.PostAsync<BaseActionResult, DividendModel>(new UrlBuilder(UrlController.Dividends).Result, dividend);
-
-        if (result.IsSuccess)
-        {
-            await notice.AlertSuccesAsync(result.Info);
-            dividends.Remove(dividend);
-        }
-        else
-            notice.ToastDanger("Dividend error.", result.Info);
+        dividends = dividends.OrderBy(x => x.DateOperation).ToList();
+        await queryServise.PostDataCollectionAsync(dividends, UrlController.Dividends, "Dividends").ConfigureAwait(false);
     }
 }

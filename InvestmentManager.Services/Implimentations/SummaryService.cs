@@ -237,7 +237,7 @@ namespace InvestmentManager.Services.Implimentations
             if (!companyId.HasValue)
                 return false;
 
-            var summary = await unitOfWork.CompanySummary.GetAll().FirstOrDefaultAsync(x => x.CompanyId == companyId.Value).ConfigureAwait(false);
+            var summary = await unitOfWork.CompanySummary.GetAll().FirstOrDefaultAsync(x => x.AccountId == transaction.AccountId &&  x.CompanyId == companyId.Value).ConfigureAwait(false);
 
             if (summary is not null)
             {

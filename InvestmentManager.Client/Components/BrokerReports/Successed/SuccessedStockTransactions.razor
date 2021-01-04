@@ -1,8 +1,15 @@
 ﻿@inject CustomHttpClient http
-@inject CustomNotification notice
 @inject ICatalogService catalogService
+@inject QueryBaseService<StockTransactionModel> queryServise
 
-<RowTitleSub Text="Stock transactions" />
+<div class="row">
+    <div class="col-6">
+        <RowTitleSub Text="Stock transactions" />
+    </div>
+    <div class="col-6 text-right">
+        <span class="ilink" @onclick="SaveDataCollection">save all</span>
+    </div>
+</div>
 
 <div class="row icontent small">
     <div class="col">
@@ -72,19 +79,13 @@
         if (tickers != default && companies != default)
             stockTransactions = StockTransactions;
 
-        await base.OnInitializedAsync();
+        await base.OnParametersSetAsync();
     }
-
-    async Task SaveData(StockTransactionModel transaction)
+    async Task SaveData(StockTransactionModel transaction) =>
+        await queryServise.PostDataAsync(transaction, stockTransactions, UrlController.StockTransactions, "Stock transaction").ConfigureAwait(false);
+    async Task SaveDataCollection()
     {
-        var result = await http.PostAsync<BaseActionResult, StockTransactionModel>(new UrlBuilder(UrlController.StockTransactions).Result, transaction);
-
-        if (result.IsSuccess)
-        {
-            await notice.AlertSuccesAsync(result.Info);
-            stockTransactions.Remove(transaction);
-        }
-        else
-            notice.ToastDanger("Stock transaction error.", result.Info);
+        stockTransactions = stockTransactions.OrderBy(x => x.DateOperation).ToList();
+        await queryServise.PostDataCollectionAsync(stockTransactions, UrlController.StockTransactions, "Stock transactions").ConfigureAwait(false);
     }
 }
