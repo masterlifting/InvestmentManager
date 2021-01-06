@@ -385,7 +385,7 @@ namespace InvestmentManager.BrokerService.Implimentations
                 int ndflFinishId = ndflStartId;
 
                 for (int i = ndflStartId; i < assetsId; i++)
-                    if (report.Rows[ndflFinishId].ItemArray[1].ToString().Equals($"Итого по валюте Рубль:"))
+                    if (report.Rows[i].ItemArray[1].ToString() == $"Итого по валюте Рубль:")
                         ndflFinishId = i;
 
                 if (ndflStartId == ndflFinishId)
