@@ -70,8 +70,7 @@ namespace InvestmentManager.BrokerService.Implimentations
             return model;
         }
 
-
-        IEnumerable<StringExchangeRateModel> ParseExchangeRates(DataTable report)
+        static IEnumerable<StringExchangeRateModel> ParseExchangeRates(DataTable report)
         {
             var exchangeRates = new List<StringExchangeRateModel>();
 
@@ -166,7 +165,7 @@ namespace InvestmentManager.BrokerService.Implimentations
 
             }
         }
-        IEnumerable<StringAccountTransactionModel> ParseAccountTransactions(DataTable report)
+        static IEnumerable<StringAccountTransactionModel> ParseAccountTransactions(DataTable report)
         {
             var accountTransactions = new List<StringAccountTransactionModel>();
 
@@ -215,7 +214,7 @@ namespace InvestmentManager.BrokerService.Implimentations
                 }
             }
         }
-        IEnumerable<StringDividendModel> ParseDividends(DataTable report)
+        static IEnumerable<StringDividendModel> ParseDividends(DataTable report)
         {
             var dividends = new List<StringDividendModel>();
 
@@ -375,7 +374,39 @@ namespace InvestmentManager.BrokerService.Implimentations
                 }
             }
 
+            SetNdfl(comissions);
+
             return comissions;
+
+            void SetNdfl(List<StringComissionModel> result)
+            {
+                var ndfl = report.Select($"{columnNumber} = '1.1. Движение денежных средств по совершенным сделкам:'").FirstOrDefault();
+                int ndflStartId = report.Rows.IndexOf(ndfl);
+                int ndflFinishId = ndflStartId;
+
+                for (int i = ndflStartId; i < assetsId; i++)
+                    if (report.Rows[ndflFinishId].ItemArray[1].ToString().Equals($"Итого по валюте Рубль:"))
+                        ndflFinishId = i;
+
+                if (ndflStartId == ndflFinishId)
+                    return;
+
+                for (int i = ndflStartId; i < ndflFinishId; i++)
+                {
+                    string ndflName = report.Rows[i].ItemArray[2].ToString();
+
+                    if (ndflName.Equals("НДФЛ"))
+                    {
+                        result.Add(new StringComissionModel
+                        {
+                            Type = ndflName,
+                            DateOperation = report.Rows[i].ItemArray[1].ToString(),
+                            Amount = report.Rows[i].ItemArray[7].ToString(),
+                            Currency = currencyRub
+                        });
+                    }
+                }
+            }
         }
 
         static void SetTableBorders(DataTable report)
