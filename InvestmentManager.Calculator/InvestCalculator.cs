@@ -254,8 +254,8 @@ namespace InvestmentManager.Calculator
                 {
                     Rating rating = data.Company.Rating is null ? new Rating { CompanyId = data.Company.Id } : data.Company.Rating;
 
-                    var companyReports = data.Reports.Select(x => x);
-                    var companyCoefficients = data.Reports.Select(x => x.Coefficient);
+                    var companyReports = data.Reports.Select(x => x).ToList();
+                    var companyCoefficients = data.Reports.Select(x => x.Coefficient).ToList();
 
                     if (!await SetRatingValueByReportsAsync(companyReports.ToList(), rating).ConfigureAwait(false)
                     || !await SetRatingValueByCoefficientsAsync(companyCoefficients.ToList(), rating).ConfigureAwait(false))
@@ -296,7 +296,7 @@ namespace InvestmentManager.Calculator
                 return false;
 
             var reports = company.Reports.Where(x => x.IsChecked).OrderBy(x => x.DateReport).ToList();
-            var coefficients = await unitOfWork.Coefficient.GetAll().Where(x => reports.Select(y => y.Id).Contains(x.ReportId)).ToListAsync().ConfigureAwait(false);
+            var coefficients = reports.Join(unitOfWork.Coefficient.GetAll(), x => x.Id, y => y.ReportId, (x, y) => y).ToList();
 
             if (reports is null || !reports.Any())
                 return false;
@@ -389,16 +389,16 @@ namespace InvestmentManager.Calculator
                 return null;
 
             #region Set data
-            var prices = await unitOfWork.Price.GetCustomPricesAsync(companyId, 12, OrderType.OrderBy, company.DateSplit).ConfigureAwait(false);
-            var reports = company.Reports.Where(x => x.IsChecked).OrderBy(x => x.DateReport);
-            var coefficients = reports.Select(x => x.Coefficient);
+            var prices = (await unitOfWork.Price.GetCustomPricesAsync(companyId, 12, OrderType.OrderBy, company.DateSplit).ConfigureAwait(false)).ToList();
+            var reports = company.Reports.Where(x => x.IsChecked).OrderBy(x => x.DateReport).ToList();
+            var coefficients = reports.Join(unitOfWork.Coefficient.GetAll(), x => x.Id, y => y.ReportId, (x, y) => y).ToList();
             #endregion
 
             var rating = new Rating { CompanyId = company.Id };
 
-            if (!await SetRatingValueByPricesAsync(prices.ToList(), rating).ConfigureAwait(false)
-                || !await SetRatingValueByReportsAsync(reports.ToList(), rating).ConfigureAwait(false)
-                || !await SetRatingValueByCoefficientsAsync(coefficients.ToList(), rating).ConfigureAwait(false))
+            if (!await SetRatingValueByPricesAsync(prices, rating).ConfigureAwait(false)
+                || !await SetRatingValueByReportsAsync(reports, rating).ConfigureAwait(false)
+                || !await SetRatingValueByCoefficientsAsync(coefficients, rating).ConfigureAwait(false))
                 return null;
 
             SetRatingResult(rating);

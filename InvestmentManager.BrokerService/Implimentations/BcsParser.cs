@@ -330,6 +330,9 @@ namespace InvestmentManager.BrokerService.Implimentations
             var comissions = new List<StringComissionModel>();
 
             var thisComissions = report.Select($"{columnNumber} = '1.3. Удержанные сборы/штрафы (итоговые суммы):'").FirstOrDefault();
+            if(thisComissions is null)
+                thisComissions = report.Select($"{columnNumber} = '1.3. Начисленные сборы/штрафы (итоговые суммы):'").FirstOrDefault();
+
             int startId = report.Rows.IndexOf(thisComissions);
 
             // Ищу удержания
