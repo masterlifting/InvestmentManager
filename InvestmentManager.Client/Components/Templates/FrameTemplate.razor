@@ -1,9 +1,9 @@
 ﻿<div class="row @Theme iframe">
     <div class="col-11">
-        <span class="text-@TitleColor.ToString() font-weight-bold">@Name</span>
+        <span class="text-@TitleColor.ToString() font-weight-bolder">@Name</span>
         @if (!string.IsNullOrWhiteSpace(Description))
         {
-            <span class="small text-muted ml-1">(@Description)</span>
+            <span class="small text-muted ml-2">@Description</span>
         }
     </div>
     <div class="col-1 text-right"><DetailToggleComponent ToggleAction="ToggleDetail" /></div>

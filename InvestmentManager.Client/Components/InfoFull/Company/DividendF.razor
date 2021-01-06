@@ -32,7 +32,7 @@
                 ColumnConfig[] CustomColumnBuilder() => new ColumnConfig[]
                     {
                         new ColumnConfig{DataField = nameof(DividendModel.DateOperation), Caption = "Date", DataType = HtmlDataType.Date, Format = "d", AlignType = AlignType.Center},
-                        new ColumnConfig{DataField = nameof(DividendModel.Amount), Caption = "Ammount", DataType = HtmlDataType.Number, Format = "f3", AlignType = AlignType.Center},
+                        new ColumnConfig{DataField = nameof(DividendModel.Amount), Caption = "Ammount", DataType = HtmlDataType.Number, Format = "#,#0.###", AlignType = AlignType.Center},
                     };
 
             var queryResult = await queryService.GetResultsAsync(user, CustomUriBuilder, CustomColumnBuilder);

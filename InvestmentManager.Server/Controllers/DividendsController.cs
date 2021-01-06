@@ -62,7 +62,7 @@ namespace InvestmentManager.Server.Controllers
                 {
                     Id = y.Id,
                     Name = y.Name,
-                    Description = x.DateOperation.ToShortDateString() + "|" + x.Amount.ToString("f2")
+                    Description = x.DateOperation.ToString("dd.MM.y") + " | " + x.Amount.ToString("#,#0.###")
                 })
                 .ToList();
 

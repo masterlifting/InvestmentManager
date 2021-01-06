@@ -1,4 +1,4 @@
-﻿@inject QueryBaseService<SummaryAccountTransaction> queryService
+﻿@inject QueryBaseService<AccountAdditionalModel> queryService
 
 <InfoTemplate InfoName="@InfoName" VisibleAction="((bool isVisible) => UpdateVisible.InvokeAsync(isVisible))">
     <ChildContent>
@@ -6,16 +6,12 @@
         {
             foreach (var detail in model.Details)
             {
-                <KeyValueCols KeySize="6" Key="Added sum" Value="@($"{detail.AddedSum.ToString("#,#0.##")} {detail.Currency}")" />
+                <KeyValueCols KeySize="6" Key="Free sum" Value="@($"{detail.FreeSum.ToString("#,#0.##")} {detail.Currency}")" />
             }
             foreach (var detail in model.Details)
             {
-                <KeyValueCols KeySize="6" Key="Withdrawn sum" Value="@($"{detail.WithdrawnSum.ToString("#,#0.##")} {detail.Currency}")" />
+                <KeyValueCols KeySize="6" Key="Invested sum" Value="@($"{detail.InvestedSum.ToString("#,#0.##")} {detail.Currency}")" />
             }
-
-            <div class="col">
-                <AccountTransactionF />
-            </div>
         }
         else
         {
@@ -31,28 +27,28 @@
     [Parameter] public string InfoName { get; set; }
     [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; }
 
-    SummaryAccountTransaction model;
+    AccountAdditionalModel model;
 
     string info = DefaultString.loading;
 
     protected override async Task OnInitializedAsync()
     {
         var user = (await AuthenticationStateTask).User;
-        string CustomUrlBuilder(long accountId) => new UrlBuilder(UrlController.AccountTransactions, UrlPath.ByAccountId, accountId, UrlOption.Summary).Result;
-        SummaryAccountTransaction CustomResultBuilder(List<SummaryAccountTransaction> summaries)
+        string CustomUrlBuilder(long accountId) => new UrlBuilder(UrlController.Accounts, accountId, UrlOption.Additional).Result;
+        AccountAdditionalModel CustomResultBuilder(List<AccountAdditionalModel> additionals)
         {
-            var result = new SummaryAccountTransaction();
-            var details = new List<SummaryAccountTransactionDetail>();
+            var result = new AccountAdditionalModel();
+            var details = new List<AccountAdditionalDetail>();
 
-            foreach (var summary in summaries)
-                details.AddRange(summary.Details);
+            foreach (var additional in additionals)
+                details.AddRange(additional.Details);
 
             if (details.Any())
-                result.Details = details.GroupBy(x => x.Currency).Select(x => new SummaryAccountTransactionDetail
+                result.Details = details.GroupBy(x => x.Currency).Select(x => new AccountAdditionalDetail
                 {
                     Currency = x.Key,
-                    AddedSum = x.Sum(y => y.AddedSum),
-                    WithdrawnSum = x.Sum(y => y.WithdrawnSum)
+                    FreeSum = x.Sum(y => y.FreeSum),
+                    InvestedSum = x.Sum(y => y.InvestedSum)
                 }).ToList();
 
             return result;

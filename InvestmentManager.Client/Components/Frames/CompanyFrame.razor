@@ -16,7 +16,7 @@
     <ActionBlock>
         @if (isAdditionalInfo)
         {
-            <AdditionalInfoS InfoName="@additionalInfo" CompanyId="CompanyId" UpdateVisible="((bool isVisible) => isAdditionalInfo = isVisible)" />
+            <CompanyAdditional InfoName="@additionalInfo" CompanyId="CompanyId" UpdateVisible="((bool isVisible) => isAdditionalInfo = isVisible)" />
         }
         @if (isTransactions)
         {

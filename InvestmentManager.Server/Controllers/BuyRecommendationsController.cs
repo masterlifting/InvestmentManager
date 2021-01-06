@@ -41,7 +41,7 @@ namespace InvestmentManager.Server.Controllers
             var items = recommendations?
                 .Skip((value - 1) * pageSize)
                 .Take(pageSize)
-                .Join(companies, x => x.CompanyId, y => y.Id, (x, y) => new ShortView { Id = y.Id, Name = y.Name, Description = x.RecommendationPrice.ToString("f2") })
+                .Join(companies, x => x.CompanyId, y => y.Id, (x, y) => new ShortView { Id = y.Id, Name = y.Name, Description = x.RecommendationPrice.ToString("#,#0.####") })
                 .ToList();
 
             if (items is null)

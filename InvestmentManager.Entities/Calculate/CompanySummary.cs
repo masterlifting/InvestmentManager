@@ -15,7 +15,7 @@ namespace InvestmentManager.Entities.Calculate
         public long CurrencyId { get; set; }
         public virtual Currency Currency { get; set; }
 
-        public decimal ActualLot { get; set; }
+        public int ActualLot { get; set; }
         public decimal CurrentProfit { get; set; }
     }
 }

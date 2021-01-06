@@ -277,8 +277,8 @@ namespace InvestmentManager.Services.Implimentations
                     foreach (var dataByAccount in dataByCompany.Select(x => x.Transaction).GroupBy(x => x.AccountId))
                         foreach (var dataByCurrency in dataByAccount.GroupBy(x => x.CurrencyId))
                         {
-                            decimal actualLotByBuy = dataByCurrency.Where(x => x.TransactionStatusId == (long)TransactionStatusTypes.Buy).Sum(x => x.Quantity);
-                            decimal actualLotBySell = dataByCurrency.Where(x => x.TransactionStatusId == (long)TransactionStatusTypes.Sell).Sum(x => x.Quantity);
+                            int actualLotByBuy = dataByCurrency.Where(x => x.TransactionStatusId == (long)TransactionStatusTypes.Buy).Sum(x => x.Quantity);
+                            int actualLotBySell = dataByCurrency.Where(x => x.TransactionStatusId == (long)TransactionStatusTypes.Sell).Sum(x => x.Quantity);
                             decimal currentProfitByBuy = dataByCurrency.Where(x => x.TransactionStatusId == (long)TransactionStatusTypes.Buy).Sum(x => x.Quantity * x.Cost);
                             decimal currentProfitBySell = dataByCurrency.Where(x => x.TransactionStatusId == (long)TransactionStatusTypes.Sell).Sum(x => x.Quantity * x.Cost);
 

@@ -8,6 +8,15 @@
             <KeyValueCols KeySize="6" Key="Status" Value="@model.StatusName" />
             <KeyValueCols KeySize="6" Key="Rate" Value="@model.Rate.ToString("f2")" />
 
+            @foreach (var item in model.Details)
+            {
+                <KeyValueCols KeySize="6" Key="Purchased average" Value="@($"{item.AvgPurchasedRate.ToString("#,#0.##")} {item.Currency}")" />
+            }
+            @foreach (var item in model.Details)
+            {
+                <KeyValueCols KeySize="6" Key="Sold average" Value="@($"{item.AvgSoldRate.ToString("#,#0.##")} {item.Currency}")" />
+            }
+
             <div class="col">
                 <ExchangeRateF />
             </div>
@@ -36,12 +45,22 @@
         SummaryExchangeRate CustomResultBuilder(List<SummaryExchangeRate> models)
         {
             var targetModel = models.OrderBy(x => x.DateLastOperation).Last();
+            var details = new List<SummaryExchangeRateDetail>();
+
+            foreach (var item in models)
+                details.AddRange(item.Details);
 
             return new SummaryExchangeRate
             {
                 DateLastOperation = targetModel.DateLastOperation,
                 StatusName = targetModel.StatusName,
-                Rate = targetModel.Rate
+                Rate = targetModel.Rate,
+                Details = details.GroupBy(x => x.Currency).Select(x => new SummaryExchangeRateDetail
+                {
+                    Currency = x.Key,
+                    AvgPurchasedRate = x.Average(y =>y.AvgPurchasedRate),
+                    AvgSoldRate = x.Average(y => y.AvgSoldRate)
+                }).ToList()
             };
         }
 

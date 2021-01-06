@@ -5,8 +5,8 @@
         @if (model is not null)
         {
             <KeyValueCols Key="Last dividend" Value="@model.DateLastDividend.ToShortDateString()" />
-            <KeyValueCols Key="Ammount" Value="@model.LastAmount.ToString("f2")" />
-            <KeyValueCols Key="Sum" Value="@model.TotalSum.ToString("f2")" />
+            <KeyValueCols Key="Ammount" Value="@model.LastAmount.ToString("#,#0.###")" />
+            <KeyValueCols Key="Total" Value="@model.TotalSum.ToString("#,#0.##")" />
 
             <div class="col">
                 <DividendF CompanyId="CompanyId" />

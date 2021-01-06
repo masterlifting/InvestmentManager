@@ -55,14 +55,14 @@ namespace InvestmentManager.Server.Controllers
             if (transactions is null || !transactions.Any())
                 return NoContent();
 
-            var lastTransaction = transactions.OrderBy(x => x.DateOperation).Last();
-
             return Ok(new SummaryAccountTransaction
             {
-                DateLastTransaction = lastTransaction.DateOperation,
-                Amount = lastTransaction.Amount,
-                StatusName = lastTransaction.TransactionStatus.Name,
-                TotalAddedSum = transactions.Where(x => x.TransactionStatusId == 1).Sum(x => x.Amount)
+                Details = transactions.GroupBy(x => x.Currency.Name).Select(x => new SummaryAccountTransactionDetail
+                {
+                    Currency = x.Key,
+                    AddedSum = x.Where(z => z.TransactionStatusId == (long)TransactionStatusTypes.Add).Sum(z => z.Amount),
+                    WithdrawnSum = x.Where(z => z.TransactionStatusId == (long)TransactionStatusTypes.Withdraw).Sum(z => z.Amount)
+                }).ToList()
             });
         }
         [HttpPost]

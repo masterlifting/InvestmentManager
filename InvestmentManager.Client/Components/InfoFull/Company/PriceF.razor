@@ -28,7 +28,7 @@
             ColumnConfig[] CustomColumnBuilder() => new ColumnConfig[]
                 {
                     new ColumnConfig{DataField = nameof(PriceModel.BidDate), Caption = "Date", DataType = HtmlDataType.Date, Format = "d", AlignType = AlignType.Center},
-                    new ColumnConfig{DataField = nameof(PriceModel.Value), Caption = "Price", DataType = HtmlDataType.Number, Format = "f2", AlignType = AlignType.Center}
+                    new ColumnConfig{DataField = nameof(PriceModel.Value), Caption = "Price", DataType = HtmlDataType.Number, Format = "#,#0.###", AlignType = AlignType.Center}
                 };
             var queryResult = await queryService.GetResultsAsync(CustomUriBuilder, CustomColumnBuilder);
 

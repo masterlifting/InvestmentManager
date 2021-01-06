@@ -7,7 +7,7 @@
             <KeyValueCols Key="Last operation" Value="@model.DateTransaction.ToShortDateString()" />
             <KeyValueCols Key="Status" Value="@model.StatusName" />
             <KeyValueCols Key="Lot" Value="@model.Quantity.ToString()" />
-            <KeyValueCols Key="Price" Value="@model.Cost.ToString("f2")" />
+            <KeyValueCols Key="Price" Value="@model.Cost.ToString("#,#0.####")" />
 
             <div class="col">
                 <StockTransactionF CompanyId="CompanyId" />

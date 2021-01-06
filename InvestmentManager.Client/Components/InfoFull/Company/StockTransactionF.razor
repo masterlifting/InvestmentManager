@@ -34,7 +34,7 @@
                             new ColumnConfig{DataField = nameof(StockTransactionModel.DateOperation), Caption = "Date", DataType = HtmlDataType.Date, Format = "d", AlignType=AlignType.Center},
                             new ColumnConfig{DataField = nameof(StockTransactionModel.StatusName), Caption = "Status", DataType = HtmlDataType.String, AlignType=AlignType.Center},
                             new ColumnConfig{DataField = nameof(StockTransactionModel.Quantity), Caption = "Volume", DataType = HtmlDataType.Number, Format = "f0", AlignType=AlignType.Center},
-                            new ColumnConfig{DataField = nameof(StockTransactionModel.Cost), Caption = "Cost", DataType = HtmlDataType.Number, Format = "f3", AlignType=AlignType.Center},
+                            new ColumnConfig{DataField = nameof(StockTransactionModel.Cost), Caption = "Cost", DataType = HtmlDataType.Number, Format = "#,#0.###", AlignType=AlignType.Center},
                 };
 
             var queryResult = await queryService.GetResultsAsync(user, CustomUriBuilder, CustomColumnBuilder);

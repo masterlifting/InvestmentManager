@@ -9,13 +9,13 @@
     </div>
     <div class="col-6 pr-0 pl-1">
         <select @onchange="GetOrderBy" id="filterIndex">
-            <option selected value="@(UrlController.Companies)">Order by (name)</option>
-            <option value="@(UrlController.BuyRecommendations)">recommendations for buy</option>
+            <option selected value="@(UrlController.Companies)">sort by (name)</option>
             <option value="@(UrlController.Ratings)">rating place</option>
             <option value="@(UrlController.Sectors)">sector name</option>
             <option value="@(UrlController.Industries)">industry name</option>
             <option value="@(UrlController.StockTransactions)">stock transaction (desc)</option>
             <option value="@(UrlController.Dividends)">dividend pay (desc) </option>
+            <option value="@(UrlController.BuyRecommendations)">recommendations for buy</option>
             <option value="@(UrlController.SellRecommendations)">recommendations for sale</option>
         </select>
     </div>

@@ -71,8 +71,7 @@ namespace InvestmentManager.Server
                 };
             });
 
-            services.AddResponseCompression(options => options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/octet-stream" }));
-            services.AddControllers();
+            services.AddResponseCompression(x => x.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/octet-stream" }));
             services.AddRazorPages();
             services.AddHttpClient<IWebService, WebService>(x =>
             {

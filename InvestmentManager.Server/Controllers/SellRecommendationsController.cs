@@ -64,11 +64,11 @@ namespace InvestmentManager.Server.Controllers
             var items = recommendations
                 .Skip((value - 1) * pageSize)
                 .Take(pageSize)
-                .Join(companies, x => x.CompanyId, y => y.Id, (x, y) => new ShortView 
-                { 
-                    Id = y.Id, 
-                    Name = y.Name, 
-                    Description = $"{x.LotMin}:{x.PriceMin}|{x.LotMid}:{x.PriceMid}|{x.LotMax}:{x.PriceMax}" 
+                .Join(companies, x => x.CompanyId, y => y.Id, (x, y) => new ShortView
+                {
+                    Id = y.Id,
+                    Name = y.Name,
+                    Description = BuildDescription(x.LotMin, x.LotMid, x.LotMax, x.PriceMin, x.PriceMid, x.PriceMax)
                 })
                 .ToList();
 
@@ -77,6 +77,19 @@ namespace InvestmentManager.Server.Controllers
             paginationResult.Items = items;
 
             return Ok(paginationResult);
+
+            static string BuildDescription(int lmin, int lmid, int lmax, decimal pmin, decimal pmid, decimal pmax)
+            {
+                string result = "";
+                if (lmin > 0)
+                    result += $"{lmin}:{pmin:#,#0.##}";
+                if (lmid > 0)
+                    result += $" | {lmid}:{pmid:#,#0.##}";
+                if (lmax > 0)
+                    result += $" | {lmax}:{pmax:#,#0.##}";
+
+                return result;
+            }
         }
 
         [HttpGet("bycompanyid/{id}")]

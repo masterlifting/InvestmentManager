@@ -51,16 +51,18 @@ namespace InvestmentManager.Server.Controllers
                 SectorId = company.SectorId
             });
         }
-        [HttpGet("{id}/summary/")]
-        public async Task<IActionResult> GetSummary(long id)
+        [HttpGet("bycompanyid/{companyId}/byaccountid/{accountId}/additional/")]
+        public async Task<IActionResult> GetAdditional(long companyId, long accountId)
         {
-            var company = await unitOfWork.Company.FindByIdAsync(id).ConfigureAwait(false);
-            long? currencyId = company?.Tickers?.FirstOrDefault()?.Prices?.FirstOrDefault()?.CurrencyId;
-            return company is null ? NoContent() : Ok(new SummaryAdditional
+            var company = await unitOfWork.Company.FindByIdAsync(companyId).ConfigureAwait(false);
+            var summary = await unitOfWork.CompanySummary.GetAll().FirstOrDefaultAsync(x => x.AccountId == accountId && x.CompanyId == companyId).ConfigureAwait(false);
+            return company is null || summary is null ? NoContent() : Ok(new CompanyAdditionalModel
             {
                 IndustryName = company.Industry.Name,
                 SectorName = company.Sector.Name,
-                CurrencyType = currencyId.HasValue ? catalogService.GetCurrencyName(currencyId.Value) : "No currency data."
+                Currency = catalogService.GetCurrencyName(summary.CurrencyId),
+                ActualLot = summary.ActualLot,
+                CurrentProfit = summary.CurrentProfit
             });
         }
 

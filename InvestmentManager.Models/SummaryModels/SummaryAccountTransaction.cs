@@ -1,13 +1,15 @@
-﻿using System;
+﻿using System.Collections.Generic;
 
 namespace InvestmentManager.Models.SummaryModels
 {
     public class SummaryAccountTransaction
     {
-        public DateTime DateLastTransaction { get; set; }
-        public string StatusName { get; set; }
-        public decimal Amount { get; set; }
-        public decimal TotalAddedSum { get; set; }
-        public decimal InvestingSum { get; set; }
+        public List<SummaryAccountTransactionDetail> Details { get; set; } = new List<SummaryAccountTransactionDetail>();
+    }
+    public class SummaryAccountTransactionDetail
+    {
+        public string Currency { get; set; }
+        public decimal AddedSum { get; set; }
+        public decimal WithdrawnSum { get; set; }
     }
 }

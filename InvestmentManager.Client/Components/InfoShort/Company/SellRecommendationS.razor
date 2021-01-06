@@ -5,9 +5,9 @@
         @if (model is not null)
         {
             <KeyValueCols Key="Date Update" Value="@model.DateUpdate.ToString()" />
-            <KeyValueCols Key="Profit of 20%" Value="@($"{model.LotMin} lot(s) by price > {model.PriceMin}")" />
-            <KeyValueCols Key="Profit of 50%" Value="@($"{model.LotMid} lot(s) by price > {model.PriceMid}")" />
-            <KeyValueCols Key="Profit of 80%" Value="@($"{model.LotMax} lot(s) by price > {model.PriceMax}")" />
+            <KeyValueCols Key="Profit of 20%" Value="@($"{model.LotMin} lot(s) by price > {model.PriceMin:#,#0.####}")" />
+            <KeyValueCols Key="Profit of 50%" Value="@($"{model.LotMid} lot(s) by price > {model.PriceMid:#,#0.####}")" />
+            <KeyValueCols Key="Profit of 80%" Value="@($"{model.LotMax} lot(s) by price > {model.PriceMax:#,#0.####}")" />
         }
         else
         {

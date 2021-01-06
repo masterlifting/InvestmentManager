@@ -6,6 +6,5 @@
         string GetStatusBootstrapColor(long statusId);
         string GetExchangeName(long exchangeId);
         string GetCurrencyName(long currencyId);
-        string GetComissionTypeName(long typeId);
     }
 }

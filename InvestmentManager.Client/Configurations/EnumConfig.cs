@@ -36,7 +36,8 @@
         {
             New,
             Last,
-            Summary
+            Summary,
+            Additional
         }
         public enum UrlCatalog
         {

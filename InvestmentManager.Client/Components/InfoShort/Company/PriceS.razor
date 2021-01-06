@@ -7,7 +7,7 @@
         {
             <KeyValueCols Key="Date update" Value="@model.DateUpdate.ToString()" />
             <KeyValueCols Key="Date price" Value="@model.DatePrice.ToString()" />
-            <KeyValueCols Key="Cost" Value="@model.Cost.ToString("f4")" />
+            <KeyValueCols Key="Cost" Value="@model.Cost.ToString("#,#0.####")" />
 
             <div class="col">
                 <PriceF CompanyId="CompanyId" />

@@ -88,6 +88,7 @@ namespace InvestmentManager.Client.Services.HttpService
             UrlOption.New => OptionName.New,
             UrlOption.Last => OptionName.Last,
             UrlOption.Summary => OptionName.Summary,
+            UrlOption.Additional => OptionName.Additional,
             _ => ""
         };
         static string SetCatalog(UrlCatalog catalog) => catalog switch
@@ -144,6 +145,7 @@ namespace InvestmentManager.Client.Services.HttpService
         public const string New = "new";
         public const string Last = "last";
         public const string Summary = "summary";
+        public const string Additional = "additional";
     }
     static class CatalogName
     {

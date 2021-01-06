@@ -20,7 +20,7 @@
         </div>
     </AdditionalBlock>
     <InfoBlock>
-        <MultiRow Name="Accounts information" IconName="info" />
+        <MultiRow Name="@additional" IconName="info" Action="(() => isAdditional = !isAdditional)" />
         <MultiRow Name="@transactions" IconName="yen" Action="(() => isTransactions = !isTransactions)" />
         <MultiRow Name="@comissions" IconName="fire" Action="(() => isComissions = !isComissions)" />
         <MultiRow Name="@exchangeRates" IconName="loop" Action="(() => isExchangeRates = !isExchangeRates)" />
@@ -29,17 +29,21 @@
         <MultiRow Name="Analytics" IconName="pie-chart" />
     </InfoBlock>
     <ActionBlock>
+        @if(isAdditional)
+        {
+            <AccountAdditional InfoName="@additional" UpdateVisible="((bool isVisible) => isAdditional = isVisible)" />
+        }
         @if (isTransactions)
         {
-            <AccountTransactionS InfoName="@transactions" UpdateVisible="((bool isVisible) => isTransactions =isVisible)" />
+            <AccountTransactionS InfoName="@transactions" UpdateVisible="((bool isVisible) => isTransactions = isVisible)" />
         }
         @if (isComissions)
         {
-            <ComissionS InfoName="@comissions" UpdateVisible="((bool isVisible) => isComissions =isVisible)" />
+            <ComissionS InfoName="@comissions" UpdateVisible="((bool isVisible) => isComissions = isVisible)" />
         }
         @if (isExchangeRates)
         {
-            <ExchangeRateS InfoName="@exchangeRates" UpdateVisible="((bool isVisible) => isExchangeRates =isVisible)" />
+            <ExchangeRateS InfoName="@exchangeRates" UpdateVisible="((bool isVisible) => isExchangeRates = isVisible)" />
         }
     </ActionBlock>
 </FrameTemplate>
@@ -53,6 +57,8 @@
     string comissions = "Comissions";
     bool isExchangeRates;
     string exchangeRates = "Exchange Rates";
+    bool isAdditional;
+    string additional = "Additional information";
 
 
     [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; }

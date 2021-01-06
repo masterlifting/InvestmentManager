@@ -12,6 +12,7 @@ using InvestmentManager.Models.Additional;
 using System.Net.Http.Json;
 using InvestmentManager.Models.EntityModels;
 using static InvestmentManager.Models.Enums;
+using InvestmentManager.Models.SummaryModels;
 
 namespace InvestmentManager.Server.Controllers
 {
@@ -93,6 +94,25 @@ namespace InvestmentManager.Server.Controllers
                 return BadRequest(result);
             }
         }
+        [HttpGet("{id}/additional/")]
+        public async Task<IActionResult> GetAdditional(long id)
+        {
+            var summaries = (await unitOfWork.Account.FindByIdAsync(id).ConfigureAwait(false))?.AccountSummaries;
+
+            if (summaries is null || !summaries.Any())
+                return NoContent();
+
+            return Ok(new AccountAdditionalModel
+            {
+                Details = summaries.Select(x => new AccountAdditionalDetail
+                {
+                    Currency = x.Currency.Name,
+                    FreeSum = x.FreeSum,
+                    InvestedSum = x.InvestedSum
+                }).ToList()
+            });
+        }
+
 
         [HttpPost]
         public async Task<IActionResult> Post(AccountModel model)

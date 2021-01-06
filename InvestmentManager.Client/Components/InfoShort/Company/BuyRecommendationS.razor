@@ -5,7 +5,7 @@
         @if (model is not null)
         {
             <KeyValueCols KeySize="6" Key="Date Update" Value="@model.DateUpdate.ToString()" />
-            <KeyValueCols KeySize="6" Key="Buy if the price is less" Value="@model.BuyPrice.ToString("f4")" />
+            <KeyValueCols KeySize="6" Key="Buy if the price is less" Value="@model.BuyPrice.ToString("#,#0.####")" />
         }
         else
         {

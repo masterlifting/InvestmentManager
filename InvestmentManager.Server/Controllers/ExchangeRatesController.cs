@@ -49,6 +49,12 @@ namespace InvestmentManager.Server.Controllers
         public async Task<IActionResult> GetSummaryByAccountId(long id)
         {
             var rates = (await unitOfWork.Account.FindByIdAsync(id).ConfigureAwait(false))?.ExchangeRates;
+            var summary = await unitOfWork.ExchangeRateSummary.GetAll().Where(x => x.AccountId == id).Join(unitOfWork.Currency.GetAll(), x => x.CurrencyId, y => y.Id, (x, y) => new
+            {
+                x.AvgPurchasedRate,
+                x.AvgSoldRate,
+                Currency = y.Name
+            }).ToListAsync().ConfigureAwait(false);
 
             if (rates is null || !rates.Any())
                 return NoContent();
@@ -59,7 +65,13 @@ namespace InvestmentManager.Server.Controllers
             {
                 DateLastOperation = lastRate.DateOperation,
                 Rate = lastRate.Rate,
-                StatusName = lastRate.TransactionStatus.Name
+                StatusName = lastRate.TransactionStatus.Name,
+                Details = summary.GroupBy(x => x.Currency).Select(x => new SummaryExchangeRateDetail
+                {
+                    Currency = x.Key,
+                    AvgPurchasedRate = x.Average(y => y.AvgPurchasedRate),
+                    AvgSoldRate = x.Average(y => y.AvgSoldRate)
+                }).ToList()
             });
         }
 

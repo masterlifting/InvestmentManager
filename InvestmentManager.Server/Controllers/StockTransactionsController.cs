@@ -66,7 +66,7 @@ namespace InvestmentManager.Server.Controllers
                 {
                     Id = y.Id,
                     Name = y.Name,
-                    Description = x.DateOperation.ToShortDateString() + $"|{catalogService.GetStatusName(x.TransactionStatusId)}"
+                    Description = x.DateOperation.ToString("dd.MM.y") + $" | {catalogService.GetStatusName(x.TransactionStatusId)}"
                 })
                 .ToList();
 

@@ -29,23 +29,9 @@ namespace InvestmentManager.Services.Implimentations
         };
         public string GetCurrencyName(long currencyId) => currencyId switch
         {
-            1 => "USD",
-            2 => "RUB",
+            1 => "usd",
+            2 => "rub",
             _ => "Currency not found"
-        };
-
-        public string GetComissionTypeName(long typeId) => typeId switch
-        {
-            1 => "НДФЛ",
-            2 => "Урегулирование сделок",
-            3 => "Вознаграждение компании",
-            4 => "Комиссия за займы Овернайт ЦБ",
-            5 => "Вознаграждение компании (СВОП)",
-            6 => "Вознаграждение за обслуживание счета депо",
-            7 => "Оплата за вывод денежных средств",
-            8 => "Вознаграждение компании (репо)",
-            9 => "Комиссия Биржевой гуру",
-            _ => "Comission type not found"
         };
     }
 }
