@@ -4,8 +4,7 @@
     <ChildContent>
         @if (model is not null)
         {
-            <KeyValueCols Key="Current volume" Value="@model.ActualLot.ToString()" />
-            <KeyValueCols Key="Profit" Value="@($"{model.CurrentProfit.ToString("#,#0.##")} {model.Currency}")" />
+            <KeyValueCols Key="Currency" Value="@model.Currency" />
             <KeyValueCols Key="Sector" Value="@model.SectorName" />
             <KeyValueCols Key="Industry" Value="@model.IndustryName" />
         }
@@ -20,28 +19,14 @@
     [Parameter] public EventCallback<bool> UpdateVisible { get; set; }
     [Parameter] public string InfoName { get; set; }
     [Parameter] public long CompanyId { get; set; }
-    [CascadingParameter] Task<AuthenticationState> AuthenticationStateTask { get; set; }
 
     string info = DefaultString.loading;
     CompanyAdditionalModel model;
 
     protected async override Task OnInitializedAsync()
     {
-        var user = (await AuthenticationStateTask).User;
-        string CustomUrlBuilder(long accountId) => new UrlBuilder(UrlController.Companies, UrlPath.ByCompanyId, CompanyId, UrlPath.ByAccountId, accountId, UrlOption.Additional).Result;
-        CompanyAdditionalModel CustomResultBuilder(List<CompanyAdditionalModel> additionals)
-        {
-            return new CompanyAdditionalModel
-            {
-                Currency = additionals.First().Currency,
-                IndustryName = additionals.First().IndustryName,
-                SectorName = additionals.First().SectorName,
-                ActualLot = additionals.Sum(x => x.ActualLot),
-                CurrentProfit = additionals.Sum(x => x.CurrentProfit)
-            };
-        }
-
-        var queryResult = await queryService.GetResultAsync(user, CustomUrlBuilder, CustomResultBuilder);
+        string CustomUrlBuilder() => new UrlBuilder(UrlController.Companies, CompanyId, UrlOption.Additional).Result;
+        var queryResult = await queryService.GetResultAsync(CustomUrlBuilder);
 
         model = queryResult.ResultContent;
         info = queryResult.ResultInfo;

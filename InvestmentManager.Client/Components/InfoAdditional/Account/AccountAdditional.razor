@@ -12,6 +12,10 @@
             {
                 <KeyValueCols KeySize="6" Key="Invested sum" Value="@($"{detail.InvestedSum.ToString("#,#0.##")} {detail.Currency}")" />
             }
+            foreach (var detail in model.Details)
+            {
+                <KeyValueCols KeySize="6" Key="Dividend sum" Value="@($"{detail.DividendSum.Value.ToString("#,#0.##")} {detail.Currency}")" />
+            }
         }
         else
         {
@@ -48,7 +52,8 @@
                 {
                     Currency = x.Key,
                     FreeSum = x.Sum(y => y.FreeSum),
-                    InvestedSum = x.Sum(y => y.InvestedSum)
+                    InvestedSum = x.Sum(y => y.InvestedSum),
+                    DividendSum = x.Where(x => x.DividendSum.HasValue).Any() ? x.Sum(x => x.DividendSum.Value) : 0
                 }).ToList();
 
             return result;

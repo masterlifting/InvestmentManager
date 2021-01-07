@@ -6,7 +6,10 @@
         {
             <KeyValueCols KeySize="6" Key="Date first comission" Value="@model.DateFirstComission.ToShortDateString()" />
             <KeyValueCols KeySize="6" Key="Date last comission" Value="@model.DateLastComission.ToShortDateString()" />
-            <KeyValueCols KeySize="6" Key="Sum all time" Value="@model.Amount.ToString("C")" />
+            @foreach (var comission in model.Details)
+            {
+                <KeyValueCols KeySize="6" Key="Sum all time" Value="@($"{comission.Amount.ToString("#,#0.##")} {comission.Currency}")" />
+            }
 
             <div class="col">
                 <ComissionF />
@@ -35,11 +38,17 @@
         string CustomUrlBuilder(long accountId) => new UrlBuilder(UrlController.Comissions, UrlPath.ByAccountId, accountId, UrlOption.Summary).Result;
         SummaryComission CustomResultBuilder(List<SummaryComission> models)
         {
+            var details = new List<SummaryComissionDetail>();
+
+            if (models.Where(x => x.Details != null).Any())
+                foreach (var item in models.Where(x => x.Details != null).Select(x => x.Details))
+                    details.AddRange(item);
+
             return new SummaryComission
             {
                 DateFirstComission = models.OrderBy(x => x.DateFirstComission).First().DateFirstComission,
                 DateLastComission = models.OrderBy(x => x.DateLastComission).Last().DateLastComission,
-                Amount = models.Sum(x => x.Amount)
+                Details = details.GroupBy(x => x.Currency).Select(x => new SummaryComissionDetail { Currency = x.Key, Amount = x.Sum(y => y.Amount) }).ToList()
             };
         }
 

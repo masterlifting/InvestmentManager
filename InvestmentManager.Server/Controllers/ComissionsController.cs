@@ -15,15 +15,18 @@ namespace InvestmentManager.Server.Controllers
     public class ComissionsController : ControllerBase
     {
         private readonly IBaseRestMethod restMethod;
+        private readonly ICatalogService catalogService;
         private readonly IUnitOfWorkFactory unitOfWork;
         private readonly IReckonerService reckonerService;
 
         public ComissionsController(
             IBaseRestMethod restMethod
+            , ICatalogService catalogService
             , IUnitOfWorkFactory unitOfWork
             , IReckonerService reckonerService)
         {
             this.restMethod = restMethod;
+            this.catalogService = catalogService;
             this.unitOfWork = unitOfWork;
             this.reckonerService = reckonerService;
         }
@@ -45,18 +48,23 @@ namespace InvestmentManager.Server.Controllers
         [HttpGet("byaccountid/{id}/summary/")]
         public async Task<IActionResult> GetSummaryByAccountId(long id)
         {
-            var comissionss = (await unitOfWork.Account.FindByIdAsync(id).ConfigureAwait(false))?.Comissions;
-
+            var account = await unitOfWork.Account.FindByIdAsync(id).ConfigureAwait(false);
+            var comissionss = account?.Comissions;
             if (comissionss is null || !comissionss.Any())
                 return NoContent();
 
             var targetComissions = comissionss.OrderBy(x => x.DateOperation);
+            var comissionSummaries = account.ComissionSummaries;
 
             return Ok(new SummaryComission
             {
                 DateFirstComission = targetComissions.First().DateOperation,
                 DateLastComission = targetComissions.Last().DateOperation,
-                Amount = targetComissions.Sum(x => x.Amount),
+                Details = comissionSummaries?.Select(x => new SummaryComissionDetail
+                {
+                    Currency = catalogService.GetCurrencyName(x.CurrencyId),
+                    Amount = x.TotalSum
+                }).ToList()
             });
         }
 

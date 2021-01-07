@@ -11,5 +11,6 @@ namespace InvestmentManager.Models.SummaryModels
         public string Currency { get; set; }
         public decimal FreeSum { get; set; }
         public decimal InvestedSum { get; set; }
+        public decimal? DividendSum { get; set; }
     }
 }

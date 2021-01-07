@@ -97,10 +97,13 @@ namespace InvestmentManager.Server.Controllers
         [HttpGet("{id}/additional/")]
         public async Task<IActionResult> GetAdditional(long id)
         {
-            var summaries = (await unitOfWork.Account.FindByIdAsync(id).ConfigureAwait(false))?.AccountSummaries;
+            var account = await unitOfWork.Account.FindByIdAsync(id).ConfigureAwait(false);
+            var summaries = account?.AccountSummaries;
 
             if (summaries is null || !summaries.Any())
                 return NoContent();
+
+            var dividendSummaries = account.DividendSummaries;
 
             return Ok(new AccountAdditionalModel
             {
@@ -108,7 +111,8 @@ namespace InvestmentManager.Server.Controllers
                 {
                     Currency = x.Currency.Name,
                     FreeSum = x.FreeSum,
-                    InvestedSum = x.InvestedSum
+                    InvestedSum = x.InvestedSum,
+                    DividendSum = dividendSummaries.Where(y => y.CurrencyId == x.CurrencyId).Any() ? dividendSummaries.Where(y => y.CurrencyId == x.CurrencyId).Sum(x => x.TotalSum) : 0
                 }).ToList()
             });
         }

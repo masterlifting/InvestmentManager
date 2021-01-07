@@ -103,12 +103,16 @@ namespace InvestmentManager.Server.Controllers
                 .OrderBy(x => x.DateOperation)
                 .LastOrDefaultAsync();
 
+            var summary = await unitOfWork.CompanySummary.GetAll().FirstOrDefaultAsync(x => x.AccountId == accountId && x.CompanyId == companyId).ConfigureAwait(false);
+
             return lastTransaction is null ? NoContent() : Ok(new SummaryStockTransaction
             {
                 DateTransaction = lastTransaction.DateOperation,
                 StatusName = catalogService.GetStatusName(lastTransaction.TransactionStatusId),
                 Quantity = lastTransaction.Quantity,
-                Cost = lastTransaction.Cost
+                Cost = lastTransaction.Cost,
+                ActualLot = summary?.ActualLot ?? 0,
+                CurrentProfit = summary?.CurrentProfit ?? 0
             });
         }
 

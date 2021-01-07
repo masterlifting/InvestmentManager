@@ -8,5 +8,7 @@ namespace InvestmentManager.Models.SummaryModels
         public decimal Cost { get; set; }
         public int Quantity { get; set; }
         public string StatusName { get; set; }
+        public int ActualLot { get; set; }
+        public decimal CurrentProfit { get; set; }
     }
 }

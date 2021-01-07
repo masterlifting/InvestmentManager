@@ -4,10 +4,10 @@
     <ChildContent>
         @if (model is not null)
         {
-            <KeyValueCols Key="Last operation" Value="@model.DateTransaction.ToShortDateString()" />
-            <KeyValueCols Key="Status" Value="@model.StatusName" />
-            <KeyValueCols Key="Lot" Value="@model.Quantity.ToString()" />
-            <KeyValueCols Key="Price" Value="@model.Cost.ToString("#,#0.####")" />
+            <KeyValueCols Key="In portfolio" Value="@model.ActualLot.ToString()" />
+            <KeyValueCols Key="Profit" Value="@($"{model.CurrentProfit:#,#0.##}")" />
+            <div class="col-2 col-md-4 text-dark">Last</div>
+            <div class="col-10 col-md-8 text-right text-md-left">@($"{model.DateTransaction:dd.MM.yy} {model.StatusName} {model.Quantity} pc by {model.Cost:#,#0.####} for 1")</div>
 
             <div class="col">
                 <StockTransactionF CompanyId="CompanyId" />
@@ -43,7 +43,9 @@
                 DateTransaction = targetData.DateTransaction,
                 StatusName = targetData.StatusName,
                 Cost = targetData.Cost,
-                Quantity = targetData.Quantity
+                Quantity = targetData.Quantity,
+                ActualLot = models.Sum(x => x.ActualLot),
+                CurrentProfit = models.Sum(x => x.CurrentProfit)
             };
         }
 
