@@ -49,7 +49,9 @@ namespace InvestmentManager.Calculator
                             price = coefficientData[i].Prices.Last().Value;
 
                         var coefficient = CalculateReportCoefficient(report, price.Value);
-                        coefficients.Add(coefficient);
+
+                        if (coefficient is not null)
+                            coefficients.Add(coefficient);
                     }
 
                 switch (dbType)
@@ -107,17 +109,28 @@ namespace InvestmentManager.Calculator
         #region Helpers
         static Coefficient CalculateReportCoefficient(Report report, decimal lastPrice)
         {
-            return report is not null && report.Id != default && lastPrice != default
-                 ? new Coefficient() { ReportId = report.Id, PE = Pe(), PB = PB(), DebtLoad = DebtLoad(), Profitability = Profitability(), ROA = Roa(), ROE = Roe(), EPS = Eps() }
-                 : throw new NullReferenceException("Not found all data for calculating");
+            if (report is null || report.Id == default || lastPrice == default)
+                return null;
 
-            decimal Eps() => report.StockVolume != 0 ? ((report.NetProfit * 1_000_000) / report.StockVolume) : 0;
-            decimal Profitability() => report.Revenue == 0 || report.Assets == 0 ? 0 : ((report.NetProfit / report.Revenue) + (report.Revenue / report.Assets)) / 2;
-            decimal Roa() => report.Assets != 0 ? (report.NetProfit / report.Assets) * 100 : 0;
-            decimal Roe() => report.ShareCapital != 0 ? (report.NetProfit / report.ShareCapital) * 100 : 0;
-            decimal DebtLoad() => report.Assets != 0 ? report.Obligations / report.Assets : 0;
-            decimal Pe() => Eps() != 0 && lastPrice > 0 ? lastPrice / Eps() : 0;
-            decimal PB() => (report.Assets - report.Obligations) != 0 && lastPrice > 0 && report.StockVolume > 0 ? (lastPrice * report.StockVolume) / ((report.Assets - report.Obligations) * 1_000_000) : 0;
+            decimal eps = report.StockVolume != 0 ? ((report.NetProfit * 1_000_000) / report.StockVolume) : 0;
+            decimal profitability = report.Revenue == 0 || report.Assets == 0 ? 0 : ((report.NetProfit / report.Revenue) + (report.Revenue / report.Assets)) / 2;
+            decimal roa = report.Assets != 0 ? (report.NetProfit / report.Assets) * 100 : 0;
+            decimal roe = report.ShareCapital != 0 ? (report.NetProfit / report.ShareCapital) * 100 : 0;
+            decimal debtLoad = report.Assets != 0 ? report.Obligations / report.Assets : 0;
+            decimal pe = eps != 0 && lastPrice > 0 ? lastPrice / eps : 0;
+            decimal pb = (report.Assets - report.Obligations) != 0 && lastPrice > 0 && report.StockVolume > 0 ? (lastPrice * report.StockVolume) / ((report.Assets - report.Obligations) * 1_000_000) : 0;
+
+            return new Coefficient()
+            {
+                ReportId = report.Id,
+                PE = pe,
+                PB = pb,
+                DebtLoad = debtLoad,
+                Profitability = profitability,
+                ROA = roa,
+                ROE = roe,
+                EPS = eps
+            };
         }
         #endregion
 
@@ -162,7 +175,7 @@ namespace InvestmentManager.Calculator
 
         public async Task<bool> SetRatingByPricesAsync()
         {
-            var prices = unitOfWork.Price.GetGroupedPrices(12, OrderType.OrderBy);
+            var prices = unitOfWork.Price.GetGroupedPricesByDateSplit(12, OrderType.OrderBy);
 
             if (prices is null || !prices.Any())
                 return false;

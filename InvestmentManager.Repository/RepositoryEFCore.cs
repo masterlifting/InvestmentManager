@@ -215,9 +215,11 @@ namespace InvestmentManager.Repository
         public async Task<IEnumerable<Price>> GetCustomPricesAsync(long companyId, int lastMonths, OrderType orderDate, DateTime? startDate = null)
         {
             DateTime baseStartDate = DateTime.Now.AddMonths(-lastMonths);
-            DateTime resultStartDate = startDate.HasValue ?
-                            startDate.Value > baseStartDate ? startDate.Value : baseStartDate
-                            : baseStartDate;
+            DateTime resultStartDate = startDate.HasValue
+                ? startDate.Value > baseStartDate
+                ? startDate.Value.AddDays(1)
+                : baseStartDate
+                : baseStartDate;
 
             return orderDate == OrderType.OrderByDesc
             ? (await context.Companies.AsNoTracking().Include(x => x.Tickers).ThenInclude(x => x.Prices).FirstOrDefaultAsync(x => x.Id == companyId).ConfigureAwait(false))
