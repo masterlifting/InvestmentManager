@@ -24,11 +24,11 @@ namespace InvestmentManager.Server.Controllers
         }
 
         [HttpGet("bypagination/{value}")]
-        public IActionResult GetPagination(int value = 1)
+        public async Task<IActionResult> GetPagination(int value = 1)
         {
             int pageSize = int.Parse(configuration["PaginationPageSize"]);
             var companies = unitOfWork.Company.GetAll();
-            var lastPricies = unitOfWork.Price.GetLastPrices(30);
+            var lastPricies = await unitOfWork.Price.GetLastPricesAsync(30).ConfigureAwait(false);
             var recommendations = lastPricies?
                 .Join(unitOfWork.BuyRecommendation.GetAll(), x => x.Key, y => y.CompanyId, (x, y) => new
                 {

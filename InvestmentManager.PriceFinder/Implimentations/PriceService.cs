@@ -34,15 +34,15 @@ namespace InvestmentManager.PriceFinder.Implimentations
 
             var foundPrice = await priceProviders[providerName].FindNewPriciesAsync(tickerId, ticker, providerUri).ConfigureAwait(false);
 
-            return foundPrice.Any() ? NewPriceFilter(foundPrice, tickerId) : resultPricies;
+            return foundPrice.Any() ? await NewPriceFilterAsync(foundPrice, tickerId).ConfigureAwait(false) : resultPricies;
         }
 
-        List<Price> NewPriceFilter(IEnumerable<Price> pricies, long tickerId)
+        async Task<List<Price>> NewPriceFilterAsync(IEnumerable<Price> pricies, long tickerId)
         {
             var filteredList = new List<Price>();
             var dateFromPriceLists = pricies.Select(x => x.BidDate.Date);
             var dateFromPriceListsCount = dateFromPriceLists.Count();
-            var dateFromDb = unitOfWork.Price.GetLastDates(tickerId, dateFromPriceListsCount).Select(x => x.Date);
+            var dateFromDb = (await unitOfWork.Price.GetLastDatesAsync(tickerId, dateFromPriceListsCount).ConfigureAwait(false)).Select(x => x.Date);
 
             var newDate = dateFromPriceLists.Except(dateFromDb);
 

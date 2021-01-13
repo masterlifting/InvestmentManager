@@ -115,105 +115,63 @@ namespace InvestmentManager.Repository
         }
         public IQueryable<DateTime> GetLastFourDateReport(long companyId) => context.Reports.AsNoTracking()
             .Where(x => x.CompanyId == companyId).OrderByDescending(x => x.DateReport).Select(x => x.DateReport).Take(4);
-        public IDictionary<long, DateTime> GetLastDateReports()
-        {
-            var result = new Dictionary<long, DateTime>();
-
-            var source = context.Reports.AsNoTracking().OrderBy(x => x.DateReport);
-            var agregatedData = source.AsEnumerable().GroupBy(x => x.CompanyId).Select(x => new { CompanyId = x.Key, LastDate = x.Last().DateReport });
-
-            foreach (var i in agregatedData)
-                result.Add(i.CompanyId, i.LastDate);
-
-            return result;
-        }
-        public DateTime GetLastDateReport(long companyId) => context.Reports.AsNoTracking().Where(x => x.CompanyId == companyId).OrderBy(x => x.DateReport).Last().DateReport;
     }
     public class PriceRepository : RepositoryEFCore<Price>, IPriceRepository
     {
         private readonly InvestmentContext context;
         public PriceRepository(InvestmentContext context) : base(context) => this.context = context;
 
-        public Dictionary<long, List<Price>> GetGroupedPrices(int lastMonths, OrderType orderDate)
+        public async Task<Dictionary<long, Price[]>> GetGroupedPricesAsync(int lastMonths, OrderType orderDate)
         {
-            var result = new Dictionary<long, List<Price>>();
-
-            var tickers = context.Companies.AsNoTracking().Include(x => x.Tickers).Select(x => x.Tickers.First());
-            var prices = orderDate == OrderType.OrderBy
-                ? context.Prices.AsNoTracking().Where(x => x.BidDate >= DateTime.Now.AddMonths(-lastMonths)).OrderBy(x => x.BidDate)
-                : context.Prices.AsNoTracking().Where(x => x.BidDate >= DateTime.Now.AddMonths(-lastMonths)).OrderByDescending(x => x.BidDate);
-
-            var agregatedData = prices.AsEnumerable().GroupBy(x => x.TickerId).Join(tickers, x => x.Key, y => y.Id, (x, y) => new { y.CompanyId, Prices = x.Select(y => y) });
-
-            foreach (var i in agregatedData)
-                result.Add(i.CompanyId, i.Prices.ToList());
-
-            return result;
-        }
-        public Dictionary<long, List<Price>> GetGroupedPricesByDateSplit(int lastMonths, OrderType orderDate)
-        {
-            var result = new Dictionary<long, List<Price>>();
+            var result = new Dictionary<long, Price[]>();
             DateTime baseStartDate = DateTime.Now.AddMonths(-lastMonths);
 
-            var tickers = context.Companies.AsNoTracking().Include(x => x.Tickers).Select(x => new { Ticker = x.Tickers.First(), x.DateSplit });
-            var prices = orderDate == OrderType.OrderBy
-                ? context.Prices.AsNoTracking().Where(x => x.BidDate >= baseStartDate).OrderBy(x => x.BidDate)
-                : context.Prices.AsNoTracking().Where(x => x.BidDate >= baseStartDate).OrderByDescending(x => x.BidDate);
+            var tickers = await GetTickersByPricesAsync().ConfigureAwait(false);
+            var priceQuery = context.Prices.Where(x => x.BidDate >= baseStartDate);
 
-            var agregatedData = prices.AsEnumerable().GroupBy(x => x.TickerId).Join(tickers, x => x.Key, y => y.Ticker.Id, (x, y) => new
-            {
-                y.Ticker.CompanyId,
-                Prices = x.Select(y => y),
-                y.DateSplit
-            });
+            var prices = orderDate == OrderType.OrderBy
+                ? (await priceQuery.OrderBy(x => x.BidDate).ToArrayAsync().ConfigureAwait(false)).GroupBy(x => x.TickerId)
+                : (await priceQuery.OrderByDescending(x => x.BidDate).ToArrayAsync().ConfigureAwait(false)).GroupBy(x => x.TickerId);
+
+            var agregatedData = tickers
+                .Join(context.Companies, x => x.CompanyId, y => y.Id, (x, y) => new { TickerId = x.Id, x.CompanyId, y.DateSplit })
+                .Join(prices, x => x.TickerId, y => y.Key, (x, y) => (x.CompanyId, x.DateSplit, Prices: y.Select(z => z).ToArray()));
+
 
             foreach (var i in agregatedData)
             {
                 if (i.DateSplit.HasValue)
                 {
                     DateTime startDateSplit = i.DateSplit.Value > baseStartDate ? i.DateSplit.Value : baseStartDate;
-                    result.Add(i.CompanyId, i.Prices.Where(x => x.BidDate >= startDateSplit).ToList());
+                    result.Add(i.CompanyId, i.Prices.Where(x => x.BidDate >= startDateSplit).ToArray());
                 }
                 else
-                    result.Add(i.CompanyId, i.Prices.ToList());
+                    result.Add(i.CompanyId, i.Prices);
             }
 
             return result;
         }
-
-        public IDictionary<long, decimal> GetLastPrices(double lastDays)
+        public async Task<IDictionary<long, decimal>> GetLastPricesAsync(double lastDays)
         {
             var result = new Dictionary<long, decimal>();
 
-            var tickers = context.Companies.AsNoTracking().Include(x => x.Tickers).Where(x => x.Tickers.Any()).Select(x => x.Tickers.First());
-            var prices = context.Prices.AsNoTracking().Where(x => x.BidDate >= DateTime.Now.AddDays(-lastDays)).OrderBy(x => x.BidDate);
-            var agregatedData = prices.AsEnumerable().GroupBy(x => x.TickerId).Join(tickers, x => x.Key, y => y.Id, (x, y) => new { y.CompanyId, LastPrice = x.Last().Value });
+            var tickers = await GetTickersByPricesAsync().ConfigureAwait(false);
+            var prices = await context.Prices.Where(x => x.BidDate >= DateTime.Now.AddDays(-lastDays)).OrderByDescending(x => x.BidDate).ToArrayAsync().ConfigureAwait(false);
 
+            var agregatedData = prices.GroupBy(x => x.TickerId).Join(tickers, x => x.Key, y => y.Id, (x, y) => new { y.CompanyId, LastPrice = x.First().Value });
             foreach (var i in agregatedData)
                 result.Add(i.CompanyId, i.LastPrice);
 
             return result;
         }
-        public IDictionary<long, DateTime> GetLastDates(double lastDays)
+        public async Task<Price[]> GetCustomPricesAsync(long companyId, int lastMonths, OrderType orderDate, DateTime? startDate = null)
         {
-            var result = new Dictionary<long, DateTime>();
+            var result = Array.Empty<Price>();
 
-            var tickers = context.Companies.AsNoTracking().Include(x => x.Tickers).Select(x => x.Tickers.First());
-            var prices = context.Prices.AsNoTracking().Where(x => x.BidDate >= DateTime.Now.AddDays(-lastDays)).OrderBy(x => x.BidDate);
-            var agregatedData = prices.AsEnumerable().GroupBy(x => x.TickerId).Join(tickers, x => x.Key, y => y.Id, (x, y) => new { y.CompanyId, LastDate = x.Last().BidDate });
+            var ticker = await context.Tickers.FirstOrDefaultAsync(x => x.CompanyId == companyId).ConfigureAwait(false);
+            if (ticker is null)
+                return result;
 
-            foreach (var i in agregatedData)
-                result.Add(i.CompanyId, i.LastDate);
-
-            return result;
-        }
-        public async Task<IEnumerable<Price>> GetCustomPricesAsync(long companyId, int lastMonths, OrderType orderDate) => orderDate == OrderType.OrderByDesc
-            ? (await context.Companies.AsNoTracking().Include(x => x.Tickers).ThenInclude(x => x.Prices).FirstOrDefaultAsync(x => x.Id == companyId).ConfigureAwait(false))
-            .Tickers.FirstOrDefault()?.Prices.Where(x => x.BidDate >= DateTime.Now.AddMonths(-lastMonths)).OrderByDescending(x => x.BidDate)
-            : (await context.Companies.AsNoTracking().Include(x => x.Tickers).ThenInclude(x => x.Prices).FirstOrDefaultAsync(x => x.Id == companyId).ConfigureAwait(false))
-            .Tickers.FirstOrDefault()?.Prices.Where(x => x.BidDate >= DateTime.Now.AddMonths(-lastMonths)).OrderBy(x => x.BidDate);
-        public async Task<IEnumerable<Price>> GetCustomPricesAsync(long companyId, int lastMonths, OrderType orderDate, DateTime? startDate = null)
-        {
             DateTime baseStartDate = DateTime.Now.AddMonths(-lastMonths);
             DateTime resultStartDate = startDate.HasValue
                 ? startDate.Value > baseStartDate
@@ -221,17 +179,21 @@ namespace InvestmentManager.Repository
                 : baseStartDate
                 : baseStartDate;
 
+            var prices = context.Prices.Where(x => x.TickerId == ticker.Id && x.BidDate >= resultStartDate);
+            if (prices is null || !prices.Any())
+                return result;
+
             return orderDate == OrderType.OrderByDesc
-            ? (await context.Companies.AsNoTracking().Include(x => x.Tickers).ThenInclude(x => x.Prices).FirstOrDefaultAsync(x => x.Id == companyId).ConfigureAwait(false))
-            .Tickers.First().Prices.Where(x => x.BidDate >= resultStartDate).OrderByDescending(x => x.BidDate)
-            : (await context.Companies.AsNoTracking().Include(x => x.Tickers).ThenInclude(x => x.Prices).FirstOrDefaultAsync(x => x.Id == companyId).ConfigureAwait(false))
-            .Tickers.First().Prices.Where(x => x.BidDate >= resultStartDate).OrderBy(x => x.BidDate);
+                ? await prices.OrderByDescending(x => x.BidDate).ToArrayAsync().ConfigureAwait(false)
+                : await prices.OrderBy(x => x.BidDate).ToArrayAsync().ConfigureAwait(false);
         }
+        public async Task<DateTime[]> GetLastDatesAsync(long tickerId, int count) =>
+            await context.Prices.Where(x => x.TickerId == tickerId).OrderByDescending(x => x.BidDate).Take(count).Select(x => x.BidDate).ToArrayAsync().ConfigureAwait(false);
+        public async Task<int> GetCompanyCountWithPricesAsync() =>
+            await context.Prices.Select(x => x.TickerId).Distinct().CountAsync().ConfigureAwait(false);
 
-        public IQueryable<DateTime> GetLastDates(long tickerId, int count) =>
-            context.Prices.Where(x => x.TickerId == tickerId).OrderByDescending(x => x.BidDate).Select(x => x.BidDate.Date).Take(count);
-        public int GetCompanyCountWithPrices() => context.Companies.AsNoTracking().Include(x => x.Tickers).ThenInclude(x => x.Prices).Select(x => x.Tickers.First()).Where(x => x.Prices.Any()).Count();
-
+        private async Task<Ticker[]> GetTickersByPricesAsync() =>
+            (await context.Tickers.ToArrayAsync().ConfigureAwait(false)).GroupBy(x => x.CompanyId).Select(x => x.First()).ToArray();
 
     }
     // Calculate

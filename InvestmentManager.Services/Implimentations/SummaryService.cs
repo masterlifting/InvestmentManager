@@ -47,7 +47,7 @@ namespace InvestmentManager.Services.Implimentations
             if (companySummaries is null || !companySummaries.Any())
                 return 0;
 
-            var actualPrices = unitOfWork.Price.GetLastPrices(30);
+            var actualPrices = await unitOfWork.Price.GetLastPricesAsync(30).ConfigureAwait(false);
             return companySummaries.Join(actualPrices, x => x.CompanyId, y => y.Key, (x, y) => x.ActualLot * y.Value).Sum();
         }
         public async Task<decimal> GetCompanyActualInvestedSumAsync(long companyId)
@@ -237,7 +237,7 @@ namespace InvestmentManager.Services.Implimentations
             if (!companyId.HasValue)
                 return false;
 
-            var summary = await unitOfWork.CompanySummary.GetAll().FirstOrDefaultAsync(x => x.AccountId == transaction.AccountId &&  x.CompanyId == companyId.Value).ConfigureAwait(false);
+            var summary = await unitOfWork.CompanySummary.GetAll().FirstOrDefaultAsync(x => x.AccountId == transaction.AccountId && x.CompanyId == companyId.Value).ConfigureAwait(false);
 
             if (summary is not null)
             {

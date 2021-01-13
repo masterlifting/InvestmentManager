@@ -9,7 +9,7 @@ namespace InvestmentManager.Calculator.Implimentations
     internal class PriceCalculate : BaseCalculate, IPriceCalculate
     {
         private readonly List<decimal> prices;
-        public PriceCalculate(List<Price> orderedPrices) => prices = orderedPrices.Select(x => x.Value).Where(x => x != default).ToList();
+        public PriceCalculate(IEnumerable<Price> orderedPrices) => prices = orderedPrices.Select(x => x.Value).Where(x => x != default).ToList();
 
         public decimal? GetPricieComporision()
         {

@@ -16,7 +16,7 @@ namespace InvestmentManager.Calculator.Implimentations
         private readonly List<decimal> debtLoadCollection;
         private readonly List<decimal> epsCollection;
 
-        public CoefficientCalculate(List<Coefficient> sortedCoefficients)
+        public CoefficientCalculate(IEnumerable<Coefficient> sortedCoefficients)
         {
             profitabilityCollection = sortedCoefficients.Select(x => x.Profitability).Where(x => x != default).ToList();
             roaCollection = sortedCoefficients.Select(x => x.ROA).Where(x => x != default).ToList();

@@ -9,7 +9,7 @@ namespace InvestmentManager.Calculator.Implimentations
     internal class ReportCalculate : BaseCalculate, IReportCalculate
     {
         private readonly List<Report> reports;
-        public ReportCalculate(List<Report> orderedReports) => reports = orderedReports;
+        public ReportCalculate(IEnumerable<Report> orderedReports) => reports = orderedReports.ToList();
 
         public decimal? GetCashFlowBalance(decimal maxPercent = 10)
         {

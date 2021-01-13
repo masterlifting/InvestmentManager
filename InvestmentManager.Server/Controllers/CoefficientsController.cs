@@ -1,12 +1,9 @@
 ﻿using InvestmentManager.Entities.Calculate;
-using InvestmentManager.Models;
 using InvestmentManager.Models.EntityModels;
 using InvestmentManager.Models.SummaryModels;
 using InvestmentManager.Repository;
 using InvestmentManager.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 

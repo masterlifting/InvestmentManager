@@ -62,19 +62,14 @@ namespace InvestmentManager.Repository
         /// <param name="companyId"></param>
         /// <returns>4 даты</returns>
         IQueryable<DateTime> GetLastFourDateReport(long companyId);
-        IDictionary<long, DateTime> GetLastDateReports();
-        DateTime GetLastDateReport(long companyId);
     }
     public interface IPriceRepository : IRepository<Price>
     {
-        Task<IEnumerable<Price>> GetCustomPricesAsync(long companyId, int lastMonths, OrderType orderDate);
-        Task<IEnumerable<Price>> GetCustomPricesAsync(long companyId, int lastMonths, OrderType orderDate, DateTime? startDate = null);
-        Dictionary<long, List<Price>> GetGroupedPrices(int lastMonths, OrderType orderDate);
-        Dictionary<long, List<Price>> GetGroupedPricesByDateSplit(int lastMonths, OrderType orderDate);
-        IDictionary<long, decimal> GetLastPrices(double lastDays);
-        IDictionary<long, DateTime> GetLastDates(double lastDays);
-        IQueryable<DateTime> GetLastDates(long tickerId, int count);
-        int GetCompanyCountWithPrices();
+        Task<Price[]> GetCustomPricesAsync(long companyId, int lastMonths, OrderType orderDate, DateTime? startDate = null);
+        Task<Dictionary<long, Price[]>> GetGroupedPricesAsync(int lastMonths, OrderType orderDate);
+        Task<IDictionary<long, decimal>> GetLastPricesAsync(double lastDays);
+        Task<DateTime[]> GetLastDatesAsync(long tickerId, int count);
+        Task<int> GetCompanyCountWithPricesAsync();
     }
     // Calculate
     public interface IRatingRepository : IRepository<Rating> { }
