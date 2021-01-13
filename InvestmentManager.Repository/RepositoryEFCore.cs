@@ -136,7 +136,7 @@ namespace InvestmentManager.Repository
             {
                 if (i.DateSplit.HasValue)
                 {
-                    DateTime startDateSplit = i.DateSplit.Value > baseStartDate ? i.DateSplit.Value : baseStartDate;
+                    DateTime startDateSplit = i.DateSplit.Value > baseStartDate ? i.DateSplit.Value.AddDays(1) : baseStartDate;
                     result.Add(i.CompanyId, i.Prices.Where(x => x.BidDate >= startDateSplit).ToArray());
                 }
                 else
