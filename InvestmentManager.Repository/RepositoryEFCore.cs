@@ -84,13 +84,7 @@ namespace InvestmentManager.Repository
     // Market
     public class ExchangeRepository : RepositoryEFCore<Exchange>, IExchangeRepository { public ExchangeRepository(InvestmentContext context) : base(context) { } }
     public class IsinRepository : RepositoryEFCore<Isin>, IIsinRepository { public IsinRepository(InvestmentContext context) : base(context) { } }
-    public class TickerRepository : RepositoryEFCore<Ticker>, ITickerRepository
-    {
-        private readonly InvestmentContext context;
-        public TickerRepository(InvestmentContext context) : base(context) => this.context = context;
-
-        public IEnumerable<Ticker> GetPriceTikers() => context.Tickers.AsNoTracking().AsEnumerable().GroupBy(x => x.CompanyId).Select(x => x.First());
-    }
+    public class TickerRepository : RepositoryEFCore<Ticker>, ITickerRepository { public TickerRepository(InvestmentContext context) : base(context) { } }
     public class LotRepository : RepositoryEFCore<Lot>, ILotRepository { public LotRepository(InvestmentContext context) : base(context) { } }
     public class CompanyRepository : RepositoryEFCore<Company>, ICompanyRepository { public CompanyRepository(InvestmentContext context) : base(context) { } }
     public class IndustryRepository : RepositoryEFCore<Industry>, IIndustryRepository { public IndustryRepository(InvestmentContext context) : base(context) { } }
@@ -101,20 +95,20 @@ namespace InvestmentManager.Repository
         private readonly InvestmentContext context;
         public ReportRepository(InvestmentContext context) : base(context) => this.context = context;
 
-        public IDictionary<long, Report> GetLastReports()
+        public async Task<IDictionary<long, Report>> GetLastReportsAsync()
         {
             var result = new Dictionary<long, Report>();
 
-            var source = context.Reports.AsNoTracking().Where(x => x.DateReport >= DateTime.Now.AddMonths(-4)).OrderBy(x => x.DateReport);
-            var agregatedData = source.AsEnumerable().GroupBy(x => x.CompanyId).Select(x => new { CompanyId = x.Key, LastReport = x.Last() });
+            var reports = await context.Reports.Where(x => x.DateReport >= DateTime.Now.AddMonths(-4)).OrderBy(x => x.DateReport).ToArrayAsync().ConfigureAwait(false);
+            var agregatedData = reports.GroupBy(x => x.CompanyId).Select(x => new { CompanyId = x.Key, LastReport = x.Last() });
 
             foreach (var i in agregatedData)
                 result.Add(i.CompanyId, i.LastReport);
 
             return result;
         }
-        public IQueryable<DateTime> GetLastFourDateReport(long companyId) => context.Reports.AsNoTracking()
-            .Where(x => x.CompanyId == companyId).OrderByDescending(x => x.DateReport).Select(x => x.DateReport).Take(4);
+        public async Task<DateTime[]> GetLastFourDateReportAsync(long companyId) =>
+            await context.Reports.Where(x => x.CompanyId == companyId).OrderByDescending(x => x.DateReport).Take(4).Select(x => x.DateReport).ToArrayAsync().ConfigureAwait(false);
     }
     public class PriceRepository : RepositoryEFCore<Price>, IPriceRepository
     {
@@ -191,10 +185,8 @@ namespace InvestmentManager.Repository
             await context.Prices.Where(x => x.TickerId == tickerId).OrderByDescending(x => x.BidDate).Take(count).Select(x => x.BidDate).ToArrayAsync().ConfigureAwait(false);
         public async Task<int> GetCompanyCountWithPricesAsync() =>
             await context.Prices.Select(x => x.TickerId).Distinct().CountAsync().ConfigureAwait(false);
-
-        private async Task<Ticker[]> GetTickersByPricesAsync() =>
+        public async Task<Ticker[]> GetTickersByPricesAsync() =>
             (await context.Tickers.ToArrayAsync().ConfigureAwait(false)).GroupBy(x => x.CompanyId).Select(x => x.First()).ToArray();
-
     }
     // Calculate
     public class RatingRepository : RepositoryEFCore<Rating>, IRatingRepository { public RatingRepository(InvestmentContext context) : base(context) { } }

@@ -86,7 +86,7 @@ namespace InvestmentManager.Server.Controllers
         {
             var newPricies = new List<Price>();
             var exchanges = unitOfWork.Exchange.GetAll();
-            var tickers = unitOfWork.Ticker.GetPriceTikers();
+            var tickers = await unitOfWork.Price.GetTickersByPricesAsync().ConfigureAwait(false);
             var priceConfigure = tickers.Join(exchanges, x => x.ExchangeId, y => y.Id, (x, y) => new { TickerId = x.Id, Ticker = x.Name, y.ProviderName, y.ProviderUri });
 
             foreach (var i in priceConfigure)
@@ -114,7 +114,7 @@ namespace InvestmentManager.Server.Controllers
         [HttpGet("parsereports/"), Authorize(Roles = "pestunov")]
         public async Task ParseReports()
         {
-            IDictionary<long, Report> lastReports = unitOfWork.Report.GetLastReports();
+            IDictionary<long, Report> lastReports = await unitOfWork.Report.GetLastReportsAsync().ConfigureAwait(false);
             var reportSource = await unitOfWork.ReportSource.GetAll().ToListAsync().ConfigureAwait(false);
             var reportsToSave = new List<Report>();
             foreach (var i in reportSource)
@@ -149,10 +149,10 @@ namespace InvestmentManager.Server.Controllers
         {
             var userIds = await userManager.Users.Select(x => x.Id).ToArrayAsync().ConfigureAwait(false);
 
-           /*/
-            DropCalculations();
-            return Ok(new BaseActionResult { IsSuccess = true, Info = "Is Drop!" });
             /*/
+             DropCalculations();
+             return Ok(new BaseActionResult { IsSuccess = true, Info = "Is Drop!" });
+             /*/
             return await calculator.ResetCalculatorDataAsync(DataBaseType.Postgres, userIds).ConfigureAwait(false)
                 ? Ok(new BaseActionResult { IsSuccess = true, Info = "Reset all calculator success." })
                 : BadRequest(new BaseActionResult { IsSuccess = false, Info = "Reset all calculator failed!" });

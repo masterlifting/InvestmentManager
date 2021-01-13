@@ -40,10 +40,7 @@ namespace InvestmentManager.Repository
     // Market
     public interface IExchangeRepository : IRepository<Exchange> { }
     public interface IIsinRepository : IRepository<Isin> { }
-    public interface ITickerRepository : IRepository<Ticker>
-    {
-        IEnumerable<Ticker> GetPriceTikers();
-    }
+    public interface ITickerRepository : IRepository<Ticker> { }
     public interface ILotRepository : IRepository<Lot> { }
     public interface ICompanyRepository : IRepository<Company> { }
     public interface IIndustryRepository : IRepository<Industry> { }
@@ -55,13 +52,13 @@ namespace InvestmentManager.Repository
         /// Словарь последних вышедших отчетов по каждой компании
         /// </summary>
         /// <returns>Словарь(CompanyId,Report)</returns>
-        IDictionary<long, Report> GetLastReports();
+        Task<IDictionary<long, Report>> GetLastReportsAsync();
         /// <summary>
         /// Четыре последних даты отчетов
         /// </summary>
         /// <param name="companyId"></param>
         /// <returns>4 даты</returns>
-        IQueryable<DateTime> GetLastFourDateReport(long companyId);
+        Task<DateTime[]> GetLastFourDateReportAsync(long companyId);
     }
     public interface IPriceRepository : IRepository<Price>
     {
@@ -70,6 +67,7 @@ namespace InvestmentManager.Repository
         Task<IDictionary<long, decimal>> GetLastPricesAsync(double lastDays);
         Task<DateTime[]> GetLastDatesAsync(long tickerId, int count);
         Task<int> GetCompanyCountWithPricesAsync();
+        Task<Ticker[]> GetTickersByPricesAsync();
     }
     // Calculate
     public interface IRatingRepository : IRepository<Rating> { }

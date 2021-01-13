@@ -65,7 +65,7 @@ namespace InvestmentManager.ReportFinder.Implimentations
             Console.WriteLine("Сравниваю даты отчетов.");
             Console.ResetColor();
 
-            var lastDateReportFromDb = await unitOfWork.Report.GetLastFourDateReport(companyId).ToArrayAsync().ConfigureAwait(false);
+            var lastDateReportFromDb = await unitOfWork.Report.GetLastFourDateReportAsync(companyId).ConfigureAwait(false);
 
             if (!lastDateReportFromDb.Any())
             {
