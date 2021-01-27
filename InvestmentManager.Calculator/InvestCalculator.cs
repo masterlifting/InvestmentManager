@@ -438,7 +438,7 @@ namespace InvestmentManager.Calculator
         }
         static void SetRatingPlaces(List<Rating> ratings)
         {
-            ratings.Sort(new RatingComparator());
+            ratings.Sort((x, y) => x.Result < y.Result ? 1 : x.Result > y.Result ? -1 : 0);
 
             for (int i = 0; i < ratings.Count; i++)
             {
@@ -679,7 +679,7 @@ namespace InvestmentManager.Calculator
                 decimal lotMin = Math.Round((stockCount * percentMin) * 0.01m, 0);
 
                 //Если распределилось не до конца, то дораспределим
-                if ((lotMax + lotMid + lotMin) < freeStockCount)
+                if ((lotMax + lotMid + lotMin) < stockCount)
                 {
                     decimal a = stockCount - (lotMax + lotMid + lotMin);
                     decimal b = (new decimal[] { percentMin, percentMid, percentMax }).Max();
@@ -853,9 +853,5 @@ namespace InvestmentManager.Calculator
                 && await SetRatingAsync(dbType).ConfigureAwait(false)
                 && await SetBuyRecommendationsAsync(dbType)
                 && await SetSellRecommendationsAsync(dbType, userIds);
-    }
-    class RatingComparator : IComparer<Rating>
-    {
-        public int Compare(Rating x, Rating y) => x.Result < y.Result ? 1 : x.Result > y.Result ? -1 : 0;
     }
 }

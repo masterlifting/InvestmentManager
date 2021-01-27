@@ -32,6 +32,7 @@ namespace InvestmentManager.Repository
         , ICompanyRepository company
         , ICompanySummaryRepository companySummary
         , IExchangeRepository exchange
+        , IWeekendRepository weekend
         , IIndustryRepository industry
         , IReportSourceRepository reportSource
         , IRatingRepository rating
@@ -62,6 +63,7 @@ namespace InvestmentManager.Repository
             Company = company;
             CompanySummary = companySummary;
             Exchange = exchange;
+            Weekend = weekend;
             Industry = industry;
             ReportSource = reportSource;
             Rating = rating;
@@ -92,6 +94,7 @@ namespace InvestmentManager.Repository
         public ICompanyRepository Company { get; }
         public ICompanySummaryRepository CompanySummary { get; }
         public IExchangeRepository Exchange { get; }
+        public IWeekendRepository Weekend { get; }
         public IIndustryRepository Industry { get; }
         public IReportSourceRepository ReportSource { get; }
         public IRatingRepository Rating { get; }

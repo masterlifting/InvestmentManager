@@ -157,7 +157,7 @@ namespace InvestmentManager.Server.Controllers
 
             if (result.IsSuccess)
             {
-                result.Info += await reckonerService.UpgradeByStockTransactionChangeAsync(entity, userManager.GetUserId(User)).ConfigureAwait(false) ? " Recalculated" : " NOT Recalculated.";
+                result.Info += await reckonerService.UpgradeByStockTransactionChangeAsync(entity, userManager.GetUserId(User)).ConfigureAwait(false) ? " Recalculated" : " NOT Recalculated";
                 return Ok(result);
             }
             else

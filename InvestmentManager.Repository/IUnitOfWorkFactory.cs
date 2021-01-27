@@ -25,6 +25,7 @@ namespace InvestmentManager.Repository
         IReportRepository Report { get; }
         ICompanyRepository Company { get; }
         IExchangeRepository Exchange { get; }
+        IWeekendRepository Weekend { get; }
         IIndustryRepository Industry { get; }
         IReportSourceRepository ReportSource { get; }
 

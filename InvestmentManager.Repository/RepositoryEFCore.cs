@@ -83,6 +83,7 @@ namespace InvestmentManager.Repository
     public class TransactionStatusRepository : RepositoryEFCore<TransactionStatus>, ITransactionStatusRepository { public TransactionStatusRepository(InvestmentContext context) : base(context) { } }
     // Market
     public class ExchangeRepository : RepositoryEFCore<Exchange>, IExchangeRepository { public ExchangeRepository(InvestmentContext context) : base(context) { } }
+    public class WeekendRepository : RepositoryEFCore<Weekend>, IWeekendRepository { public WeekendRepository(InvestmentContext context) : base(context) { } }
     public class IsinRepository : RepositoryEFCore<Isin>, IIsinRepository { public IsinRepository(InvestmentContext context) : base(context) { } }
     public class TickerRepository : RepositoryEFCore<Ticker>, ITickerRepository { public TickerRepository(InvestmentContext context) : base(context) { } }
     public class LotRepository : RepositoryEFCore<Lot>, ILotRepository { public LotRepository(InvestmentContext context) : base(context) { } }

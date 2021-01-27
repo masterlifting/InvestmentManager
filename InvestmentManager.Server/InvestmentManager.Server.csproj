@@ -25,7 +25,6 @@
     <ProjectReference Include="..\InvestmentManager.Client\InvestmentManager.Client.csproj" />
     <ProjectReference Include="..\InvestmentManager.Mapper\InvestmentManager.Mapper.csproj" />
     <ProjectReference Include="..\InvestmentManager.Models\InvestmentManager.Models.csproj" />
-    <ProjectReference Include="..\InvestmentManager.PriceFinder\InvestmentManager.PriceFinder.csproj" />
     <ProjectReference Include="..\InvestmentManager.ReportFinder\InvestmentManager.ReportFinder.csproj" />
     <ProjectReference Include="..\InvestmentManager.Repository\InvestmentManager.Repository.csproj" />
     <ProjectReference Include="..\InvestmentManager.Services\InvestmentManager.Services.csproj" />

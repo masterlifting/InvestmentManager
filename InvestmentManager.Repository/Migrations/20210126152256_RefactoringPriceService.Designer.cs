@@ -3,15 +3,17 @@ using System;
 using InvestmentManager.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace InvestmentManager.Repository.Migrations
 {
     [DbContext(typeof(InvestmentContext))]
-    partial class InvestmentContextModelSnapshot : ModelSnapshot
+    [Migration("20210126152256_RefactoringPriceService")]
+    partial class RefactoringPriceService
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -932,7 +934,7 @@ namespace InvestmentManager.Repository.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
-                        .UseIdentityByDefaultColumn();
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
 
                     b.Property<long>("ExchangeId")
                         .HasColumnType("bigint");

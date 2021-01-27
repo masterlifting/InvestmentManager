@@ -52,7 +52,14 @@
     async Task ParsePrices()
     {
         if (await IsAdmin())
-            await http.GetAsync(new UrlBuilder(UrlService.ParsePrices).Result);
+        {
+            var result = await http.GetAsync<BaseActionResult>(new UrlBuilder(UrlService.ParsePrices).Result);
+
+            if (result.IsSuccess)
+                notice.ToastSuccess("Parse prices result", result.Info);
+            else
+                notice.ToastDanger("Parse prices result", result.Info);
+        }
     }
     async Task ParseReports()
     {

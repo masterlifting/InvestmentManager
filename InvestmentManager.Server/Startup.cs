@@ -3,8 +3,6 @@ using InvestmentManager.Calculator;
 using InvestmentManager.Calculator.ConfigurationBinding;
 using InvestmentManager.Mapper.Implimentations;
 using InvestmentManager.Mapper.Interfaces;
-using InvestmentManager.PriceFinder.Implimentations;
-using InvestmentManager.PriceFinder.Interfaces;
 using InvestmentManager.ReportFinder.Implimentations;
 using InvestmentManager.ReportFinder.Interfaces;
 using InvestmentManager.Repository;
@@ -103,6 +101,7 @@ namespace InvestmentManager.Server
             services.AddScoped<ICompanyRepository, CompanyRepository>();
             services.AddScoped<ICompanySummaryRepository, CompanySummaryRepository>();
             services.AddScoped<IExchangeRepository, ExchangeRepository>();
+            services.AddScoped<IWeekendRepository, WeekendRepository>();
             services.AddScoped<IIndustryRepository, IndustryRepository>();
             services.AddScoped<IReportSourceRepository, ReportSourceRepository>();
             services.AddScoped<IRatingRepository, RatingRepository>();

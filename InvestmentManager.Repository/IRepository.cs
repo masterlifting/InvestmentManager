@@ -39,6 +39,7 @@ namespace InvestmentManager.Repository
     public interface ITransactionStatusRepository : IRepository<TransactionStatus> { }
     // Market
     public interface IExchangeRepository : IRepository<Exchange> { }
+    public interface IWeekendRepository : IRepository<Weekend> { }
     public interface IIsinRepository : IRepository<Isin> { }
     public interface ITickerRepository : IRepository<Ticker> { }
     public interface ILotRepository : IRepository<Lot> { }

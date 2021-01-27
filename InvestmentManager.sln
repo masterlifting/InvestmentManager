@@ -17,8 +17,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InvestmentManager.Entities"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InvestmentManager.Mapper", "InvestmentManager.Mapper\InvestmentManager.Mapper.csproj", "{C7532E96-7F8D-4C30-A815-EAA82E384AFA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InvestmentManager.PriceFinder", "InvestmentManager.PriceFinder\InvestmentManager.PriceFinder.csproj", "{829A0EA9-B509-4BC2-9184-47B1F5F062D3}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InvestmentManager.Repository", "InvestmentManager.Repository\InvestmentManager.Repository.csproj", "{D0826080-959E-4CA0-A35B-797F3CDFC942}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InvestmentManager.Services", "InvestmentManager.Services\InvestmentManager.Services.csproj", "{9BD65189-E05A-4701-83F9-63A04DE92D23}"
@@ -59,10 +57,6 @@ Global
 		{C7532E96-7F8D-4C30-A815-EAA82E384AFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C7532E96-7F8D-4C30-A815-EAA82E384AFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C7532E96-7F8D-4C30-A815-EAA82E384AFA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{829A0EA9-B509-4BC2-9184-47B1F5F062D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{829A0EA9-B509-4BC2-9184-47B1F5F062D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{829A0EA9-B509-4BC2-9184-47B1F5F062D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{829A0EA9-B509-4BC2-9184-47B1F5F062D3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D0826080-959E-4CA0-A35B-797F3CDFC942}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D0826080-959E-4CA0-A35B-797F3CDFC942}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D0826080-959E-4CA0-A35B-797F3CDFC942}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -4,7 +4,6 @@ using InvestmentManager.Entities.Market;
 using InvestmentManager.Mapper.Interfaces;
 using InvestmentManager.Models;
 using InvestmentManager.Models.Additional;
-using InvestmentManager.PriceFinder.Interfaces;
 using InvestmentManager.ReportFinder.Interfaces;
 using InvestmentManager.Repository;
 using InvestmentManager.Services.Interfaces;
@@ -82,35 +81,23 @@ namespace InvestmentManager.Server.Controllers
             }
         }
         [HttpGet("parseprices/"), Authorize(Roles = "pestunov")]
-        public async Task ParsePrices()
+        public async Task<IActionResult> ParsePrices()
         {
-            var newPricies = new List<Price>();
-            var exchanges = unitOfWork.Exchange.GetAll();
-            var tickers = await unitOfWork.Price.GetTickersByPricesAsync().ConfigureAwait(false);
-            var priceConfigure = tickers.Join(exchanges, x => x.ExchangeId, y => y.Id, (x, y) => new { TickerId = x.Id, Ticker = x.Name, y.ProviderName, y.ProviderUri });
+            var companyCountWithParsedPrices = await priceService.DownloadNewStockPricesAsync(100).ConfigureAwait(false);
 
-            foreach (var i in priceConfigure)
+            string recalculatedResult = "";
+            if (companyCountWithParsedPrices > 0)
             {
-                try
-                {
-                    var newPrice = await priceService.GetPriceListAsync(i.ProviderName, i.TickerId, i.Ticker, i.ProviderUri).ConfigureAwait(false);
-                    newPricies.AddRange(newPrice);
-                }
-                catch
-                {
-                    continue;
-                }
+                var userIds = await userManager.Users.Select(x => x.Id).ToArrayAsync().ConfigureAwait(false);
+                bool isRecalculated = await reckonerService.UpgradeByPriceChangeAsync(DataBaseType.Postgres, userIds).ConfigureAwait(false);
+                recalculatedResult = isRecalculated ? "Recalculated" : "NOT Recalculated";
             }
-            if (newPricies.Any())
-            {
-                await unitOfWork.Price.CreateEntitiesAsync(newPricies).ConfigureAwait(false);
-                if (await unitOfWork.Price.CompletePostgresAsync().ConfigureAwait(false))
-                {
-                    var userIds = await userManager.Users.Select(x => x.Id).ToArrayAsync().ConfigureAwait(false);
-                    await reckonerService.UpgradeByPriceChangeAsync(DataBaseType.Postgres, userIds).ConfigureAwait(false);
-                }
-            }
+
+            return companyCountWithParsedPrices >= 0
+                            ? Ok(new BaseActionResult { IsSuccess = true, Info = $"Company: {companyCountWithParsedPrices}. {recalculatedResult}" })
+                            : BadRequest(new BaseActionResult { IsSuccess = false, Info = "Prices update failed!" });
         }
+
         [HttpGet("parsereports/"), Authorize(Roles = "pestunov")]
         public async Task ParseReports()
         {

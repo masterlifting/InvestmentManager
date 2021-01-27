@@ -28,6 +28,7 @@ namespace InvestmentManager.Repository
         public DbSet<ReportSource> ReportSources { get; set; }
         public DbSet<Company> Companies { get; set; }
         public DbSet<Exchange> Exchanges { get; set; }
+        public DbSet<Weekend> Weekends { get; set; }
         public DbSet<Industry> Industries { get; set; }
         public DbSet<Lot> Lots { get; set; }
         public DbSet<Price> Prices { get; set; }

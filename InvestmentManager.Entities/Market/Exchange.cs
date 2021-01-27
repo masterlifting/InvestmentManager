@@ -12,15 +12,8 @@ namespace InvestmentManager.Entities.Market
         [Required]
         public string Name { get; set; }
 
-        [StringLength(100)]
-        [Required]
-        public string ProviderName { get; set; }
-
-        [StringLength(100)]
-        [Required]
-        public string ProviderUri { get; set; }
-
         public virtual IEnumerable<Ticker> Tickers { get; set; }
         public virtual IEnumerable<StockTransaction> StockTransactions { get; set; }
+        public virtual IEnumerable<Weekend> Weekend { get; set; }
     }
 }
