@@ -46,14 +46,14 @@ namespace InvestmentManager.Services.Implimentations
 
             var exchanges = unitOfWork.Exchange.GetAll();
             var tickers = await unitOfWork.Price.GetTickersByPricesAsync().ConfigureAwait(false);
-            var prices = (await unitOfWork.Price.GetAll().Where(x => x.BidDate >= startPriceDate).OrderByDescending(x => x.BidDate).ToArrayAsync().ConfigureAwait(false))
+            var prices = (await unitOfWork.Price.GetAll().Where(x => x.BidDate >= startPriceDate).ToArrayAsync().ConfigureAwait(false))
                 .GroupBy(x => x.TickerId);
 
             var tickerIds = tickers.Select(x => x.Id);
             var tickerIdsWhithPrices = prices.Select(x => x.Key);
             var tickerIdsWithOutPrices = tickerIds.Except(tickerIdsWhithPrices);
 
-            var dataWithPricesGrouped = prices.Select(x => new { TickerId = x.Key, DateLastPrice = x.First().BidDate, IdLastPrice = x.First().Id })
+            var dataWithPricesGrouped = prices.Select(x => new { TickerId = x.Key, DateLastPrice = x.OrderBy(x => x.BidDate).Last().BidDate, IdLastPrice = x.OrderBy(x => x.BidDate).Last().Id })
                 .Join(tickers, x => x.TickerId, y => y.Id, (x, y) => new { x.DateLastPrice, x.IdLastPrice, Ticker = y, y.ExchangeId })
                 .Join(exchanges, x => x.ExchangeId, y => y.Id, (x, y) => new { x.Ticker, Exchange = y, x.DateLastPrice, x.IdLastPrice })
                 .GroupBy(x => x.Exchange);

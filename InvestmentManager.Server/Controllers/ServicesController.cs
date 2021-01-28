@@ -83,7 +83,7 @@ namespace InvestmentManager.Server.Controllers
         [HttpGet("parseprices/"), Authorize(Roles = "pestunov")]
         public async Task<IActionResult> ParsePrices()
         {
-            var companyCountWithParsedPrices = await priceService.DownloadNewStockPricesAsync(100).ConfigureAwait(false);
+            var companyCountWithParsedPrices = await priceService.DownloadNewStockPricesAsync(365).ConfigureAwait(false);
 
             string recalculatedResult = "";
             if (companyCountWithParsedPrices > 0)
