@@ -103,13 +103,22 @@ namespace InvestmentManager.Services.Implimentations
             if (result.Any())
             {
                 var newPrices = result.Where(x => x.Id == default);
-                var currentPrices = result.Where(x => x.Id != default);
+                var currentPrices = result.Where(x => x.Id != default).ToArray();
                 int companyCountWithPrices = result.GroupBy(x => x.TickerId).Count();
 
                 if (newPrices.Any())
                     await unitOfWork.Price.CreateEntitiesAsync(newPrices).ConfigureAwait(false);
                 if (currentPrices.Any())
-                    unitOfWork.Price.UpdateEntities(currentPrices);
+                {
+                    for (int i = 0; i < currentPrices.Length; i++)
+                    {
+                        var price = await unitOfWork.Price.FindByIdAsync(currentPrices[i].Id).ConfigureAwait(false);
+                        
+                        price.Value = currentPrices[i].Value;
+                        price.BidDate = currentPrices[i].BidDate;
+                        price.DateUpdate = currentPrices[i].DateUpdate;
+                    }
+                }
 
                 return await unitOfWork.CompleteAsync().ConfigureAwait(false) ? companyCountWithPrices : -1;
             }

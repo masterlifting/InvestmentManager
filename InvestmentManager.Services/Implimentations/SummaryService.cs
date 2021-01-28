@@ -1,9 +1,7 @@
 ﻿using InvestmentManager.Entities.Broker;
 using InvestmentManager.Entities.Calculate;
-using InvestmentManager.Models;
 using InvestmentManager.Repository;
 using InvestmentManager.Services.Interfaces;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -47,7 +45,7 @@ namespace InvestmentManager.Services.Implimentations
             if (companySummaries is null || !companySummaries.Any())
                 return 0;
 
-            var actualPrices = await unitOfWork.Price.GetLastPricesAsync(30).ConfigureAwait(false);
+            var actualPrices = await unitOfWork.Price.GetLastPricesAsync(30, companySummaries.Select(x => x.CompanyId)).ConfigureAwait(false);
             return companySummaries.Join(actualPrices, x => x.CompanyId, y => y.Key, (x, y) => x.ActualLot * y.Value).Sum();
         }
         public async Task<decimal> GetCompanyActualInvestedSumAsync(long companyId)
@@ -56,11 +54,11 @@ namespace InvestmentManager.Services.Implimentations
             if (companySummary.ActualLot == 0)
                 return 0;
 
-            var actualPrice = await unitOfWork.Price.GetCustomPricesAsync(companyId, 1, OrderType.OrderByDesc).ConfigureAwait(false);
+            var actualPrice = await unitOfWork.Price.GetCustomOrderedPricesAsync(companyId, 1).ConfigureAwait(false);
             if (actualPrice is null)
                 return 0;
 
-            return companySummary.ActualLot * actualPrice.First().Value;
+            return companySummary.ActualLot * actualPrice.Last().Value;
         }
 
 

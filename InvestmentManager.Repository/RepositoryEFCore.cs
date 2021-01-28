@@ -65,11 +65,6 @@ namespace InvestmentManager.Repository
             }
         }
     }
-    public enum OrderType
-    {
-        OrderBy,
-        OrderByDesc
-    }
 
     #region Repository Classes
     // Broker
@@ -116,7 +111,7 @@ namespace InvestmentManager.Repository
         private readonly InvestmentContext context;
         public PriceRepository(InvestmentContext context) : base(context) => this.context = context;
 
-        public async Task<Dictionary<long, Price[]>> GetGroupedPricesAsync(int lastMonths, OrderType orderDate)
+        public async Task<Dictionary<long, Price[]>> GetGroupedOrderedPricesAsync(int lastMonths)
         {
             var result = new Dictionary<long, Price[]>();
             DateTime baseStartDate = DateTime.Now.AddMonths(-lastMonths);
@@ -124,13 +119,11 @@ namespace InvestmentManager.Repository
             var tickers = await GetTickersByPricesAsync().ConfigureAwait(false);
             var priceQuery = context.Prices.Where(x => x.BidDate >= baseStartDate);
 
-            var prices = orderDate == OrderType.OrderBy
-                ? (await priceQuery.OrderBy(x => x.BidDate).ToArrayAsync().ConfigureAwait(false)).GroupBy(x => x.TickerId)
-                : (await priceQuery.OrderByDescending(x => x.BidDate).ToArrayAsync().ConfigureAwait(false)).GroupBy(x => x.TickerId);
+            var prices = (await priceQuery.ToArrayAsync().ConfigureAwait(false)).GroupBy(x => x.TickerId);
 
             var agregatedData = tickers
                 .Join(context.Companies, x => x.CompanyId, y => y.Id, (x, y) => new { TickerId = x.Id, x.CompanyId, y.DateSplit })
-                .Join(prices, x => x.TickerId, y => y.Key, (x, y) => (x.CompanyId, x.DateSplit, Prices: y.Select(z => z).ToArray()));
+                .Join(prices, x => x.TickerId, y => y.Key, (x, y) => (x.CompanyId, x.DateSplit, Prices: y.Select(z => z)));
 
 
             foreach (var i in agregatedData)
@@ -138,10 +131,10 @@ namespace InvestmentManager.Repository
                 if (i.DateSplit.HasValue)
                 {
                     DateTime startDateSplit = i.DateSplit.Value > baseStartDate ? i.DateSplit.Value.AddDays(1) : baseStartDate;
-                    result.Add(i.CompanyId, i.Prices.Where(x => x.BidDate >= startDateSplit).ToArray());
+                    result.Add(i.CompanyId, i.Prices.OrderBy(x => x.BidDate).Where(x => x.BidDate >= startDateSplit).ToArray());
                 }
                 else
-                    result.Add(i.CompanyId, i.Prices);
+                    result.Add(i.CompanyId, i.Prices.OrderBy(x => x.BidDate).ToArray());
             }
 
             return result;
@@ -151,15 +144,32 @@ namespace InvestmentManager.Repository
             var result = new Dictionary<long, decimal>();
 
             var tickers = await GetTickersByPricesAsync().ConfigureAwait(false);
-            var prices = await context.Prices.Where(x => x.BidDate >= DateTime.Now.AddDays(-lastDays)).OrderByDescending(x => x.BidDate).ToArrayAsync().ConfigureAwait(false);
+            var prices = await context.Prices.Where(x => x.BidDate >= DateTime.Now.AddDays(-lastDays)).ToArrayAsync().ConfigureAwait(false);
 
-            var agregatedData = prices.GroupBy(x => x.TickerId).Join(tickers, x => x.Key, y => y.Id, (x, y) => new { y.CompanyId, LastPrice = x.First().Value });
+            var agregatedData = prices.GroupBy(x => x.TickerId).Join(tickers, x => x.Key, y => y.Id, (x, y) => new { y.CompanyId, LastPrice = x.OrderByDescending(x => x.BidDate).First().Value });
             foreach (var i in agregatedData)
                 result.Add(i.CompanyId, i.LastPrice);
 
             return result;
         }
-        public async Task<Price[]> GetCustomPricesAsync(long companyId, int lastMonths, OrderType orderDate, DateTime? startDate = null)
+        public async Task<IDictionary<long, decimal>> GetLastPricesAsync(double lastDays, IEnumerable<long> companyIds)
+        {
+            var result = new Dictionary<long, decimal>();
+
+            if (companyIds is null || !companyIds.Any())
+                return result;
+
+            var tickers = (await GetTickersByPricesAsync().ConfigureAwait(false)).Where(x => companyIds.Contains(x.CompanyId));
+            var prices = await context.Prices.Where(x => x.BidDate >= DateTime.Now.AddDays(-lastDays)).ToArrayAsync().ConfigureAwait(false);
+
+            var agregatedData = prices.GroupBy(x => x.TickerId).Join(tickers, x => x.Key, y => y.Id, (x, y) => new { y.CompanyId, LastPrice = x.OrderByDescending(x => x.BidDate).First().Value });
+            foreach (var i in agregatedData)
+                result.Add(i.CompanyId, i.LastPrice);
+
+            return result;
+        }
+
+        public async Task<Price[]> GetCustomOrderedPricesAsync(long companyId, int lastMonths, DateTime? startDate = null)
         {
             var result = Array.Empty<Price>();
 
@@ -178,9 +188,7 @@ namespace InvestmentManager.Repository
             if (prices is null || !prices.Any())
                 return result;
 
-            return orderDate == OrderType.OrderByDesc
-                ? await prices.OrderByDescending(x => x.BidDate).ToArrayAsync().ConfigureAwait(false)
-                : await prices.OrderBy(x => x.BidDate).ToArrayAsync().ConfigureAwait(false);
+            return await prices.OrderBy(x => x.BidDate).ToArrayAsync().ConfigureAwait(false);
         }
         public async Task<DateTime[]> GetLastDatesAsync(long tickerId, int count) =>
             await context.Prices.Where(x => x.TickerId == tickerId).OrderByDescending(x => x.BidDate).Take(count).Select(x => x.BidDate).ToArrayAsync().ConfigureAwait(false);
@@ -188,6 +196,7 @@ namespace InvestmentManager.Repository
             await context.Prices.Select(x => x.TickerId).Distinct().CountAsync().ConfigureAwait(false);
         public async Task<Ticker[]> GetTickersByPricesAsync() =>
             (await context.Tickers.ToArrayAsync().ConfigureAwait(false)).GroupBy(x => x.CompanyId).Select(x => x.First()).ToArray();
+
     }
     // Calculate
     public class RatingRepository : RepositoryEFCore<Rating>, IRatingRepository { public RatingRepository(InvestmentContext context) : base(context) { } }

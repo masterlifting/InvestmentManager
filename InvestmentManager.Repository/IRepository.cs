@@ -63,9 +63,10 @@ namespace InvestmentManager.Repository
     }
     public interface IPriceRepository : IRepository<Price>
     {
-        Task<Price[]> GetCustomPricesAsync(long companyId, int lastMonths, OrderType orderDate, DateTime? startDate = null);
-        Task<Dictionary<long, Price[]>> GetGroupedPricesAsync(int lastMonths, OrderType orderDate);
+        Task<Price[]> GetCustomOrderedPricesAsync(long companyId, int lastMonths, DateTime? startDate = null);
+        Task<Dictionary<long, Price[]>> GetGroupedOrderedPricesAsync(int lastMonths);
         Task<IDictionary<long, decimal>> GetLastPricesAsync(double lastDays);
+        Task<IDictionary<long, decimal>> GetLastPricesAsync(double lastDays, IEnumerable<long> companyIds);
         Task<DateTime[]> GetLastDatesAsync(long tickerId, int count);
         Task<int> GetCompanyCountWithPricesAsync();
         Task<Ticker[]> GetTickersByPricesAsync();

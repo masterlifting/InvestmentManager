@@ -17,10 +17,10 @@ namespace InvestmentManager.Server.Controllers
         [HttpGet("bycompanyid/{id}")]
         public async Task<IActionResult> GetByCompanyId(long id)
         {
-            var prices = await unitOfWork.Price.GetCustomPricesAsync(id, 12, OrderType.OrderByDesc).ConfigureAwait(false);
+            var prices = await unitOfWork.Price.GetCustomOrderedPricesAsync(id, 12).ConfigureAwait(false);
             return prices is null
                 ? NoContent()
-                : Ok(prices.Select(x => new PriceModel
+                : Ok(prices.Reverse().Select(x => new PriceModel
                 {
                     DateUpdate = x.DateUpdate,
                     BidDate = x.BidDate,
@@ -32,7 +32,7 @@ namespace InvestmentManager.Server.Controllers
         [HttpGet("bycompanyid/{id}/summary/")]
         public async Task<IActionResult> GetSummaryByCompanyId(long id)
         {
-            var prices = await unitOfWork.Price.GetCustomPricesAsync(id, 1, OrderType.OrderBy).ConfigureAwait(false);
+            var prices = await unitOfWork.Price.GetCustomOrderedPricesAsync(id, 1).ConfigureAwait(false);
 
             if (prices is null || !prices.Any())
                 return NoContent();
