@@ -4,12 +4,12 @@
 
 <FrameTemplate Theme="ColorCustom.idanger" Name="Administrator" TitleColor="ColorBootstrap.light">
     <InfoBlock>
-        <MultiRow Name="Reset summary" IconName="calculator" Action="ResetSummary" />
-        <MultiRow Name="Reset calculator" IconName="calculator" Action="ResetCalculator" />
-        <MultiRow Name="Load prices" IconName="script" Action="ParsePrices" />
-        <MultiRow Name="Load reports" IconName="document" Action="ParseReports" />
-        <MultiRow Name="Check reports" IconName="check" Action="  CheckParsedReports" />
-        <MultiRow Name="@addCompany" IconName="file" Action="     AddCompany" />
+        <MultiRow Name="Reset summary" IconName="calculator" Action="ResetSummary" Description="All balances values are recalculated" />
+        <MultiRow Name="Reset calculator" IconName="calculator" Action="ResetCalculator" Description="All calculated values are recalculated"/>
+        <MultiRow Name="Load prices" IconName="script" Action="ParsePrices" Description="Receives missing prices to date for all companies from exchanges"/>
+        <MultiRow Name="Load reports" IconName="document" Action="ParseReports" Description="Parses data from public company reports from websites"/>
+        <MultiRow Name="Check reports" IconName="check" Action="CheckParsedReports" Description="Checks the validity of data from received reports and saves to the database"/>
+        <MultiRow Name="@addCompany" IconName="file" Action="AddCompany" Description="And so everything is clear :)"/>
     </InfoBlock>
     <ActionBlock>
         @if (isAddingCompany)

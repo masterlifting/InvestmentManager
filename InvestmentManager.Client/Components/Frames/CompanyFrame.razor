@@ -2,16 +2,16 @@
 
 <FrameTemplate Name="@Name" Description="@Description" TitleColor="ColorBootstrap.warning">
     <InfoBlock>
-        <MultiRow Name="@additionalInfo" IconName="info" Action="(() => isAdditionalInfo = !isAdditionalInfo)" Description="Test description" />
-        <MultiRow Name="@transactions" IconName="yen" Action="(() => isTransactions = !isTransactions)" />
-        <MultiRow Name="@rating" IconName="bar-chart" Action="(() => isRating = !isRating )" />
-        <MultiRow Name="@buyRecommendations" IconName="plus" Action="(() => isBuyRecommendations = !isBuyRecommendations)" />
-        <MultiRow Name="@sellRecommendations" IconName="minus" Action="(() => isSellRecommendations = !isSellRecommendations)" />
-        <MultiRow Name="@coefficient" IconName="calculator" Action="(() => isCoefficient = !isCoefficient)" />
-        <MultiRow Name="@report" IconName="document" Action="(() => isReport = !isReport )" />
-        <MultiRow Name="@price" IconName="graph" Action="(() => isPrice = !isPrice)" />
-        <MultiRow Name="@dividend" IconName="target" Action="(() => isDividend = !isDividend)" />
-        <MultiRow Name="@edit" IconName="pencil" Action="(() => isEdit = !isEdit)" />
+        <MultiRow Name="@additionalInfo" IconName="info" Action="(() => isAdditionalInfo = !isAdditionalInfo)" Description="General information about a company" />
+        <MultiRow Name="@transactions" IconName="yen" Action="(() => isTransactions = !isTransactions)" Description="Information about transactions (purchase / sale) for this company on this brokerage account and some summary relevant information" />
+        <MultiRow Name="@rating" IconName="bar-chart" Action="(() => isRating = !isRating )" Description="Information about the calculated rating for this company. A place in the ranking among all. The rating is calculated based on data from reports, multiples and company prices. A comparison is made of homogeneous indicators with the accumulation of information in these comparisons. The results are averaged" />
+        <MultiRow Name="@buyRecommendations" IconName="plus" Action="(() => isBuyRecommendations = !isBuyRecommendations)" Description="The maximum price per share at which it is recommended to buy this company. This price is calculated based on the rating" />
+        <MultiRow Name="@sellRecommendations" IconName="minus" Action="(() => isSellRecommendations = !isSellRecommendations)" Description="The logic of these calculations is based on three stages of profit fixing for this company on this brokerage account, depending on its place in the rating. The first stage is the sale of shares upon reaching a profit: 20% of the value of all existing shares of this company. The number of lots to be sold is calculated depending on the place in the rating. The same is true for the second stage of taking profit at 50%. And the last stage of profit taking - 80%" />
+        <MultiRow Name="@coefficient" IconName="calculator" Action="(() => isCoefficient = !isCoefficient)" Description="Standard market multiples are calculated here based on available reports and prices for this company." />
+        <MultiRow Name="@report" IconName="document" Action="(() => isReport = !isReport )" Description="Here, the necessary historical data from the reports of this company is collected for all calculations in the program" />
+        <MultiRow Name="@price" IconName="graph" Action="(() => isPrice = !isPrice)" Description="Information about the maximum price per day for the last year for this company" />
+        <MultiRow Name="@dividend" IconName="target" Action="(() => isDividend = !isDividend)" Description="History of all dividends received for this company on this brokerage account. Some summary information" />
+        <MultiRow Name="@edit" IconName="pencil" Action="(() => isEdit = !isEdit)" Description="And so everything is clear :)" />
     </InfoBlock>
     <ActionBlock>
         @if (isAdditionalInfo)

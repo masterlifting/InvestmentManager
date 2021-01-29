@@ -20,16 +20,14 @@
         </div>
     </AdditionalBlock>
     <InfoBlock>
-        <MultiRow Name="@additional" IconName="info" Action="(() => isAdditional = !isAdditional)" />
-        <MultiRow Name="@transactions" IconName="yen" Action="(() => isTransactions = !isTransactions)" />
-        <MultiRow Name="@comissions" IconName="fire" Action="(() => isComissions = !isComissions)" />
-        <MultiRow Name="@exchangeRates" IconName="loop" Action="(() => isExchangeRates = !isExchangeRates)" />
-        <MultiRow Name="Add a transaction manually" IconName="plus" />
-        <MultiRow Name="Download files (xls) with transactions" IconName="data-transfer-download" Action="@(() => ClickInputFileButtonAsync("inputButton"))" Description="Available only for the Russian broker BCS" />
-        <MultiRow Name="Analytics" IconName="pie-chart" />
+        <MultiRow Name="@additional" IconName="info" Action="(() => isAdditional = !isAdditional)" Description="Basic information about the summarized data on brokerage accounts: 1. Free balance of money. 2. The amount of net investment. 3. The sum of all received dividends." />
+        <MultiRow Name="@transactions" IconName="yen" Action="(() => isTransactions = !isTransactions)" Description="Information about all transactions on brokerage accounts. Some general information" />
+        <MultiRow Name="@comissions" IconName="fire" Action="(() => isComissions = !isComissions)" Description="Information about all commissions on brokerage accounts. The sum of all commissions" />
+        <MultiRow Name="@exchangeRates" IconName="loop" Action="(() => isExchangeRates = !isExchangeRates)" Description="Information on all operations with currency exchange on brokerage accounts" />
+        <MultiRow Name="Download BCS reports (xls)" IconName="data-transfer-download" Action="@(() => ClickInputFileButtonAsync("inputButton"))" Description="You can enter data into this system about your accounts, transactions on accounts, operations with shares, received dividends or commissions only by downloading daily or monthly reports in excel format from the BCS broker. Based on this data, recommendations and all relevant information about the status of the portfolio will be calculated. No more than 10 files per upload" />
     </InfoBlock>
     <ActionBlock>
-        @if(isAdditional)
+        @if (isAdditional)
         {
             <AccountAdditional InfoName="@additional" UpdateVisible="((bool isVisible) => isAdditional = isVisible)" />
         }
