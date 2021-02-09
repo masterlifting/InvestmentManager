@@ -229,6 +229,8 @@ namespace InvestmentManager.Services.Implimentations
                         CurrentModel.PriceData.Add((priceData[i].Ticker, priceData[i].PriceDate, priceData[i].PriceId));
                     else if (lastPriceDate == DateTime.Now.AddDays(-1).Date)
                         CurrentModel.PriceData.Add((priceData[i].Ticker, priceData[i].PriceDate, default));
+                    else if (DateTime.Now.DayOfWeek == DayOfWeek.Monday && lastPriceDate.DayOfWeek == DayOfWeek.Friday)
+                        CurrentModel.PriceData.Add((priceData[i].Ticker, priceData[i].PriceDate, default));
                     else if (weekend.Contains(priceData[i].PriceDate.AddDays(-1).Date))
                     {
                         var previousDate = priceData[i].PriceDate.AddDays(-1).Date;
