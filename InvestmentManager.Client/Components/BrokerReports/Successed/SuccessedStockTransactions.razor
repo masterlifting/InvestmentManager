@@ -82,10 +82,10 @@
         await base.OnParametersSetAsync();
     }
     async Task SaveData(StockTransactionModel transaction) =>
-        await queryServise.PostDataAsync(transaction, stockTransactions, UrlController.StockTransactions, "Stock transaction").ConfigureAwait(false);
+        await queryServise.PostDataAsync(transaction, stockTransactions, UrlController.StockTransactions, "Stock transaction");
     async Task SaveDataCollection()
     {
         stockTransactions = stockTransactions.OrderBy(x => x.DateOperation).ToList();
-        await queryServise.PostDataCollectionAsync(stockTransactions, UrlController.StockTransactions, "Stock transactions").ConfigureAwait(false);
+        await queryServise.PostDataCollectionAsync(stockTransactions, UrlController.StockTransactions, "Stock transactions");
     }
 }

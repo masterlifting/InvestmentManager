@@ -45,8 +45,8 @@ namespace InvestmentManager.Services.Implimentations
             var startPriceDate = DateTime.Now.AddDays(-period);
 
             var exchanges = unitOfWork.Exchange.GetAll();
-            var tickers = await unitOfWork.Price.GetTickersByPricesAsync().ConfigureAwait(false);
-            var prices = (await unitOfWork.Price.GetAll().Where(x => x.BidDate >= startPriceDate).ToArrayAsync().ConfigureAwait(false))
+            var tickers = await unitOfWork.Price.GetTickersByPricesAsync();
+            var prices = (await unitOfWork.Price.GetAll().Where(x => x.BidDate >= startPriceDate).ToArrayAsync())
                 .GroupBy(x => x.TickerId);
 
             var tickerIds = tickers.Select(x => x.Id);
@@ -94,9 +94,9 @@ namespace InvestmentManager.Services.Implimentations
             {
                 var separatedData = new PriceSeparatedData(resultPreparatedData[i]);
                 if (separatedData.CurrentModel.PriceData.Any())
-                    result.AddRange(await agregator.GetCurrentPricesAsync(separatedData.CurrentModel).ConfigureAwait(false));
+                    result.AddRange(await agregator.GetCurrentPricesAsync(separatedData.CurrentModel));
                 if (separatedData.HistoryModel.PriceData.Any())
-                    result.AddRange(await agregator.GetHistoryPricesAsync(separatedData.HistoryModel).ConfigureAwait(false));
+                    result.AddRange(await agregator.GetHistoryPricesAsync(separatedData.HistoryModel));
             }
             #endregion
             #region Data save
@@ -107,12 +107,12 @@ namespace InvestmentManager.Services.Implimentations
                 int companyCountWithPrices = result.GroupBy(x => x.TickerId).Count();
 
                 if (newPrices.Any())
-                    await unitOfWork.Price.CreateEntitiesAsync(newPrices).ConfigureAwait(false);
+                    await unitOfWork.Price.CreateEntitiesAsync(newPrices);
                 if (currentPrices.Any())
                 {
                     for (int i = 0; i < currentPrices.Length; i++)
                     {
-                        var price = await unitOfWork.Price.FindByIdAsync(currentPrices[i].Id).ConfigureAwait(false);
+                        var price = await unitOfWork.Price.FindByIdAsync(currentPrices[i].Id);
                         
                         price.Value = currentPrices[i].Value;
                         price.BidDate = currentPrices[i].BidDate;
@@ -120,7 +120,7 @@ namespace InvestmentManager.Services.Implimentations
                     }
                 }
 
-                return await unitOfWork.CompleteAsync().ConfigureAwait(false) ? companyCountWithPrices : -1;
+                return await unitOfWork.CompleteAsync() ? companyCountWithPrices : -1;
             }
             else
                 return 0;
@@ -166,14 +166,14 @@ namespace InvestmentManager.Services.Implimentations
             {
                 ExchangeId = (long)ExchangeTypes.mmvb,
                 ExchangeWeekend = x
-            })).ConfigureAwait(false);
+            }));
             await unitOfWork.Weekend.CreateEntitiesAsync(spbWeekend.Select(x => new Weekend
             {
                 ExchangeId = (long)ExchangeTypes.spb,
                 ExchangeWeekend = x
-            })).ConfigureAwait(false);
+            }));
 
-            await unitOfWork.CompleteAsync().ConfigureAwait(false);
+            await unitOfWork.CompleteAsync();
         }
     }
     abstract class BasePriceData
@@ -278,11 +278,11 @@ namespace InvestmentManager.Services.Implimentations
 
         public async Task<List<Price>> GetCurrentPricesAsync(PriceCurrentModel model) =>
             model?.Exchange is not null && agregator.ContainsKey(model.Exchange.Name)
-                ? await agregator[model.Exchange.Name].GetCurrentPricesAsync(model.PriceData).ConfigureAwait(false)
+                ? await agregator[model.Exchange.Name].GetCurrentPricesAsync(model.PriceData)
                 : new List<Price>();
         public async Task<List<Price>> GetHistoryPricesAsync(PriceHistoryModel model) =>
             model?.Exchange is not null && agregator.ContainsKey(model.Exchange.Name)
-                ? await agregator[model.Exchange.Name].GetHistoryPricesAsync(model.PriceData).ConfigureAwait(false)
+                ? await agregator[model.Exchange.Name].GetHistoryPricesAsync(model.PriceData)
                 : new List<Price>();
     }
     interface IPriceAgregator
@@ -321,12 +321,12 @@ namespace InvestmentManager.Services.Implimentations
         {
             List<Price> result = new();
 
-            var response = await webService.GetDataAsync(currentPricesUrl).ConfigureAwait(false);
+            var response = await webService.GetDataAsync(currentPricesUrl);
 
             if (!response.IsSuccessStatusCode)
                 return result;
 
-            var responseData = await response.Content.ReadFromJsonAsync<CurrentPricesModel>().ConfigureAwait(false);
+            var responseData = await response.Content.ReadFromJsonAsync<CurrentPricesModel>();
 
             List<IntermediateModel> intermediateModels = new();
 
@@ -380,11 +380,11 @@ namespace InvestmentManager.Services.Implimentations
             {
                 DateTime priceDate = item.priceDate != default ? item.priceDate.AddDays(1) : DateTime.Now.AddYears(-1);
 
-                var response = await webService.GetDataAsync(HistoryPriceUrlBuilder(item.ticker.Name, priceDate)).ConfigureAwait(false);
+                var response = await webService.GetDataAsync(HistoryPriceUrlBuilder(item.ticker.Name, priceDate));
                 if (!response.IsSuccessStatusCode)
                     continue;
 
-                var responseData = await response.Content.ReadFromJsonAsync<HistoryPriceModel>().ConfigureAwait(false);
+                var responseData = await response.Content.ReadFromJsonAsync<HistoryPriceModel>();
 
                 List<IntermediateModel> intermediateModels = new();
                 for (int i = 0; i < responseData.History.Data.Length; i++)
@@ -487,12 +487,12 @@ namespace InvestmentManager.Services.Implimentations
             Dictionary<string, Dictionary<string, object>> parsedResult;
             try
             {
-                var response = await webService.GetDataAsync(currentPricesUrl).ConfigureAwait(false);
+                var response = await webService.GetDataAsync(currentPricesUrl);
 
                 if (!response.IsSuccessStatusCode)
                     return result;
 
-                string responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                string responseString = await response.Content.ReadAsStringAsync();
                 parsedResult = JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, object>>>(responseString);
             }
             catch
@@ -547,11 +547,11 @@ namespace InvestmentManager.Services.Implimentations
                 }
 
                 var ticker = item.ticker.Name.ToUpperInvariant();
-                var response = await webService.GetDataAsync(HistoryPriceUrlBuilder(ticker)).ConfigureAwait(false);
+                var response = await webService.GetDataAsync(HistoryPriceUrlBuilder(ticker));
                 if (!response.IsSuccessStatusCode)
                     continue;
 
-                var responseData = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                var responseData = await response.Content.ReadAsStringAsync();
                 var deserialazedData = JsonSerializer.Deserialize<CandleList>(responseData);
 
                 List<Price> intermediatePrices = new();

@@ -34,7 +34,7 @@ namespace InvestmentManager.Server.Controllers
         [HttpGet("byaccountid/{id}")]
         public async Task<IActionResult> GetByAccountId(long id)
         {
-            var transactions = (await unitOfWork.Account.FindByIdAsync(id).ConfigureAwait(false))?.AccountTransactions;
+            var transactions = (await unitOfWork.Account.FindByIdAsync(id))?.AccountTransactions;
 
             return transactions is null
                 ? NoContent()
@@ -50,7 +50,7 @@ namespace InvestmentManager.Server.Controllers
         [HttpGet("byaccountid/{id}/summary/")]
         public async Task<IActionResult> GetSummaryByAccountId(long id)
         {
-            var transactions = (await unitOfWork.Account.FindByIdAsync(id).ConfigureAwait(false))?.AccountTransactions;
+            var transactions = (await unitOfWork.Account.FindByIdAsync(id))?.AccountTransactions;
 
             if (transactions is null || !transactions.Any())
                 return NoContent();
@@ -85,18 +85,18 @@ namespace InvestmentManager.Server.Controllers
                         .FirstOrDefaultAsync(x =>
                         x.AccountId == model.AccountId
                         && x.CurrencyId == model.CurrencyId)
-                        .ConfigureAwait(false);
+                        ;
 
                     return summary is not null && model.Amount <= summary.FreeSum;
                 }
                 else
                     return true;
             }
-            var result = await restMethod.BasePostAsync(ModelState, entity, model, TransactionValidatorAsync).ConfigureAwait(false);
+            var result = await restMethod.BasePostAsync(ModelState, entity, model, TransactionValidatorAsync);
 
             if (result.IsSuccess)
             {
-                result.Info += await reckonerService.UpgradeByAccountTransactionChangeAsync(entity).ConfigureAwait(false) ? " Recalculated" : " NOT Recalculated.";
+                result.Info += await reckonerService.UpgradeByAccountTransactionChangeAsync(entity) ? " Recalculated" : " NOT Recalculated.";
 
                 return Ok(result);
             }

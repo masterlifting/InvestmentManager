@@ -60,10 +60,10 @@
         base.OnParametersSet();
     }
     async Task SaveData(ExchangeRateModel exchangeRate) =>
-        await queryServise.PostDataAsync(exchangeRate, exchangeRates, UrlController.ExchangeRates, "Exchange rate").ConfigureAwait(false);
+        await queryServise.PostDataAsync(exchangeRate, exchangeRates, UrlController.ExchangeRates, "Exchange rate");
     async Task SaveDataCollection()
     {
         exchangeRates = exchangeRates.OrderBy(x => x.DateOperation).ToList();
-        await queryServise.PostDataCollectionAsync(exchangeRates, UrlController.ExchangeRates, "Exchange rates").ConfigureAwait(false);
+        await queryServise.PostDataCollectionAsync(exchangeRates, UrlController.ExchangeRates, "Exchange rates");
     }
 }

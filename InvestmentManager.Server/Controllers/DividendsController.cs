@@ -78,7 +78,7 @@ namespace InvestmentManager.Server.Controllers
         {
             var transactions = await unitOfWork.Dividend.GetAll()
                 .Where(x => x.AccountId == accountId && x.Isin.CompanyId == companyId)
-                .ToListAsync().ConfigureAwait(false);
+                .ToListAsync();
 
             return transactions is null
                 ? NoContent()
@@ -122,10 +122,10 @@ namespace InvestmentManager.Server.Controllers
                 DateOperation = model.DateOperation
             };
 
-            var result = await restMethod.BasePostAsync(ModelState, entity, model).ConfigureAwait(false);
+            var result = await restMethod.BasePostAsync(ModelState, entity, model);
             if (result.IsSuccess)
             {
-                result.Info += await reckonerService.UpgradeByDividendChangeAsync(entity).ConfigureAwait(false) ? " Recalculated" : " NOT Recalculated.";
+                result.Info += await reckonerService.UpgradeByDividendChangeAsync(entity) ? " Recalculated" : " NOT Recalculated.";
                 return Ok(result);
             }
             else

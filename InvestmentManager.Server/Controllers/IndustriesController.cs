@@ -48,11 +48,11 @@ namespace InvestmentManager.Server.Controllers
         }
         [HttpGet]
         public async Task<IActionResult> Get() =>
-            Ok(await unitOfWork.Industry.GetAll().OrderBy(x => x.Name).Select(x => new ShortView { Id = x.Id, Name = x.Name }).ToListAsync().ConfigureAwait(false));
+            Ok(await unitOfWork.Industry.GetAll().OrderBy(x => x.Name).Select(x => new ShortView { Id = x.Id, Name = x.Name }).ToListAsync());
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(long id)
         {
-            var industry = await unitOfWork.Industry.FindByIdAsync(id).ConfigureAwait(false);
+            var industry = await unitOfWork.Industry.FindByIdAsync(id);
             return industry is null ? NoContent() : Ok(new ShortView { Id = industry.Id, Name = industry.Name });
         }
     }

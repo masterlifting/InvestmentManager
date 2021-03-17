@@ -61,10 +61,10 @@
         await base.OnParametersSetAsync();
     }
     async Task SaveData(ComissionModel comission) =>
-    await queryServise.PostDataAsync(comission, comissions, UrlController.Comissions, "Comission").ConfigureAwait(false);
+    await queryServise.PostDataAsync(comission, comissions, UrlController.Comissions, "Comission");
     async Task SaveDataCollection()
     {
         comissions = comissions.OrderBy(x => x.DateOperation).ToList();
-        await queryServise.PostDataCollectionAsync(comissions, UrlController.Comissions, "Comissions").ConfigureAwait(false);
+        await queryServise.PostDataCollectionAsync(comissions, UrlController.Comissions, "Comissions");
     }
 }

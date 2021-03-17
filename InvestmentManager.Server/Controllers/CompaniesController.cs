@@ -12,6 +12,7 @@ using InvestmentManager.Models.EntityModels;
 using InvestmentManager.Models.SummaryModels;
 using InvestmentManager.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
+using System.Text.Json;
 
 namespace InvestmentManager.Server.Controllers
 {
@@ -36,12 +37,13 @@ namespace InvestmentManager.Server.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get() =>
-            Ok(await unitOfWork.Company.GetAll().OrderBy(x => x.Name).Select(x => new ShortView { Id = x.Id, Name = x.Name }).ToListAsync().ConfigureAwait(false));
+        public async Task<IActionResult> Get() => 
+            Ok(await unitOfWork.Company.GetAll().OrderBy(x => x.Name).Select(x => new ShortView { Id = x.Id, Name = x.Name }).ToListAsync());
+
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(long id)
         {
-            var company = await unitOfWork.Company.FindByIdAsync(id).ConfigureAwait(false);
+            var company = await unitOfWork.Company.FindByIdAsync(id);
             return company is null ? NoContent() : Ok(new CompanyModel
             {
                 Id = company.Id,
@@ -54,7 +56,7 @@ namespace InvestmentManager.Server.Controllers
         [HttpGet("{id}/additional/")]
         public async Task<IActionResult> GetAdditional(long id)
         {
-            var company = await unitOfWork.Company.FindByIdAsync(id).ConfigureAwait(false);
+            var company = await unitOfWork.Company.FindByIdAsync(id);
 
             return company is null ? NoContent() : Ok(new CompanyAdditionalModel
             {
@@ -74,10 +76,10 @@ namespace InvestmentManager.Server.Controllers
                 .Skip((value - 1) * pageSize)
                 .Take(pageSize)
                 .Select(x => new ShortView { Id = x.Id, Name = x.Name, Description = x.Tickers.FirstOrDefault().Name })
-                .ToListAsync().ConfigureAwait(false);
+                .ToListAsync();
 
             var paginationResult = new PaginationViewModel<ShortView>();
-            paginationResult.Pagination.SetPagination(await companies.CountAsync().ConfigureAwait(false), value, pageSize);
+            paginationResult.Pagination.SetPagination(await companies.CountAsync(), value, pageSize);
             paginationResult.Items = items;
 
             return Ok(paginationResult);
@@ -95,11 +97,11 @@ namespace InvestmentManager.Server.Controllers
             };
             async Task<bool> CompanyValidatorAsync(CompanyModel model)
             {
-                var names = await unitOfWork.Company.GetAll().Select(x => x.Name).ToListAsync().ConfigureAwait(false);
+                var names = await unitOfWork.Company.GetAll().Select(x => x.Name).ToListAsync();
                 return !names.Where(x => x.Equals(model.Name, StringComparison.OrdinalIgnoreCase)).Any();
             }
 
-            var result = await restMethod.BasePostAsync(ModelState, entity, model, CompanyValidatorAsync).ConfigureAwait(false);
+            var result = await restMethod.BasePostAsync(ModelState, entity, model, CompanyValidatorAsync);
             return result.IsSuccess ? (IActionResult)Ok(result) : BadRequest(result);
         }
 

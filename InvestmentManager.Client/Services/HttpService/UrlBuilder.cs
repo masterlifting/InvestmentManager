@@ -80,7 +80,7 @@ namespace InvestmentManager.Client.Services.HttpService
         {
             UrlPath.ByCompanyId => PathName.ByCompanyId,
             UrlPath.ByAccountId => PathName.ByAccountId,
-            UrlPath.ByPagination => PathName.ByPaginationl,
+            UrlPath.ByPagination => PathName.ByPagination,
             _ => ""
         };
         static string SetOption(UrlOption option) => option switch
@@ -136,7 +136,7 @@ namespace InvestmentManager.Client.Services.HttpService
     }
     static class PathName
     {
-        public const string ByPaginationl = "bypagination";
+        public const string ByPagination = "bypagination";
         public const string ByCompanyId = "bycompanyid";
         public const string ByAccountId = "byaccountid";
     }

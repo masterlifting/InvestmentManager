@@ -17,7 +17,7 @@ namespace InvestmentManager.Server.Controllers
         [HttpGet("bycompanyid/{id}")]
         public async Task<IActionResult> GetByCompanyId(long id)
         {
-            var prices = await unitOfWork.Price.GetCustomOrderedPricesAsync(id, 12).ConfigureAwait(false);
+            var prices = await unitOfWork.Price.GetCustomOrderedPricesAsync(id, 12);
             return prices is null
                 ? NoContent()
                 : Ok(prices.Reverse().Select(x => new PriceModel
@@ -32,7 +32,7 @@ namespace InvestmentManager.Server.Controllers
         [HttpGet("bycompanyid/{id}/summary/")]
         public async Task<IActionResult> GetSummaryByCompanyId(long id)
         {
-            var prices = await unitOfWork.Price.GetCustomOrderedPricesAsync(id, 1).ConfigureAwait(false);
+            var prices = await unitOfWork.Price.GetCustomOrderedPricesAsync(id, 1);
 
             if (prices is null || !prices.Any())
                 return NoContent();

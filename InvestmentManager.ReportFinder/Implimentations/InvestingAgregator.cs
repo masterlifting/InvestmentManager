@@ -36,7 +36,7 @@ namespace InvestmentManager.ReportFinder.Implimentations
         {
             var resultReports = new List<Report>();
 
-            var parsedReports = await ParserAsync(companyId, sourceValue).ConfigureAwait(false);
+            var parsedReports = await ParserAsync(companyId, sourceValue);
 
             return parsedReports is null || (parsedReports.DecimalDictionary.Count == 0 && parsedReports.DividendCollection.Count == 0)
                 ? resultReports
@@ -54,10 +54,10 @@ namespace InvestmentManager.ReportFinder.Implimentations
             Console.WriteLine("Получаю страницу с данными отчетов для определения новых отчетов");
 
             var financialSummaryQuery = $"{pattern}-financial-summary";
-            var response = await httpService.GetDataAsync(financialSummaryQuery).ConfigureAwait(false);
+            var response = await httpService.GetDataAsync(financialSummaryQuery);
 
             var financialSummaryPage = new HtmlDocument();
-            financialSummaryPage.LoadHtml(await response.Content.ReadAsStringAsync().ConfigureAwait(false));
+            financialSummaryPage.LoadHtml(await response.Content.ReadAsStringAsync());
 
             if (financialSummaryPage is null)
                 throw new NullReferenceException("Первая стпаница не загружена");
@@ -65,7 +65,7 @@ namespace InvestmentManager.ReportFinder.Implimentations
             Console.WriteLine("Сравниваю даты отчетов.");
             Console.ResetColor();
 
-            var lastDateReportFromDb = await unitOfWork.Report.GetLastFourDateReportAsync(companyId).ConfigureAwait(false);
+            var lastDateReportFromDb = await unitOfWork.Report.GetLastFourDateReportAsync(companyId);
 
             if (!lastDateReportFromDb.Any())
             {
@@ -73,7 +73,7 @@ namespace InvestmentManager.ReportFinder.Implimentations
                 Console.WriteLine("В базе по этой компании отчетов нет. Загружаю все.");
                 ParsedDates = GetParsedDateFromInvesting(financialSummaryPage, lastDateReportFromDb);
                 Console.ResetColor();
-                return await DownloaderAllData(pattern, financialSummaryPage).ConfigureAwait(false);
+                return await DownloaderAllData(pattern, financialSummaryPage);
             }
 
             //Получаю даты новых отчетов и даты всех найденых отчетов
@@ -85,7 +85,7 @@ namespace InvestmentManager.ReportFinder.Implimentations
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine("Новые даты отчетов нашлись. Продолжаю парсинг.");
                 Console.ResetColor();
-                return await DownloaderAllData(pattern, financialSummaryPage).ConfigureAwait(false);
+                return await DownloaderAllData(pattern, financialSummaryPage);
             }
             else
             {
@@ -99,21 +99,21 @@ namespace InvestmentManager.ReportFinder.Implimentations
         {
             Console.ForegroundColor = ConsoleColor.DarkYellow;
             Console.WriteLine("Загружаю остальные страницы с данными");
-            var mainResponse = await httpService.GetDataAsync(pattern).ConfigureAwait(false);
+            var mainResponse = await httpService.GetDataAsync(pattern);
             var mainPage = new HtmlDocument();
-            mainPage.LoadHtml(await mainResponse.Content.ReadAsStringAsync().ConfigureAwait(false));
+            mainPage.LoadHtml(await mainResponse.Content.ReadAsStringAsync());
             if (mainPage is null)
                 throw new NullReferenceException("Главная страница не была загружена");
 
-            var balanceResponse = await httpService.GetDataAsync($"{pattern}-balance-sheet").ConfigureAwait(false);
+            var balanceResponse = await httpService.GetDataAsync($"{pattern}-balance-sheet");
             var balancePage = new HtmlDocument();
-            balancePage.LoadHtml(await balanceResponse.Content.ReadAsStringAsync().ConfigureAwait(false));
+            balancePage.LoadHtml(await balanceResponse.Content.ReadAsStringAsync());
             if (balancePage is null)
                 throw new NullReferenceException("Страница с балансами не была загружена");
 
-            var dividendsResponse = await httpService.GetDataAsync($"{pattern}-dividends").ConfigureAwait(false);
+            var dividendsResponse = await httpService.GetDataAsync($"{pattern}-dividends");
             var dividendsPage = new HtmlDocument();
-            dividendsPage.LoadHtml(await dividendsResponse.Content.ReadAsStringAsync().ConfigureAwait(false));
+            dividendsPage.LoadHtml(await dividendsResponse.Content.ReadAsStringAsync());
             if (dividendsPage is null)
                 throw new NullReferenceException("Страница с дивидендами не была загружена");
 
@@ -134,7 +134,7 @@ namespace InvestmentManager.ReportFinder.Implimentations
         // Работаю с страницами сайта
         private async Task<ParsedDataResult> ParserAsync(long companyId, string sourceValue)
         {
-            var pagesWithData = await ConfigureDataAsync(companyId, sourceValue).ConfigureAwait(false);
+            var pagesWithData = await ConfigureDataAsync(companyId, sourceValue);
             if (!pagesWithData.Any())
                 return new ParsedDataResult();
             Console.ForegroundColor = ConsoleColor.DarkGreen;
@@ -164,11 +164,11 @@ namespace InvestmentManager.ReportFinder.Implimentations
                 shareCapitalTask,
                 cashFlowTask,
                 turnoverTask,
-                longTermDebtTask }).ConfigureAwait(false);
+                longTermDebtTask });
             #endregion
             #region Собираю полученные данные и возвращаю для привидения к моим типам
-            var listDividendResult = await dividendCollectionTask.ConfigureAwait(false);
-            var stockInCirculation = await stockCirculationTask.ConfigureAwait(false);
+            var listDividendResult = await dividendCollectionTask;
+            var stockInCirculation = await stockCirculationTask;
             var decimalDictionary = new Dictionary<string, List<decimal>>
             {
                 { "RevenueCollection", listDecimalResult[0] },
@@ -285,7 +285,7 @@ namespace InvestmentManager.ReportFinder.Implimentations
                 stockInCirculation = long.TryParse(html.DocumentNode.
                 SelectSingleNode("//div[@class='clear overviewDataTable overviewDataTableWithTooltip']/div[14]/span[2]").InnerText.Replace(".", "", StringComparison.CurrentCultureIgnoreCase),
                 style, culture, out long value) ? value : 0;
-            }).ConfigureAwait(false);
+            });
 
             return stockInCirculation;
         }
@@ -305,7 +305,7 @@ namespace InvestmentManager.ReportFinder.Implimentations
                     .Where(x => x.Name == "td")
                     .Skip(1)
                     .Select(x => decimal.TryParse(x.InnerText, style, culture, out decimal value) ? value : 0).ToList();
-            }).ConfigureAwait(false);
+            });
             return result;
         }
         //Возвращает Чистую прибыль || Валовую прибыль || Активы || Акционерный капитал || Обязательства || Денежный поток
@@ -331,7 +331,7 @@ namespace InvestmentManager.ReportFinder.Implimentations
                 {
                     values.AddRange(new[] { 0m, 0m, 0m, 0m });
                 }
-            }).ConfigureAwait(false);
+            });
 
             return values;
         }
@@ -370,7 +370,7 @@ namespace InvestmentManager.ReportFinder.Implimentations
                             collection.Add((dividentDate[i].Year, converterService.ConvertToQuarter(dividentDate[i].Month)), dividendValue[i]);
                         }
                     }
-                }).ConfigureAwait(false);
+                });
             }
 
             return collection;

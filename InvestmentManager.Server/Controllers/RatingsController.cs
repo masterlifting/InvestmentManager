@@ -37,15 +37,15 @@ namespace InvestmentManager.Server.Controllers
                 return NoContent();
 
             var paginationResult = new PaginationViewModel<ShortView>();
-            paginationResult.Items = await result.Skip((value - 1) * pageSize).Take(pageSize).ToListAsync().ConfigureAwait(false);
-            paginationResult.Pagination.SetPagination(await result.CountAsync().ConfigureAwait(false), value, pageSize);
+            paginationResult.Items = await result.Skip((value - 1) * pageSize).Take(pageSize).ToListAsync();
+            paginationResult.Pagination.SetPagination(await result.CountAsync(), value, pageSize);
 
             return Ok(paginationResult);
         }
         [HttpGet("bycompanyid/{id}")]
         public async Task<IActionResult> GetByCompanyId(long id)
         {
-            var result = (await unitOfWork.Company.FindByIdAsync(id).ConfigureAwait(false))?.Rating;
+            var result = (await unitOfWork.Company.FindByIdAsync(id))?.Rating;
 
             return result is null ? NoContent() : Ok(new RatingModel
             {
@@ -59,8 +59,8 @@ namespace InvestmentManager.Server.Controllers
         [HttpGet("bycompanyid/{id}/summary/")]
         public async Task<IActionResult> GetSummaryByCompanyId(long id)
         {
-            var ratingCount = await unitOfWork.Rating.GetAll().CountAsync().ConfigureAwait(false);
-            var result = (await unitOfWork.Company.FindByIdAsync(id).ConfigureAwait(false))?.Rating;
+            var ratingCount = await unitOfWork.Rating.GetAll().CountAsync();
+            var result = (await unitOfWork.Company.FindByIdAsync(id))?.Rating;
 
             return result is null ? NoContent() : Ok(new SummaryRating
             {

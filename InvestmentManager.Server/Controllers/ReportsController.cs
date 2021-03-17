@@ -42,7 +42,7 @@ namespace InvestmentManager.Server.Controllers
         [HttpGet("bycompanyid/{id}")]
         public async Task<IActionResult> GetByCompanyId(long id)
         {
-            var reports = (await unitOfWork.Company.FindByIdAsync(id).ConfigureAwait(false))?.Reports;
+            var reports = (await unitOfWork.Company.FindByIdAsync(id))?.Reports;
             return reports is null
                 ? NoContent()
                 : Ok(reports.Select(x => new ReportModel
@@ -65,7 +65,7 @@ namespace InvestmentManager.Server.Controllers
         [HttpGet("bycompanyid/{id}/summary/")]
         public async Task<IActionResult> GetSummaryByCompanyId(long id)
         {
-            var reports = (await unitOfWork.Company.FindByIdAsync(id).ConfigureAwait(false))?.Reports.OrderBy(x => x.DateReport);
+            var reports = (await unitOfWork.Company.FindByIdAsync(id))?.Reports.OrderBy(x => x.DateReport);
 
             return reports is null || !reports.Any() ? NoContent() : Ok(new SummaryReport
             {
@@ -97,7 +97,7 @@ namespace InvestmentManager.Server.Controllers
                 ShareCapital = x.ShareCapital,
                 StockVolume = x.StockVolume,
                 Turnover = x.Turnover
-            }).ToListAsync().ConfigureAwait(false));
+            }).ToListAsync());
         }
 
         [HttpPut("{id}"), Authorize(Roles = "pestunov")]
@@ -124,9 +124,9 @@ namespace InvestmentManager.Server.Controllers
 
             if (result.IsSuccess)
             {
-                long companyId = (await unitOfWork.Report.FindByIdAsync(id).ConfigureAwait(false)).CompanyId;
-                var userIds = await userManager.Users.Select(x => x.Id).ToArrayAsync().ConfigureAwait(false);
-                result.Info += await reckonerService.UpgradeByReportChangeAsync(DataBaseType.Postgres, companyId, userIds).ConfigureAwait(false) ? " Recalculated" : " NOT Recalculated.";
+                long companyId = (await unitOfWork.Report.FindByIdAsync(id)).CompanyId;
+                var userIds = await userManager.Users.Select(x => x.Id).ToArrayAsync();
+                result.Info += await reckonerService.UpgradeByReportChangeAsync(DataBaseType.Postgres, companyId, userIds) ? " Recalculated" : " NOT Recalculated.";
                 return Ok(result);
             }
             else
@@ -136,7 +136,7 @@ namespace InvestmentManager.Server.Controllers
         [HttpDelete("{id}"), Authorize(Roles = "pestunov")]
         public async Task<IActionResult> Delete(long id)
         {
-            var result = await restMethod.BaseDeleteAsync<Report>(id).ConfigureAwait(false);
+            var result = await restMethod.BaseDeleteAsync<Report>(id);
             return result.IsSuccess ? (IActionResult)Ok(result) : BadRequest(result);
         }
     }

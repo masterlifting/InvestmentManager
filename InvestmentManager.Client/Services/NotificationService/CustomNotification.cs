@@ -32,20 +32,20 @@ namespace InvestmentManager.Client.Services.NotificationService
         #endregion
         #region Alerts
         public async Task AlertAccessAsync(string message = null, int delay = 1500) =>
-            await AlertBaseAsync(ColorCustom.iwarning, string.IsNullOrWhiteSpace(message) ? DefaultString.noticeAccess : message, delay).ConfigureAwait(false);
+            await AlertBaseAsync(ColorCustom.iwarning, string.IsNullOrWhiteSpace(message) ? DefaultString.noticeAccess : message, delay);
         public async Task AlertFailedAsync(string message = null, int delay = 1500) =>
-            await AlertBaseAsync(ColorCustom.idanger, string.IsNullOrWhiteSpace(message) ? DefaultString.noticeFailed : message, delay).ConfigureAwait(false);
+            await AlertBaseAsync(ColorCustom.idanger, string.IsNullOrWhiteSpace(message) ? DefaultString.noticeFailed : message, delay);
         public async Task AlertSuccesAsync(string message = null, int delay = 1500) =>
-            await AlertBaseAsync(ColorCustom.isuccess, string.IsNullOrWhiteSpace(message) ? DefaultString.noticeSuccess : message, delay).ConfigureAwait(false);
+            await AlertBaseAsync(ColorCustom.isuccess, string.IsNullOrWhiteSpace(message) ? DefaultString.noticeSuccess : message, delay);
         public async Task AlertInfoAsync(string message = null, int delay = 1500) =>
-            await AlertBaseAsync(ColorCustom.iinfo, string.IsNullOrWhiteSpace(message) ? DefaultString.noticeInfo : message, delay).ConfigureAwait(false);
+            await AlertBaseAsync(ColorCustom.iinfo, string.IsNullOrWhiteSpace(message) ? DefaultString.noticeInfo : message, delay);
         private async Task AlertBaseAsync(ColorCustom color, string message, int delay)
         {
             Alert.ColorBg = color.ToString();
             Alert.Message = message;
             Alert.Visible = true;
             NotifyStateChanged();
-            await Task.Delay(delay).ConfigureAwait(false);
+            await Task.Delay(delay);
             Alert.Visible = false;
             NotifyStateChanged();
         }

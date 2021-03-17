@@ -18,17 +18,17 @@ namespace InvestmentManager.Services.Implimentations
 
         public async Task<decimal> GetAccountTotalSumAsync(long accountId, long currencyId)
         {
-            var accountSummary = await unitOfWork.AccountSummary.GetAll().FirstOrDefaultAsync(x => x.AccountId == accountId && x.CurrencyId == currencyId).ConfigureAwait(false);
+            var accountSummary = await unitOfWork.AccountSummary.GetAll().FirstOrDefaultAsync(x => x.AccountId == accountId && x.CurrencyId == currencyId);
             if (accountSummary is null)
                 return 0;
 
-            decimal companiesActualInvestedSum = await GetCompaniesActualInvestedSumAsync(accountId, currencyId).ConfigureAwait(false);
+            decimal companiesActualInvestedSum = await GetCompaniesActualInvestedSumAsync(accountId, currencyId);
 
             return companiesActualInvestedSum + accountSummary.FreeSum;
         }
         public async Task<decimal> GetAccountInvestedSumAsync(long accountId, long currencyId)
         {
-            var result = await unitOfWork.AccountSummary.GetAll().FirstOrDefaultAsync(x => x.AccountId == accountId && x.CurrencyId == currencyId).ConfigureAwait(false);
+            var result = await unitOfWork.AccountSummary.GetAll().FirstOrDefaultAsync(x => x.AccountId == accountId && x.CurrencyId == currencyId);
             if (result is null)
                 return 0;
 
@@ -36,25 +36,25 @@ namespace InvestmentManager.Services.Implimentations
         }
 
         public async Task<decimal> GetCompaniesFixedProfitSumAsync(long accountId, long currencyId) =>
-            await unitOfWork.CompanySummary.GetAll().Where(x => x.AccountId == accountId && x.CurrencyId == currencyId && x.CurrentProfit > 0).SumAsync(x => x.CurrentProfit).ConfigureAwait(false);
+            await unitOfWork.CompanySummary.GetAll().Where(x => x.AccountId == accountId && x.CurrencyId == currencyId && x.CurrentProfit > 0).SumAsync(x => x.CurrentProfit);
         public async Task<decimal> GetCompaniesOriginalInvestedSumAsync(long accountId, long currencyId) =>
-            (await unitOfWork.CompanySummary.GetAll().Where(x => x.AccountId == accountId && x.CurrencyId == currencyId && x.CurrentProfit < 0).SumAsync(x => x.CurrentProfit).ConfigureAwait(false)) * -1;
+            (await unitOfWork.CompanySummary.GetAll().Where(x => x.AccountId == accountId && x.CurrencyId == currencyId && x.CurrentProfit < 0).SumAsync(x => x.CurrentProfit)) * -1;
         public async Task<decimal> GetCompaniesActualInvestedSumAsync(long accountId, long currencyId)
         {
-            var companySummaries = await unitOfWork.CompanySummary.GetAll().Where(x => x.AccountId == accountId && x.CurrencyId == currencyId && x.ActualLot > 0).ToArrayAsync().ConfigureAwait(false);
+            var companySummaries = await unitOfWork.CompanySummary.GetAll().Where(x => x.AccountId == accountId && x.CurrencyId == currencyId && x.ActualLot > 0).ToArrayAsync();
             if (companySummaries is null || !companySummaries.Any())
                 return 0;
 
-            var actualPrices = await unitOfWork.Price.GetLastPricesAsync(30, companySummaries.Select(x => x.CompanyId)).ConfigureAwait(false);
+            var actualPrices = await unitOfWork.Price.GetLastPricesAsync(30, companySummaries.Select(x => x.CompanyId));
             return companySummaries.Join(actualPrices, x => x.CompanyId, y => y.Key, (x, y) => x.ActualLot * y.Value).Sum();
         }
         public async Task<decimal> GetCompanyActualInvestedSumAsync(long companyId)
         {
-            var companySummary = await unitOfWork.CompanySummary.GetAll().FirstOrDefaultAsync(x => x.CompanyId == companyId).ConfigureAwait(false);
+            var companySummary = await unitOfWork.CompanySummary.GetAll().FirstOrDefaultAsync(x => x.CompanyId == companyId);
             if (companySummary.ActualLot == 0)
                 return 0;
 
-            var actualPrice = await unitOfWork.Price.GetCustomOrderedPricesAsync(companyId, 1).ConfigureAwait(false);
+            var actualPrice = await unitOfWork.Price.GetCustomOrderedPricesAsync(companyId, 1);
             if (actualPrice is null)
                 return 0;
 
@@ -68,7 +68,7 @@ namespace InvestmentManager.Services.Implimentations
                 return false;
 
             var summary = await unitOfWork.AccountSummary.GetAll()
-                .FirstOrDefaultAsync(x => x.AccountId == transaction.AccountId && x.CurrencyId == transaction.CurrencyId).ConfigureAwait(false);
+                .FirstOrDefaultAsync(x => x.AccountId == transaction.AccountId && x.CurrencyId == transaction.CurrencyId);
 
             if (summary is not null)
             {
@@ -86,9 +86,9 @@ namespace InvestmentManager.Services.Implimentations
                     AccountId = transaction.AccountId,
                     CurrencyId = transaction.CurrencyId,
                     InvestedSum = transaction.Amount
-                }).ConfigureAwait(false);
+                });
 
-            return await unitOfWork.CompleteAsync().ConfigureAwait(false);
+            return await unitOfWork.CompleteAsync();
         }
         public async Task<bool> SetAccountSummaryAsync(IEnumerable<AccountTransaction> transactions)
         {
@@ -108,10 +108,10 @@ namespace InvestmentManager.Services.Implimentations
                             AccountId = dataByAccount.Key,
                             CurrencyId = dataByCurrency.Key,
                             InvestedSum = addedSum - withdrawedSum
-                        }).ConfigureAwait(false);
+                        });
                     }
 
-                return await unitOfWork.CompleteAsync().ConfigureAwait(false);
+                return await unitOfWork.CompleteAsync();
             }
             catch
             {
@@ -124,7 +124,7 @@ namespace InvestmentManager.Services.Implimentations
                 return false;
 
             var summaryIn = await unitOfWork.AccountSummary.GetAll()
-                .FirstOrDefaultAsync(x => x.AccountId == exchangeRate.AccountId && x.CurrencyId == exchangeRate.CurrencyId).ConfigureAwait(false);
+                .FirstOrDefaultAsync(x => x.AccountId == exchangeRate.AccountId && x.CurrencyId == exchangeRate.CurrencyId);
 
             if (summaryIn is not null)
             {
@@ -142,10 +142,10 @@ namespace InvestmentManager.Services.Implimentations
                     AccountId = exchangeRate.AccountId,
                     CurrencyId = exchangeRate.CurrencyId,
                     InvestedSum = exchangeRate.Quantity
-                }).ConfigureAwait(false);
+                });
 
             var summaryOut = await unitOfWork.AccountSummary.GetAll()
-                .FirstOrDefaultAsync(x => x.AccountId == exchangeRate.AccountId && x.CurrencyId == (long)CurrencyTypes.rub).ConfigureAwait(false);
+                .FirstOrDefaultAsync(x => x.AccountId == exchangeRate.AccountId && x.CurrencyId == (long)CurrencyTypes.rub);
 
             if (summaryOut is not null)
             {
@@ -163,9 +163,9 @@ namespace InvestmentManager.Services.Implimentations
                     AccountId = exchangeRate.AccountId,
                     CurrencyId = (long)CurrencyTypes.rub,
                     InvestedSum = exchangeRate.Quantity * exchangeRate.Rate
-                }).ConfigureAwait(false);
+                });
 
-            return await unitOfWork.CompleteAsync().ConfigureAwait(false);
+            return await unitOfWork.CompleteAsync();
         }
         public async Task<bool> SetAccountSummaryAsync(IEnumerable<ExchangeRate> exchangeRates)
         {
@@ -177,7 +177,7 @@ namespace InvestmentManager.Services.Implimentations
                 foreach (var dataByAccount in exchangeRates.GroupBy(x => x.AccountId))
                     foreach (var dataByCurrency in dataByAccount.GroupBy(x => x.CurrencyId))
                     {
-                        var summaryIn = await unitOfWork.AccountSummary.GetAll().FirstOrDefaultAsync(x => x.AccountId == dataByAccount.Key && x.CurrencyId == dataByCurrency.Key).ConfigureAwait(false);
+                        var summaryIn = await unitOfWork.AccountSummary.GetAll().FirstOrDefaultAsync(x => x.AccountId == dataByAccount.Key && x.CurrencyId == dataByCurrency.Key);
 
                         decimal summaryInInvestedSumByBuy = dataByCurrency.Where(x => x.TransactionStatusId == (long)TransactionStatusTypes.Buy).Sum(x => x.Quantity);
                         decimal summaryInInvestedSumBySell = dataByCurrency.Where(x => x.TransactionStatusId == (long)TransactionStatusTypes.Sell).Sum(x => x.Quantity);
@@ -194,10 +194,10 @@ namespace InvestmentManager.Services.Implimentations
                                 AccountId = dataByAccount.Key,
                                 CurrencyId = dataByCurrency.Key,
                                 InvestedSum = summaryInInvestedSumByBuy - summaryInInvestedSumBySell
-                            }).ConfigureAwait(false);
+                            });
                         }
 
-                        var summaryOut = await unitOfWork.AccountSummary.GetAll().FirstOrDefaultAsync(x => x.AccountId == dataByAccount.Key && x.CurrencyId == (long)CurrencyTypes.rub).ConfigureAwait(false);
+                        var summaryOut = await unitOfWork.AccountSummary.GetAll().FirstOrDefaultAsync(x => x.AccountId == dataByAccount.Key && x.CurrencyId == (long)CurrencyTypes.rub);
 
                         decimal summaryOutInvestedSumByBuy = dataByCurrency.Where(x => x.TransactionStatusId == (long)TransactionStatusTypes.Buy).Sum(x => x.Quantity * x.Rate);
                         decimal summaryOutInvestedSumBySell = dataByCurrency.Where(x => x.TransactionStatusId == (long)TransactionStatusTypes.Sell).Sum(x => x.Quantity * x.Rate);
@@ -214,11 +214,11 @@ namespace InvestmentManager.Services.Implimentations
                                 AccountId = dataByAccount.Key,
                                 CurrencyId = (long)CurrencyTypes.rub,
                                 InvestedSum = summaryOutInvestedSumBySell - summaryOutInvestedSumByBuy
-                            }).ConfigureAwait(false);
+                            });
                         }
                     }
 
-                return await unitOfWork.CompleteAsync().ConfigureAwait(false);
+                return await unitOfWork.CompleteAsync();
             }
             catch
             {
@@ -231,11 +231,11 @@ namespace InvestmentManager.Services.Implimentations
             if (transaction is null)
                 return false;
 
-            var companyId = (await unitOfWork.Ticker.FindByIdAsync(transaction.TickerId).ConfigureAwait(false))?.CompanyId;
+            var companyId = (await unitOfWork.Ticker.FindByIdAsync(transaction.TickerId))?.CompanyId;
             if (!companyId.HasValue)
                 return false;
 
-            var summary = await unitOfWork.CompanySummary.GetAll().FirstOrDefaultAsync(x => x.AccountId == transaction.AccountId && x.CompanyId == companyId.Value).ConfigureAwait(false);
+            var summary = await unitOfWork.CompanySummary.GetAll().FirstOrDefaultAsync(x => x.AccountId == transaction.AccountId && x.CompanyId == companyId.Value);
 
             if (summary is not null)
             {
@@ -260,9 +260,9 @@ namespace InvestmentManager.Services.Implimentations
                     CurrencyId = transaction.CurrencyId,
                     ActualLot = transaction.Quantity,
                     CurrentProfit = transaction.Quantity * transaction.Cost * -1
-                }).ConfigureAwait(false);
+                });
 
-            return await unitOfWork.CompleteAsync().ConfigureAwait(false);
+            return await unitOfWork.CompleteAsync();
         }
         public async Task<bool> SetCompanySummaryAsync(IEnumerable<StockTransaction> transactions)
         {
@@ -287,10 +287,10 @@ namespace InvestmentManager.Services.Implimentations
                                 CurrencyId = dataByCurrency.Key,
                                 ActualLot = actualLotByBuy - actualLotBySell,
                                 CurrentProfit = currentProfitBySell - currentProfitByBuy
-                            }).ConfigureAwait(false);
+                            });
                         }
 
-                return await unitOfWork.CompleteAsync().ConfigureAwait(false);
+                return await unitOfWork.CompleteAsync();
             }
             catch
             {
@@ -302,12 +302,12 @@ namespace InvestmentManager.Services.Implimentations
             if (dividend is null)
                 return false;
 
-            var companyId = (await unitOfWork.Isin.FindByIdAsync(dividend.IsinId).ConfigureAwait(false))?.CompanyId;
+            var companyId = (await unitOfWork.Isin.FindByIdAsync(dividend.IsinId))?.CompanyId;
             if (!companyId.HasValue)
                 return false;
 
             var summary = await unitOfWork.DividendSummary.GetAll()
-                .FirstOrDefaultAsync(x => x.AccountId == dividend.AccountId && x.CurrencyId == dividend.CurrencyId && x.CompanyId == companyId.Value).ConfigureAwait(false);
+                .FirstOrDefaultAsync(x => x.AccountId == dividend.AccountId && x.CurrencyId == dividend.CurrencyId && x.CompanyId == companyId.Value);
 
             if (summary is not null)
             {
@@ -323,9 +323,9 @@ namespace InvestmentManager.Services.Implimentations
                     CompanyId = companyId.Value,
                     TotalSum = dividend.Amount,
                     TotalTax = dividend.Tax
-                }).ConfigureAwait(false);
+                });
 
-            return await unitOfWork.CompleteAsync().ConfigureAwait(false);
+            return await unitOfWork.CompleteAsync();
         }
         public async Task<bool> SetDividendSummaryAsync(IEnumerable<Dividend> dividends)
         {
@@ -345,10 +345,10 @@ namespace InvestmentManager.Services.Implimentations
                                 CurrencyId = dataByCurrency.Key,
                                 TotalSum = dataByCurrency.Sum(x => x.Amount),
                                 TotalTax = dataByCurrency.Sum(x => x.Tax)
-                            }).ConfigureAwait(false);
+                            });
                         }
 
-                return await unitOfWork.CompleteAsync().ConfigureAwait(false);
+                return await unitOfWork.CompleteAsync();
             }
             catch
             {
@@ -361,7 +361,7 @@ namespace InvestmentManager.Services.Implimentations
                 return false;
 
             var summary = await unitOfWork.ComissionSummary.GetAll()
-                .FirstOrDefaultAsync(x => x.AccountId == comission.AccountId && x.CurrencyId == comission.CurrencyId).ConfigureAwait(false);
+                .FirstOrDefaultAsync(x => x.AccountId == comission.AccountId && x.CurrencyId == comission.CurrencyId);
 
             if (summary is not null)
             {
@@ -374,9 +374,9 @@ namespace InvestmentManager.Services.Implimentations
                     AccountId = comission.AccountId,
                     CurrencyId = comission.CurrencyId,
                     TotalSum = comission.Amount
-                }).ConfigureAwait(false);
+                });
 
-            return await unitOfWork.CompleteAsync().ConfigureAwait(false);
+            return await unitOfWork.CompleteAsync();
         }
         public async Task<bool> SetComissionSummaryAsync(IEnumerable<Comission> comissions)
         {
@@ -393,10 +393,10 @@ namespace InvestmentManager.Services.Implimentations
                             AccountId = dataByAccount.Key,
                             CurrencyId = dataByCurrency.Key,
                             TotalSum = dataByCurrency.Sum(x => x.Amount)
-                        }).ConfigureAwait(false);
+                        });
                     }
 
-                return await unitOfWork.CompleteAsync().ConfigureAwait(false);
+                return await unitOfWork.CompleteAsync();
             }
             catch
             {
@@ -409,7 +409,7 @@ namespace InvestmentManager.Services.Implimentations
                 return false;
 
             var summary = await unitOfWork.ExchangeRateSummary.GetAll()
-                .FirstOrDefaultAsync(x => x.AccountId == exchangeRate.AccountId && x.CurrencyId == exchangeRate.CurrencyId).ConfigureAwait(false);
+                .FirstOrDefaultAsync(x => x.AccountId == exchangeRate.AccountId && x.CurrencyId == exchangeRate.CurrencyId);
 
             var exchangeRateSummary = new ExchangeRateSummary
             {
@@ -458,10 +458,10 @@ namespace InvestmentManager.Services.Implimentations
                         exchangeRateSummary.AvgSoldRate = exchangeRateSummary.TotalSoldCost / exchangeRateSummary.TotalSoldQuantity;
                         break;
                 }
-                await unitOfWork.ExchangeRateSummary.CreateEntityAsync(exchangeRateSummary).ConfigureAwait(false);
+                await unitOfWork.ExchangeRateSummary.CreateEntityAsync(exchangeRateSummary);
             }
 
-            return await unitOfWork.CompleteAsync().ConfigureAwait(false);
+            return await unitOfWork.CompleteAsync();
         }
         public async Task<bool> SetExchangeRateSummaryAsync(IEnumerable<ExchangeRate> exchangeRates)
         {
@@ -488,10 +488,10 @@ namespace InvestmentManager.Services.Implimentations
                             TotalSoldQuantity = totalSoldQuantity,
                             AvgPurchasedRate = totalPurchasedCost / totalPurchasedQuantity,
                             AvgSoldRate = totalSoldCost / totalSoldQuantity
-                        }).ConfigureAwait(false);
+                        });
                     }
 
-                return await unitOfWork.CompleteAsync().ConfigureAwait(false);
+                return await unitOfWork.CompleteAsync();
             }
             catch
             {
@@ -501,20 +501,20 @@ namespace InvestmentManager.Services.Implimentations
 
         public async Task<bool> SetAccountFreeSumAsync(long accountId, long currencyId)
         {
-            var accountSummary = await unitOfWork.AccountSummary.GetAll().FirstOrDefaultAsync(x => x.AccountId == accountId && x.CurrencyId == currencyId).ConfigureAwait(false);
+            var accountSummary = await unitOfWork.AccountSummary.GetAll().FirstOrDefaultAsync(x => x.AccountId == accountId && x.CurrencyId == currencyId);
 
             if (accountSummary is not null)
             {
-                var companySummary = await unitOfWork.CompanySummary.GetAll().Where(x => x.AccountId == accountId && x.CurrencyId == currencyId).ToListAsync().ConfigureAwait(false);
+                var companySummary = await unitOfWork.CompanySummary.GetAll().Where(x => x.AccountId == accountId && x.CurrencyId == currencyId).ToListAsync();
                 var dividendSummary = unitOfWork.DividendSummary.GetAll().Where(x => x.AccountId == accountId && x.CurrencyId == currencyId);
 
                 decimal companiesFixedProfitSum = companySummary.Any() ? companySummary.Where(x => x.CurrentProfit > 0).Sum(x => x.CurrentProfit) : 0;
                 decimal companiesOriginalInvestedSum = companySummary.Any() ? companySummary.Where(x => x.CurrentProfit < 0).Sum(x => x.CurrentProfit) : 0;
-                decimal companiesDividendSum = dividendSummary is not null ? await dividendSummary.SumAsync(x => x.TotalSum).ConfigureAwait(false) : 0;
+                decimal companiesDividendSum = dividendSummary is not null ? await dividendSummary.SumAsync(x => x.TotalSum) : 0;
                 decimal accountComissionSum = 0;
                 if (currencyId == (long)CurrencyTypes.rub)
                 {
-                    var comissions = await unitOfWork.ComissionSummary.GetAll().FirstOrDefaultAsync(x => x.AccountId == accountId && x.CurrencyId == currencyId).ConfigureAwait(false);
+                    var comissions = await unitOfWork.ComissionSummary.GetAll().FirstOrDefaultAsync(x => x.AccountId == accountId && x.CurrencyId == currencyId);
                     if (comissions is not null)
                         accountComissionSum = comissions.TotalSum;
                 }
@@ -523,7 +523,7 @@ namespace InvestmentManager.Services.Implimentations
 
                 accountSummary.FreeSum = result;
                 accountSummary.DateUpdate = DateTime.Now;
-                return await unitOfWork.CompleteAsync().ConfigureAwait(false);
+                return await unitOfWork.CompleteAsync();
             }
 
             return true;
@@ -532,7 +532,7 @@ namespace InvestmentManager.Services.Implimentations
         public async Task<bool> ResetSummaryDataAsync(string userId)
         {
             #region set data to calculate
-            var accountIds = await unitOfWork.Account.GetAll().Where(x => x.UserId.Equals(userId)).Select(x => x.Id).ToArrayAsync().ConfigureAwait(false);
+            var accountIds = await unitOfWork.Account.GetAll().Where(x => x.UserId.Equals(userId)).Select(x => x.Id).ToArrayAsync();
 
             AccountTransaction[] accountTransactions;
             StockTransaction[] stockTransactions;
@@ -542,11 +542,11 @@ namespace InvestmentManager.Services.Implimentations
 
             try
             {
-                accountTransactions = await unitOfWork.AccountTransaction.GetAll().Where(x => accountIds.Contains(x.AccountId)).OrderBy(x => x.DateOperation).ToArrayAsync().ConfigureAwait(false);
-                stockTransactions = await unitOfWork.StockTransaction.GetAll().Where(x => accountIds.Contains(x.AccountId)).OrderBy(x => x.DateOperation).ToArrayAsync().ConfigureAwait(false);
-                dividends = await unitOfWork.Dividend.GetAll().Where(x => accountIds.Contains(x.AccountId)).OrderBy(x => x.DateOperation).ToArrayAsync().ConfigureAwait(false);
-                comissions = await unitOfWork.Comission.GetAll().Where(x => accountIds.Contains(x.AccountId)).OrderBy(x => x.DateOperation).ToArrayAsync().ConfigureAwait(false);
-                exchangeRates = await unitOfWork.ExchangeRate.GetAll().Where(x => accountIds.Contains(x.AccountId)).OrderBy(x => x.DateOperation).ToArrayAsync().ConfigureAwait(false);
+                accountTransactions = await unitOfWork.AccountTransaction.GetAll().Where(x => accountIds.Contains(x.AccountId)).OrderBy(x => x.DateOperation).ToArrayAsync();
+                stockTransactions = await unitOfWork.StockTransaction.GetAll().Where(x => accountIds.Contains(x.AccountId)).OrderBy(x => x.DateOperation).ToArrayAsync();
+                dividends = await unitOfWork.Dividend.GetAll().Where(x => accountIds.Contains(x.AccountId)).OrderBy(x => x.DateOperation).ToArrayAsync();
+                comissions = await unitOfWork.Comission.GetAll().Where(x => accountIds.Contains(x.AccountId)).OrderBy(x => x.DateOperation).ToArrayAsync();
+                exchangeRates = await unitOfWork.ExchangeRate.GetAll().Where(x => accountIds.Contains(x.AccountId)).OrderBy(x => x.DateOperation).ToArrayAsync();
             }
             catch
             {
@@ -567,24 +567,24 @@ namespace InvestmentManager.Services.Implimentations
             unitOfWork.ComissionSummary.DeleteEntities(comissionSummary);
             unitOfWork.ExchangeRateSummary.DeleteEntities(exchangeRateSummary);
 
-            if (!await unitOfWork.CompleteAsync().ConfigureAwait(false))
+            if (!await unitOfWork.CompleteAsync())
                 return false;
             #endregion
 
             #region calculating
             try
             {
-                if (!await SetAccountSummaryAsync(accountTransactions).ConfigureAwait(false)
-                || !await SetCompanySummaryAsync(stockTransactions).ConfigureAwait(false)
-                || !await SetDividendSummaryAsync(dividends).ConfigureAwait(false)
-                || !await SetComissionSummaryAsync(comissions).ConfigureAwait(false)
-                || !await SetExchangeRateSummaryAsync(exchangeRates).ConfigureAwait(false)
-                || !await SetAccountSummaryAsync(exchangeRates).ConfigureAwait(false))
+                if (!await SetAccountSummaryAsync(accountTransactions)
+                || !await SetCompanySummaryAsync(stockTransactions)
+                || !await SetDividendSummaryAsync(dividends)
+                || !await SetComissionSummaryAsync(comissions)
+                || !await SetExchangeRateSummaryAsync(exchangeRates)
+                || !await SetAccountSummaryAsync(exchangeRates))
                     return false;
 
-                foreach (var currencyId in await unitOfWork.Currency.GetAll().Select(x => x.Id).ToArrayAsync().ConfigureAwait(false))
+                foreach (var currencyId in await unitOfWork.Currency.GetAll().Select(x => x.Id).ToArrayAsync())
                     foreach (var accountId in accountIds)
-                        if (!await SetAccountFreeSumAsync(accountId, currencyId).ConfigureAwait(false))
+                        if (!await SetAccountFreeSumAsync(accountId, currencyId))
                             return false;
 
                 return true;
@@ -631,7 +631,7 @@ namespace InvestmentManager.Services.Implimentations
             foreach (var userId in userIds)
             {
                 #region set data to calculate
-                var accountIds = await unitOfWork.Account.GetAll().Where(x => x.UserId.Equals(userId)).Select(x => x.Id).ToArrayAsync().ConfigureAwait(false);
+                var accountIds = await unitOfWork.Account.GetAll().Where(x => x.UserId.Equals(userId)).Select(x => x.Id).ToArrayAsync();
 
                 AccountTransaction[] accountTransactions;
                 StockTransaction[] stockTransactions;
@@ -641,11 +641,11 @@ namespace InvestmentManager.Services.Implimentations
 
                 try
                 {
-                    accountTransactions = await unitOfWork.AccountTransaction.GetAll().Where(x => accountIds.Contains(x.AccountId)).OrderBy(x => x.DateOperation).ToArrayAsync().ConfigureAwait(false);
-                    stockTransactions = await unitOfWork.StockTransaction.GetAll().Where(x => accountIds.Contains(x.AccountId)).OrderBy(x => x.DateOperation).ToArrayAsync().ConfigureAwait(false);
-                    dividends = await unitOfWork.Dividend.GetAll().Where(x => accountIds.Contains(x.AccountId)).OrderBy(x => x.DateOperation).ToArrayAsync().ConfigureAwait(false);
-                    comissions = await unitOfWork.Comission.GetAll().Where(x => accountIds.Contains(x.AccountId)).OrderBy(x => x.DateOperation).ToArrayAsync().ConfigureAwait(false);
-                    exchangeRates = await unitOfWork.ExchangeRate.GetAll().Where(x => accountIds.Contains(x.AccountId)).OrderBy(x => x.DateOperation).ToArrayAsync().ConfigureAwait(false);
+                    accountTransactions = await unitOfWork.AccountTransaction.GetAll().Where(x => accountIds.Contains(x.AccountId)).OrderBy(x => x.DateOperation).ToArrayAsync();
+                    stockTransactions = await unitOfWork.StockTransaction.GetAll().Where(x => accountIds.Contains(x.AccountId)).OrderBy(x => x.DateOperation).ToArrayAsync();
+                    dividends = await unitOfWork.Dividend.GetAll().Where(x => accountIds.Contains(x.AccountId)).OrderBy(x => x.DateOperation).ToArrayAsync();
+                    comissions = await unitOfWork.Comission.GetAll().Where(x => accountIds.Contains(x.AccountId)).OrderBy(x => x.DateOperation).ToArrayAsync();
+                    exchangeRates = await unitOfWork.ExchangeRate.GetAll().Where(x => accountIds.Contains(x.AccountId)).OrderBy(x => x.DateOperation).ToArrayAsync();
                 }
                 catch
                 {
@@ -656,17 +656,17 @@ namespace InvestmentManager.Services.Implimentations
                 #region calculating
                 try
                 {
-                    if (!await SetAccountSummaryAsync(accountTransactions).ConfigureAwait(false)
-                    || !await SetCompanySummaryAsync(stockTransactions).ConfigureAwait(false)
-                    || !await SetDividendSummaryAsync(dividends).ConfigureAwait(false)
-                    || !await SetComissionSummaryAsync(comissions).ConfigureAwait(false)
-                    || !await SetExchangeRateSummaryAsync(exchangeRates).ConfigureAwait(false)
-                    || !await SetAccountSummaryAsync(exchangeRates).ConfigureAwait(false))
+                    if (!await SetAccountSummaryAsync(accountTransactions)
+                    || !await SetCompanySummaryAsync(stockTransactions)
+                    || !await SetDividendSummaryAsync(dividends)
+                    || !await SetComissionSummaryAsync(comissions)
+                    || !await SetExchangeRateSummaryAsync(exchangeRates)
+                    || !await SetAccountSummaryAsync(exchangeRates))
                         return false;
 
-                    foreach (var currencyId in await unitOfWork.Currency.GetAll().Select(x => x.Id).ToArrayAsync().ConfigureAwait(false))
+                    foreach (var currencyId in await unitOfWork.Currency.GetAll().Select(x => x.Id).ToArrayAsync())
                         foreach (var accountId in accountIds)
-                            if (!await SetAccountFreeSumAsync(accountId, currencyId).ConfigureAwait(false))
+                            if (!await SetAccountFreeSumAsync(accountId, currencyId))
                                 return false;
                 }
                 catch

@@ -24,7 +24,7 @@ namespace InvestmentManager.Server.Controllers
         [HttpGet("bycompanyid/{id}")]
         public async Task<IActionResult> GetByCompanyId(long id)
         {
-            var result = (await unitOfWork.Company.FindByIdAsync(id).ConfigureAwait(false))?.Reports?.Select(x => x.Coefficient);
+            var result = (await unitOfWork.Company.FindByIdAsync(id))?.Reports?.Select(x => x.Coefficient);
             return result is null ? NoContent() : Ok(result.Select(x => new CoefficientModel
             {
                 PE = x.PE,
@@ -41,7 +41,7 @@ namespace InvestmentManager.Server.Controllers
         [HttpGet("bycompanyid/{id}/summary/")]
         public async Task<IActionResult> GetSummaryByCompanyId(long id)
         {
-            var results = (await unitOfWork.Company.FindByIdAsync(id).ConfigureAwait(false))
+            var results = (await unitOfWork.Company.FindByIdAsync(id))
                 ?.Reports?.Select(x => x.Coefficient).OrderBy(x => x.DateUpdate);
             return results is null ? NoContent() : Ok(new SummaryCoefficient
             {

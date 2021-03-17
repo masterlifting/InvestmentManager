@@ -34,7 +34,7 @@ namespace InvestmentManager.Server.Controllers
         [HttpGet("byaccountid/{id}")]
         public async Task<IActionResult> GetByAccountId(long id)
         {
-            var comissions = (await unitOfWork.Account.FindByIdAsync(id).ConfigureAwait(false))?.Comissions;
+            var comissions = (await unitOfWork.Account.FindByIdAsync(id))?.Comissions;
 
             return comissions is null
                 ? NoContent()
@@ -48,7 +48,7 @@ namespace InvestmentManager.Server.Controllers
         [HttpGet("byaccountid/{id}/summary/")]
         public async Task<IActionResult> GetSummaryByAccountId(long id)
         {
-            var account = await unitOfWork.Account.FindByIdAsync(id).ConfigureAwait(false);
+            var account = await unitOfWork.Account.FindByIdAsync(id);
             var comissionss = account?.Comissions;
             if (comissionss is null || !comissionss.Any())
                 return NoContent();
@@ -80,11 +80,11 @@ namespace InvestmentManager.Server.Controllers
                 DateOperation = model.DateOperation
             };
 
-            var result = await restMethod.BasePostAsync(ModelState, entity, model).ConfigureAwait(false);
+            var result = await restMethod.BasePostAsync(ModelState, entity, model);
 
             if (result.IsSuccess)
             {
-                result.Info += await reckonerService.UpgradeByComissionChangeAsync(entity).ConfigureAwait(false) ? " Recalculated" : " NOT Recalculated.";
+                result.Info += await reckonerService.UpgradeByComissionChangeAsync(entity) ? " Recalculated" : " NOT Recalculated.";
                 return Ok(result);
             }
             else

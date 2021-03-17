@@ -57,10 +57,10 @@
         base.OnParametersSet();
     }
     async Task SaveData(AccountTransactionModel transaction) =>
-    await queryServise.PostDataAsync(transaction, accountTransactions, UrlController.AccountTransactions, "Account transaction").ConfigureAwait(false);
+    await queryServise.PostDataAsync(transaction, accountTransactions, UrlController.AccountTransactions, "Account transaction");
     async Task SaveDataCollection()
     {
         accountTransactions = accountTransactions.OrderBy(x => x.DateOperation).ToList();
-        await queryServise.PostDataCollectionAsync(accountTransactions, UrlController.AccountTransactions, "Account transactions").ConfigureAwait(false);
+        await queryServise.PostDataCollectionAsync(accountTransactions, UrlController.AccountTransactions, "Account transactions");
     }
 }

@@ -108,7 +108,7 @@ namespace InvestmentManager.Repository
         {
             try
             {
-                return await context.SaveChangesAsync().ConfigureAwait(false) >= 0;
+                return await context.SaveChangesAsync() >= 0;
             }
             catch
             {
@@ -123,22 +123,22 @@ namespace InvestmentManager.Repository
 
             var newEntities = entities.Where(x => x.Id == default);
             if (newEntities.Any())
-                await context.Set<T>().AddRangeAsync(newEntities).ConfigureAwait(false);
+                await context.Set<T>().AddRangeAsync(newEntities);
 
             var currentEntities = entities.Where(x => x.Id != default);
             if (currentEntities.Any())
                 context.Set<T>().UpdateRange(currentEntities);
 
-            var oldEntityIds = await context.Set<T>().Select(x => x.Id).ToArrayAsync().ConfigureAwait(false);
+            var oldEntityIds = await context.Set<T>().Select(x => x.Id).ToArrayAsync();
             var idsToDelete = oldEntityIds.Except(currentEntities.Select(x => x.Id));
 
             if (idsToDelete.Any())
             {
-                var entitiesToDelete = await context.Set<T>().Where(x => idsToDelete.Contains(x.Id)).ToArrayAsync().ConfigureAwait(false);
+                var entitiesToDelete = await context.Set<T>().Where(x => idsToDelete.Contains(x.Id)).ToArrayAsync();
                 context.Set<T>().RemoveRange(entitiesToDelete);
             }
 
-            return await context.SaveChangesAsync().ConfigureAwait(false) >= 0;
+            return await context.SaveChangesAsync() >= 0;
         }
     }
 }

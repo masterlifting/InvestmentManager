@@ -82,7 +82,7 @@ namespace InvestmentManager.Server.Controllers
         {
             var transactions = await unitOfWork.StockTransaction.GetAll()
                 .Where(x => x.AccountId == accountId && x.Ticker.CompanyId == companyId)
-                .ToListAsync().ConfigureAwait(false);
+                .ToListAsync();
 
             return transactions is null || !transactions.Any()
                 ? NoContent()
@@ -103,7 +103,7 @@ namespace InvestmentManager.Server.Controllers
                 .OrderBy(x => x.DateOperation)
                 .LastOrDefaultAsync();
 
-            var summary = await unitOfWork.CompanySummary.GetAll().FirstOrDefaultAsync(x => x.AccountId == accountId && x.CompanyId == companyId).ConfigureAwait(false);
+            var summary = await unitOfWork.CompanySummary.GetAll().FirstOrDefaultAsync(x => x.AccountId == accountId && x.CompanyId == companyId);
 
             return lastTransaction is null ? NoContent() : Ok(new SummaryStockTransaction
             {
@@ -135,7 +135,7 @@ namespace InvestmentManager.Server.Controllers
             {
                 if (model.StatusId == (long)TransactionStatusTypes.Sell)
                 {
-                    var ticker = await unitOfWork.Ticker.FindByIdAsync(model.TickerId).ConfigureAwait(false);
+                    var ticker = await unitOfWork.Ticker.FindByIdAsync(model.TickerId);
 
                     if (ticker is null)
                         return false;
@@ -146,18 +146,18 @@ namespace InvestmentManager.Server.Controllers
                         .FirstOrDefaultAsync(x =>
                         x.AccountId == model.AccountId
                         && x.CompanyId == companyId
-                        && x.CurrencyId == model.CurrencyId).ConfigureAwait(false);
+                        && x.CurrencyId == model.CurrencyId);
 
                     return summary is not null && model.Quantity <= summary.ActualLot;
                 }
                 else
                     return true;
             }
-            var result = await restMethod.BasePostAsync(ModelState, entity, model, TransactionValidatorAsync).ConfigureAwait(false);
+            var result = await restMethod.BasePostAsync(ModelState, entity, model, TransactionValidatorAsync);
 
             if (result.IsSuccess)
             {
-                result.Info += await reckonerService.UpgradeByStockTransactionChangeAsync(entity, userManager.GetUserId(User)).ConfigureAwait(false) ? " Recalculated" : " NOT Recalculated";
+                result.Info += await reckonerService.UpgradeByStockTransactionChangeAsync(entity, userManager.GetUserId(User)) ? " Recalculated" : " NOT Recalculated";
                 return Ok(result);
             }
             else

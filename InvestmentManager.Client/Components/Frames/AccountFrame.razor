@@ -153,13 +153,13 @@
             content.Add(new ByteArrayContent(buffer), file.Name, file.Name);
         }
 
-        var model = await http.PostContentAsync<BrokerReportModel>(new UrlBuilder(UrlService.ParseBrokerReports).Result, content).ConfigureAwait(false);
+        var model = await http.PostContentAsync<BrokerReportModel>(new UrlBuilder(UrlService.ParseBrokerReports).Result, content);
 
         content.Dispose();
 
         if (model is not null)
         {
-            await localStorage.SetItemAsync<BrokerReportModel>($"{user.Identity.Name}_{DefaultString.Id.brokerReport}", model).ConfigureAwait(false);
+            await localStorage.SetItemAsync<BrokerReportModel>($"{user.Identity.Name}_{DefaultString.Id.brokerReport}", model);
             navigationManager.NavigateTo("brokerreports");
         }
         else

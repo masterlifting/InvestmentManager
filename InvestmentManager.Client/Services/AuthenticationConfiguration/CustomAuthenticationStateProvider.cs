@@ -15,26 +15,26 @@ namespace InvestmentManager.Client.Services.AuthenticationConfiguration
         {
             if (string.IsNullOrWhiteSpace(token))
             {
-                await localStorage.RemoveItemAsync("authToken").ConfigureAwait(false);
-                await localStorage.RemoveItemAsync("authTokenExpiry").ConfigureAwait(false);
+                await localStorage.RemoveItemAsync("authToken");
+                await localStorage.RemoveItemAsync("authTokenExpiry");
             }
             else
             {
-                await localStorage.SetItemAsync("authToken", token).ConfigureAwait(false);
-                await localStorage.SetItemAsync("authTokenExpiry", expiry).ConfigureAwait(false);
+                await localStorage.SetItemAsync("authToken", token);
+                await localStorage.SetItemAsync("authTokenExpiry", expiry);
             }
             NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
         }
         public async Task<string> GetTokenAsync()
         {
-            DateTime expiry = await localStorage.GetItemAsync<DateTime>("authTokenExpiry").ConfigureAwait(false);
+            DateTime expiry = await localStorage.GetItemAsync<DateTime>("authTokenExpiry");
 
             if (expiry != default)
             {
                 if (expiry > DateTime.Now)
-                    return await localStorage.GetItemAsync<string>("authToken").ConfigureAwait(false);
+                    return await localStorage.GetItemAsync<string>("authToken");
                 else
-                    await SetTokenAsync(null).ConfigureAwait(false);
+                    await SetTokenAsync(null);
             }
 
             return null;
@@ -42,7 +42,7 @@ namespace InvestmentManager.Client.Services.AuthenticationConfiguration
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
-            string token = await GetTokenAsync().ConfigureAwait(false);
+            string token = await GetTokenAsync();
             var identity = string.IsNullOrWhiteSpace(token)
                 ? new ClaimsIdentity()
                 : new ClaimsIdentity(AuthenticationServiceExtentions.ParseClaimsFromJwt(token), "jwt");

@@ -27,35 +27,35 @@ namespace InvestmentManager.Client.Services.HttpService
 
         public async Task GetAsync(string url)
         {
-            await SetAuthHeaderAsync().ConfigureAwait(false);
+            await SetAuthHeaderAsync();
             notice.ToastWarning("Longer process.", "This request do not have a response!");
-            await httpClient.GetAsync(url).ConfigureAwait(false);
+            await httpClient.GetAsync(url);
         }
 
-        public async Task<TResult> GetAsync<TResult>(string url) => await BaseQueryAsync<TResult>(httpClient.GetAsync(url)).ConfigureAwait(false);
-        public async Task<TResult> PostAsync<TResult, TModel>(string url, TModel model) => await BaseQueryAsync<TResult>(httpClient.PostAsJsonAsync(url, model)).ConfigureAwait(false);
-        public async Task<TResult> PostContentAsync<TResult>(string url, HttpContent content) => await BaseQueryAsync<TResult>(httpClient.PostAsync(url, content)).ConfigureAwait(false);
-        public async Task<TResult> PutAsync<TResult, TModel>(string url, TModel model) => await BaseQueryAsync<TResult>(httpClient.PutAsJsonAsync(url, model)).ConfigureAwait(false);
-        public async Task<TResult> DeleteAsync<TResult>(string url) => await BaseQueryAsync<TResult>(httpClient.DeleteAsync(url)).ConfigureAwait(false);
+        public async Task<TResult> GetAsync<TResult>(string url) => await BaseQueryAsync<TResult>(httpClient.GetAsync(url));
+        public async Task<TResult> PostAsync<TResult, TModel>(string url, TModel model) => await BaseQueryAsync<TResult>(httpClient.PostAsJsonAsync(url, model));
+        public async Task<TResult> PostContentAsync<TResult>(string url, HttpContent content) => await BaseQueryAsync<TResult>(httpClient.PostAsync(url, content));
+        public async Task<TResult> PutAsync<TResult, TModel>(string url, TModel model) => await BaseQueryAsync<TResult>(httpClient.PutAsJsonAsync(url, model));
+        public async Task<TResult> DeleteAsync<TResult>(string url) => await BaseQueryAsync<TResult>(httpClient.DeleteAsync(url));
 
         async Task<TResult> BaseQueryAsync<TResult>(Task<HttpResponseMessage> responseTask)
         {
             TResult result;
             notice.LoadStart();
 
-            await SetAuthHeaderAsync().ConfigureAwait(false);
-            var response = await responseTask.ConfigureAwait(false);
+            await SetAuthHeaderAsync();
+            var response = await responseTask;
 
             if (response.IsSuccessStatusCode)
             {
                 result = response.StatusCode == System.Net.HttpStatusCode.NoContent
                     ? default
-                    : await response.Content.ReadFromJsonAsync<TResult>().ConfigureAwait(false);
+                    : await response.Content.ReadFromJsonAsync<TResult>();
             }
             else
             {
                 result = response.Content is not null
-                    ? await response.Content.ReadFromJsonAsync<TResult>().ConfigureAwait(false)
+                    ? await response.Content.ReadFromJsonAsync<TResult>()
                     : Activator.CreateInstance<TResult>();
             }
 
@@ -64,7 +64,7 @@ namespace InvestmentManager.Client.Services.HttpService
         }
         public async Task SetAuthHeaderAsync()
         {
-            string token = await customAuthenticationState.GetTokenAsync().ConfigureAwait(false);
+            string token = await customAuthenticationState.GetTokenAsync();
             httpClient.DefaultRequestHeaders.Authorization = token != null ? new AuthenticationHeaderValue("Bearer", token) : null;
         }
     }

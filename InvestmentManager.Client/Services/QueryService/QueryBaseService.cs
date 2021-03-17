@@ -45,7 +45,7 @@ namespace InvestmentManager.Client.Services.QueryService
                         foreach (var accountId in accountIds)
                         {
                             string uri = urlBuilder.Invoke(accountId);
-                            var previewResult = await http.GetAsync<List<T>>(uri).ConfigureAwait(false);
+                            var previewResult = await http.GetAsync<List<T>>(uri);
 
                             if (previewResult != default)
                                 previewResults.AddRange(previewResult);
@@ -81,7 +81,7 @@ namespace InvestmentManager.Client.Services.QueryService
             List<ColumnConfig> columns = null;
 
             string uri = urlBuilder.Invoke();
-            List<T> items = await http.GetAsync<List<T>>(uri).ConfigureAwait(false);
+            List<T> items = await http.GetAsync<List<T>>(uri);
 
             if (items != default && items.Any())
             {
@@ -114,7 +114,7 @@ namespace InvestmentManager.Client.Services.QueryService
                         foreach (var accountId in accountIds)
                         {
                             string uri = urlBuilder.Invoke(accountId);
-                            var previewResult = await http.GetAsync<T>(uri).ConfigureAwait(false);
+                            var previewResult = await http.GetAsync<T>(uri);
 
                             if (previewResult != default)
                                 previewResults.Add(previewResult);
@@ -142,7 +142,7 @@ namespace InvestmentManager.Client.Services.QueryService
             string resultInfo = null;
 
             string uri = urlBuilder.Invoke();
-            var previewResult = await http.GetAsync<T>(uri).ConfigureAwait(false);
+            var previewResult = await http.GetAsync<T>(uri);
 
             if (previewResult != default)
                 item = previewResult;
@@ -159,7 +159,7 @@ namespace InvestmentManager.Client.Services.QueryService
             if (user.Identity.IsAuthenticated)
             {
                 string uri = urlBuilder.Invoke();
-                var previewResult = await http.GetAsync<T>(uri).ConfigureAwait(false);
+                var previewResult = await http.GetAsync<T>(uri);
 
                 if (previewResult != default)
                     item = previewResult;

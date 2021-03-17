@@ -26,7 +26,7 @@ namespace InvestmentManager.ReportFinder.Implimentations
             var resultReport = new List<Report>();
 
             return reportSources.ContainsKey(sourceKey)
-                ? await reportSources[sourceKey].GetNewReportsAsync(companyId, sourceValue).ConfigureAwait(false)
+                ? await reportSources[sourceKey].GetNewReportsAsync(companyId, sourceValue)
                 : resultReport;
         }
     }

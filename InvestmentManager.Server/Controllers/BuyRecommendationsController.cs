@@ -28,7 +28,7 @@ namespace InvestmentManager.Server.Controllers
         {
             int pageSize = int.Parse(configuration["PaginationPageSize"]);
             var companies = unitOfWork.Company.GetAll();
-            var lastPricies = await unitOfWork.Price.GetLastPricesAsync(30).ConfigureAwait(false);
+            var lastPricies = await unitOfWork.Price.GetLastPricesAsync(30);
             var recommendations = lastPricies?
                 .Join(unitOfWork.BuyRecommendation.GetAll(), x => x.Key, y => y.CompanyId, (x, y) => new
                 {
@@ -56,7 +56,7 @@ namespace InvestmentManager.Server.Controllers
         [HttpGet("bycompanyid/{id}")]
         public async Task<IActionResult> GetByCompanyId(long id)
         {
-            var result = await unitOfWork.BuyRecommendation.GetAll().FirstOrDefaultAsync(x => x.CompanyId == id).ConfigureAwait(false);
+            var result = await unitOfWork.BuyRecommendation.GetAll().FirstOrDefaultAsync(x => x.CompanyId == id);
             return result is null ? NoContent() : Ok(new BuyRecommendationModel
             {
                 DateUpdate = result.DateUpdate,
@@ -66,7 +66,7 @@ namespace InvestmentManager.Server.Controllers
         [HttpGet("bycompanyid/{id}/summary/")]
         public async Task<IActionResult> GetSummaryByCompanyId(long id)
         {
-            var recommendation = (await unitOfWork.Company.FindByIdAsync(id).ConfigureAwait(false))?.BuyRecommendation;
+            var recommendation = (await unitOfWork.Company.FindByIdAsync(id))?.BuyRecommendation;
             return recommendation is null ? NoContent() : Ok(new SummaryBuyRecommendation
             {
                 DateUpdate = recommendation.DateUpdate,

@@ -37,7 +37,7 @@ namespace InvestmentManager.Server.Controllers
             int pageSize = int.Parse(configuration["PaginationPageSize"]);
 
             var companies = unitOfWork.Company.GetAll();
-            var lastPricies = await unitOfWork.Price.GetLastPricesAsync(30).ConfigureAwait(false);
+            var lastPricies = await unitOfWork.Price.GetLastPricesAsync(30);
             var recommendations = lastPricies?
                 .Join(unitOfWork.SellRecommendation.GetAll().Where(x => x.UserId.Equals(userId)), x => x.Key, y => y.CompanyId, (x, y) => new
                 {
@@ -96,7 +96,7 @@ namespace InvestmentManager.Server.Controllers
         public async Task<IActionResult> GetByCompanyId(long id)
         {
             string userId = userManager.GetUserId(User);
-            var recommentation = await unitOfWork.SellRecommendation.GetAll().FirstOrDefaultAsync(x => x.UserId.Equals(userId) && x.CompanyId == id).ConfigureAwait(false);
+            var recommentation = await unitOfWork.SellRecommendation.GetAll().FirstOrDefaultAsync(x => x.UserId.Equals(userId) && x.CompanyId == id);
 
             return recommentation is null ? NoContent() : Ok(new SellRecommendationModel
             {
@@ -113,7 +113,7 @@ namespace InvestmentManager.Server.Controllers
         public async Task<IActionResult> GetSummaryByCompanyId(long id)
         {
             string userId = userManager.GetUserId(User);
-            var recommentation = await unitOfWork.SellRecommendation.GetAll().FirstOrDefaultAsync(x => x.UserId.Equals(userId) && x.CompanyId == id).ConfigureAwait(false);
+            var recommentation = await unitOfWork.SellRecommendation.GetAll().FirstOrDefaultAsync(x => x.UserId.Equals(userId) && x.CompanyId == id);
 
             return recommentation is null ? NoContent() : Ok(new SummarySellRecommendation
             {

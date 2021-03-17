@@ -31,11 +31,11 @@ namespace InvestmentManager.Server.Controllers
 
             async Task<bool> ComissionTypeValidatorAsync(ComissionTypeModel model)
             {
-                var names = await unitOfWork.ComissionType.GetAll().Select(x => x.Name).ToListAsync().ConfigureAwait(false);
+                var names = await unitOfWork.ComissionType.GetAll().Select(x => x.Name).ToListAsync();
                 return !names.Where(x => x.Equals(model.Name, StringComparison.OrdinalIgnoreCase)).Any();
             }
 
-            var result = await restMethod.BasePostAsync(ModelState, entity, model, ComissionTypeValidatorAsync).ConfigureAwait(false);
+            var result = await restMethod.BasePostAsync(ModelState, entity, model, ComissionTypeValidatorAsync);
 
             return result.IsSuccess ? Ok(result) : BadRequest(result);
         }

@@ -40,8 +40,8 @@ namespace InvestmentManager.BrokerService
                 throw new NullReferenceException();
 
             var parsedReports = ParseFiles(files);
-            var checkedReports = await CheckParsedReportsAsync(parsedReports, userId).ConfigureAwait(false);
-            var filteredNewReports = await FilterOutNewReportsAsync(checkedReports).ConfigureAwait(false);
+            var checkedReports = await CheckParsedReportsAsync(parsedReports, userId);
+            var filteredNewReports = await FilterOutNewReportsAsync(checkedReports);
 
             return filteredNewReports;
         }
@@ -80,7 +80,7 @@ namespace InvestmentManager.BrokerService
             var reports = new List<EntityReportModel>();
             var errors = new List<ErrorReportModel>();
 
-            var accounts = await unitOfWork.Account.GetAll().Where(x => x.UserId.Equals(userId)).ToListAsync().ConfigureAwait(false);
+            var accounts = await unitOfWork.Account.GetAll().Where(x => x.UserId.Equals(userId)).ToListAsync();
 
             if (!accounts.Any())
             {
@@ -113,11 +113,11 @@ namespace InvestmentManager.BrokerService
                 var entityReportModel = new EntityReportModel { AccountId = account.Id };
                 try
                 {
-                    entityReportModel.AccountTransactions = await reportMapper.MapToAccountTransactionsAsync(model.AccountTransactions, account.Id, errors).ConfigureAwait(false);
-                    entityReportModel.StockTransactions = await reportMapper.MapToStockTransactionsAsync(model.StockTransactions, account.Id, errors).ConfigureAwait(false);
-                    entityReportModel.Dividends = await reportMapper.MapToDividendsAsync(model.Dividends, account.Id, errors).ConfigureAwait(false);
-                    entityReportModel.Comissions = await reportMapper.MapToComissionsAsync(model.Comissions, account.Id, errors).ConfigureAwait(false);
-                    entityReportModel.ExchangeRates = await reportMapper.MapToExchangeRatesAsync(model.ExchangeRates, account.Id, errors).ConfigureAwait(false);
+                    entityReportModel.AccountTransactions = await reportMapper.MapToAccountTransactionsAsync(model.AccountTransactions, account.Id, errors);
+                    entityReportModel.StockTransactions = await reportMapper.MapToStockTransactionsAsync(model.StockTransactions, account.Id, errors);
+                    entityReportModel.Dividends = await reportMapper.MapToDividendsAsync(model.Dividends, account.Id, errors);
+                    entityReportModel.Comissions = await reportMapper.MapToComissionsAsync(model.Comissions, account.Id, errors);
+                    entityReportModel.ExchangeRates = await reportMapper.MapToExchangeRatesAsync(model.ExchangeRates, account.Id, errors);
                 }
                 catch (Exception ex)
                 {
@@ -142,7 +142,7 @@ namespace InvestmentManager.BrokerService
             {
                 var reportModel = new EntityReportModel { AccountId = i.Key };
                 reportModel.AccountTransactions = await reportFilter.GetNewTransactionsAsync(i.Select(x => x.AccountTransactions).Aggregate((x, y) => x.Union(y)), i.Key, CheckAccountTransactions);
-                reportModel.StockTransactions = await reportFilter.GetNewTransactionsAsync(i.Select(x => x.StockTransactions).Aggregate((x, y) => x.Union(y)), i.Key, CheckStockTransactions).ConfigureAwait(false);
+                reportModel.StockTransactions = await reportFilter.GetNewTransactionsAsync(i.Select(x => x.StockTransactions).Aggregate((x, y) => x.Union(y)), i.Key, CheckStockTransactions);
                 reportModel.Dividends = await reportFilter.GetNewTransactionsAsync(i.Select(x => x.Dividends).Aggregate((x, y) => x.Union(y)), i.Key, CheckDividends);
                 reportModel.Comissions = await reportFilter.GetNewTransactionsAsync(i.Select(x => x.Comissions).Aggregate((x, y) => x.Union(y)), i.Key, CheckComissions);
                 reportModel.ExchangeRates = await reportFilter.GetNewTransactionsAsync(i.Select(x => x.ExchangeRates).Aggregate((x, y) => x.Union(y)), i.Key, CheckExchangeRates);

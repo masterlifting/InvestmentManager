@@ -14,11 +14,11 @@ namespace InvestmentManager.Repository
         private readonly InvestmentContext context;
         public RepositoryEFCore(InvestmentContext context) => this.context = context;
 
-        public async Task<TEntity> FindByIdAsync(long id) => await context.Set<TEntity>().FindAsync(id).ConfigureAwait(false);
+        public async Task<TEntity> FindByIdAsync(long id) => await context.Set<TEntity>().FindAsync(id);
         public IQueryable<TEntity> GetAll() => context.Set<TEntity>();
 
-        public async Task CreateEntityAsync(TEntity entity) => await context.Set<TEntity>().AddAsync(entity).ConfigureAwait(false);
-        public async Task CreateEntitiesAsync(IEnumerable<TEntity> entities) => await context.Set<TEntity>().AddRangeAsync(entities).ConfigureAwait(false);
+        public async Task CreateEntityAsync(TEntity entity) => await context.Set<TEntity>().AddAsync(entity);
+        public async Task CreateEntitiesAsync(IEnumerable<TEntity> entities) => await context.Set<TEntity>().AddRangeAsync(entities);
 
         public void UpdateEntity(TEntity entity) => context.Set<TEntity>().Update(entity);
         public void UpdateEntities(IEnumerable<TEntity> entities) => context.Set<TEntity>().UpdateRange(entities);
@@ -49,14 +49,14 @@ namespace InvestmentManager.Repository
         {
             try
             {
-                return await context.SaveChangesAsync().ConfigureAwait(false) > 0;
+                return await context.SaveChangesAsync() > 0;
             }
             catch
             {
                 try
                 {
                     PostgresAutoReseed();
-                    return await context.SaveChangesAsync().ConfigureAwait(false) > 0;
+                    return await context.SaveChangesAsync() > 0;
                 }
                 catch
                 {
@@ -95,7 +95,7 @@ namespace InvestmentManager.Repository
         {
             var result = new Dictionary<long, Report>();
 
-            var reports = await context.Reports.Where(x => x.DateReport >= DateTime.Now.AddMonths(-4)).OrderBy(x => x.DateReport).ToArrayAsync().ConfigureAwait(false);
+            var reports = await context.Reports.Where(x => x.DateReport >= DateTime.Now.AddMonths(-4)).OrderBy(x => x.DateReport).ToArrayAsync();
             var agregatedData = reports.GroupBy(x => x.CompanyId).Select(x => new { CompanyId = x.Key, LastReport = x.Last() });
 
             foreach (var i in agregatedData)
@@ -104,7 +104,7 @@ namespace InvestmentManager.Repository
             return result;
         }
         public async Task<DateTime[]> GetLastFourDateReportAsync(long companyId) =>
-            await context.Reports.Where(x => x.CompanyId == companyId).OrderByDescending(x => x.DateReport).Take(4).Select(x => x.DateReport).ToArrayAsync().ConfigureAwait(false);
+            await context.Reports.Where(x => x.CompanyId == companyId).OrderByDescending(x => x.DateReport).Take(4).Select(x => x.DateReport).ToArrayAsync();
     }
     public class PriceRepository : RepositoryEFCore<Price>, IPriceRepository
     {
@@ -116,10 +116,10 @@ namespace InvestmentManager.Repository
             var result = new Dictionary<long, Price[]>();
             DateTime baseStartDate = DateTime.Now.AddMonths(-lastMonths);
 
-            var tickers = await GetTickersByPricesAsync().ConfigureAwait(false);
+            var tickers = await GetTickersByPricesAsync();
             var priceQuery = context.Prices.Where(x => x.BidDate >= baseStartDate);
 
-            var prices = (await priceQuery.ToArrayAsync().ConfigureAwait(false)).GroupBy(x => x.TickerId);
+            var prices = (await priceQuery.ToArrayAsync()).GroupBy(x => x.TickerId);
 
             var agregatedData = tickers
                 .Join(context.Companies, x => x.CompanyId, y => y.Id, (x, y) => new { TickerId = x.Id, x.CompanyId, y.DateSplit })
@@ -143,8 +143,8 @@ namespace InvestmentManager.Repository
         {
             var result = new Dictionary<long, decimal>();
 
-            var tickers = await GetTickersByPricesAsync().ConfigureAwait(false);
-            var prices = await context.Prices.Where(x => x.BidDate >= DateTime.Now.AddDays(-lastDays)).ToArrayAsync().ConfigureAwait(false);
+            var tickers = await GetTickersByPricesAsync();
+            var prices = await context.Prices.Where(x => x.BidDate >= DateTime.Now.AddDays(-lastDays)).ToArrayAsync();
 
             var agregatedData = prices.GroupBy(x => x.TickerId).Join(tickers, x => x.Key, y => y.Id, (x, y) => new { y.CompanyId, LastPrice = x.OrderByDescending(x => x.BidDate).First().Value });
             foreach (var i in agregatedData)
@@ -159,8 +159,8 @@ namespace InvestmentManager.Repository
             if (companyIds is null || !companyIds.Any())
                 return result;
 
-            var tickers = (await GetTickersByPricesAsync().ConfigureAwait(false)).Where(x => companyIds.Contains(x.CompanyId));
-            var prices = await context.Prices.Where(x => x.BidDate >= DateTime.Now.AddDays(-lastDays)).ToArrayAsync().ConfigureAwait(false);
+            var tickers = (await GetTickersByPricesAsync()).Where(x => companyIds.Contains(x.CompanyId));
+            var prices = await context.Prices.Where(x => x.BidDate >= DateTime.Now.AddDays(-lastDays)).ToArrayAsync();
 
             var agregatedData = prices.GroupBy(x => x.TickerId).Join(tickers, x => x.Key, y => y.Id, (x, y) => new { y.CompanyId, LastPrice = x.OrderByDescending(x => x.BidDate).First().Value });
             foreach (var i in agregatedData)
@@ -173,7 +173,7 @@ namespace InvestmentManager.Repository
         {
             var result = Array.Empty<Price>();
 
-            var ticker = await context.Tickers.FirstOrDefaultAsync(x => x.CompanyId == companyId).ConfigureAwait(false);
+            var ticker = await context.Tickers.FirstOrDefaultAsync(x => x.CompanyId == companyId);
             if (ticker is null)
                 return result;
 
@@ -188,14 +188,14 @@ namespace InvestmentManager.Repository
             if (prices is null || !prices.Any())
                 return result;
 
-            return await prices.OrderBy(x => x.BidDate).ToArrayAsync().ConfigureAwait(false);
+            return await prices.OrderBy(x => x.BidDate).ToArrayAsync();
         }
         public async Task<DateTime[]> GetLastDatesAsync(long tickerId, int count) =>
-            await context.Prices.Where(x => x.TickerId == tickerId).OrderByDescending(x => x.BidDate).Take(count).Select(x => x.BidDate).ToArrayAsync().ConfigureAwait(false);
+            await context.Prices.Where(x => x.TickerId == tickerId).OrderByDescending(x => x.BidDate).Take(count).Select(x => x.BidDate).ToArrayAsync();
         public async Task<int> GetCompanyCountWithPricesAsync() =>
-            await context.Prices.Select(x => x.TickerId).Distinct().CountAsync().ConfigureAwait(false);
+            await context.Prices.Select(x => x.TickerId).Distinct().CountAsync();
         public async Task<Ticker[]> GetTickersByPricesAsync() =>
-            (await context.Tickers.ToArrayAsync().ConfigureAwait(false)).GroupBy(x => x.CompanyId).Select(x => x.First()).ToArray();
+            (await context.Tickers.ToArrayAsync()).GroupBy(x => x.CompanyId).Select(x => x.First()).ToArray();
 
     }
     // Calculate

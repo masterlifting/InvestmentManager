@@ -67,10 +67,10 @@
         await base.OnParametersSetAsync();
     }
     async Task SaveData(DividendModel dividend) =>
-        await queryServise.PostDataAsync(dividend, dividends, UrlController.Dividends, "Divivend").ConfigureAwait(false);
+        await queryServise.PostDataAsync(dividend, dividends, UrlController.Dividends, "Divivend");
     async Task SaveDataCollection()
     {
         dividends = dividends.OrderBy(x => x.DateOperation).ToList();
-        await queryServise.PostDataCollectionAsync(dividends, UrlController.Dividends, "Dividends").ConfigureAwait(false);
+        await queryServise.PostDataCollectionAsync(dividends, UrlController.Dividends, "Dividends");
     }
 }

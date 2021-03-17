@@ -45,12 +45,12 @@ namespace InvestmentManager.Server.Controllers
             var accounts = unitOfWork.Account.GetAll().Where(x => x.UserId.Equals(userId));
             return accounts is null
                 ? NoContent()
-                : Ok(await accounts.Select(x => new AccountModel { Id = x.Id, Name = x.Name }).ToListAsync().ConfigureAwait(false));
+                : Ok(await accounts.Select(x => new AccountModel { Id = x.Id, Name = x.Name }).ToListAsync());
         }
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(long id)
         {
-            Account account = await unitOfWork.Account.FindByIdAsync(id).ConfigureAwait(false);
+            Account account = await unitOfWork.Account.FindByIdAsync(id);
             return account is null
                 ? NoContent()
                 : Ok(new AccountModel { Id = account.Id, Name = account.Name });
@@ -62,17 +62,17 @@ namespace InvestmentManager.Server.Controllers
 
             try
             {
-                long[] currencyIds = await unitOfWork.Currency.GetAll().Select(x => x.Id).ToArrayAsync().ConfigureAwait(false);
+                long[] currencyIds = await unitOfWork.Currency.GetAll().Select(x => x.Id).ToArrayAsync();
 
                 foreach (var currencyId in currencyIds)
                 {
-                    decimal intermediateResult = await summaryService.GetAccountTotalSumAsync(id, currencyId).ConfigureAwait(false);
+                    decimal intermediateResult = await summaryService.GetAccountTotalSumAsync(id, currencyId);
                     decimal rateValue = 1;
 
                     if (currencyId != (long)CurrencyTypes.rub)
                     {
-                        var response = await webService.GetCBRateAsync().ConfigureAwait(false);
-                        var rate = response.IsSuccessStatusCode ? await response.Content.ReadFromJsonAsync<CBRF>().ConfigureAwait(false) : null;
+                        var response = await webService.GetCBRateAsync();
+                        var rate = response.IsSuccessStatusCode ? await response.Content.ReadFromJsonAsync<CBRF>() : null;
 
                         rateValue = rate is not null
                             ? currencyId switch
@@ -97,7 +97,7 @@ namespace InvestmentManager.Server.Controllers
         [HttpGet("{id}/additional/")]
         public async Task<IActionResult> GetAdditional(long id)
         {
-            var account = await unitOfWork.Account.FindByIdAsync(id).ConfigureAwait(false);
+            var account = await unitOfWork.Account.FindByIdAsync(id);
             var summaries = account?.AccountSummaries;
 
             if (summaries is null || !summaries.Any())
@@ -123,8 +123,8 @@ namespace InvestmentManager.Server.Controllers
         {
             var entity = new Account { Name = model.Name, UserId = userManager.GetUserId(User) };
             async Task<bool> AccountValidatorAsync(AccountModel model) =>
-                !await unitOfWork.Account.GetAll().Where(x => x.Name.Equals(model.Name)).AnyAsync().ConfigureAwait(false);
-            var result = await restMethod.BasePostAsync(ModelState, entity, model, AccountValidatorAsync).ConfigureAwait(false);
+                !await unitOfWork.Account.GetAll().Where(x => x.Name.Equals(model.Name)).AnyAsync();
+            var result = await restMethod.BasePostAsync(ModelState, entity, model, AccountValidatorAsync);
             return result.IsSuccess ? (IActionResult)Ok(result) : BadRequest(result);
         }
     }

@@ -37,7 +37,7 @@ namespace InvestmentManager.BrokerService.Implimentations
                     errors.Add(new ErrorReportModel { ErrorType = ParseErrorTypes.AccountTransactionError, ErrorValue = $"Не удалось преобразовать \'{i.Amount}\' - {i.DateOperation}" });
                     continue;
                 }
-                var curency = await unitOfWork.Currency.GetAll().FirstOrDefaultAsync(x => x.Name.Equals(i.Currency)).ConfigureAwait(false);
+                var curency = await unitOfWork.Currency.GetAll().FirstOrDefaultAsync(x => x.Name.Equals(i.Currency));
                 if (curency != null)
                     dbEntity.CurrencyId = curency.Id;
                 else
@@ -130,7 +130,7 @@ namespace InvestmentManager.BrokerService.Implimentations
                     errors.Add(new ErrorReportModel { ErrorType = ParseErrorTypes.DividendError, ErrorValue = $"Не удалось найти тип валюты для \'{ i.Currency}\' - {i.DateOperation}" });
                     continue;
                 }
-                var identifier = await unitOfWork.Isin.GetAll().FirstOrDefaultAsync(x => i.CompanyName.IndexOf(x.Name) >= 0).ConfigureAwait(false);
+                var identifier = await unitOfWork.Isin.GetAll().FirstOrDefaultAsync(x => i.CompanyName.IndexOf(x.Name) >= 0);
                 if (identifier != null)
                     dbEntity.IsinId = identifier.Id;
                 else
@@ -264,7 +264,7 @@ namespace InvestmentManager.BrokerService.Implimentations
                     errors.Add(new ErrorReportModel { ErrorType = ParseErrorTypes.StockTransactionError, ErrorValue = $"Не удалось найти тип биржи для \'{ i.Exchange}\' - { i.DateOperation}" });
                     continue;
                 }
-                var ticker = await unitOfWork.Ticker.GetAll().FirstOrDefaultAsync(x => x.Name.Equals(i.Ticker)).ConfigureAwait(false);
+                var ticker = await unitOfWork.Ticker.GetAll().FirstOrDefaultAsync(x => x.Name.Equals(i.Ticker));
                 if (ticker != null)
                     dbEntity.TickerId = ticker.Id;
                 else

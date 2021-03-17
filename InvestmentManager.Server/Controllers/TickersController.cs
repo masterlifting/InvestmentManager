@@ -32,11 +32,11 @@ namespace InvestmentManager.Server.Controllers
                 CompanyId = x.CompanyId,
                 ExchangeId = x.ExchangeId,
                 LotId = x.LotId,
-            }).ToListAsync().ConfigureAwait(false));
+            }).ToListAsync());
         [HttpGet("bycompanyid/{id}")]
         public async Task<IActionResult> GetByCompanyId(long id)
         {
-            var tickers = (await unitOfWork.Company.FindByIdAsync(id).ConfigureAwait(false))?.Tickers;
+            var tickers = (await unitOfWork.Company.FindByIdAsync(id))?.Tickers;
             return tickers is null
                 ? NoContent()
                 : Ok(tickers.Select(x => new TickerModel
@@ -52,8 +52,8 @@ namespace InvestmentManager.Server.Controllers
         public async Task<IActionResult> Post(TickerModel model)
         {
             var entity = new Ticker { Name = model.Name, CompanyId = model.CompanyId, ExchangeId = model.ExchangeId, LotId = model.LotId };
-            async Task<bool> TickerValidatorAsync(TickerModel model) => !await unitOfWork.Ticker.GetAll().Where(x => x.Name.Equals(model.Name)).AnyAsync().ConfigureAwait(false);
-            var result = await restMethod.BasePostAsync(ModelState, entity, model, TickerValidatorAsync).ConfigureAwait(false);
+            async Task<bool> TickerValidatorAsync(TickerModel model) => !await unitOfWork.Ticker.GetAll().Where(x => x.Name.Equals(model.Name)).AnyAsync();
+            var result = await restMethod.BasePostAsync(ModelState, entity, model, TickerValidatorAsync);
             return result.IsSuccess ? (IActionResult)Ok(result) : BadRequest(result);
         }
         [HttpPut("{id}"), Authorize(Roles = "pestunov")]
@@ -73,7 +73,7 @@ namespace InvestmentManager.Server.Controllers
         [HttpDelete("{id}"), Authorize(Roles = "pestunov")]
         public async Task<IActionResult> Delete(long id)
         {
-            var result = await restMethod.BaseDeleteAsync<Ticker>(id).ConfigureAwait(false);
+            var result = await restMethod.BaseDeleteAsync<Ticker>(id);
             return result.IsSuccess ? (IActionResult)Ok(result) : BadRequest(result);
         }
     }

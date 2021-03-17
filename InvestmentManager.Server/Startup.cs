@@ -26,6 +26,7 @@ namespace InvestmentManager.Server
 {
     public class Startup
     {
+        readonly string ReactOrigins = "reactOrigins";
         public Startup(IConfiguration configuration) => Configuration = configuration;
 
         public IConfiguration Configuration { get; }
@@ -39,9 +40,9 @@ namespace InvestmentManager.Server
             services.AddDbContext<InvestmentContext>(provider =>
             {
                 provider.UseLazyLoadingProxies();
-               /*/
-                provider.UseNpgsql(Configuration["ConnectionStrings:LocalPostgresConnection"]);
                 /*/
+                 provider.UseNpgsql(Configuration["ConnectionStrings:LocalPostgresConnection"]);
+                 /*/
                 provider.UseNpgsql(Configuration["ConnectionStrings:PostgresConnection"]);
                 //*/
             });
@@ -55,6 +56,9 @@ namespace InvestmentManager.Server
                 options.User.RequireUniqueEmail = true;
 
             }).AddEntityFrameworkStores<InvestmentContext>();
+            
+            services.AddCors(x => { x.AddPolicy(name: ReactOrigins, policy => policy.WithOrigins("http://localhost:3000")); });
+           
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {
                 options.TokenValidationParameters = new TokenValidationParameters
@@ -134,12 +138,14 @@ namespace InvestmentManager.Server
                 app.UseWebAssemblyDebugging();
             }
 
-            app.UseResponseCompression();
             app.UseHttpsRedirection();
             app.UseBlazorFrameworkFiles();
             app.UseStaticFiles();
 
             app.UseRouting();
+            app.UseCors(ReactOrigins);
+
+            app.UseResponseCompression();
 
             app.UseAuthentication();
             app.UseAuthorization();

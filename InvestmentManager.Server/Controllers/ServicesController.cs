@@ -61,8 +61,8 @@ namespace InvestmentManager.Server.Controllers
         [HttpGet("rate/")]
         public async Task<IActionResult> GetRate()
         {
-            var response = await webService.GetCBRateAsync().ConfigureAwait(false);
-            return response.IsSuccessStatusCode ? Ok(await response.Content.ReadFromJsonAsync<CBRF>().ConfigureAwait(false)) : NoContent();
+            var response = await webService.GetCBRateAsync();
+            return response.IsSuccessStatusCode ? Ok(await response.Content.ReadFromJsonAsync<CBRF>()) : NoContent();
         }
 
         [HttpPost("parsebrokerreports/"), Authorize]
@@ -72,7 +72,7 @@ namespace InvestmentManager.Server.Controllers
             string userId = userManager.GetUserId(User);
             try
             {
-                var parsedReports = await brokerService.GetNewReportsAsync(files, userId).ConfigureAwait(false);
+                var parsedReports = await brokerService.GetNewReportsAsync(files, userId);
                 return Ok(mapper.MapBcsReports(parsedReports));
             }
             catch
@@ -83,13 +83,13 @@ namespace InvestmentManager.Server.Controllers
         [HttpGet("parseprices/"), Authorize(Roles = "pestunov")]
         public async Task<IActionResult> ParsePrices()
         {
-            var companyCountWithParsedPrices = await priceService.DownloadNewStockPricesAsync(365).ConfigureAwait(false);
+            var companyCountWithParsedPrices = await priceService.DownloadNewStockPricesAsync(365);
 
             string recalculatedResult = "";
             if (companyCountWithParsedPrices > 0)
             {
-                var userIds = await userManager.Users.Select(x => x.Id).ToArrayAsync().ConfigureAwait(false);
-                bool isRecalculated = await reckonerService.UpgradeByPriceChangeAsync(DataBaseType.Postgres, userIds).ConfigureAwait(false);
+                var userIds = await userManager.Users.Select(x => x.Id).ToArrayAsync();
+                bool isRecalculated = await reckonerService.UpgradeByPriceChangeAsync(DataBaseType.Postgres, userIds);
                 recalculatedResult = isRecalculated ? "Recalculated" : "NOT Recalculated";
             }
 
@@ -101,8 +101,8 @@ namespace InvestmentManager.Server.Controllers
         [HttpGet("parsereports/"), Authorize(Roles = "pestunov")]
         public async Task ParseReports()
         {
-            IDictionary<long, Report> lastReports = await unitOfWork.Report.GetLastReportsAsync().ConfigureAwait(false);
-            var reportSource = await unitOfWork.ReportSource.GetAll().ToListAsync().ConfigureAwait(false);
+            IDictionary<long, Report> lastReports = await unitOfWork.Report.GetLastReportsAsync();
+            var reportSource = await unitOfWork.ReportSource.GetAll().ToListAsync();
             var reportsToSave = new List<Report>();
             foreach (var i in reportSource)
             {
@@ -116,7 +116,7 @@ namespace InvestmentManager.Server.Controllers
                 List<Report> foundReports;
                 try
                 {
-                    foundReports = await reportService.FindNewReportsAsync(i.CompanyId, i.Key, i.Value).ConfigureAwait(false);
+                    foundReports = await reportService.FindNewReportsAsync(i.CompanyId, i.Key, i.Value);
                 }
                 catch
                 {
@@ -127,20 +127,20 @@ namespace InvestmentManager.Server.Controllers
             }
 
             await unitOfWork.Report.CreateEntitiesAsync(reportsToSave);
-            await unitOfWork.Report.CompletePostgresAsync().ConfigureAwait(false);
+            await unitOfWork.Report.CompletePostgresAsync();
         }
 
 
         [HttpGet("resetcalculatordata/"), Authorize(Roles = "pestunov")]
         public async Task<IActionResult> ResetCalculatorData()
         {
-            var userIds = await userManager.Users.Select(x => x.Id).ToArrayAsync().ConfigureAwait(false);
+            var userIds = await userManager.Users.Select(x => x.Id).ToArrayAsync();
 
             /*/
              DropCalculations();
              return Ok(new BaseActionResult { IsSuccess = true, Info = "Is Drop!" });
              /*/
-            return await calculator.ResetCalculatorDataAsync(DataBaseType.Postgres, userIds).ConfigureAwait(false)
+            return await calculator.ResetCalculatorDataAsync(DataBaseType.Postgres, userIds)
                 ? Ok(new BaseActionResult { IsSuccess = true, Info = "Reset all calculator success." })
                 : BadRequest(new BaseActionResult { IsSuccess = false, Info = "Reset all calculator failed!" });
             //*/
@@ -148,9 +148,9 @@ namespace InvestmentManager.Server.Controllers
         [HttpGet("resetsummarydata/"), Authorize(Roles = "pestunov")]
         public async Task<IActionResult> ResetSummaryData()
         {
-            var userIds = await userManager.Users.Select(x => x.Id).ToArrayAsync().ConfigureAwait(false);
+            var userIds = await userManager.Users.Select(x => x.Id).ToArrayAsync();
 
-            return await summaryService.ResetSummaryDataAsync(DataBaseType.Postgres, userIds).ConfigureAwait(false)
+            return await summaryService.ResetSummaryDataAsync(DataBaseType.Postgres, userIds)
                 ? Ok(new BaseActionResult { IsSuccess = true, Info = "Reset all summary success." })
                 : BadRequest(new BaseActionResult { IsSuccess = false, Info = "Reset all summary failed!" });
         }

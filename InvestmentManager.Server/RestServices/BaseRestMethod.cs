@@ -23,7 +23,7 @@ namespace InvestmentManager.Server.RestServices
             {
                 try
                 {
-                    if (!await customValidator.Invoke(model).ConfigureAwait(false))
+                    if (!await customValidator.Invoke(model))
                         return new BaseActionResult { IsSuccess = false, Info = $"Impossible action." };
                 }
                 catch
@@ -32,11 +32,11 @@ namespace InvestmentManager.Server.RestServices
                 }
             }
 
-            await context.Set<TEntity>().AddAsync(result).ConfigureAwait(false);
+            await context.Set<TEntity>().AddAsync(result);
 
             try
             {
-                await context.SaveChangesAsync().ConfigureAwait(false);
+                await context.SaveChangesAsync();
             }
             catch
             {
@@ -47,7 +47,7 @@ namespace InvestmentManager.Server.RestServices
                     long nextId = (long)idlimit + 1;
                     context.Database.ExecuteSqlRaw($"ALTER SEQUENCE \"{tableName}_Id_seq\" RESTART WITH {nextId}");
 
-                    await context.SaveChangesAsync().ConfigureAwait(false);
+                    await context.SaveChangesAsync();
                 }
                 catch
                 {
@@ -62,7 +62,7 @@ namespace InvestmentManager.Server.RestServices
             if (!modelState.IsValid)
                 return new BaseActionResult { IsSuccess = false, Info = modelInvalid };
 
-            var entity = await context.Set<TEntity>().FindAsync(id).ConfigureAwait(false);
+            var entity = await context.Set<TEntity>().FindAsync(id);
 
             if (entity is null)
                 return new BaseActionResult { IsSuccess = false, Info = modelIsNull };
@@ -74,7 +74,7 @@ namespace InvestmentManager.Server.RestServices
 
             try
             {
-                await context.SaveChangesAsync().ConfigureAwait(false);
+                await context.SaveChangesAsync();
             }
             catch
             {
@@ -85,7 +85,7 @@ namespace InvestmentManager.Server.RestServices
         }
         public async Task<BaseActionResult> BaseDeleteAsync<TEntity>(long id) where TEntity : class
         {
-            var entity = await context.Set<TEntity>().FindAsync(id).ConfigureAwait(false);
+            var entity = await context.Set<TEntity>().FindAsync(id);
 
             if (entity is null)
                 return new BaseActionResult { IsSuccess = false, Info = modelIsNull };
@@ -93,7 +93,7 @@ namespace InvestmentManager.Server.RestServices
             try
             {
                 context.Set<TEntity>().Remove(entity);
-                await context.SaveChangesAsync().ConfigureAwait(false);
+                await context.SaveChangesAsync();
             }
             catch
             {

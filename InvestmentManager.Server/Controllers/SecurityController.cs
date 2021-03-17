@@ -34,12 +34,12 @@ namespace InvestmentManager.Server.Controllers
         [HttpPost("login/")]
         public async Task<IActionResult> Login(LoginModel model)
         {
-            var result = await signInManager.PasswordSignInAsync(model.Email.Split('@')[0], model.Password, false, false).ConfigureAwait(false);
+            var result = await signInManager.PasswordSignInAsync(model.Email.Split('@')[0], model.Password, false, false);
             if (!result.Succeeded)
                 return BadRequest(new LoginResult { IsSuccess = false, Info = "Username or password are invalid." });
 
-            var currentUser = await userManager.FindByEmailAsync(model.Email).ConfigureAwait(false);
-            var roles = await userManager.GetRolesAsync(currentUser).ConfigureAwait(false);
+            var currentUser = await userManager.FindByEmailAsync(model.Email);
+            var roles = await userManager.GetRolesAsync(currentUser);
 
             var claims = new List<Claim> { new Claim(ClaimTypes.Name, model.Email) };
             foreach (var role in roles)
@@ -57,7 +57,7 @@ namespace InvestmentManager.Server.Controllers
         public async Task<IActionResult> Register(RegisterModel model)
         {
             var newUser = new IdentityUser { Email = model.Email, UserName = model.Email.Split('@')[0] };
-            var result = await userManager.CreateAsync(newUser, model.Password).ConfigureAwait(false);
+            var result = await userManager.CreateAsync(newUser, model.Password);
 
             if (!result.Succeeded)
             {

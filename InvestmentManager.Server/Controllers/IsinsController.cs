@@ -31,11 +31,11 @@ namespace InvestmentManager.Server.Controllers
                 Id = x.Id,
                 Name = x.Name,
                 CompanyId = x.CompanyId
-            }).ToListAsync().ConfigureAwait(false));
+            }).ToListAsync());
         [HttpGet("bycompanyid/{id}")]
         public async Task<IActionResult> GetByCompanyId(long id)
         {
-            var isins = (await unitOfWork.Company.FindByIdAsync(id).ConfigureAwait(false))?.Isins;
+            var isins = (await unitOfWork.Company.FindByIdAsync(id))?.Isins;
             return isins is null
                 ? NoContent()
                 : Ok(isins.Select(x => new IsinModel { Id = x.Id, CompanyId = x.CompanyId, Name = x.Name }).ToList());
@@ -46,9 +46,9 @@ namespace InvestmentManager.Server.Controllers
             var entity = new Isin { Name = model.Name, CompanyId = model.CompanyId };
 
             async Task<bool> IsinValidatorAsync(IsinModel model) =>
-                !await unitOfWork.Isin.GetAll().Where(x => x.Name.Equals(model.Name)).AnyAsync().ConfigureAwait(false);
+                !await unitOfWork.Isin.GetAll().Where(x => x.Name.Equals(model.Name)).AnyAsync();
 
-            var result = await restMethod.BasePostAsync(ModelState, entity, model, IsinValidatorAsync).ConfigureAwait(false);
+            var result = await restMethod.BasePostAsync(ModelState, entity, model, IsinValidatorAsync);
 
             return result.IsSuccess ? (IActionResult)Ok(result) : BadRequest(result);
         }
@@ -68,7 +68,7 @@ namespace InvestmentManager.Server.Controllers
         [HttpDelete("{id}"), Authorize(Roles = "pestunov")]
         public async Task<IActionResult> Delete(long id)
         {
-            var result = await restMethod.BaseDeleteAsync<Isin>(id).ConfigureAwait(false);
+            var result = await restMethod.BaseDeleteAsync<Isin>(id);
             return result.IsSuccess ? (IActionResult)Ok(result) : BadRequest(result);
         }
     }

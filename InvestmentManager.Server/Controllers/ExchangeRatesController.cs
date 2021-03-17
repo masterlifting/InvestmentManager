@@ -33,7 +33,7 @@ namespace InvestmentManager.Server.Controllers
         [HttpGet("byaccountid/{id}")]
         public async Task<IActionResult> GetByAccountId(long id)
         {
-            var rates = (await unitOfWork.Account.FindByIdAsync(id).ConfigureAwait(false))?.ExchangeRates;
+            var rates = (await unitOfWork.Account.FindByIdAsync(id))?.ExchangeRates;
 
             return rates is null
                 ? NoContent()
@@ -48,13 +48,13 @@ namespace InvestmentManager.Server.Controllers
         [HttpGet("byaccountid/{id}/summary/")]
         public async Task<IActionResult> GetSummaryByAccountId(long id)
         {
-            var rates = (await unitOfWork.Account.FindByIdAsync(id).ConfigureAwait(false))?.ExchangeRates;
+            var rates = (await unitOfWork.Account.FindByIdAsync(id))?.ExchangeRates;
             var summary = await unitOfWork.ExchangeRateSummary.GetAll().Where(x => x.AccountId == id).Join(unitOfWork.Currency.GetAll(), x => x.CurrencyId, y => y.Id, (x, y) => new
             {
                 x.AvgPurchasedRate,
                 x.AvgSoldRate,
                 Currency = y.Name
-            }).ToListAsync().ConfigureAwait(false);
+            }).ToListAsync();
 
             if (rates is null || !rates.Any())
                 return NoContent();
@@ -97,7 +97,7 @@ namespace InvestmentManager.Server.Controllers
                         .FirstOrDefaultAsync(x =>
                         x.AccountId == model.AccountId
                         && x.CurrencyId == model.CurrencyId)
-                        .ConfigureAwait(false);
+                        ;
 
                     return summary is not null && model.Quantity <= summary.FreeSum;
                 }
@@ -107,7 +107,7 @@ namespace InvestmentManager.Server.Controllers
                         .FirstOrDefaultAsync(x =>
                         x.AccountId == model.AccountId
                         && x.CurrencyId == (long)CurrencyTypes.rub)
-                        .ConfigureAwait(false);
+                        ;
 
                     return summary is not null && model.Quantity * model.Rate <= summary.FreeSum;
                 }
@@ -115,11 +115,11 @@ namespace InvestmentManager.Server.Controllers
                     return true;
             }
 
-            var result = await restMethod.BasePostAsync(ModelState, entity, model, ExchangeRateValidatorAsync).ConfigureAwait(false);
+            var result = await restMethod.BasePostAsync(ModelState, entity, model, ExchangeRateValidatorAsync);
 
             if (result.IsSuccess)
             {
-                result.Info += await reckonerService.UpgradeByExchangeRateChangeAsync(entity).ConfigureAwait(false) ? " Recalculated" : " NOT Recalculated.";
+                result.Info += await reckonerService.UpgradeByExchangeRateChangeAsync(entity) ? " Recalculated" : " NOT Recalculated.";
                 return Ok(result);
             }
             else

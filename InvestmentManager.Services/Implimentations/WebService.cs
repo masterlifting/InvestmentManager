@@ -9,7 +9,7 @@ namespace InvestmentManager.Services.Implimentations
         private readonly HttpClient httpClient;
         public WebService(HttpClient httpClient) => this.httpClient = httpClient;
 
-        public async Task<HttpResponseMessage> GetDataAsync(string query) => await httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, query)).ConfigureAwait(false);
-        public async Task<HttpResponseMessage> GetCBRateAsync() => await GetDataAsync("https://www.cbr-xml-daily.ru/daily_json.js").ConfigureAwait(false);
+        public async Task<HttpResponseMessage> GetDataAsync(string query) => await httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, query));
+        public async Task<HttpResponseMessage> GetCBRateAsync() => await GetDataAsync("https://www.cbr-xml-daily.ru/daily_json.js");
     }
 }
