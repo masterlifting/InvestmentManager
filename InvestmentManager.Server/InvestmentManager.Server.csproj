@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Controllers\CoefficientsController.cs~RF23b730.TMP" />
     <None Remove="Controllers\DividendsController.cs~RF537ad9.TMP" />
   </ItemGroup>
 

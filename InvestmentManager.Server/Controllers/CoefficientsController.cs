@@ -25,7 +25,7 @@ namespace InvestmentManager.Server.Controllers
         public async Task<IActionResult> GetByCompanyId(long id)
         {
             var result = (await unitOfWork.Company.FindByIdAsync(id))?.Reports?.Select(x => x.Coefficient);
-            return result is null ? NoContent() : Ok(result.Select(x => new CoefficientModel
+            return result is null && !result.Any() ? NoContent() : Ok(result.Select(x => new CoefficientModel
             {
                 PE = x.PE,
                 PB = x.PB,
@@ -43,7 +43,7 @@ namespace InvestmentManager.Server.Controllers
         {
             var results = (await unitOfWork.Company.FindByIdAsync(id))
                 ?.Reports?.Select(x => x.Coefficient).OrderBy(x => x.DateUpdate);
-            return results is null ? NoContent() : Ok(new SummaryCoefficient
+            return results is null || !results.Any() ? NoContent() : Ok(new SummaryCoefficient
             {
                 DateUpdate = results.Last().DateUpdate,
                 Count = results.Count(),

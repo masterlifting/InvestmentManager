@@ -46,12 +46,10 @@ namespace InvestmentManager.ReportFinder.Implimentations
 
         private async Task<Dictionary<string, HtmlDocument>> ConfigureDataAsync(long companyId, string patternFromDb)
         {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-
             // Составлю базовый паттерн для запросов
             string pattern = $"{basePattern}{patternFromDb}";
 
-            Console.WriteLine("Получаю страницу с данными отчетов для определения новых отчетов");
+            //Получаю страницу с данными отчетов для определения новых отчетов
 
             var financialSummaryQuery = $"{pattern}-financial-summary";
             var response = await httpService.GetDataAsync(financialSummaryQuery);
@@ -60,45 +58,26 @@ namespace InvestmentManager.ReportFinder.Implimentations
             financialSummaryPage.LoadHtml(await response.Content.ReadAsStringAsync());
 
             if (financialSummaryPage is null)
-                throw new NullReferenceException("Первая стпаница не загружена");
+                throw new NullReferenceException("Первая страница не загружена");
 
-            Console.WriteLine("Сравниваю даты отчетов.");
-            Console.ResetColor();
-
+            //Сравниваю даты отчетов.");
             var lastDateReportFromDb = await unitOfWork.Report.GetLastFourDateReportAsync(companyId);
 
             if (!lastDateReportFromDb.Any())
             {
-                Console.ForegroundColor = ConsoleColor.Magenta;
-                Console.WriteLine("В базе по этой компании отчетов нет. Загружаю все.");
+                //В базе по этой компании отчетов нет. Загружаю все
                 ParsedDates = GetParsedDateFromInvesting(financialSummaryPage, lastDateReportFromDb);
-                Console.ResetColor();
-                return await DownloaderAllData(pattern, financialSummaryPage);
+                return await DownloadDataAsync(pattern, financialSummaryPage);
             }
 
             //Получаю даты новых отчетов и даты всех найденых отчетов
             ParsedDates = GetParsedDateFromInvesting(financialSummaryPage, lastDateReportFromDb);
 
-
-            if (ParsedDates.NewDates.Any())
-            {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("Новые даты отчетов нашлись. Продолжаю парсинг.");
-                Console.ResetColor();
-                return await DownloaderAllData(pattern, financialSummaryPage);
-            }
-            else
-            {
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.WriteLine("Новых дат отчетов еще нет.");
-                Console.ResetColor();
-                return new Dictionary<string, HtmlDocument>();
-            }
+            return ParsedDates.NewDates.Any() ? await DownloadDataAsync(pattern, financialSummaryPage) : new Dictionary<string, HtmlDocument>();
         }
-        private async Task<Dictionary<string, HtmlDocument>> DownloaderAllData(string pattern, HtmlDocument financialSummaryPage)
+        private async Task<Dictionary<string, HtmlDocument>> DownloadDataAsync(string pattern, HtmlDocument financialSummaryPage)
         {
-            Console.ForegroundColor = ConsoleColor.DarkYellow;
-            Console.WriteLine("Загружаю остальные страницы с данными");
+            //Загружаю остальные страницы с данными
             var mainResponse = await httpService.GetDataAsync(pattern);
             var mainPage = new HtmlDocument();
             mainPage.LoadHtml(await mainResponse.Content.ReadAsStringAsync());
@@ -117,8 +96,7 @@ namespace InvestmentManager.ReportFinder.Implimentations
             if (dividendsPage is null)
                 throw new NullReferenceException("Страница с дивидендами не была загружена");
 
-            Console.WriteLine("Все страницы загружены");
-            Console.ResetColor();
+            //Все страницы загружены
 
             var resultPages = new Dictionary<string, HtmlDocument>
             {
@@ -137,8 +115,7 @@ namespace InvestmentManager.ReportFinder.Implimentations
             var pagesWithData = await ConfigureDataAsync(companyId, sourceValue);
             if (!pagesWithData.Any())
                 return new ParsedDataResult();
-            Console.ForegroundColor = ConsoleColor.DarkGreen;
-            Console.WriteLine("Начинаю парсинг найденных данных.");
+            //Начинаю парсинг найденных данных.
 
             #region Создаю задачи на основе методов парсинга
             var stockCirculationTask = GetStockInCirculation(pagesWithData["mainPage"]);
@@ -182,7 +159,7 @@ namespace InvestmentManager.ReportFinder.Implimentations
                 { "LongTermDebtCollection", listDecimalResult[8] }
             };
 
-            Console.WriteLine("Парсинг окончен.");
+            //Парсинг окончен.");
             Console.ResetColor();
 
 
@@ -277,17 +254,27 @@ namespace InvestmentManager.ReportFinder.Implimentations
         //Возвращает количество акций в обращении
         private static async Task<long> GetStockInCirculation(HtmlDocument html)
         {
-            if (html is null) return 0;
+            long result = 0;
 
-            long stockInCirculation = 0;
+            if (html is null)
+                return result;
+
             await Task.Run(() =>
             {
-                stockInCirculation = long.TryParse(html.DocumentNode.
-                SelectSingleNode("//div[@class='clear overviewDataTable overviewDataTableWithTooltip']/div[14]/span[2]").InnerText.Replace(".", "", StringComparison.CurrentCultureIgnoreCase),
-                style, culture, out long value) ? value : 0;
+                var td = html.DocumentNode.SelectNodes("//dt").FirstOrDefault(x => x.InnerText == "Акции в обращении");
+
+                if (td?.NextSibling is not null)
+                {
+                    string value = td.NextSibling.InnerText;
+                    if (value is not null)
+                    {
+                        value = value.Replace(".", "");
+                        _ = long.TryParse(value, out result);
+                    }
+                }
             });
 
-            return stockInCirculation;
+            return result;
         }
         //Возвращает оборот и долгосрочную заадолженность
         private static async Task<List<decimal>> GetTurnoverOrLongTermDebt(HtmlDocument html, string pattern)
@@ -323,7 +310,7 @@ namespace InvestmentManager.ReportFinder.Implimentations
                 {
                     foreach (string value in foundName.ChildNodes.Where(x => x.Name == "td").Skip(1).Select(x => x.InnerText))
                     {
-                        Decimal.TryParse(value, style, culture, out decimal result);
+                        decimal.TryParse(value, style, culture, out decimal result);
                         values.Add(result);
                     }
                 }

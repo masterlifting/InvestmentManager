@@ -49,14 +49,14 @@ namespace InvestmentManager.Repository
         {
             try
             {
-                return await context.SaveChangesAsync() > 0;
+                return await context.SaveChangesAsync() >= 0;
             }
             catch
             {
                 try
                 {
                     PostgresAutoReseed();
-                    return await context.SaveChangesAsync() > 0;
+                    return await context.SaveChangesAsync() >= 0;
                 }
                 catch
                 {

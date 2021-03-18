@@ -102,9 +102,9 @@ namespace InvestmentManager.Server.Controllers
         public async Task ParseReports()
         {
             IDictionary<long, Report> lastReports = await unitOfWork.Report.GetLastReportsAsync();
-            var reportSource = await unitOfWork.ReportSource.GetAll().ToListAsync();
-            var reportsToSave = new List<Report>();
-            foreach (var i in reportSource)
+            var reportSources = await unitOfWork.ReportSource.GetAll().ToListAsync();
+
+            foreach (var i in reportSources)
             {
                 if (lastReports.ContainsKey(i.CompanyId))
                 {
@@ -113,21 +113,19 @@ namespace InvestmentManager.Server.Controllers
                         continue;
                 }
 
-                List<Report> foundReports;
                 try
                 {
-                    foundReports = await reportService.FindNewReportsAsync(i.CompanyId, i.Key, i.Value);
+                    var foundReports = await reportService.FindNewReportsAsync(i.CompanyId, i.Key, i.Value);
+                    await unitOfWork.Report.CreateEntitiesAsync(foundReports);
+                    await unitOfWork.Report.CompletePostgresAsync();
                 }
                 catch
                 {
                     continue;
                 }
 
-                reportsToSave.AddRange(foundReports);
+                await Task.Delay(5000);
             }
-
-            await unitOfWork.Report.CreateEntitiesAsync(reportsToSave);
-            await unitOfWork.Report.CompletePostgresAsync();
         }
 
 
