@@ -112,16 +112,20 @@ namespace InvestmentManager.Server.Controllers
                     if (lastReportDate.AddDays(92) > DateTime.Now)
                         continue;
                 }
-
+                List<Report> foundReports;
                 try
                 {
-                    var foundReports = await reportService.FindNewReportsAsync(i.CompanyId, i.Key, i.Value);
-                    await unitOfWork.Report.CreateEntitiesAsync(foundReports);
-                    await unitOfWork.Report.CompletePostgresAsync();
+                    foundReports = await reportService.FindNewReportsAsync(i.CompanyId, i.Key, i.Value);
                 }
                 catch
                 {
                     continue;
+                }
+
+                if (foundReports.Any())
+                {
+                    await unitOfWork.Report.CreateEntitiesAsync(foundReports);
+                    await unitOfWork.Report.CompletePostgresAsync();
                 }
 
                 await Task.Delay(5000);

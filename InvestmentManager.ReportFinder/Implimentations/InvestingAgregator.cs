@@ -215,15 +215,15 @@ namespace InvestmentManager.ReportFinder.Implimentations
             if (htmlPage is null)
                 throw new NullReferenceException($"Html страница для работы с датами отчетов не поступила в метод {nameof(GetParsedDateFromInvesting)}");
 
-            List<DateTime> foundDates = htmlPage.DocumentNode
-                .SelectNodes("//th[@class='arial_11 noBold title right period']")[0]
-                .ParentNode.ChildNodes
-                .Where(x => x.Name == "th")
-                .Skip(1)
-                .Select(x => DateTime.TryParse(x.InnerText, culture, DateTimeStyles.None, out DateTime newDate) ? newDate.Date : DateTime.MinValue)
-                .ToList();
-
-
+            List<DateTime> foundDates = new();
+            var dateNode = htmlPage.DocumentNode.SelectNodes("//th[@class='arial_11 noBold title right period']").FirstOrDefault();
+            if (dateNode is not null)
+            {
+                var dates = dateNode.ParentNode.InnerText.Split("\n");
+                for (int i = 0; i < dates.Length; i++)
+                    if (DateTime.TryParse(dates[i], out DateTime date))
+                        foundDates.Add(date);
+            }
 
             var foundConvertedDates = new Dictionary<(int year, int quarter), DateTime>();
             foreach (var i in foundDates)
