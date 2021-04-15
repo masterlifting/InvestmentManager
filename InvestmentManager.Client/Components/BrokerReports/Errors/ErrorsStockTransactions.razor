@@ -1,4 +1,4 @@
-﻿@inject CustomHttpClient http
+﻿@inject API api
 @inject CustomNotification notice
 
 <BaseError Title="@Title" IsDone="isDone" ErrorValue="@ErrorValue">
@@ -49,9 +49,9 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        companies = await http.GetAsync<List<ShortView>>(new UrlBuilder(UrlController.Companies).Result);
-        exchanges = await http.GetAsync<List<ShortView>>(new UrlBuilder(UrlCatalog.ExchangeTypes).Result);
-        lots = await http.GetAsync<List<ShortView>>(new UrlBuilder(UrlCatalog.LotTypes).Result);
+        companies = await api.Company.Value.GetShortCompaniesAsync();
+        exchanges = await api.Catalog.Value.GetExchangeTypesAsync();
+        lots = await api.Catalog.Value.GetLotTypesAsync();
 
         if (companies != default && exchanges != default && lots != default)
         {
@@ -67,7 +67,7 @@
 
     async Task SendData()
     {
-        var result = await http.PostAsync<BaseActionResult, TickerModel>(new UrlBuilder(UrlController.Tickers).Result, model);
+        var result = await api.Ticker.Value.AddNewAsync(model);
         if (result.IsSuccess)
         {
             isDone = true;

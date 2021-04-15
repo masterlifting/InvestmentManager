@@ -1,4 +1,4 @@
-﻿@inject QueryBaseService<AccountAdditionalModel> queryService
+﻿@inject APIService<AccountAdditionalModel> apiService
 
 <InfoTemplate InfoName="@InfoName" VisibleAction="((bool isVisible) => UpdateVisible.InvokeAsync(isVisible))">
     <ChildContent>
@@ -38,7 +38,8 @@
     protected override async Task OnInitializedAsync()
     {
         var user = (await AuthenticationStateTask).User;
-        string CustomUrlBuilder(long accountId) => new UrlBuilder(UrlController.Accounts, accountId, UrlOption.Additional).Result;
+
+        string CustomUrlBuilder(long accountId) => AccountAPI.GetUriAddittionalById(accountId);
         AccountAdditionalModel CustomResultBuilder(List<AccountAdditionalModel> additionals)
         {
             var result = new AccountAdditionalModel();
@@ -59,7 +60,7 @@
             return result;
         }
 
-        var queryResult = await queryService.GetResultAsync(user, CustomUrlBuilder, CustomResultBuilder);
+        var queryResult = await apiService.GetResultAsync(user, CustomUrlBuilder, CustomResultBuilder);
 
         model = queryResult.ResultContent;
         info = queryResult.ResultInfo;

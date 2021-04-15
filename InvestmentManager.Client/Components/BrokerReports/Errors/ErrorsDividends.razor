@@ -1,4 +1,4 @@
-﻿@inject CustomHttpClient http
+﻿@inject API api
 @inject CustomNotification notice
 @using System.Text.RegularExpressions
 
@@ -40,7 +40,7 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        companies = await http.GetAsync<List<ShortView>>(new UrlBuilder(UrlController.Companies).Result);
+        companies = await api.Company.Value.GetShortCompaniesAsync();
         if (companies != default)
         {
             model = new IsinModel
@@ -52,7 +52,7 @@
     }
     async Task SendData()
     {
-        var result = await http.PostAsync<BaseActionResult, IsinModel>(new UrlBuilder(UrlController.Isins).Result, model);
+        var result = await api.Isin.Value.AddNewAsync(model);
         if (result.IsSuccess)
         {
             isDone = true;

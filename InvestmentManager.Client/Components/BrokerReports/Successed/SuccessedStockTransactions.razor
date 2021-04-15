@@ -1,6 +1,6 @@
-﻿@inject CustomHttpClient http
+﻿@inject API api
 @inject ICatalogService catalogService
-@inject QueryBaseService<StockTransactionModel> queryServise
+@inject APIService<StockTransactionModel> apiService
 
 <div class="row">
     <div class="col-6">
@@ -73,8 +73,8 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        tickers = await http.GetAsync<List<TickerModel>>(new UrlBuilder(UrlController.Tickers).Result);
-        companies = await http.GetAsync<List<ShortView>>(new UrlBuilder(UrlController.Companies).Result);
+        tickers = await api.Ticker.Value.GeTickersAsync();
+        companies = await api.Company.Value.GetShortCompaniesAsync();
 
         if (tickers != default && companies != default)
             stockTransactions = StockTransactions;
@@ -82,10 +82,10 @@
         await base.OnParametersSetAsync();
     }
     async Task SaveData(StockTransactionModel transaction) =>
-        await queryServise.PostDataAsync(transaction, stockTransactions, UrlController.StockTransactions, "Stock transaction");
+        await apiService.PostDataAsync(transaction, stockTransactions, "stocktransactions", "Stock transaction");
     async Task SaveDataCollection()
     {
         stockTransactions = stockTransactions.OrderBy(x => x.DateOperation).ToList();
-        await queryServise.PostDataCollectionAsync(stockTransactions, UrlController.StockTransactions, "Stock transactions");
+        await apiService.PostDataCollectionAsync(stockTransactions, "stocktransactions", "Stock transactions");
     }
 }

@@ -1,6 +1,5 @@
 ﻿using Blazored.LocalStorage;
 using InvestmentManager.Client.Configurations;
-using InvestmentManager.Client.Services.HttpService;
 using InvestmentManager.Client.Services.NotificationService;
 using InvestmentManager.Models;
 using System;
@@ -8,11 +7,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using static InvestmentManager.Client.Configurations.EnumConfig;
 
-namespace InvestmentManager.Client.Services.QueryService
+namespace InvestmentManager.Client.Services.HttpService
 {
-    public class QueryBaseService<T> where T : class
+    public class APIService<T> where T : class
     {
         private readonly ILocalStorageService localStorage;
         private readonly CustomHttpClient http;
@@ -20,7 +18,7 @@ namespace InvestmentManager.Client.Services.QueryService
 
         private static Func<ClaimsPrincipal, string> AccountIdBuilder => (ClaimsPrincipal user) => $"{user.Identity.Name}_{DefaultString.Id.accountId}";
 
-        public QueryBaseService(ILocalStorageService localStorage, CustomHttpClient http, CustomNotification notice)
+        public APIService(ILocalStorageService localStorage, CustomHttpClient http, CustomNotification notice)
         {
             this.localStorage = localStorage;
             this.http = http;
@@ -171,9 +169,9 @@ namespace InvestmentManager.Client.Services.QueryService
 
             return new BaseViewModel<T> { ResultInfo = resultInfo, ResultContent = item };
         }
-        public async Task PostDataAsync(T model, List<T> items, UrlController controllerName, string name = null)
+        public async Task PostDataAsync(T model, List<T> items, string controllerName, string name = null)
         {
-            var result = await http.PostAsync<BaseActionResult, T>(new UrlBuilder(controllerName).Result, model);
+            var result = await http.PostAsync<BaseActionResult, T>(controllerName, model);
 
             if (result.IsSuccess)
             {
@@ -183,7 +181,7 @@ namespace InvestmentManager.Client.Services.QueryService
             else
                 notice.ToastDanger($"{name} error.", result.Info);
         }
-        public async Task PostDataCollectionAsync(List<T> items, UrlController controllerName, string name = null)
+        public async Task PostDataCollectionAsync(List<T> items, string controllerName, string name = null)
         {
             if (items is not null && items.Any())
             {
@@ -191,7 +189,7 @@ namespace InvestmentManager.Client.Services.QueryService
 
                 for (int i = 0; i < items.Count; i++)
                 {
-                    var result = await http.PostAsync<BaseActionResult, T>(new UrlBuilder(controllerName).Result, items[i]);
+                    var result = await http.PostAsync<BaseActionResult, T>(controllerName, items[i]);
 
                     if (result.IsSuccess)
                     {

@@ -78,7 +78,7 @@ namespace InvestmentManager.Server.Controllers
         }
 
         [HttpGet("byaccountid/{accountId}/bycompanyid/{companyId}")]
-        public async Task<IActionResult> GetByAccountIds(long accountId, long companyId)
+        public async Task<IActionResult> GetByAccountIdByCompanyId(long accountId, long companyId)
         {
             var transactions = await unitOfWork.StockTransaction.GetAll()
                 .Where(x => x.AccountId == accountId && x.Ticker.CompanyId == companyId)
@@ -96,7 +96,7 @@ namespace InvestmentManager.Server.Controllers
                 }).ToList());
         }
         [HttpGet("byaccountid/{accountId}/bycompanyid/{companyId}/summary/")]
-        public async Task<IActionResult> GetSummaryByAccountIds(long accountId, long companyId)
+        public async Task<IActionResult> GetSummaryByAccountIdByCompanyId(long accountId, long companyId)
         {
             var lastTransaction = await unitOfWork.StockTransaction.GetAll()
                 .Where(x => x.AccountId == accountId && x.Ticker.CompanyId == companyId)

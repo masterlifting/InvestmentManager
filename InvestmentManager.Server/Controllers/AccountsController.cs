@@ -125,7 +125,7 @@ namespace InvestmentManager.Server.Controllers
             async Task<bool> AccountValidatorAsync(AccountModel model) =>
                 !await unitOfWork.Account.GetAll().Where(x => x.Name.Equals(model.Name)).AnyAsync();
             var result = await restMethod.BasePostAsync(ModelState, entity, model, AccountValidatorAsync);
-            return result.IsSuccess ? (IActionResult)Ok(result) : BadRequest(result);
+            return result.IsSuccess ? Ok(result) : BadRequest(result);
         }
     }
 }

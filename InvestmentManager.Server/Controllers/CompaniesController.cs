@@ -12,7 +12,6 @@ using InvestmentManager.Models.EntityModels;
 using InvestmentManager.Models.SummaryModels;
 using InvestmentManager.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
-using System.Text.Json;
 
 namespace InvestmentManager.Server.Controllers
 {
@@ -102,7 +101,7 @@ namespace InvestmentManager.Server.Controllers
             }
 
             var result = await restMethod.BasePostAsync(ModelState, entity, model, CompanyValidatorAsync);
-            return result.IsSuccess ? (IActionResult)Ok(result) : BadRequest(result);
+            return result.IsSuccess ? Ok(result) : BadRequest(result);
         }
 
         [HttpPut("{id}"), Authorize(Roles = "pestunov")]
@@ -118,7 +117,7 @@ namespace InvestmentManager.Server.Controllers
             }
 
             var result = await restMethod.BasePutAsync<Company>(ModelState, id, UpdateCompany);
-            return result.IsSuccess ? (IActionResult)Ok(result) : BadRequest(result);
+            return result.IsSuccess ? Ok(result) : BadRequest(result);
         }
     }
 }

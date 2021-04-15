@@ -1,4 +1,4 @@
-﻿@inject QueryBaseService<PriceModel> queryService
+﻿@inject APIService<PriceModel> apiService
 
 <DetailTemplate Name="Price list" DetailTemplateAction="ShowInfo">
     <ChildContent>
@@ -24,13 +24,13 @@
     {
         if (isDetails == true)
         {
-            string CustomUriBuilder() => new UrlBuilder(UrlController.Prices, UrlPath.ByCompanyId, CompanyId).Result;
+            string CustomUriBuilder() => PriceAPI.GetUriByCompanyId(CompanyId);
             ColumnConfig[] CustomColumnBuilder() => new ColumnConfig[]
                 {
                     new ColumnConfig{DataField = nameof(PriceModel.BidDate), Caption = "Date", DataType = HtmlDataType.Date, Format = "d", AlignType = AlignType.Center},
                     new ColumnConfig{DataField = nameof(PriceModel.Value), Caption = "Price", DataType = HtmlDataType.Number, Format = "#,#0.###", AlignType = AlignType.Center}
                 };
-            var queryResult = await queryService.GetResultsAsync(CustomUriBuilder, CustomColumnBuilder);
+            var queryResult = await apiService.GetResultsAsync(CustomUriBuilder, CustomColumnBuilder);
 
             columns = queryResult.Columns;
             items = queryResult.ViewResult.ResultContents;

@@ -1,4 +1,4 @@
-﻿@inject CustomHttpClient http
+﻿@inject API api
 @inject CustomNotification notice
 
 <RowTitleSub Text="Roport source" />
@@ -36,9 +36,9 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        reportSource = await http.GetAsync<ReportSourceModel>(new UrlBuilder(UrlController.ReportSources, UrlPath.ByCompanyId, CompanyId).Result);
+        reportSource = await api.ReportSource.Value.GetReportSourceByCompanyIdAsync(CompanyId);
 
-        if(reportSource == default)
+        if (reportSource == default)
         {
             isEditeble = false;
             reportSource = new ReportSourceModel { CompanyId = CompanyId };
@@ -54,8 +54,8 @@ else
         if (editContext.Validate())
         {
             var result = isEditeble
-                ? await http.PutAsync<BaseActionResult, ReportSourceModel>(new UrlBuilder(UrlController.ReportSources, reportSource.Id).Result, reportSource)
-                : await http.PostAsync<BaseActionResult, ReportSourceModel>(new UrlBuilder(UrlController.ReportSources).Result, reportSource);
+                ? await api.ReportSource.Value.EditAsync(reportSource.Id, reportSource)
+                : await api.ReportSource.Value.AddNewAsync(reportSource);
 
             if (result.IsSuccess)
             {

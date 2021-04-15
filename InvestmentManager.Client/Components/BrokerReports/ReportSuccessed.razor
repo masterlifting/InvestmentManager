@@ -1,4 +1,4 @@
-﻿@inject CustomHttpClient http
+﻿@inject API api
 
 <RowTitleSub Color="ColorBootstrap.muted" Text="Tap row to save" />
 @if (reports is not null)
@@ -43,7 +43,7 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        accounts = await http.GetAsync<List<AccountModel>>(new UrlBuilder(UrlController.Accounts).Result);
+        accounts = await api.Account.Value.GetAccountsAsync();
         if (accounts != default)
             reports = Reports;
 

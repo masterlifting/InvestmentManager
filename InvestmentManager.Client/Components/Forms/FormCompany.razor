@@ -1,4 +1,4 @@
-﻿@inject CustomHttpClient http
+﻿@inject API api
 @inject CustomNotification notice
 
 <RowTitleSub Text="Company" />
@@ -69,16 +69,16 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        industries = await http.GetAsync<List<ShortView>>(new UrlBuilder(UrlController.Industries).Result);
-        sectors = await http.GetAsync<List<ShortView>>(new UrlBuilder(UrlController.Sectors).Result);
+        industries = await api.Industry.Value.GetIndustriesAsync();
+        sectors = await api.Sector.Value.GetSectorsAsync();
 
         if (industries != default && sectors != default)
         {
-            if(CompanyId.HasValue)
-                company = await http.GetAsync<CompanyModel>(new UrlBuilder(UrlController.Companies, CompanyId.Value).Result);
-            
-            if(company == default)
-                company =  new CompanyModel();
+            if (CompanyId.HasValue)
+                company = await api.Company.Value.GetCompanyAsync(CompanyId.Value);
+
+            if (company == default)
+                company = new CompanyModel();
 
             editContext = new EditContext(company);
         }
@@ -92,9 +92,9 @@ else
     {
         if (editContext.Validate())
         {
-            var result = CompanyId.HasValue
-                ? await http.PutAsync<BaseActionResult, CompanyModel>(new UrlBuilder(UrlController.Companies, CompanyId.Value).Result, company)
-                : await http.PostAsync<BaseActionResult, CompanyModel>(new UrlBuilder(UrlController.Companies).Result, company);
+            var result = CompanyId.HasValue 
+                ? await api.Company.Value.EditAsync(CompanyId.Value, company) 
+                : await api.Company.Value.AddNewAsync(company);
 
             if (result.IsSuccess)
             {

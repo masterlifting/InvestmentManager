@@ -1,11 +1,11 @@
-﻿@inject CustomHttpClient http
-@inject CustomNotification notice
-@inject IJSRuntime jsscript
+﻿@inject IJSRuntime jsscript
 @inject ILocalStorageService localStorage
-@inject NavigationManager navigationManager
 @inject IAuthenticationService authenticationService
+@inject API api
+@inject CustomNotification notice
+@inject NavigationManager navigationManager
 
-<FrameTemplate Theme="ColorCustom.isuccess" Name="@sumResult.ToString("C", new CultureInfo("ru-RU"))" TitleColor="ColorBootstrap.light">
+<FrameTemplate Theme="ColorCustom.isuccess" Name="@sumResult.ToString("#,0.##",new NumberFormatInfo() { NumberGroupSeparator = " " })" TitleColor="ColorBootstrap.light">
     <AdditionalBlock>
         <div class="col-12">
             @foreach (var account in accountCollection)
@@ -75,12 +75,12 @@
         {
             try
             {
-                var accounts = await http.GetAsync<List<AccountModel>>(new UrlBuilder(UrlController.Accounts).Result);
+                var accounts = await api.Account.Value.GetAccountsAsync();
                 if (accounts != default)
                 {
                     foreach (var account in accounts)
                     {
-                        decimal accountSum = await http.GetAsync<decimal>(new UrlBuilder(UrlController.Accounts, account.Id, UrlOption.Summary).Result);
+                        decimal accountSum = await api.Account.Value.GetAccountSumAsync(account.Id);
                         sumAccounts.Add(account.Id, accountSum);
                         accountCollection.Add(account, true);
                     }
@@ -108,7 +108,7 @@
         if (!accountCollection[account])
             sumResult -= sumAccounts[account.Id];
         else
-            sumResult += await http.GetAsync<decimal>(new UrlBuilder(UrlController.Accounts, account.Id, UrlOption.Summary).Result);
+            sumResult += await api.Account.Value.GetAccountSumAsync(account.Id);
 
         await localStorage.SetItemAsync<long[]>($"{user.Identity.Name}_{DefaultString.Id.accountId}", accountCollection.Where(x => x.Value == true).Select(x => x.Key.Id).ToArray());
     }
@@ -153,7 +153,7 @@
             content.Add(new ByteArrayContent(buffer), file.Name, file.Name);
         }
 
-        var model = await http.PostContentAsync<BrokerReportModel>(new UrlBuilder(UrlService.ParseBrokerReports).Result, content);
+        var model = await api.Service.Value.ParseBcsReportsAsync(content);
 
         content.Dispose();
 

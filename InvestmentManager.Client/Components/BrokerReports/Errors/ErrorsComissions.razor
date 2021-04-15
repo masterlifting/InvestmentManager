@@ -1,4 +1,4 @@
-﻿@inject CustomHttpClient http
+﻿@inject API api
 @inject CustomNotification notice
 
 <BaseError Title="@Title" ErrorValue="@ErrorValue" IsDone="isDone">
@@ -30,7 +30,7 @@
     }
     async Task SendData()
     {
-        var result = await http.PostAsync<BaseActionResult, ComissionTypeModel>(new UrlBuilder(UrlController.ComissionTypes).Result, model);
+        var result = await api.ComissionType.Value.AddNewAsync(model);
         if (result.IsSuccess)
         {
             isDone = true;

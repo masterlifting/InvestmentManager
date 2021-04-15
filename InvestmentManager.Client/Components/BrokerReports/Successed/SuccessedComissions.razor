@@ -1,5 +1,5 @@
-﻿@inject CustomHttpClient http
-@inject QueryBaseService<ComissionModel> queryServise
+﻿@inject API api
+@inject APIService<ComissionModel> apiService
 
 <div class="row">
     <div class="col-6">
@@ -54,17 +54,17 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        comissionTypes = await http.GetAsync<List<ShortView>>(new UrlBuilder(UrlCatalog.ComissionTypes).Result);
+        comissionTypes = await api.Catalog.Value.GetComissionTypesAsync();
         if (comissionTypes != default)
             comissions = Comissions;
 
         await base.OnParametersSetAsync();
     }
     async Task SaveData(ComissionModel comission) =>
-    await queryServise.PostDataAsync(comission, comissions, UrlController.Comissions, "Comission");
+    await apiService.PostDataAsync(comission, comissions, "comissions", "Comission");
     async Task SaveDataCollection()
     {
         comissions = comissions.OrderBy(x => x.DateOperation).ToList();
-        await queryServise.PostDataCollectionAsync(comissions, UrlController.Comissions, "Comissions");
+        await apiService.PostDataCollectionAsync(comissions, "comissions", "Comissions");
     }
 }

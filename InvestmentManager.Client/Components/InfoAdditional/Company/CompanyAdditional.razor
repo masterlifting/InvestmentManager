@@ -1,4 +1,4 @@
-﻿@inject QueryBaseService<CompanyAdditionalModel> queryService
+﻿@inject APIService<CompanyAdditionalModel> apiService
 
 <InfoTemplate InfoName="@InfoName" VisibleAction="@((bool isVisible) => UpdateVisible.InvokeAsync(isVisible))">
     <ChildContent>
@@ -25,8 +25,8 @@
 
     protected async override Task OnInitializedAsync()
     {
-        string CustomUrlBuilder() => new UrlBuilder(UrlController.Companies, CompanyId, UrlOption.Additional).Result;
-        var queryResult = await queryService.GetResultAsync(CustomUrlBuilder);
+        string CustomUrlBuilder() => CompanyAPI.GetUriAddittionalByCompanyId(CompanyId);
+        var queryResult = await apiService.GetResultAsync(CustomUrlBuilder);
 
         model = queryResult.ResultContent;
         info = queryResult.ResultInfo;

@@ -1,4 +1,4 @@
-﻿@inject QueryBaseService<SummaryComission> queryService
+﻿@inject APIService<SummaryComission> apiService
 
 <InfoTemplate InfoName="@InfoName" VisibleAction="((bool isVisible) => UpdateVisible.InvokeAsync(isVisible))">
     <ChildContent>
@@ -35,7 +35,7 @@
     protected override async Task OnInitializedAsync()
     {
         var user = (await AuthenticationStateTask).User;
-        string CustomUrlBuilder(long accountId) => new UrlBuilder(UrlController.Comissions, UrlPath.ByAccountId, accountId, UrlOption.Summary).Result;
+        string CustomUrlBuilder(long accountId) => ComissionAPI.GetUriSummaryByAccountId(accountId);
         SummaryComission CustomResultBuilder(List<SummaryComission> models)
         {
             var details = new List<SummaryComissionDetail>();
@@ -52,7 +52,7 @@
             };
         }
 
-        var queryResult = await queryService.GetResultAsync(user, CustomUrlBuilder, CustomResultBuilder);
+        var queryResult = await apiService.GetResultAsync(user, CustomUrlBuilder, CustomResultBuilder);
 
         model = queryResult.ResultContent;
         info = queryResult.ResultInfo;

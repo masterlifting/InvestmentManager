@@ -1,4 +1,4 @@
-﻿@inject QueryBaseService<SummarySellRecommendation> queryService
+﻿@inject APIService<SummarySellRecommendation> apiService
 
 <InfoTemplate InfoName="@InfoName" VisibleAction="((bool isVisible) => UpdateVisible.InvokeAsync(isVisible))">
     <ChildContent>
@@ -30,8 +30,8 @@
     {
         var user = (await AuthenticationStateTask).User;
 
-        string CustomUriBuilder() => new UrlBuilder(UrlController.SellRecommendations, UrlPath.ByCompanyId, CompanyId, UrlOption.Summary).Result;
-        var queryResult = await queryService.GetResultAsync(user, CustomUriBuilder);
+        string CustomUriBuilder() => SellRecommendationAPI.GetUriSummaryByCompanyId(CompanyId);
+        var queryResult = await apiService.GetResultAsync(user, CustomUriBuilder);
 
         model = queryResult.ResultContent;
         info = queryResult.ResultInfo;

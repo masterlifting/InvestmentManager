@@ -1,4 +1,4 @@
-﻿@inject QueryBaseService<StockTransactionModel> queryService
+﻿@inject APIService<StockTransactionModel> apiService
 
 
 <DetailTemplate Name="Transaction list" DetailTemplateAction="ShowInfo">
@@ -28,16 +28,16 @@
         if (isDetails == true)
         {
             var user = (await AuthenticationState).User;
-            string CustomUriBuilder(long accountId) => new UrlBuilder(UrlController.StockTransactions, UrlPath.ByAccountId, accountId, UrlPath.ByCompanyId, CompanyId).Result;
+            string CustomUriBuilder(long accountId) => StockTransactionAPI.GetUriByAccountIdByCompanyId(accountId, CompanyId);
             ColumnConfig[] CustomColumnBuilder() => new ColumnConfig[]
                 {
-                            new ColumnConfig{DataField = nameof(StockTransactionModel.DateOperation), Caption = "Date", DataType = HtmlDataType.Date, Format = "d", AlignType=AlignType.Center},
-                            new ColumnConfig{DataField = nameof(StockTransactionModel.StatusName), Caption = "Status", DataType = HtmlDataType.String, AlignType=AlignType.Center},
-                            new ColumnConfig{DataField = nameof(StockTransactionModel.Quantity), Caption = "Volume", DataType = HtmlDataType.Number, Format = "f0", AlignType=AlignType.Center},
-                            new ColumnConfig{DataField = nameof(StockTransactionModel.Cost), Caption = "Cost", DataType = HtmlDataType.Number, Format = "#,#0.###", AlignType=AlignType.Center},
+                    new ColumnConfig{DataField = nameof(StockTransactionModel.DateOperation), Caption = "Date", DataType = HtmlDataType.Date, Format = "d", AlignType=AlignType.Center},
+                    new ColumnConfig{DataField = nameof(StockTransactionModel.StatusName), Caption = "Status", DataType = HtmlDataType.String, AlignType=AlignType.Center},
+                    new ColumnConfig{DataField = nameof(StockTransactionModel.Quantity), Caption = "Volume", DataType = HtmlDataType.Number, Format = "f0", AlignType=AlignType.Center},
+                    new ColumnConfig{DataField = nameof(StockTransactionModel.Cost), Caption = "Cost", DataType = HtmlDataType.Number, Format = "#,#0.###", AlignType=AlignType.Center},
                 };
 
-            var queryResult = await queryService.GetResultsAsync(user, CustomUriBuilder, CustomColumnBuilder);
+            var queryResult = await apiService.GetResultsAsync(user, CustomUriBuilder, CustomColumnBuilder);
 
             columns = queryResult.Columns;
             items = queryResult.ViewResult.ResultContents;

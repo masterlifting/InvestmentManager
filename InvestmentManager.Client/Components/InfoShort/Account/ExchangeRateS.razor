@@ -1,4 +1,4 @@
-﻿@inject QueryBaseService<SummaryExchangeRate> queryService
+﻿@inject APIService<SummaryExchangeRate> apiService
 
 <InfoTemplate InfoName="@InfoName" VisibleAction="((bool isVisible) => UpdateVisible.InvokeAsync(isVisible))">
     <ChildContent>
@@ -41,7 +41,7 @@
     protected override async Task OnInitializedAsync()
     {
         var user = (await AuthenticationStateTask).User;
-        string CustomUrlBuilder(long accountId) => new UrlBuilder(UrlController.ExchangeRates, UrlPath.ByAccountId, accountId, UrlOption.Summary).Result;
+        string CustomUrlBuilder(long accountId) => ExchangeRateAPI.GetUriSummaryByAccountId(accountId);
         SummaryExchangeRate CustomResultBuilder(List<SummaryExchangeRate> models)
         {
             var targetModel = models.OrderBy(x => x.DateLastOperation).Last();
@@ -64,7 +64,7 @@
             };
         }
 
-        var queryResult = await queryService.GetResultAsync(user, CustomUrlBuilder, CustomResultBuilder);
+        var queryResult = await apiService.GetResultAsync(user, CustomUrlBuilder, CustomResultBuilder);
 
         model = queryResult.ResultContent;
         info = queryResult.ResultInfo;

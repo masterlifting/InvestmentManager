@@ -1,5 +1,5 @@
 ﻿@inject ICatalogService catalogService
-@inject QueryBaseService<ExchangeRateModel> queryServise
+@inject APIService<ExchangeRateModel> apiService
 
 <div class="row">
     <div class="col-6">
@@ -60,10 +60,10 @@
         base.OnParametersSet();
     }
     async Task SaveData(ExchangeRateModel exchangeRate) =>
-        await queryServise.PostDataAsync(exchangeRate, exchangeRates, UrlController.ExchangeRates, "Exchange rate");
+        await apiService.PostDataAsync(exchangeRate, exchangeRates, "exchangerates", "Exchange rate");
     async Task SaveDataCollection()
     {
         exchangeRates = exchangeRates.OrderBy(x => x.DateOperation).ToList();
-        await queryServise.PostDataCollectionAsync(exchangeRates, UrlController.ExchangeRates, "Exchange rates");
+        await apiService.PostDataCollectionAsync(exchangeRates, "exchangerates", "Exchange rates");
     }
 }

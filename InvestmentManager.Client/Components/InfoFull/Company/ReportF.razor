@@ -1,4 +1,4 @@
-﻿@inject QueryBaseService<ReportModel> queryService
+﻿@inject APIService<ReportModel> apiService
 
 <DetailTemplate Name="Report details" DetailTemplateAction="ShowInfo">
     <ChildContent>
@@ -25,7 +25,7 @@
     {
         if (isDetails == true)
         {
-            string CustomUriBuilder() => new UrlBuilder(UrlController.Reports, UrlPath.ByCompanyId, CompanyId).Result;
+            string CustomUriBuilder() => ReportAPI.GetUriByCompanyId(CompanyId);
             ColumnConfig[] CustomColumnBuilder() => new ColumnConfig[]
                 {
                     new ColumnConfig{DataField = nameof(ReportModel.DateReport), Caption = "Date Report", DataType = HtmlDataType.Date, Format = "d" },
@@ -41,7 +41,7 @@
                     new ColumnConfig{DataField = nameof(ReportModel.Obligation), Caption = "Obligation", DataType = HtmlDataType.Number, Format = "f0" },
                     new ColumnConfig{DataField = nameof(ReportModel.LongTermDebt), Caption = "Long Term Debt", DataType = HtmlDataType.Number, Format = "f0" },
                 };
-            var queryResult = await queryService.GetResultsAsync(CustomUriBuilder, CustomColumnBuilder);
+            var queryResult = await apiService.GetResultsAsync(CustomUriBuilder, CustomColumnBuilder);
 
             columns = queryResult.Columns;
             items = queryResult.ViewResult.ResultContents;

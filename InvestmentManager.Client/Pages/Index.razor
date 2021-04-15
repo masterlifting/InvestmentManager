@@ -1,5 +1,5 @@
 @page "/"
-@inject CustomHttpClient http
+@inject API api
 @inject CustomNotification notice
 @inject IJSRuntime jsRuntime
 
@@ -9,14 +9,14 @@
     </div>
     <div class="col-6 pr-0 pl-1">
         <select @onchange="GetOrderBy" id="filterIndex">
-            <option selected value="@(UrlController.Companies)">sort by (name)</option>
-            <option value="@(UrlController.Ratings)">rating place</option>
-            <option value="@(UrlController.Sectors)">sector name</option>
-            <option value="@(UrlController.Industries)">industry name</option>
-            <option value="@(UrlController.StockTransactions)">stock transaction (desc)</option>
-            <option value="@(UrlController.Dividends)">dividend pay (desc) </option>
-            <option value="@(UrlController.BuyRecommendations)">recommendations for buy</option>
-            <option value="@(UrlController.SellRecommendations)">recommendations for sale</option>
+            <option selected value="@CompanyAPI.controller">sort by (name)</option>
+            <option value="@RatingAPI.controller">rating place</option>
+            <option value="@SectorAPI.controller">sector name</option>
+            <option value="@IndustryAPI.controller">industry name</option>
+            <option value="@StockTransactionAPI.controller">stock transaction (desc)</option>
+            <option value="@DividendAPI.controller">dividend pay (desc) </option>
+            <option value="@BuyRecommendationAPI.controller">recommendations for buy</option>
+            <option value="@SellRecommendationAPI.controller">recommendations for sale</option>
         </select>
     </div>
 </div>
@@ -25,7 +25,7 @@
     <div class="col-8"><span class="oi oi-dollar text-dark" aria-hidden="true"></span> today:</div>
     @if (cbrf != null)
     {
-        <div class="col-4 text-right font-weight-bold text-dark">@cbrf.Valute.USD.Value.ToString("C", new CultureInfo("ru-RU"))</div>
+        <div class="col-4 text-right font-weight-bold text-dark">@cbrf.Valute.USD.Value.ToString("#.##")</div>
     }
     else
     {
@@ -66,41 +66,39 @@
     PaginationViewModel<ShortView> companies;
     List<ShortView> allCompanies;
 
-    UrlController paginationController = UrlController.Companies;
+    string paginationController = CompanyAPI.controller;
 
     protected override async Task OnInitializedAsync()
     {
         user = (await AuthenticationState).User;
-        companies = await http.GetAsync<PaginationViewModel<ShortView>>(new UrlBuilder(paginationController, UrlPath.ByPagination, 1).Result);
-        cbrf = await http.GetAsync<CBRF>(new UrlBuilder(UrlService.Rate).Result);
+        companies = await api.GetByPaginationAsync(paginationController, 1);
+        cbrf = await api.Service.Value.GetRateAsync();
 
         _else = companies.Pagination.HasNextPage;
     }
     async Task GetAllCompanies()
     {
         await SetDefaultFilterAsync();
-        allCompanies = await http.GetAsync<List<ShortView>>(new UrlBuilder(UrlController.Companies).Result);
+        allCompanies = await api.Company.Value.GetShortCompaniesAsync();
     }
     async Task GetOrderBy(ChangeEventArgs e)
     {
-        paginationController = Enum.Parse<UrlController>(e.Value.ToString());
+        paginationController = e.Value.ToString();
 
-        if (!user.Identity.IsAuthenticated
-            && (paginationController == UrlController.SellRecommendations
-            || paginationController == UrlController.StockTransactions
-            || paginationController == UrlController.Dividends))
+        if (!user.Identity.IsAuthenticated 
+            && (paginationController == SellRecommendationAPI.controller || paginationController == StockTransactionAPI.controller || paginationController == DividendAPI.controller))
         {
             await SetDefaultFilterAsync();
             await notice.AlertAccessAsync();
         }
 
-        companies = await http.GetAsync<PaginationViewModel<ShortView>>(new UrlBuilder(paginationController, UrlPath.ByPagination, 1).Result);
+        companies = await api.GetByPaginationAsync(paginationController, 1);
         _else = companies.Pagination.HasNextPage;
     }
     async Task GetElse()
     {
         int paginationValue = companies.Pagination.PageNumber + 1;
-        var next = await http.GetAsync<PaginationViewModel<ShortView>>(new UrlBuilder(paginationController, UrlPath.ByPagination, paginationValue).Result);
+        var next = await api.GetByPaginationAsync(paginationController, paginationValue);
 
         companies.Pagination = next.Pagination;
         _else = next.Pagination.HasNextPage;
@@ -115,8 +113,8 @@
     async Task SetDefaultFilterAsync()
     {
         await jsRuntime.InvokeVoidAsync("setDefaultFilter", "filterIndex");
-        paginationController = UrlController.Companies;
-        companies = await http.GetAsync<PaginationViewModel<ShortView>>(new UrlBuilder(paginationController, UrlPath.ByPagination, 1).Result);
+        paginationController = CompanyAPI.controller;
+        companies = await api.GetByPaginationAsync(paginationController, 1);
         _else = companies.Pagination.HasNextPage;
     }
 }

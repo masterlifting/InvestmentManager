@@ -1,5 +1,4 @@
-﻿using InvestmentManager.Client.Configurations;
-using InvestmentManager.Client.Services.AuthenticationConfiguration;
+﻿using InvestmentManager.Client.Services.AuthenticationConfiguration;
 using InvestmentManager.Client.Services.NotificationService;
 using System;
 using System.Net.Http;

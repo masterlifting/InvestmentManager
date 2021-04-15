@@ -1,4 +1,4 @@
-﻿@inject CustomHttpClient http
+﻿@inject API api
 @inject CustomNotification notice
 
 <BaseError Title="@Title" IsDone="isDone" ErrorValue="@ErrorValue">
@@ -24,7 +24,7 @@
     protected override void OnParametersSet() => model.Name = ErrorValue.Split('\'')[1];
     async Task SendData()
     {
-        var result = await http.PostAsync<BaseActionResult, AccountModel>(new UrlBuilder(UrlController.Accounts).Result, model);
+        var result = await api.Account.Value.AddNewAsync(model);
         if (result.IsSuccess)
         {
             isDone = true;

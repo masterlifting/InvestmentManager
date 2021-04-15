@@ -1,4 +1,4 @@
-﻿@inject QueryBaseService<AccountTransactionModel> queryService
+﻿@inject APIService<AccountTransactionModel> apiService
 
 <DetailTemplate Name="Transaction list" DetailTemplateAction="ShowInfo">
     <ChildContent>
@@ -26,17 +26,17 @@
         {
             var user = (await AuthenticationState).User;
 
-            string CustomUriBuilder(long accountId) => new UrlBuilder(UrlController.AccountTransactions, UrlPath.ByAccountId, accountId).Result;
+            string CustomUriBuilder(long accountId) => AccountTransactionAPI.GetUriByAccountId(accountId);
             ColumnConfig[] CustomColumnBuilder() => new ColumnConfig[]
-                {
+            {
                     new ColumnConfig{DataField = nameof(AccountTransactionModel.AccountName), Caption = "Account", DataType = HtmlDataType.String},
                     new ColumnConfig{DataField = nameof(AccountTransactionModel.DateOperation), Caption = "Date", DataType = HtmlDataType.Date, Format = "d"},
                     new ColumnConfig{DataField = nameof(AccountTransactionModel.StatusName), Caption = "Status", DataType = HtmlDataType.String},
                     new ColumnConfig{DataField = nameof(AccountTransactionModel.Amount), Caption = "Amount", DataType = HtmlDataType.Number, Format = "#,#0.##"},
-                    new ColumnConfig{DataField = nameof(AccountTransactionModel.CurrencyName), Caption = "Currency", DataType = HtmlDataType.String}                
-                };
+                    new ColumnConfig{DataField = nameof(AccountTransactionModel.CurrencyName), Caption = "Currency", DataType = HtmlDataType.String}
+            };
 
-            var queryResult = await queryService.GetResultsAsync(user, CustomUriBuilder, CustomColumnBuilder);
+            var queryResult = await apiService.GetResultsAsync(user, CustomUriBuilder, CustomColumnBuilder);
 
             columns = queryResult.Columns;
             items = queryResult.ViewResult.ResultContents;

@@ -1,5 +1,5 @@
-﻿@inject CustomHttpClient http
-@inject QueryBaseService<DividendModel> queryServise
+﻿@inject API api
+@inject APIService<DividendModel> apiService
 
 <div class="row">
     <div class="col-6">
@@ -58,8 +58,8 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        isins = await http.GetAsync<List<IsinModel>>(new UrlBuilder(UrlController.Isins).Result);
-        companies = await http.GetAsync<List<ShortView>>(new UrlBuilder(UrlController.Companies).Result);
+        isins = await api.Isin.Value.GetIsinsAsync();
+        companies = await api.Company.Value.GetShortCompaniesAsync();
 
         if (isins != default && companies != default)
             dividends = Dividends;
@@ -67,10 +67,10 @@
         await base.OnParametersSetAsync();
     }
     async Task SaveData(DividendModel dividend) =>
-        await queryServise.PostDataAsync(dividend, dividends, UrlController.Dividends, "Divivend");
+        await apiService.PostDataAsync(dividend, dividends, "dividends", "Divivend");
     async Task SaveDataCollection()
     {
         dividends = dividends.OrderBy(x => x.DateOperation).ToList();
-        await queryServise.PostDataCollectionAsync(dividends, UrlController.Dividends, "Dividends");
+        await apiService.PostDataCollectionAsync(dividends, "dividends", "Dividends");
     }
 }

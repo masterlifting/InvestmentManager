@@ -1,4 +1,4 @@
-﻿@inject CustomHttpClient http
+﻿@inject API api
 @inject CustomNotification notice
 
 <RowTitleSub Text="Tickers" />
@@ -83,10 +83,10 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        exchanges = await http.GetAsync<List<ShortView>>(new UrlBuilder(UrlCatalog.ExchangeTypes).Result);
-        lots = await http.GetAsync<List<ShortView>>(new UrlBuilder(UrlCatalog.LotTypes).Result);
+        lots = await api.Catalog.Value.GetLotTypesAsync();
+        exchanges = await api.Catalog.Value.GetExchangeTypesAsync();
 
-        List<TickerModel> tickers = await http.GetAsync<List<TickerModel>>(new UrlBuilder(UrlController.Tickers, UrlPath.ByCompanyId, CompanyId).Result);
+        var tickers = await api.Ticker.Value.GetTickersByCompanyIdAsync(CompanyId);
 
         if (tickers == default || !tickers.Any())
         {
@@ -135,8 +135,8 @@ else
         }
 
         var result = isEditeble
-            ? await http.PutAsync<BaseActionResult, TickerModel>(new UrlBuilder(UrlController.Tickers, model.Id).Result, model)
-            : await http.PostAsync<BaseActionResult, TickerModel>(new UrlBuilder(UrlController.Tickers).Result, model);
+            ? await api.Ticker.Value.EditAsync(model.Id, model)
+            : await api.Ticker.Value.AddNewAsync(model);
 
         if (result.IsSuccess)
         {
@@ -165,7 +165,7 @@ else
         async Task RemoveFromDbAsync()
         {
             var model = editContext.Model as TickerModel;
-            var result = await http.DeleteAsync<BaseActionResult>(new UrlBuilder(UrlController.Tickers, model.Id).Result);
+            var result = await api.Ticker.Value.DeleteAsync(model.Id);
 
             if (result.IsSuccess)
             {

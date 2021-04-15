@@ -1,4 +1,4 @@
-﻿@inject QueryBaseService<SummaryDividend> queryService
+﻿@inject APIService<SummaryDividend> apiService
 
 <InfoTemplate InfoName="@InfoName" VisibleAction="((bool isVisible) => UpdateVisible.InvokeAsync(isVisible))">
     <ChildContent>
@@ -34,7 +34,7 @@
     {
         var user = (await AuthenticationStateTask).User;
 
-        string CustomUrlBuilder(long accountId) => new UrlBuilder(UrlController.Dividends, UrlPath.ByAccountId, accountId, UrlPath.ByCompanyId, CompanyId, UrlOption.Summary).Result;
+        string CustomUrlBuilder(long accountId) => DividendAPI.GetUriSummaryByAccountIdByCompanyId(accountId, CompanyId);
         SummaryDividend CustomResultBuilder(List<SummaryDividend> models)
         {
             var targetData = models.OrderBy(x => x.DateLastDividend).Last();
@@ -46,7 +46,7 @@
             };
         }
 
-        var queryResult = await queryService.GetResultAsync(user, CustomUrlBuilder, CustomResultBuilder);
+        var queryResult = await apiService.GetResultAsync(user, CustomUrlBuilder, CustomResultBuilder);
 
         model = queryResult.ResultContent;
         info = queryResult.ResultInfo;

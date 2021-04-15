@@ -1,4 +1,4 @@
-﻿@inject QueryBaseService<RatingModel> queryService
+﻿@inject APIService<RatingModel> apiService
 <DetailTemplate Name="Rating detail" DetailTemplateAction="ShowInfo">
     <ChildContent>
         @if (model is not null)
@@ -28,8 +28,8 @@
     {
         if (isDetails == true)
         {
-            string CustomUriBuilder() => new UrlBuilder(UrlController.Ratings, UrlPath.ByCompanyId, CompanyId).Result;
-            var queryResult = await queryService.GetResultAsync(CustomUriBuilder);
+            string CustomUriBuilder() => RatingAPI.GetUriByCompanyId(CompanyId);
+            var queryResult = await apiService.GetResultAsync(CustomUriBuilder);
 
             model = queryResult.ResultContent;
             info = queryResult.ResultInfo;

@@ -1,4 +1,4 @@
-﻿@inject CustomHttpClient http
+﻿@inject API api
 @inject CustomNotification notice
 
 <RowTitleSub Text="Isins" />
@@ -54,7 +54,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        List<IsinModel> isins = await http.GetAsync<List<IsinModel>>(new UrlBuilder(UrlController.Isins, UrlPath.ByCompanyId, CompanyId).Result);
+        List<IsinModel> isins = await api.Isin.Value.GetIsinsByCompanyIdAsync(CompanyId);
 
         if (isins == default || !isins.Any())
         {
@@ -104,8 +104,8 @@ else
         }
 
         var result = isEditeble
-            ? await http.PutAsync<BaseActionResult, IsinModel>(new UrlBuilder(UrlController.Isins, model.Id).Result, model)
-            : await http.PostAsync<BaseActionResult, IsinModel>(new UrlBuilder(UrlController.Isins).Result, model);
+            ? await api.Isin.Value.EditAsync(model.Id, model)
+            : await api.Isin.Value.AddNewAsync(model);
 
         if (result.IsSuccess)
         {
@@ -130,7 +130,7 @@ else
         async Task RemoveFromDbAsync()
         {
             var model = editContext.Model as IsinModel;
-            var result = await http.DeleteAsync<BaseActionResult>(new UrlBuilder(UrlController.Isins, model.Id).Result);
+            var result = await api.Isin.Value.DeleteAsync(model.Id);
 
             if (result.IsSuccess)
             {
