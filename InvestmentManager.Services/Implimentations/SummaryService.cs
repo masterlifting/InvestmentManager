@@ -1,11 +1,13 @@
 ﻿using InvestmentManager.Entities.Broker;
 using InvestmentManager.Entities.Calculate;
+using InvestmentManager.Models.Additional;
 using InvestmentManager.Repository;
 using InvestmentManager.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
 using static InvestmentManager.Models.Enums;
 
@@ -14,9 +16,52 @@ namespace InvestmentManager.Services.Implimentations
     public class SummaryService : ISummaryService
     {
         private readonly IUnitOfWorkFactory unitOfWork;
-        public SummaryService(IUnitOfWorkFactory unitOfWork) => this.unitOfWork = unitOfWork;
+        private readonly IWebService webService;
 
-        public async Task<decimal> GetAccountTotalSumAsync(long accountId, long currencyId)
+        public SummaryService(IUnitOfWorkFactory unitOfWork, IWebService webService)
+        {
+            this.unitOfWork = unitOfWork;
+            this.webService = webService;
+        }
+
+        public async Task<decimal> GetAccountSumAsync(long accountId)
+        {
+            decimal result = 0;
+
+            long[] currencyIds = await unitOfWork.Currency.GetAll().Select(x => x.Id).ToArrayAsync();
+
+            try
+            {
+                foreach (var currencyId in currencyIds)
+                {
+                    decimal intermediateResult = await GetAccountSumAsync(accountId, currencyId);
+                    decimal rateValue = 1;
+
+                    if (currencyId != (long)CurrencyTypes.rub)
+                    {
+                        var response = await webService.GetCBRateAsync();
+                        var rate = response.IsSuccessStatusCode ? await response.Content.ReadFromJsonAsync<CBRF>() : null;
+
+                        rateValue = rate is not null
+                            ? currencyId switch
+                            {
+                                (long)CurrencyTypes.usd => rate.Valute.USD.Value,
+                                //(long)CurrencyTypes.RUB => rate.Valute.EUR.Value,
+                                _ => 0
+                            }
+                            : 0;
+                    }
+
+                    result += intermediateResult * rateValue;
+                }
+                return result;
+            }
+            catch (Exception)
+            {
+                return result;
+            }
+        }
+        public async Task<decimal> GetAccountSumAsync(long accountId, long currencyId)
         {
             var accountSummary = await unitOfWork.AccountSummary.GetAll().FirstOrDefaultAsync(x => x.AccountId == accountId && x.CurrencyId == currencyId);
             if (accountSummary is null)

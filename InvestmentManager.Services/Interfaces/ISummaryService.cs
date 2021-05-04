@@ -8,7 +8,8 @@ namespace InvestmentManager.Services.Interfaces
     public interface ISummaryService
     {
         Task<decimal> GetAccountInvestedSumAsync(long accountId, long currencyId);
-        Task<decimal> GetAccountTotalSumAsync(long accountId, long currencyId);
+        Task<decimal> GetAccountSumAsync(long accountId);
+        Task<decimal> GetAccountSumAsync(long accountId, long currencyId);
         Task<decimal> GetCompaniesActualInvestedSumAsync(long accountId, long currencyId);
         Task<decimal> GetCompaniesFixedProfitSumAsync(long accountId, long currencyId);
         Task<decimal> GetCompaniesOriginalInvestedSumAsync(long accountId, long currencyId);
@@ -24,7 +25,7 @@ namespace InvestmentManager.Services.Interfaces
         Task<bool> SetComissionSummaryAsync(Comission comission);
         Task<bool> SetComissionSummaryAsync(IEnumerable<Comission> comissions);
         Task<bool> SetAccountSummaryAsync(ExchangeRate exchangeRate);
-        Task<bool> SetAccountSummaryAsync(IEnumerable<ExchangeRate>exchangeRates);
+        Task<bool> SetAccountSummaryAsync(IEnumerable<ExchangeRate> exchangeRates);
         Task<bool> SetExchangeRateSummaryAsync(ExchangeRate exchangeRate);
         Task<bool> SetExchangeRateSummaryAsync(IEnumerable<ExchangeRate> exchangeRates);
 

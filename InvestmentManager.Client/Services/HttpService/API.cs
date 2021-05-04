@@ -344,8 +344,8 @@ namespace InvestmentManager.Client.Services.HttpService
 
         private readonly CustomHttpClient http;
         public SecurityAPI(CustomHttpClient http) => this.http = http;
-        public async Task<LoginResult> LoginAsync(LoginModel model) => await http.PostAsync<LoginResult, LoginModel>($"{_controller}/login/", model);
-        public async Task<BaseActionResult> RegisterAsync(RegisterModel model) => await http.PostAsync<BaseActionResult, RegisterModel>($"{_controller}/register/", model);
+        public async Task<AuthResult> LoginAsync(LoginModel model) => await http.PostAsync<AuthResult, LoginModel>($"{_controller}/login/", model);
+        public async Task<AuthResult> RegisterAsync(RegisterModel model) => await http.PostAsync<AuthResult, RegisterModel>($"{_controller}/register/", model);
     }
     public class SellRecommendationAPI
     {

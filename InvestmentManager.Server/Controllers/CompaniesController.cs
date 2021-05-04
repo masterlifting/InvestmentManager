@@ -36,7 +36,7 @@ namespace InvestmentManager.Server.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get() => 
+        public async Task<IActionResult> Get() =>
             Ok(await unitOfWork.Company.GetAll().OrderBy(x => x.Name).Select(x => new ShortView { Id = x.Id, Name = x.Name }).ToListAsync());
 
         [HttpGet("{id}")]
@@ -119,5 +119,26 @@ namespace InvestmentManager.Server.Controllers
             var result = await restMethod.BasePutAsync<Company>(ModelState, id, UpdateCompany);
             return result.IsSuccess ? Ok(result) : BadRequest(result);
         }
+
+        #region for react
+        [HttpGet("react/")]
+        public async Task<IActionResult> Get(int page = 1, int limit = 10, string phrase = null)
+        {
+            var query = unitOfWork.Company.GetAll();
+
+            if (!string.IsNullOrWhiteSpace(phrase))
+                query = query.Where(x => x.Name.ToLower().Contains(phrase.ToLower()));
+
+            int totalCount = page == 1 ? await query.CountAsync() : default;
+
+            var items = await query
+                .OrderBy(x => x.Name)
+                .Skip((page - 1) * limit)
+                .Take(limit)
+                .Select(x => new ShortView { Id = x.Id, Name = x.Name, Description = x.Tickers.FirstOrDefault().Name })
+                .ToArrayAsync();
+            return Ok(new PaginationModel<ShortView> { Items = items, TotalCount = totalCount });
+        }
+        #endregion
     }
 }

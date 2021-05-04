@@ -56,44 +56,7 @@ namespace InvestmentManager.Server.Controllers
                 : Ok(new AccountModel { Id = account.Id, Name = account.Name });
         }
         [HttpGet("{id}/summary/")]
-        public async Task<IActionResult> GetSum(long id)
-        {
-            decimal result = 0;
-
-            try
-            {
-                long[] currencyIds = await unitOfWork.Currency.GetAll().Select(x => x.Id).ToArrayAsync();
-
-                foreach (var currencyId in currencyIds)
-                {
-                    decimal intermediateResult = await summaryService.GetAccountTotalSumAsync(id, currencyId);
-                    decimal rateValue = 1;
-
-                    if (currencyId != (long)CurrencyTypes.rub)
-                    {
-                        var response = await webService.GetCBRateAsync();
-                        var rate = response.IsSuccessStatusCode ? await response.Content.ReadFromJsonAsync<CBRF>() : null;
-
-                        rateValue = rate is not null
-                            ? currencyId switch
-                            {
-                                (long)CurrencyTypes.usd => rate.Valute.USD.Value,
-                                //(long)CurrencyTypes.RUB => rate.Valute.EUR.Value,
-                                _ => 0
-                            }
-                            : 0;
-                    }
-
-                    result += intermediateResult * rateValue;
-                }
-
-                return Ok(result);
-            }
-            catch
-            {
-                return BadRequest(result);
-            }
-        }
+        public async Task<IActionResult> GetSum(long id) => Ok(await summaryService.GetAccountSumAsync(id));
         [HttpGet("{id}/additional/")]
         public async Task<IActionResult> GetAdditional(long id)
         {
@@ -127,5 +90,9 @@ namespace InvestmentManager.Server.Controllers
             var result = await restMethod.BasePostAsync(ModelState, entity, model, AccountValidatorAsync);
             return result.IsSuccess ? Ok(result) : BadRequest(result);
         }
+
+        #region React
+
+        #endregion
     }
 }

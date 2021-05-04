@@ -1,5 +1,4 @@
 ﻿using InvestmentManager.Client.Services.HttpService;
-using InvestmentManager.Models;
 using InvestmentManager.Models.Security;
 using System.Threading.Tasks;
 
@@ -16,7 +15,7 @@ namespace InvestmentManager.Client.Services.AuthenticationConfiguration
             this.customAuthenticationState = customAuthenticationState;
         }
 
-        public async Task<LoginResult> LoginAsync(LoginModel model)
+        public async Task<AuthResult> LoginAsync(LoginModel model)
         {
             var result = await api.Security.Value.LoginAsync(model);
             
@@ -25,7 +24,16 @@ namespace InvestmentManager.Client.Services.AuthenticationConfiguration
 
             return result;
         }
-        public async Task<BaseActionResult> RegisterAsync(RegisterModel model) => await api.Security.Value.RegisterAsync(model);
+        public async Task<AuthResult> RegisterAsync(RegisterModel model)
+        {
+            var result = await api.Security.Value.RegisterAsync(model);
+
+            if (result.IsSuccess)
+                await customAuthenticationState.SetTokenAsync(result.Token, result.Expiry);
+
+            return result;
+        }
+
         public async Task LogoutAsync() => await customAuthenticationState.SetTokenAsync(null);
     }
 }

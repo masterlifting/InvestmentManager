@@ -48,7 +48,7 @@
         var result = await authenticationService.RegisterAsync(registerModel);
 
         if (result.IsSuccess)
-            navigation.NavigateTo("/login");
+            navigation.NavigateTo("/");
         else
         {
             errors = result.Info.Split(';');

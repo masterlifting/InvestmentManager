@@ -56,9 +56,18 @@ namespace InvestmentManager.Server
                 options.User.RequireUniqueEmail = true;
 
             }).AddEntityFrameworkStores<InvestmentContext>();
-            
-            services.AddCors(x => { x.AddPolicy(name: ReactOrigins, policy => policy.WithOrigins("http://localhost:3000")); });
-           
+
+            services.AddCors(x =>
+            {
+                x.AddPolicy(name: ReactOrigins, policy =>
+                {
+                    policy.WithOrigins("http://localhost:3000");
+                    policy.AllowAnyHeader();
+                    policy.AllowAnyMethod();
+                    policy.AllowCredentials();
+                });
+            });
+
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {
                 options.TokenValidationParameters = new TokenValidationParameters

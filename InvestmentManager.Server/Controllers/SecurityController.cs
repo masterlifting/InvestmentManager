@@ -6,7 +6,6 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
-using InvestmentManager.Models;
 using InvestmentManager.Models.Security;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -32,18 +31,50 @@ namespace InvestmentManager.Server.Controllers
         }
 
         [HttpPost("login/")]
-        public async Task<IActionResult> Login(LoginModel model)
+        public async Task<AuthResult> Login(LoginModel model)
         {
+            if (!ModelState.IsValid)
+                return new() { IsSuccess = false, Info = string.Join(";", ModelState.Values.SelectMany(x => x.Errors)) };
+
             var result = await signInManager.PasswordSignInAsync(model.Email.Split('@')[0], model.Password, false, false);
+
             if (!result.Succeeded)
-                return BadRequest(new LoginResult { IsSuccess = false, Info = "Username or password are invalid." });
+                return new() { IsSuccess = false, Info = "email or password are invalid" };
 
             var currentUser = await userManager.FindByEmailAsync(model.Email);
             var roles = await userManager.GetRolesAsync(currentUser);
 
-            var claims = new List<Claim> { new Claim(ClaimTypes.Name, model.Email) };
-            foreach (var role in roles)
-                claims.Add(new Claim(ClaimTypes.Role, role));
+            var (token, expiry) = GetTokenData(currentUser.UserName, roles);
+
+            return new() { IsSuccess = true, Token = token, Expiry = expiry };
+        }
+        [HttpPost("register/")]
+        public async Task<AuthResult> Register(RegisterModel model)
+        {
+            if (!ModelState.IsValid)
+                return new() { IsSuccess = false, Info = string.Join(";", ModelState.Values.SelectMany(x => x.Errors)) };
+
+            var newUser = new IdentityUser { Email = model.Email, UserName = model.Email.Split('@')[0] };
+            var result = await userManager.CreateAsync(newUser, model.Password);
+
+            if (!result.Succeeded)
+            {
+                var errors = result.Errors.Select(x => x.Description);
+                return new() { IsSuccess = false, Info = string.Join(";", errors) };
+            }
+
+            var (token, expiry) = GetTokenData(newUser.UserName);
+
+            return new() { IsSuccess = true, Token = token, Expiry = expiry };
+        }
+
+        private (string token, DateTime expiry) GetTokenData(string userName, IList<string> roles = null)
+        {
+            var claims = new List<Claim> { new(ClaimTypes.Name, userName) };
+
+            if (roles is not null)
+                foreach (var role in roles)
+                    claims.Add(new Claim(ClaimTypes.Role, role));
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSecurityKey"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -51,20 +82,7 @@ namespace InvestmentManager.Server.Controllers
 
             var token = new JwtSecurityToken(configuration["JwtIssuer"], configuration["JwtAudience"], claims, expires: expiry, signingCredentials: creds);
 
-            return Ok(new LoginResult { IsSuccess = true, Token = new JwtSecurityTokenHandler().WriteToken(token), Expiry = expiry });
-        }
-        [HttpPost("register/")]
-        public async Task<IActionResult> Register(RegisterModel model)
-        {
-            var newUser = new IdentityUser { Email = model.Email, UserName = model.Email.Split('@')[0] };
-            var result = await userManager.CreateAsync(newUser, model.Password);
-
-            if (!result.Succeeded)
-            {
-                var errors = result.Errors.Select(x => x.Description);
-                return BadRequest(new BaseActionResult { IsSuccess = false, Info = string.Join(";", errors) });
-            }
-            return Ok(new BaseActionResult { IsSuccess = true });
+            return (new JwtSecurityTokenHandler().WriteToken(token), expiry);
         }
     }
 }
