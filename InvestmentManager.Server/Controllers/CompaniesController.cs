@@ -1,17 +1,17 @@
-﻿using InvestmentManager.Repository;
+﻿using InvestmentManager.Entities.Market;
 using InvestmentManager.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using InvestmentManager.Entities.Market;
-using System;
-using InvestmentManager.Server.RestServices;
 using InvestmentManager.Models.EntityModels;
 using InvestmentManager.Models.SummaryModels;
+using InvestmentManager.Repository;
+using InvestmentManager.Server.RestServices;
 using InvestmentManager.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace InvestmentManager.Server.Controllers
 {
@@ -119,26 +119,5 @@ namespace InvestmentManager.Server.Controllers
             var result = await restMethod.BasePutAsync<Company>(ModelState, id, UpdateCompany);
             return result.IsSuccess ? Ok(result) : BadRequest(result);
         }
-
-        #region for react
-        [HttpGet("react/")]
-        public async Task<IActionResult> Get(int page = 1, int limit = 10, string phrase = null)
-        {
-            var query = unitOfWork.Company.GetAll();
-
-            if (!string.IsNullOrWhiteSpace(phrase))
-                query = query.Where(x => x.Name.ToLower().Contains(phrase.ToLower()));
-
-            int totalCount = page == 1 ? await query.CountAsync() : default;
-
-            var items = await query
-                .OrderBy(x => x.Name)
-                .Skip((page - 1) * limit)
-                .Take(limit)
-                .Select(x => new ShortView { Id = x.Id, Name = x.Name, Description = x.Tickers.FirstOrDefault().Name })
-                .ToArrayAsync();
-            return Ok(new PaginationModel<ShortView> { Items = items, TotalCount = totalCount });
-        }
-        #endregion
     }
 }

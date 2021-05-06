@@ -4,16 +4,14 @@ namespace InvestmentManager.Models.Additional
 {
     public class CBRF
     {
-        public CBRF() => Valute = new Valute();
         public DateTime Date { get; set; }
-        public Valute Valute { get; set; }
+        public Valute Valute { get; set; } = new();
     }
 
     public class Valute
     {
-        public Valute() => USD = new USD();
-        public USD USD { get; set; }
-        public EUR EUR { get; set; }
+        public USD USD { get; set; } = new();
+        public EUR EUR { get; set; } = new();
 
     }
 

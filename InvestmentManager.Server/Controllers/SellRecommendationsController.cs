@@ -126,5 +126,25 @@ namespace InvestmentManager.Server.Controllers
                 PriceMax = recommentation.PriceMax
             });
         }
+
+        #region React
+        [HttpGet("react/")]
+        public async Task<SellRecommendationModel> Get(long companyId)
+        {
+            string userId = userManager.GetUserId(User);
+            var recommentation = await unitOfWork.SellRecommendation.GetAll().FirstOrDefaultAsync(x => x.UserId.Equals(userId) && x.CompanyId == companyId);
+
+            return recommentation is null ? null : new()
+            {
+                DateUpdate = recommentation.DateUpdate,
+                LotMin = recommentation.LotMin,
+                LotMid = recommentation.LotMid,
+                LotMax = recommentation.LotMax,
+                PriceMin = recommentation.PriceMin,
+                PriceMid = recommentation.PriceMid,
+                PriceMax = recommentation.PriceMax
+            };
+        }
+        #endregion
     }
 }

@@ -23,6 +23,7 @@
   <ItemGroup>
     <ProjectReference Include="..\InvestmentManager.BrokerService\InvestmentManager.BrokerService.csproj" />
     <ProjectReference Include="..\InvestmentManager.Calculator\InvestmentManager.Calculator.csproj" />
+    <ProjectReference Include="..\InvestmentManager.ClientModels\InvestmentManager.ClientModels.csproj" />
     <ProjectReference Include="..\InvestmentManager.Client\InvestmentManager.Client.csproj" />
     <ProjectReference Include="..\InvestmentManager.Mapper\InvestmentManager.Mapper.csproj" />
     <ProjectReference Include="..\InvestmentManager.Models\InvestmentManager.Models.csproj" />

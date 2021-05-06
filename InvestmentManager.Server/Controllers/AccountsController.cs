@@ -1,18 +1,15 @@
 ﻿using InvestmentManager.Entities.Broker;
+using InvestmentManager.Models.EntityModels;
+using InvestmentManager.Models.SummaryModels;
+using InvestmentManager.Repository;
+using InvestmentManager.Server.RestServices;
+using InvestmentManager.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
-using InvestmentManager.Server.RestServices;
-using InvestmentManager.Repository;
-using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using InvestmentManager.Services.Interfaces;
-using InvestmentManager.Models.Additional;
-using System.Net.Http.Json;
-using InvestmentManager.Models.EntityModels;
-using static InvestmentManager.Models.Enums;
-using InvestmentManager.Models.SummaryModels;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace InvestmentManager.Server.Controllers
 {
@@ -23,20 +20,17 @@ namespace InvestmentManager.Server.Controllers
         private readonly IBaseRestMethod restMethod;
         private readonly IUnitOfWorkFactory unitOfWork;
         private readonly ISummaryService summaryService;
-        private readonly IWebService webService;
 
         public AccountsController(
             UserManager<IdentityUser> userManager
             , IBaseRestMethod restMethod
             , IUnitOfWorkFactory unitOfWork
-            , ISummaryService summaryService
-            , IWebService webService)
+            , ISummaryService summaryService)
         {
             this.userManager = userManager;
             this.restMethod = restMethod;
             this.unitOfWork = unitOfWork;
             this.summaryService = summaryService;
-            this.webService = webService;
         }
         [HttpGet]
         public async Task<IActionResult> Get()
@@ -90,9 +84,5 @@ namespace InvestmentManager.Server.Controllers
             var result = await restMethod.BasePostAsync(ModelState, entity, model, AccountValidatorAsync);
             return result.IsSuccess ? Ok(result) : BadRequest(result);
         }
-
-        #region React
-
-        #endregion
     }
 }

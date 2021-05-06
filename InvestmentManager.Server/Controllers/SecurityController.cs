@@ -39,7 +39,7 @@ namespace InvestmentManager.Server.Controllers
             var result = await signInManager.PasswordSignInAsync(model.Email.Split('@')[0], model.Password, false, false);
 
             if (!result.Succeeded)
-                return new() { IsSuccess = false, Info = "email or password are invalid" };
+                return new() { IsSuccess = false, Info = "email or password are invalid;" };
 
             var currentUser = await userManager.FindByEmailAsync(model.Email);
             var roles = await userManager.GetRolesAsync(currentUser);

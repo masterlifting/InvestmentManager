@@ -59,10 +59,16 @@ namespace InvestmentManager.Server.Controllers
         }
 
         [HttpGet("rate/")]
-        public async Task<IActionResult> GetRate()
+        public async Task<CBRF> GetRate()
         {
+            CBRF result = new();
+
             var response = await webService.GetCBRateAsync();
-            return response.IsSuccessStatusCode ? Ok(await response.Content.ReadFromJsonAsync<CBRF>()) : NoContent();
+
+            if (response.IsSuccessStatusCode)
+                result = await response.Content.ReadFromJsonAsync<CBRF>();
+
+            return result;
         }
 
         [HttpPost("parsebrokerreports/"), Authorize]

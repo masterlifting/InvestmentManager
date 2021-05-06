@@ -23,6 +23,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InvestmentManager.Services"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InvestmentManager.ReportFinder", "InvestmentManager.ReportFinder\InvestmentManager.ReportFinder.csproj", "{0D05989C-0417-4218-B3B1-1C18EC3463F7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InvestmentManager.ClientModels", "InvestmentManager.ClientModels\InvestmentManager.ClientModels.csproj", "{C590948C-0241-4248-A68B-573365098327}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,10 @@ Global
 		{0D05989C-0417-4218-B3B1-1C18EC3463F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0D05989C-0417-4218-B3B1-1C18EC3463F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0D05989C-0417-4218-B3B1-1C18EC3463F7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C590948C-0241-4248-A68B-573365098327}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C590948C-0241-4248-A68B-573365098327}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C590948C-0241-4248-A68B-573365098327}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C590948C-0241-4248-A68B-573365098327}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

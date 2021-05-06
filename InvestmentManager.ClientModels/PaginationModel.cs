@@ -1,4 +1,4 @@
-﻿namespace InvestmentManager.Models
+﻿namespace InvestmentManager.ClientModels
 {
     public class PaginationModel<T> where T : class
     {
