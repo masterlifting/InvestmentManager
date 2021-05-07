@@ -1,6 +1,6 @@
 ﻿namespace InvestmentManager.ClientModels.CompanyModels
 {
-    public class ClientCompanyTransaction
+    public class ClientCompanyTransaction : BrokerReportBase
     {
         public long Identifier { get; set; }
         public decimal Cost { get; set; }
