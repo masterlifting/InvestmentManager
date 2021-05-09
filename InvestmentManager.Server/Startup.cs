@@ -58,16 +58,7 @@ namespace InvestmentManager.Server
 
             }).AddEntityFrameworkStores<InvestmentContext>();
 
-            services.AddCors(x =>
-            {
-                x.AddPolicy(name: ReactOrigins, policy =>
-                {
-                    policy.WithOrigins("http://localhost:3000");
-                    policy.AllowAnyHeader();
-                    policy.AllowAnyMethod();
-                    policy.AllowCredentials();
-                });
-            });
+            services.AddCors();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {
@@ -153,7 +144,13 @@ namespace InvestmentManager.Server
             app.UseStaticFiles();
 
             app.UseRouting();
-            app.UseCors(ReactOrigins);
+            app.UseCors(policy =>
+            {
+                policy.WithOrigins(Configuration["CorsOrigins"].Split(','));
+                policy.AllowAnyHeader();
+                policy.AllowAnyMethod();
+                policy.AllowCredentials();
+            });
 
             app.UseResponseCompression();
 
