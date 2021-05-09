@@ -1,8 +1,8 @@
 ﻿using InvestmentManager.ClientModels;
 using InvestmentManager.ClientModels.AccountModels;
 using InvestmentManager.Repository;
+using InvestmentManager.Server.JwtService;
 using InvestmentManager.Services.Interfaces;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace InvestmentManager.Server.Controllers
 {
-    [ApiController, Route("[controller]"), Authorize]
+    [ApiController, Route("[controller]"), JwtAuthorize]
     public class AccountController : ControllerBase
     {
         private readonly UserManager<IdentityUser> userManager;
@@ -24,14 +24,11 @@ namespace InvestmentManager.Server.Controllers
             this.unitOfWork = unitOfWork;
             this.summaryService = summaryService;
         }
-        public async Task<ClientBaseResponse<PaginationModel<ClientAccount>>> Get(int page = 1, int limit = 5, string phrase = null)
+        public async Task<ClientBaseResponse<PaginationModel<ClientAccount>>> Get(int page = 1, int limit = 5)
         {
             var userId = userManager.GetUserId(User);
 
             var query = unitOfWork.Account.GetAll().Where(x => x.UserId.Equals(userId));
-
-            if (!string.IsNullOrWhiteSpace(phrase))
-                query = query.Where(x => x.Name.ToLower().Contains(phrase.ToLower()));
 
             int totalCount = await query.CountAsync();
 

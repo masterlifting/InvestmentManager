@@ -6,6 +6,7 @@ using InvestmentManager.Mapper.Interfaces;
 using InvestmentManager.ReportFinder.Implimentations;
 using InvestmentManager.ReportFinder.Interfaces;
 using InvestmentManager.Repository;
+using InvestmentManager.Server.JwtService;
 using InvestmentManager.Server.RestServices;
 using InvestmentManager.Services.Implimentations;
 using InvestmentManager.Services.Interfaces;
@@ -155,6 +156,8 @@ namespace InvestmentManager.Server
             app.UseCors(ReactOrigins);
 
             app.UseResponseCompression();
+
+            app.UseMiddleware<JwtMiddleware>();
 
             app.UseAuthentication();
             app.UseAuthorization();

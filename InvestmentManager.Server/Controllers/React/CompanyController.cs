@@ -79,6 +79,15 @@ namespace InvestmentManager.Server.Controllers
             return new() { IsSuccess = true, Data = new() { Items = items, TotalCount = totalCount } };
         }
 
+
+        [HttpGet("{id}/buyrecommendation/")]
+        public async Task<ClientBaseResponse<ClientCompanyBuyRecommendation>> GetRecommendationForBuy(long id) => new();
+        [HttpGet("{id}/sellrecommendation/")]
+        public async Task<ClientBaseResponse<ClientCompanySellRecommendation>> GetRecommendationForSale(long id) => new();
+        [HttpGet("{id}/rating/")]
+        public async Task<ClientBaseResponse<ClientCompanyRating>> GetRating(long id) => new();
+
+
         [HttpGet("{id}/summary/{accountId}")]
         public async Task<ClientBaseResponse<ClientCompanySummary>> GetSummary(long id, long accountId)
         {
@@ -124,14 +133,9 @@ namespace InvestmentManager.Server.Controllers
             return result;
         }
 
-        [HttpGet("{id}/buyrecommendation/")]
-        public async Task<ClientBaseResponse<ClientCompanyBuyRecommendation>> GetRecommendationForBuy(long id) => new();
-        [HttpGet("{id}/sellrecommendation/")]
-        public async Task<ClientBaseResponse<ClientCompanySellRecommendation>> GetRecommendationForSale(long id) => new();
-        [HttpGet("{id}/rating/")]
-        public async Task<ClientBaseResponse<ClientCompanyRating>> GetRating(long id) => new();
+
         [HttpGet("{id}/transactions/{accountId}/")]
-        public async Task<ClientBaseResponse<PaginationModel<ClientCompanyTransaction>>> GetTransactions(long id, long accountId, int page = 1, int limit = 10)
+        public async Task<ClientBaseResponse<PaginationModel<ClientCompanyTransaction>>> GetTransactions(long id, long accountId, int page = 1, int limit = 5)
         {
             var result = new ClientBaseResponse<PaginationModel<ClientCompanyTransaction>>();
 
@@ -159,12 +163,12 @@ namespace InvestmentManager.Server.Controllers
             return new() { IsSuccess = true, Data = new() { Items = items, TotalCount = totalCount } };
         }
         [HttpGet("{id}/dividends/{accountId}")]
-        public async Task<ClientBaseResponse<ClientCompanyDividend[]>> GetDividends(long id, long accountId, int page = 1, int limit = 10) => new();
+        public async Task<ClientBaseResponse<PaginationModel<ClientCompanyDividend>>> GetDividends(long id, long accountId, int page = 1, int limit = 5) => new();
         [HttpGet("{id}/prices/{accountId}")]
-        public async Task<ClientBaseResponse<ClientCompanyPrice[]>> GetPrices(long id, long accountId, int page = 1, int limit = 10) => new();
+        public async Task<ClientBaseResponse<PaginationModel<ClientCompanyPrice>>> GetPrices(long id, long accountId, int page = 1, int limit = 5) => new();
         [HttpGet("{id}/indexes/{accountId}")]
-        public async Task<ClientBaseResponse<ClientCompanyIndex>> GetInexes(long id, long accountId, int page = 1, int limit = 10) => new();
+        public async Task<ClientBaseResponse<PaginationModel<ClientCompanyIndex>>> GetInexes(long id, long accountId, int page = 1, int limit = 5) => new();
         [HttpGet("{id}/reports/{accountId}")]
-        public async Task<ClientBaseResponse<ClientCompanyReport[]>> GetReports(long id, long accountId, int page = 1, int limit = 10) => new();
+        public async Task<ClientBaseResponse<PaginationModel<ClientCompanyReport>>> GetReports(long id, long accountId, int page = 1, int limit = 5) => new();
     }
 }
