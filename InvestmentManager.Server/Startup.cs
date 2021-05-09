@@ -58,7 +58,16 @@ namespace InvestmentManager.Server
 
             }).AddEntityFrameworkStores<InvestmentContext>();
 
-            services.AddCors();
+            services.AddCors(options =>
+            {
+                options.AddPolicy(ReactOrigins, policy =>
+                {
+                    policy.WithOrigins("https://paviams.com", "https://react.paviams.com");
+                    policy.AllowAnyHeader();
+                    policy.AllowAnyMethod();
+                    policy.AllowCredentials();
+                });
+            });
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {
@@ -144,13 +153,7 @@ namespace InvestmentManager.Server
             app.UseStaticFiles();
 
             app.UseRouting();
-            app.UseCors(policy =>
-            {
-                policy.WithOrigins(Configuration["CorsOrigins"].Split(','));
-                policy.AllowAnyHeader();
-                policy.AllowAnyMethod();
-                policy.AllowCredentials();
-            });
+            app.UseCors(ReactOrigins);
 
             app.UseResponseCompression();
 
